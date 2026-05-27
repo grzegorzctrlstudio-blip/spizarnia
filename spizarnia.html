@@ -400,12 +400,12 @@ async function renderLog(){
 // ── LOGIN ─────────────────────────────────────────────────────────────────────
 function doLogin(){
   const n=document.getElementById("name-inp").value.trim();
-  if(!n) return;
+  if(!n){ document.getElementById("name-inp").style.borderColor="#EF4444"; return; }
   userName=n;
   localStorage.setItem(LS_NAME,n);
   document.getElementById("login").style.display="none";
   document.getElementById("splash").style.display="flex";
-  document.getElementById("splash-lbl").textContent="Łączenie z spiżarnią...";
+  document.getElementById("splash-lbl").textContent="Łączenie z bazą danych...";
   document.getElementById("user-pill").textContent="👤 "+n;
   startApp();
 }
@@ -599,15 +599,13 @@ function render(){
 }
 
 // ── START ─────────────────────────────────────────────────────────────────────
+// Zawsze zaczynaj od ekranu logowania
 document.getElementById("splash").style.display="none";
+document.getElementById("login").style.display="flex";
 const savedName=localStorage.getItem(LS_NAME);
 if(savedName){
-  userName=savedName;
-  document.getElementById("user-pill").textContent="👤 "+savedName;
-  document.getElementById("splash").style.display="flex";
-  startApp();
-} else {
-  document.getElementById("login").style.display="flex";
+  // Prefill imię jeśli zapamiętane
+  document.getElementById("name-inp").value=savedName;
 }
 </script>
 </body>
