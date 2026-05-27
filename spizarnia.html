@@ -42,6 +42,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .hbtn{background:#334155;border:none;border-radius:20px;padding:7px 12px;font-size:11px;font-weight:700;cursor:pointer;color:#94A3B8}
 .hbtn.danger{color:#F87171}
 .hbtn.log-btn{color:#818CF8}
+.shop-bar{background:#0F172A;border:1.5px solid #334155;border-radius:12px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.shop-date{font-size:11px;color:#94A3B8;font-weight:600;line-height:1.5}
+.shop-date strong{color:#F1F5F9;font-size:12px;display:block}
+.shop-btn{background:linear-gradient(135deg,#16A34A,#059669);border:none;color:#fff;border-radius:10px;padding:9px 14px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.shop-btn:active{transform:scale(.95)}
+.fresh-ok{font-size:10px;color:#22C55E;font-weight:700;margin-top:3px}
+.fresh-warn{font-size:10px;color:#F59E0B;font-weight:700;margin-top:3px}
+.fresh-bad{font-size:10px;color:#EF4444;font-weight:800;margin-top:3px;animation:blink2 1s infinite}
+@keyframes blink2{0%,100%{opacity:1}50%{opacity:.5}}
 
 .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:10px}
 .stat{background:#0F172A;border-radius:11px;padding:9px 6px;text-align:center;border:1.5px solid #1E293B}
@@ -168,6 +177,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="stat grn"><div class="stat-n" id="n-grn">0</div><div class="stat-l">🟢 Jest</div></div>
       <div class="stat all"><div class="stat-n" id="n-all">0</div><div class="stat-l">Produktów</div></div>
     </div>
+    <div class="shop-bar">
+      <div class="shop-date">
+        <strong id="shop-date-lbl">Nie ustawiono daty zakupów</strong>
+        <span id="shop-days-lbl"></span>
+      </div>
+      <button class="shop-btn" onclick="markShopping()">🛍️ Byłem w sklepie!</button>
+    </div>
     <div class="search-row">
       <span class="sico">🔍</span>
       <input class="sinp" id="sinp" placeholder="Szukaj produktu..." oninput="onSearch(this.value)">
@@ -195,30 +211,31 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 <script>
 const FB   = "https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
+let lastShopTs = 0; // timestamp ostatnich zakupów
 const LS_NAME = "spiz_name";
 
 const CATS = [
   {id:"warzywa",label:"Warzywa i owoce",ic:"🥦",items:[
-    {n:"Papryka (czerwona/żółta)",target:2,unit:"szt."},
-    {n:"Pomidory",target:3,unit:"szt."},
-    {n:"Ogórek",target:3,unit:"szt."},
-    {n:"Cukinia",target:2,unit:"szt."},
-    {n:"Pieczarki",target:1,unit:"opak. 500g"},
-    {n:"Marchew",target:4,unit:"szt."},
-    {n:"Cebula biała (duża)",target:2,unit:"szt."},
-    {n:"Czosnek",target:1,unit:"główka"},
-    {n:"Sałata / rukola",target:1,unit:"opak."},
-    {n:"Rzodkiewka",target:1,unit:"pęczek"},
-    {n:"Koperek",target:1,unit:"pęczek"},
-    {n:"Jabłka",target:4,unit:"szt."},
-    {n:"Banany",target:4,unit:"szt."},
-    {n:"Truskawki / maliny",target:1,unit:"opak. 500g"},
-    {n:"Awokado",target:2,unit:"szt."},
-    {n:"Cytryna",target:1,unit:"szt."},
-    {n:"Bataty",target:4,unit:"szt."},
+    {n:"Papryka (czerwona/żółta)",target:2,unit:"szt.",days:7},
+    {n:"Pomidory",target:3,unit:"szt.",days:4},
+    {n:"Ogórek",target:3,unit:"szt.",days:4},
+    {n:"Cukinia",target:2,unit:"szt.",days:6},
+    {n:"Pieczarki",target:1,unit:"opak. 500g",days:4},
+    {n:"Marchew",target:4,unit:"szt.",days:10},
+    {n:"Cebula biała (duża)",target:2,unit:"szt.",days:14},
+    {n:"Czosnek",target:1,unit:"główka",days:21},
+    {n:"Sałata / rukola",target:1,unit:"opak.",days:4},
+    {n:"Rzodkiewka",target:1,unit:"pęczek",days:5},
+    {n:"Koperek",target:1,unit:"pęczek",days:4},
+    {n:"Jabłka",target:4,unit:"szt.",days:10},
+    {n:"Banany",target:4,unit:"szt.",days:4},
+    {n:"Truskawki / maliny",target:1,unit:"opak. 500g",days:3},
+    {n:"Awokado",target:2,unit:"szt.",days:4},
+    {n:"Cytryna",target:1,unit:"szt.",days:14},
+    {n:"Bataty",target:4,unit:"szt.",days:14},
   ]},
   {id:"piekarnia",label:"Piekarnia",ic:"🍞",items:[
-    {n:"Chleb pełnoziarnisty",target:2,unit:"bochenek"},
+    {n:"Chleb pełnoziarnisty",target:2,unit:"bochenek",days:5},
   ]},
   {id:"suche",label:"Płatki, kasze, ryże",ic:"🌾",items:[
     {n:"Płatki owsiane błyskawiczne",target:3,unit:"opak. 500g"},
@@ -244,17 +261,17 @@ const CATS = [
     {n:"Mąka jaglana",target:1,unit:"opak. 400g"},
   ]},
   {id:"mieso",label:"Mięso świeże",ic:"🥩",items:[
-    {n:"Pierś z kurczaka",target:3,unit:"szt."},
-    {n:"Wołowina mielona",target:1,unit:"opak. 150g"},
-    {n:"Filet z łososia (świeży)",target:1,unit:"szt."},
+    {n:"Pierś z kurczaka",target:3,unit:"szt.",days:3},
+    {n:"Wołowina mielona",target:1,unit:"opak. 150g",days:2},
+    {n:"Filet z łososia (świeży)",target:1,unit:"szt.",days:2},
   ]},
   {id:"nabial",label:"Nabiał",ic:"🥛",items:[
-    {n:"Skyr naturalny",target:4,unit:"opak. 350g"},
-    {n:"Ser twarogowy chudy",target:3,unit:"opak. 400g"},
-    {n:"Serek wiejski light (0% tłuszczu)",target:3,unit:"opak. 400g"},
-    {n:"Mozzarella light",target:2,unit:"opak."},
-    {n:"Jogurt naturalny 2%",target:1,unit:"opak. duży"},
-    {n:"Mleko 0,5%",target:4,unit:"litr"},
+    {n:"Skyr naturalny",target:4,unit:"opak. 350g",days:10},
+    {n:"Ser twarogowy chudy",target:3,unit:"opak. 400g",days:7},
+    {n:"Serek wiejski light (0% tłuszczu)",target:3,unit:"opak. 400g",days:7},
+    {n:"Mozzarella light",target:2,unit:"opak.",days:5},
+    {n:"Jogurt naturalny 2%",target:1,unit:"opak. duży",days:7},
+    {n:"Mleko 0,5%",target:4,unit:"litr",days:5},
   ]},
   {id:"jaja",label:"Jaja",ic:"🥚",items:[
     {n:"Jaja L",target:2,unit:"opak. 10 szt."},
@@ -387,7 +404,11 @@ async function startApp(){
   try{
     const remote=await fbGet(roomPath);
     state=mkState();
-    if(remote){ Object.keys(remote).forEach(k=>{ if(k in state) state[k]=remote[k]||0; }); }
+    if(remote){
+      Object.keys(remote).forEach(k=>{ if(k in state) state[k]=remote[k]||0; });
+      if(remote.__shopTs) { lastShopTs=remote.__shopTs; }
+    }
+    updateShopBar();
     else { await fbPatch(roomPath,state); }
     document.getElementById("splash").style.display="none";
     document.getElementById("app").style.display="block";
@@ -399,6 +420,7 @@ async function startApp(){
         const r=await fbGet(roomPath); if(!r) return;
         let ch=false;
         Object.keys(r).forEach(k=>{ if(k in state && r[k]!==state[k]){state[k]=r[k]||0;ch=true;} });
+        if(r.__shopTs && r.__shopTs!==lastShopTs){lastShopTs=r.__shopTs;updateShopBar();ch=true;}
         if(ch) render(); setSyncUI("ok");
       }catch(e){ setSyncUI("err"); }
     },3000);
@@ -459,6 +481,31 @@ function clearSearch(){ document.getElementById("sinp").value=""; onSearch(""); 
 
 function cls(cur,target){ return cur>=target?"grn":cur>0?"low":"red"; }
 
+function markShopping(){
+  if(!confirm("Zaznaczyć że dziś byłeś/aś w sklepie?")) return;
+  lastShopTs = Date.now();
+  fbPatch(roomPath, {__shopTs: lastShopTs});
+  updateShopBar();
+  render();
+}
+
+function updateShopBar(){
+  const lbl = document.getElementById("shop-date-lbl");
+  const sub = document.getElementById("shop-days-lbl");
+  if(!lastShopTs){ lbl.textContent="Nie ustawiono daty zakupów"; sub.textContent=""; return; }
+  const d = new Date(lastShopTs);
+  const days = Math.floor((Date.now()-lastShopTs)/(1000*60*60*24));
+  lbl.textContent = "Zakupy: "+d.toLocaleDateString("pl-PL",{weekday:"long",day:"numeric",month:"long"});
+  sub.textContent = days===0?"dziś 🛍️":days===1?"wczoraj":days+" dni temu";
+}
+
+function getFreshness(it){
+  if(!it.days || !lastShopTs) return null;
+  const daysPassed = (Date.now()-lastShopTs)/(1000*60*60*24);
+  const daysLeft = Math.round(it.days - daysPassed);
+  return daysLeft;
+}
+
 // ── RENDER ────────────────────────────────────────────────────────────────────
 function render(){
   const body=document.getElementById("body");
@@ -497,6 +544,15 @@ function render(){
         :c==="low"
           ?`<span style="color:#F59E0B">🟡 Mało — kup jeszcze ${brak} ${it.unit}</span>`
           :`<span style="color:#EF4444">🔴 Brak — kup ${brak} ${it.unit}</span>`;
+      // Freshness
+      const daysLeft = getFreshness(it);
+      let freshHtml = "";
+      if(daysLeft !== null){
+        if(daysLeft <= 0) freshHtml=`<div class="fresh-bad">⚠️ Przeterminowane lub dziś!</div>`;
+        else if(daysLeft === 1) freshHtml=`<div class="fresh-bad">🔴 Zostaje 1 dzień!</div>`;
+        else if(daysLeft <= 2) freshHtml=`<div class="fresh-warn">🟡 Zostają ${daysLeft} dni</div>`;
+        else freshHtml=`<div class="fresh-ok">✅ Świeże — zostaje ${daysLeft} dni</div>`;
+      }
       let nm=it.n;
       if(searchQ){
         const i=it.n.toLowerCase().indexOf(searchQ);
@@ -504,7 +560,7 @@ function render(){
       }
       html+=`<div class="item ${c}">
         <div class="item-top">
-          <div class="item-name">${nm}</div>
+          <div class="item-name">${nm}${freshHtml}</div>
           <div class="kup">${bt}<br><span style="font-size:12px;opacity:.9;font-weight:700">${bs}</span></div>
         </div>
         <div class="prog-row">
