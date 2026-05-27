@@ -498,13 +498,12 @@ function handleScanPhoto(input){
 }
 function callClaude(b64,mime){
   var key=localStorage.getItem(LS_KEY);
-  fetch("https://api.anthropic.com/v1/messages",{
+  fetch("https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/",{
     method:"POST",
     headers:{
       "Content-Type":"application/json",
       "x-api-key":key,
-      "anthropic-version":"2023-06-01",
-      "anthropic-dangerous-direct-browser-ipc":"true"
+      "anthropic-version":"2023-06-01"
     },
     body:JSON.stringify({
       model:"claude-sonnet-4-20250514",
