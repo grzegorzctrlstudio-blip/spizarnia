@@ -7,14 +7,10 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0F172A;min-height:100vh;padding-bottom:40px}
-
-/* SPLASH */
 #splash{min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px}
 .spin{width:44px;height:44px;border:4px solid #334155;border-top-color:#22C55E;border-radius:50%;animation:rot 1s linear infinite}
 @keyframes rot{to{transform:rotate(360deg)}}
 .spin-lbl{font-size:13px;color:#64748B;font-weight:600;text-align:center;line-height:1.8;max-width:300px}
-
-/* LOGIN */
 #login{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;gap:16px}
 #login h2{font-size:26px;font-weight:900;color:#fff}
 #login p{font-size:13px;color:#64748B}
@@ -23,8 +19,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .name-inp::placeholder{color:#475569;font-weight:400}
 .login-btn{width:100%;max-width:340px;background:linear-gradient(135deg,#16A34A,#059669);color:#fff;border:none;border-radius:14px;padding:16px;font-size:17px;font-weight:900;cursor:pointer}
 .login-btn:active{transform:scale(.97)}
-
-/* HEADER */
 .hdr{background:linear-gradient(135deg,#1E293B,#334155);padding:14px 16px 12px;border-bottom:1px solid #334155;position:sticky;top:0;z-index:10}
 .hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .title-row{display:flex;align-items:center;gap:8px}
@@ -38,10 +32,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .user-pill{background:#1D4ED820;border:1.5px solid #1D4ED8;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:800;color:#60A5FA}
 .hdr-btns{display:flex;gap:6px}
 .hbtn{background:#334155;border:none;border-radius:20px;padding:7px 12px;font-size:11px;font-weight:700;cursor:pointer;color:#94A3B8}
-.hbtn.log-btn{color:#818CF8}
-.hbtn.danger{color:#F87171}
-
-/* STATS */
 .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:10px}
 .stat{background:#0F172A;border-radius:11px;padding:9px 6px;text-align:center;border:1.5px solid #1E293B}
 .stat-n{font-size:24px;font-weight:900;line-height:1;color:#fff}
@@ -49,47 +39,34 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .stat.red{border-color:#7F1D1D}.stat.red .stat-n{color:#F87171}.stat.red .stat-l{color:#EF4444}
 .stat.grn{border-color:#14532D}.stat.grn .stat-n{color:#4ADE80}.stat.grn .stat-l{color:#22C55E}
 .stat.all .stat-n{color:#fff}.stat.all .stat-l{color:#475569}
-
-/* SHOP BAR */
 .shop-bar{background:#0F172A;border:1.5px solid #334155;border-radius:12px;padding:10px 14px;margin-bottom:10px}
-.shop-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
-.shop-date{font-size:11px;color:#94A3B8;font-weight:600;line-height:1.5}
+.shop-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
 .shop-date strong{color:#fff;font-size:12px;display:block}
+.shop-date span{font-size:11px;color:#64748B}
 .shop-btns{display:flex;gap:6px;flex-shrink:0}
-.shop-btn{background:linear-gradient(135deg,#16A34A,#059669);border:none;color:#fff;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap}
-.shop-btn:active{transform:scale(.95)}
-.shop-edit{background:#334155;border:none;color:#94A3B8;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
-.date-edit-row{display:flex;align-items:center;gap:8px;margin-top:2px}
+.shop-btn{background:linear-gradient(135deg,#16A34A,#059669);border:none;color:#fff;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:800;cursor:pointer}
+.shop-edit-btn{background:#334155;border:none;color:#94A3B8;border-radius:10px;padding:8px 10px;font-size:12px;font-weight:700;cursor:pointer}
+.date-edit-row{display:none;align-items:center;gap:8px;margin-top:6px}
+.date-edit-row.show{display:flex}
 .date-inp{background:#1E293B;border:1.5px solid #334155;border-radius:8px;padding:6px 10px;font-size:12px;color:#fff;outline:none;flex:1}
-.date-inp:focus{border-color:#38BDF8}
 .date-save{background:#16A34A;border:none;color:#fff;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:800;cursor:pointer}
 .date-cancel{background:#334155;border:none;color:#94A3B8;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer}
-
-/* FRESH */
 .fresh-ok{font-size:10px;color:#22C55E;font-weight:700;margin-top:2px}
 .fresh-warn{font-size:10px;color:#F59E0B;font-weight:700;margin-top:2px}
 .fresh-bad{font-size:10px;color:#EF4444;font-weight:800;margin-top:2px}
-
-/* SEARCH */
 .search-row{margin-bottom:10px;position:relative}
 .sico{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none}
 .sinp{width:100%;background:#0F172A;border:1.5px solid #334155;border-radius:10px;padding:9px 36px 9px 34px;font-size:13px;color:#fff;outline:none}
 .sinp:focus{border-color:#38BDF8}
 .sinp::placeholder{color:#475569}
 .xbtn{display:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#64748B;font-size:16px;cursor:pointer}
-
-/* FILTERS */
-.filters{display:flex;gap:6px}
-.f{flex:1;padding:8px 4px;border-radius:10px;border:none;font-weight:700;font-size:11px;cursor:pointer;transition:all .15s}
+.filters{display:flex;gap:5px}
+.f{flex:1;padding:7px 2px;border-radius:10px;border:none;font-weight:700;font-size:10px;cursor:pointer;transition:all .15s}
 .f.act{color:#fff}
 .f:not(.act){background:#1E293B;color:#64748B}
-
-/* BODY */
 .body{padding:0 12px}
 .cat{margin-top:14px}
 .cat-hdr{font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#475569;margin-bottom:7px;padding:0 2px;display:flex;align-items:center;gap:6px}
-
-/* ITEMS */
 .item{background:#1E293B;border-radius:15px;margin-bottom:7px;padding:12px 13px;border:2px solid #334155}
 .item.red{border-color:#7F1D1D;background:#1C0A0A}
 .item.grn{border-color:#14532D;background:#0A1C0A}
@@ -118,74 +95,51 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .qnum{min-width:48px;height:42px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0F172A;border-radius:10px}
 .qnum-cur{font-size:20px;font-weight:900;line-height:1;color:#fff}
 .qnum-unit{font-size:8.5px;color:#475569;font-weight:600;margin-top:1px}
-
-/* EXPIRY DATE BUTTON ON ITEM */
-.expiry-row{display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap}
-.exp-lbl{font-size:10px;color:#475569}
-.exp-btn{background:#0F172A;border:1px solid #334155;border-radius:8px;padding:3px 8px;font-size:11px;color:#94A3B8;cursor:pointer;display:flex;align-items:center;gap:4px}
-.exp-btn:active{transform:scale(.95)}
-.exp-set{border-color:#16A34A;color:#4ADE80}
-.exp-warn{border-color:#D97706;color:#FCD34D}
-.exp-bad{border-color:#DC2626;color:#F87171}
-
-/* PHOTO MODAL */
+.exp-row{margin-top:6px}
+.exp-btn{background:#0F172A;border:1px solid #334155;border-radius:8px;padding:4px 10px;font-size:11px;color:#94A3B8;cursor:pointer}
+.exp-btn.ok{border-color:#16A34A;color:#4ADE80}
+.exp-btn.warn{border-color:#D97706;color:#FCD34D}
+.exp-btn.bad{border-color:#DC2626;color:#F87171}
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;align-items:center;justify-content:center;padding:20px}
 .overlay.show{display:flex}
-.modal{background:#1E293B;border-radius:18px;padding:20px;width:100%;max-width:400px;border:1.5px solid #334155}
+.overlay.bottom{align-items:flex-end}
+.modal{background:#1E293B;border-radius:18px;padding:20px;width:100%;max-width:420px;border:1.5px solid #334155}
 .modal h3{font-size:16px;font-weight:800;color:#fff;margin-bottom:8px}
-.modal p{font-size:12px;color:#94A3B8;margin-bottom:12px;line-height:1.6}
+.modal p{font-size:12px;color:#64748B;margin-bottom:12px;line-height:1.6}
+.modal-inp{width:100%;background:#0F172A;border:1.5px solid #334155;border-radius:10px;padding:12px;font-size:14px;color:#fff;outline:none;margin-bottom:10px;text-align:center}
+.modal-inp:focus{border-color:#38BDF8}
 .modal-btns{display:flex;gap:8px;flex-wrap:wrap}
-.mbtn{flex:1;min-width:100px;padding:12px;border-radius:10px;border:none;font-weight:800;font-size:13px;cursor:pointer}
+.mbtn{flex:1;min-width:80px;padding:12px;border-radius:10px;border:none;font-weight:800;font-size:13px;cursor:pointer}
 .mbtn.ok{background:#16A34A;color:#fff}
-.mbtn.cam{background:#1D4ED8;color:#fff}
+.mbtn.blue{background:#1D4ED8;color:#fff}
+.mbtn.del{background:#7F1D1D;color:#F87171}
 .mbtn.cancel{background:#334155;color:#94A3B8}
-.photo-preview{width:100%;border-radius:12px;margin-bottom:12px;max-height:200px;object-fit:cover;display:none}
-.date-manual{width:100%;background:#0F172A;border:1.5px solid #334155;border-radius:10px;padding:12px;font-size:16px;color:#fff;outline:none;margin-bottom:10px;text-align:center}
-.date-manual:focus{border-color:#38BDF8}
-
-/* SETTINGS */
-.settings-modal{background:#1E293B;border-radius:18px;padding:20px;width:100%;max-width:420px;border:1.5px solid #334155}
-.settings-modal h3{font-size:16px;font-weight:800;color:#fff;margin-bottom:6px}
-.settings-modal p{font-size:12px;color:#64748B;margin-bottom:12px;line-height:1.6}
-.api-inp{width:100%;background:#0F172A;border:1.5px solid #334155;border-radius:10px;padding:12px;font-size:12px;color:#fff;outline:none;font-family:monospace;margin-bottom:8px}
-.api-inp:focus{border-color:#38BDF8}
-.api-status{font-size:11px;margin-bottom:10px;padding:6px 10px;border-radius:8px;display:none}
-.api-status.ok{background:#14532D;color:#4ADE80;display:block}
-.api-status.err{background:#7F1D1D;color:#F87171;display:block}
-/* SCANNER */
-.scanner-overlay{background:rgba(0,0,0,.92)}
-.scanner-modal{background:#1E293B;border-radius:18px;padding:20px;width:100%;max-width:400px;border:1.5px solid #334155}
-.scanner-modal h3{font-size:16px;font-weight:800;color:#fff;margin-bottom:8px}
-.scan-preview{width:100%;border-radius:12px;max-height:220px;object-fit:cover;margin-bottom:12px;display:none;border:2px solid #334155}
-.scan-result{background:#0F172A;border-radius:10px;padding:12px;margin-bottom:12px;display:none}
-.scan-result-title{font-size:11px;color:#64748B;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
-.scan-product{font-size:14px;font-weight:800;color:#fff;margin-bottom:4px}
-.scan-date{font-size:13px;color:#4ADE80;font-weight:700}
-.scan-note{font-size:11px;color:#64748B;margin-top:4px}
-.scan-loading{display:none;text-align:center;padding:16px;color:#94A3B8;font-size:13px}
+.scan-preview{width:100%;border-radius:12px;max-height:200px;object-fit:cover;margin-bottom:12px;display:none;border:2px solid #334155}
+.scan-loading{display:none;text-align:center;padding:12px 0;color:#94A3B8;font-size:13px}
 .scan-spin{width:28px;height:28px;border:3px solid #334155;border-top-color:#38BDF8;border-radius:50%;animation:rot 1s linear infinite;margin:0 auto 8px}
-/* LOG MODAL */
-.log-modal{background:#1E293B;border-radius:20px 20px 0 0;width:100%;max-width:600px;max-height:80vh;display:flex;flex-direction:column;border-top:1px solid #334155}
+.scan-result{background:#0F172A;border-radius:10px;padding:12px;margin-bottom:12px;display:none}
+.scan-result b{color:#fff;font-size:14px;display:block;margin-bottom:4px}
+.scan-result span{color:#4ADE80;font-size:13px;font-weight:700}
+.log-modal{background:#1E293B;border-radius:20px 20px 0 0;width:100%;max-width:600px;max-height:80vh;display:flex;flex-direction:column}
 .log-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid #334155;flex-shrink:0}
 .log-hdr h3{font-size:16px;font-weight:800;color:#fff}
 .log-close{background:#334155;border:none;color:#94A3B8;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer}
 .log-body{overflow-y:auto;padding:12px 16px;flex:1}
 .log-entry{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #0F172A}
 .log-entry:last-child{border-bottom:none}
-.log-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;flex-shrink:0;color:#fff}
+.log-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;flex-shrink:0;color:#fff}
 .log-info{flex:1}
 .log-who{font-size:12px;font-weight:800;color:#fff}
 .log-what{font-size:11.5px;color:#94A3B8;margin-top:2px}
 .log-when{font-size:10px;color:#475569;margin-top:2px}
-.log-badge{font-size:11px;font-weight:800;border-radius:6px;padding:2px 8px;flex-shrink:0}
-.log-badge.up{background:#14532D;color:#4ADE80}
-.log-badge.down{background:#7F1D1D;color:#F87171}
+.lbadge{font-size:11px;font-weight:800;border-radius:6px;padding:2px 8px;flex-shrink:0}
+.lbadge.up{background:#14532D;color:#4ADE80}
+.lbadge.dn{background:#7F1D1D;color:#F87171}
 .log-empty{text-align:center;padding:40px 20px;color:#475569;font-size:13px}
-
-.log-overlay{align-items:flex-end}
-
 .empty{text-align:center;padding:40px 20px;color:#475569;font-size:13px}
 .empty div{font-size:36px;margin-bottom:8px}
+.api-row{background:#0F172A;border:1.5px solid #334155;border-radius:10px;padding:10px;margin-bottom:10px;font-size:11px;color:#4ADE80}
+.api-row.none{color:#EF4444}
 </style>
 </head>
 <body>
@@ -216,9 +170,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       </div>
       <div class="hdr-btns">
         <div class="user-pill" id="user-pill"></div>
-        <button class="hbtn log-btn" onclick="openLog()">📋</button>
-        <button class="hbtn" onclick="openSettings()" style="color:#F59E0B">⚙️</button>
-        <button class="hbtn danger" onclick="resetAll()">🗑️</button>
+        <button class="hbtn" style="color:#F59E0B" onclick="openSettings()">⚙️</button>
+        <button class="hbtn" style="color:#818CF8" onclick="openLog()">📋</button>
+        <button class="hbtn" style="color:#F87171" onclick="resetAll()">🗑️</button>
       </div>
     </div>
     <div class="stats">
@@ -226,19 +180,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="stat grn"><div class="stat-n" id="n-grn">0</div><div class="stat-l">🟢 Jest</div></div>
       <div class="stat all"><div class="stat-n" id="n-all">0</div><div class="stat-l">Produktów</div></div>
     </div>
-    <!-- SHOP BAR -->
     <div class="shop-bar">
       <div class="shop-top">
         <div class="shop-date">
-          <strong id="shop-date-lbl">Nie ustawiono daty zakupów</strong>
-          <span id="shop-days-lbl" style="font-size:11px;color:#64748B"></span>
+          <strong id="shop-lbl">Nie ustawiono daty zakupów</strong>
+          <span id="shop-ago"></span>
         </div>
         <div class="shop-btns">
-          <button class="shop-edit" onclick="toggleDateEdit()">✏️ Edytuj</button>
+          <button class="shop-edit-btn" onclick="toggleDateEdit()">✏️</button>
           <button class="shop-btn" onclick="markShopping()">🛍️ Byłem!</button>
         </div>
       </div>
-      <div class="date-edit-row" id="date-edit-row" style="display:none">
+      <div class="date-edit-row" id="date-edit-row">
         <input type="date" class="date-inp" id="date-inp">
         <button class="date-save" onclick="saveDateEdit()">✓</button>
         <button class="date-cancel" onclick="toggleDateEdit()">✕</button>
@@ -250,10 +203,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <button class="xbtn" id="xbtn" onclick="clearSearch()">✕</button>
     </div>
     <div class="filters">
-      <button class="f act" id="f-all"  onclick="setFilter('all')"  style="background:#334155">Wszystko</button>
-      <button class="f"     id="f-exp"  onclick="setFilter('exp')">⚠️ Wygasają</button>
-      <button class="f"     id="f-red"  onclick="setFilter('red')">🔴 Kupić</button>
-      <button class="f"     id="f-grn"  onclick="setFilter('grn')">🟢 Jest</button>
+      <button class="f act" id="f-all" onclick="setFilter('all')" style="background:#334155">Wszystko</button>
+      <button class="f" id="f-exp" onclick="setFilter('exp')">⚠️ Wygasają</button>
+      <button class="f" id="f-red" onclick="setFilter('red')">🔴 Kupić</button>
+      <button class="f" id="f-grn" onclick="setFilter('grn')">🟢 Jest</button>
     </div>
   </div>
   <div class="body" id="body"></div>
@@ -262,21 +215,59 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- EXPIRY MODAL -->
 <div class="overlay" id="exp-overlay" onclick="if(event.target===this)closeExpiry()">
   <div class="modal">
-    <h3 id="exp-modal-title">📅 Data przydatności</h3>
-    <p id="exp-modal-name" style="color:#94A3B8;font-size:12px;margin-bottom:12px"></p>
-    <img class="photo-preview" id="photo-preview" alt="Zdjęcie produktu">
-    <input type="date" class="date-manual" id="exp-date-inp" placeholder="DD.MM.RRRR">
+    <h3>📅 Data przydatności</h3>
+    <p id="exp-name" style="color:#94A3B8;font-size:12px;margin-bottom:10px"></p>
+    <img class="scan-preview" id="exp-photo" alt="">
+    <input type="date" class="modal-inp" id="exp-date-inp">
     <div class="modal-btns">
-      <button class="mbtn cam" onclick="closeExpiry();openScanner()">🔍 Skanuj AI</button>
-      <button class="mbtn ok"  onclick="saveExpiry()">✅ Zapisz</button>
-      <button class="mbtn cancel" onclick="clearExpiry()">🗑️ Usuń</button>
+      <button class="mbtn blue" onclick="openScannerFromExpiry()">🔍 Skanuj AI</button>
+      <button class="mbtn ok" onclick="saveExpiry()">✅ Zapisz</button>
+      <button class="mbtn del" onclick="clearExpiry()">🗑️ Usuń</button>
     </div>
-    <input type="file" id="photo-input" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(this)">
+    <button class="mbtn cancel" style="width:100%;margin-top:8px" onclick="closeExpiry()">Zamknij</button>
   </div>
 </div>
 
-<!-- LOG OVERLAY -->
-<div class="overlay log-overlay" id="log-overlay" onclick="if(event.target===this)closeLog()">
+<!-- SCANNER MODAL -->
+<div class="overlay" id="scan-overlay" onclick="if(event.target===this)closeScanner()">
+  <div class="modal">
+    <h3>🔍 Skaner AI</h3>
+    <img class="scan-preview" id="scan-img" alt="">
+    <div class="scan-loading" id="scan-loading">
+      <div class="scan-spin"></div>
+      Claude analizuje zdjęcie...
+    </div>
+    <div class="scan-result" id="scan-result">
+      <b id="scan-product"></b>
+      <span id="scan-date-txt"></span>
+      <div id="scan-note" style="font-size:11px;color:#64748B;margin-top:4px"></div>
+    </div>
+    <div class="modal-btns">
+      <button class="mbtn blue" onclick="triggerScanPhoto()">📷 Zdjęcie</button>
+      <button class="mbtn ok" id="scan-apply" style="display:none" onclick="applyScan()">✅ Zastosuj</button>
+      <button class="mbtn cancel" onclick="closeScanner()">Zamknij</button>
+    </div>
+    <input type="file" id="scan-file" accept="image/*" capture="environment" style="display:none" onchange="handleScanPhoto(this)">
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="overlay" id="settings-overlay" onclick="if(event.target===this)closeSettings()">
+  <div class="modal">
+    <h3>⚙️ Ustawienia — Skaner AI</h3>
+    <p>Klucz API Anthropic zapisuje się tylko na tym urządzeniu. Wygeneruj go na <strong style="color:#38BDF8">console.anthropic.com</strong> → API Keys.</p>
+    <div class="api-row" id="api-status-row" style="display:none"></div>
+    <input class="modal-inp" id="api-key-inp" type="password" placeholder="sk-ant-api03-..." style="text-align:left;font-size:12px;font-family:monospace">
+    <div class="modal-btns">
+      <button class="mbtn ok" onclick="saveApiKey()">💾 Zapisz</button>
+      <button class="mbtn del" onclick="clearApiKey()">🗑️ Usuń</button>
+    </div>
+    <button class="mbtn cancel" style="width:100%;margin-top:8px" onclick="closeSettings()">Zamknij</button>
+  </div>
+</div>
+
+<!-- LOG MODAL -->
+<div class="overlay bottom" id="log-overlay" onclick="if(event.target===this)closeLog()">
   <div class="log-modal">
     <div class="log-hdr">
       <h3>📋 Historia zmian</h3>
@@ -286,216 +277,152 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 </div>
 
-<!-- SETTINGS MODAL -->
-<div class="overlay" id="settings-overlay" onclick="if(event.target===this)closeSettings()">
-  <div class="settings-modal">
-    <h3>⚙️ Ustawienia — Skaner AI</h3>
-    <p>Wpisz swój klucz API Anthropic. Zapisuje się <strong style="color:#fff">tylko na tym urządzeniu</strong> — nie trafia do Firebase ani do kodu.</p>
-    <div class="api-status" id="api-status"></div>
-    <input class="api-inp" id="api-key-inp" type="password" placeholder="sk-ant-api03-...">
-    <div style="display:flex;gap:8px">
-      <button class="mbtn ok" style="flex:1;padding:11px;border-radius:10px;border:none;font-weight:800;font-size:13px;cursor:pointer;background:#16A34A;color:#fff" onclick="saveApiKey()">💾 Zapisz klucz</button>
-      <button class="mbtn cancel" style="flex:1;padding:11px;border-radius:10px;border:none;font-weight:800;font-size:13px;cursor:pointer;background:#334155;color:#94A3B8" onclick="clearApiKey()">🗑️ Usuń</button>
-    </div>
-    <div style="margin-top:10px">
-      <button style="width:100%;padding:11px;border-radius:10px;border:none;font-weight:800;font-size:13px;cursor:pointer;background:#334155;color:#94A3B8" onclick="closeSettings()">Zamknij</button>
-    </div>
-    <p style="margin-top:10px;font-size:10px;color:#334155">Klucz API: console.anthropic.com → API Keys → Create Key</p>
-  </div>
-</div>
-
-<!-- SCANNER MODAL -->
-<div class="overlay scanner-overlay" id="scanner-overlay" onclick="if(event.target===this)closeScanner()">
-  <div class="scanner-modal">
-    <h3>🔍 Skaner produktu</h3>
-    <img class="scan-preview" id="scan-preview" alt="">
-    <div class="scan-loading" id="scan-loading">
-      <div class="scan-spin"></div>
-      Claude analizuje zdjęcie...
-    </div>
-    <div class="scan-result" id="scan-result">
-      <div class="scan-result-title">Wynik skanowania</div>
-      <div class="scan-product" id="scan-product"></div>
-      <div class="scan-date" id="scan-date"></div>
-      <div class="scan-note" id="scan-note"></div>
-    </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="mbtn cam" style="flex:1;min-width:100px;padding:12px;border-radius:10px;border:none;font-weight:800;font-size:13px;cursor:pointer;background:#1D4ED8;color:#fff" onclick="startScan()">📷 Zdjęcie</button>
-      <button class="mbtn ok" id="scan-apply-btn" style="flex:1;min-width:100px;padding:12px;border-radius:10px;border:none;font-weight:800;font-size:13px;cursor:pointer;background:#16A34A;color:#fff;display:none" onclick="applyScanResult()">✅ Zastosuj</button>
-      <button class="mbtn cancel" style="flex:1;min-width:100px;padding:12px;border-radius:10px;border:none;font-weight:800;font-size:13px;cursor:pointer;background:#334155;color:#94A3B8" onclick="closeScanner()">Zamknij</button>
-    </div>
-    <input type="file" id="scan-input" accept="image/*" capture="environment" style="display:none" onchange="handleScan(this)">
-  </div>
-</div>
-
 <script>
-var FB       = "https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
-var LS_NAME  = "spiz_name";
-var ROOM     = location.hash.replace(/^#/,"").trim() || "room1";
+var FB      = "https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
+var LS_NAME = "spiz_name";
+var LS_KEY  = "spiz_apikey";
+var ROOM    = location.hash.replace(/^#/,"").trim() || "room1";
 if (!location.hash) location.hash = ROOM;
-var RPATH    = FB + "/rooms/"  + ROOM;
-var LPATH    = FB + "/logs/"   + ROOM;
-var EPATH    = FB + "/expiry/" + ROOM; // individual expiry dates
+var RP      = FB + "/rooms/"  + ROOM;
+var LP      = FB + "/logs/"   + ROOM;
+var EP      = FB + "/expiry/" + ROOM;
 
-// ── PRODUKTY (z typowymi datami Biedronki) ────────────────────────────────────
 var CATS = [
-  {id:"warzywa", label:"Warzywa i owoce", ic:"🥦", items:[
-    {n:"Papryka (czerwona/żółta)", target:2, unit:"szt.",        days:7},
-    {n:"Pomidory",                 target:3, unit:"szt.",        days:4},
-    {n:"Ogórek",                   target:3, unit:"szt.",        days:4},
-    {n:"Cukinia",                  target:2, unit:"szt.",        days:6},
-    {n:"Pieczarki",                target:1, unit:"opak. 500g",  days:4},
-    {n:"Marchew",                  target:4, unit:"szt.",        days:10},
-    {n:"Cebula biała (duża)",      target:2, unit:"szt.",        days:14},
-    {n:"Czosnek",                  target:1, unit:"główka",      days:21},
-    {n:"Sałata / rukola",          target:1, unit:"opak.",       days:4},
-    {n:"Rzodkiewka",               target:1, unit:"pęczek",      days:5},
-    {n:"Koperek",                  target:1, unit:"pęczek",      days:4},
-    {n:"Jabłka",                   target:4, unit:"szt.",        days:10},
-    {n:"Banany",                   target:4, unit:"szt.",        days:4},
-    {n:"Truskawki / maliny",       target:1, unit:"opak. 500g",  days:3},
-    {n:"Awokado",                  target:2, unit:"szt.",        days:4},
-    {n:"Cytryna",                  target:1, unit:"szt.",        days:14},
-    {n:"Bataty",                   target:4, unit:"szt.",        days:14}
+  {id:"warzywa",label:"Warzywa i owoce",ic:"🥦",items:[
+    {n:"Papryka (czerwona/żółta)",target:2,unit:"szt.",days:7},
+    {n:"Pomidory",target:3,unit:"szt.",days:4},
+    {n:"Ogórek",target:3,unit:"szt.",days:4},
+    {n:"Cukinia",target:2,unit:"szt.",days:6},
+    {n:"Pieczarki",target:1,unit:"opak. 500g",days:4},
+    {n:"Marchew",target:4,unit:"szt.",days:10},
+    {n:"Cebula biała (duża)",target:2,unit:"szt.",days:14},
+    {n:"Czosnek",target:1,unit:"główka",days:21},
+    {n:"Sałata / rukola",target:1,unit:"opak.",days:4},
+    {n:"Rzodkiewka",target:1,unit:"pęczek",days:5},
+    {n:"Koperek",target:1,unit:"pęczek",days:4},
+    {n:"Jabłka",target:4,unit:"szt.",days:10},
+    {n:"Banany",target:4,unit:"szt.",days:4},
+    {n:"Truskawki / maliny",target:1,unit:"opak. 500g",days:3},
+    {n:"Awokado",target:2,unit:"szt.",days:4},
+    {n:"Cytryna",target:1,unit:"szt.",days:14},
+    {n:"Bataty",target:4,unit:"szt.",days:14}
   ]},
-  {id:"piekarnia", label:"Piekarnia", ic:"🍞", items:[
-    {n:"Chleb pełnoziarnisty", target:2, unit:"bochenek", days:5}
+  {id:"piekarnia",label:"Piekarnia",ic:"🍞",items:[
+    {n:"Chleb pełnoziarnisty",target:2,unit:"bochenek",days:5}
   ]},
-  {id:"suche", label:"Płatki, kasze, ryże", ic:"🌾", items:[
-    {n:"Płatki owsiane błyskawiczne", target:3, unit:"opak. 500g"},
-    {n:"Płatki jaglane",              target:1, unit:"opak."},
-    {n:"Ryż basmati",                 target:1, unit:"opak. 1kg"},
-    {n:"Kasza gryczana",              target:1, unit:"opak. 500g"}
+  {id:"suche",label:"Płatki, kasze, ryże",ic:"🌾",items:[
+    {n:"Płatki owsiane błyskawiczne",target:3,unit:"opak. 500g"},
+    {n:"Płatki jaglane",target:1,unit:"opak."},
+    {n:"Ryż basmati",target:1,unit:"opak. 1kg"},
+    {n:"Kasza gryczana",target:1,unit:"opak. 500g"}
   ]},
-  {id:"puszki", label:"Puszki i sosy", ic:"🫙", items:[
-    {n:"Ciecierzyca (puszka)",        target:2, unit:"puszka"},
-    {n:"Passata pomidorowa",          target:1, unit:"opak."},
-    {n:"Ketchup Słodka Ania",         target:1, unit:"butelka"},
-    {n:"Musztarda miodowa / łagodna", target:1, unit:"słoik"}
+  {id:"puszki",label:"Puszki i sosy",ic:"🫙",items:[
+    {n:"Ciecierzyca (puszka)",target:2,unit:"puszka"},
+    {n:"Passata pomidorowa",target:1,unit:"opak."},
+    {n:"Ketchup Słodka Ania",target:1,unit:"butelka"},
+    {n:"Musztarda miodowa / łagodna",target:1,unit:"słoik"}
   ]},
-  {id:"tluszcze", label:"Orzechy i tłuszcze", ic:"🥜", items:[
-    {n:"Oliwa z oliwek",            target:1, unit:"butelka 500ml"},
-    {n:"Masło orzechowe Vitanella", target:2, unit:"opak. 350g"},
-    {n:"Płatki migdałów",           target:1, unit:"opak. 200g"},
-    {n:"Orzechy włoskie/laskowe",   target:1, unit:"opak. 200g"},
-    {n:"Kakao (bez cukru)",         target:1, unit:"opak."}
+  {id:"tluszcze",label:"Orzechy i tłuszcze",ic:"🥜",items:[
+    {n:"Oliwa z oliwek",target:1,unit:"butelka 500ml"},
+    {n:"Masło orzechowe Vitanella",target:2,unit:"opak. 350g"},
+    {n:"Płatki migdałów",target:1,unit:"opak. 200g"},
+    {n:"Orzechy włoskie/laskowe",target:1,unit:"opak. 200g"},
+    {n:"Kakao (bez cukru)",target:1,unit:"opak."}
   ]},
-  {id:"maki", label:"Mąki", ic:"🌾", items:[
-    {n:"Mąka ryżowa",  target:1, unit:"opak. 400g"},
-    {n:"Mąka jaglana", target:1, unit:"opak. 400g"}
+  {id:"maki",label:"Mąki",ic:"🌾",items:[
+    {n:"Mąka ryżowa",target:1,unit:"opak. 400g"},
+    {n:"Mąka jaglana",target:1,unit:"opak. 400g"}
   ]},
-  {id:"mieso", label:"Mięso świeże", ic:"🥩", items:[
-    {n:"Pierś z kurczaka",         target:3, unit:"szt.",       days:3},
-    {n:"Wołowina mielona",         target:1, unit:"opak. 150g", days:2},
-    {n:"Filet z łososia (świeży)", target:1, unit:"szt.",       days:2}
+  {id:"mieso",label:"Mięso świeże",ic:"🥩",items:[
+    {n:"Pierś z kurczaka",target:3,unit:"szt.",days:3},
+    {n:"Wołowina mielona",target:1,unit:"opak. 150g",days:2},
+    {n:"Filet z łososia (świeży)",target:1,unit:"szt.",days:2}
   ]},
-  {id:"nabial", label:"Nabiał", ic:"🥛", items:[
-    {n:"Skyr naturalny",                    target:4, unit:"opak. 350g", days:10},
-    {n:"Ser twarogowy chudy",               target:3, unit:"opak. 400g", days:7},
-    {n:"Serek wiejski light (0% tłuszczu)", target:3, unit:"opak. 400g", days:7},
-    {n:"Mozzarella light",                  target:2, unit:"opak.",      days:5},
-    {n:"Jogurt naturalny 2%",               target:1, unit:"opak. duży", days:7},
-    {n:"Mleko 0,5%",                        target:4, unit:"litr",       days:5}
+  {id:"nabial",label:"Nabiał",ic:"🥛",items:[
+    {n:"Skyr naturalny",target:4,unit:"opak. 350g",days:10},
+    {n:"Ser twarogowy chudy",target:3,unit:"opak. 400g",days:7},
+    {n:"Serek wiejski light (0% tłuszczu)",target:3,unit:"opak. 400g",days:7},
+    {n:"Mozzarella light",target:2,unit:"opak.",days:5},
+    {n:"Jogurt naturalny 2%",target:1,unit:"opak. duży",days:7},
+    {n:"Mleko 0,5%",target:4,unit:"litr",days:5}
   ]},
-  {id:"jaja", label:"Jaja", ic:"🥚", items:[
-    {n:"Jaja L", target:2, unit:"opak. 10 szt.", days:21}
+  {id:"jaja",label:"Jaja",ic:"🥚",items:[
+    {n:"Jaja L",target:2,unit:"opak. 10 szt.",days:21}
   ]},
-  {id:"wedliny", label:"Wędliny i ryby", ic:"🍖", items:[
-    {n:"Polędwica z indyka — Kraina Mięs (min. 97%)",    target:3, unit:"opak.", days:7},
-    {n:"Szynka z indyka — Kraina Wędlin (min. 97%)",     target:2, unit:"opak.", days:7},
-    {n:"Polędwica z kurczaka — Kraina Mięs (min. 97%)",  target:2, unit:"opak.", days:7},
-    {n:"Filet z piersi kurczaka w plastrach (min. 97%)", target:2, unit:"opak.", days:7},
-    {n:"Łosoś wędzony",                                  target:2, unit:"opak.", days:14}
+  {id:"wedliny",label:"Wędliny i ryby",ic:"🍖",items:[
+    {n:"Polędwica z indyka — Kraina Mięs (min. 97%)",target:3,unit:"opak.",days:7},
+    {n:"Szynka z indyka — Kraina Wędlin (min. 97%)",target:2,unit:"opak.",days:7},
+    {n:"Polędwica z kurczaka — Kraina Mięs (min. 97%)",target:2,unit:"opak.",days:7},
+    {n:"Filet z piersi kurczaka w plastrach (min. 97%)",target:2,unit:"opak.",days:7},
+    {n:"Łosoś wędzony",target:2,unit:"opak.",days:14}
   ]}
 ];
 
-// ── HELPERS ───────────────────────────────────────────────────────────────────
-function fbKey(catId, name) {
-  return (catId+"__"+name).replace(/[.$#\[\]\/]/g,"_").replace(/\s+/g,"_");
-}
-function mkState() {
-  var s={};
-  CATS.forEach(function(c){c.items.forEach(function(it){s[fbKey(c.id,it.n)]=0;});});
-  return s;
-}
-var COLORS=["#7C3AED","#DC2626","#D97706","#059669","#2563EB","#DB2777","#0891B2"];
-function nameColor(n){var h=0;for(var i=0;i<n.length;i++)h=(h*31+n.charCodeAt(i))%COLORS.length;return COLORS[h];}
-function nameInitial(n){return n.trim().charAt(0).toUpperCase();}
+function fbk(catId,name){return(catId+"__"+name).replace(/[.$#\[\]\/]/g,"_").replace(/\s+/g,"_");}
+function mkState(){var s={};CATS.forEach(function(c){c.items.forEach(function(it){s[fbk(c.id,it.n)]=0;});});return s;}
+var CLR=["#7C3AED","#DC2626","#D97706","#059669","#2563EB","#DB2777","#0891B2"];
+function nc(n){var h=0;for(var i=0;i<n.length;i++)h=(h*31+n.charCodeAt(i))%CLR.length;return CLR[h];}
+function ni(n){return n.trim().charAt(0).toUpperCase();}
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
-var state={}, expiry={}, filter="all", searchQ="", userName="", lastShopTs=0, saveTimer=null;
-var expiryTarget=null; // current item being edited
+var state={},expiry={},filter="all",searchQ="",userName="",shopTs=0,saveTimer=null;
+var expiryItem=null,scanData=null,scanFromExpiry=false;
 
-// ── FIREBASE ──────────────────────────────────────────────────────────────────
 function setSyncUI(m){
   var d=document.getElementById("sdot"),l=document.getElementById("slbl");
   if(m==="ok"){d.className="sdot";d.style.background="#22C55E";l.textContent="zsync";}
   else if(m==="saving"){d.className="sdot pulse";d.style.background="#F59E0B";l.textContent="zapis...";}
   else{d.className="sdot err";d.style.background="#EF4444";l.textContent="błąd";}
 }
-function fbFetch(path,opts){
+
+function fbf(path,opts){
   var ctrl=new AbortController();
   var t=setTimeout(function(){ctrl.abort();},8000);
   return fetch(path+".json",Object.assign({signal:ctrl.signal},opts||{}))
     .then(function(r){clearTimeout(t);if(!r.ok)throw new Error("HTTP "+r.status);return r.json();})
-    .catch(function(e){clearTimeout(t);if(e.name==="AbortError")throw new Error("Timeout — brak odpowiedzi Firebase");throw e;});
+    .catch(function(e){clearTimeout(t);if(e.name==="AbortError")throw new Error("Timeout Firebase");throw e;});
 }
-function fbGet(p){return fbFetch(p);}
-function fbPatch(p,d){return fbFetch(p,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)});}
-function fbPost(p,d){return fbFetch(p,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)});}
+function fbGet(p){return fbf(p);}
+function fbPatch(p,d){return fbf(p,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)});}
+function fbPost(p,d){return fbf(p,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)});}
 
-// ── SHOP DATE ─────────────────────────────────────────────────────────────────
 function markShopping(){
   if(!confirm("Zaznaczyć że dziś byłeś/aś w sklepie?"))return;
-  lastShopTs=Date.now();
-  fbPatch(RPATH,{__shopTs:lastShopTs});
+  shopTs=Date.now();
+  fbPatch(RP,{__shopTs:shopTs});
   updateShopBar();render();
 }
 function toggleDateEdit(){
-  var row=document.getElementById("date-edit-row");
-  var inp=document.getElementById("date-inp");
-  if(row.style.display==="none"){
-    row.style.display="flex";
-    if(lastShopTs){
-      var d=new Date(lastShopTs);
-      inp.value=d.toISOString().slice(0,10);
-    }
-  } else {
-    row.style.display="none";
+  var r=document.getElementById("date-edit-row");
+  r.classList.toggle("show");
+  if(r.classList.contains("show")&&shopTs){
+    var d=new Date(shopTs);
+    document.getElementById("date-inp").value=d.toISOString().slice(0,10);
   }
 }
 function saveDateEdit(){
-  var val=document.getElementById("date-inp").value;
-  if(!val)return;
-  lastShopTs=new Date(val).getTime();
-  fbPatch(RPATH,{__shopTs:lastShopTs});
+  var v=document.getElementById("date-inp").value;
+  if(!v)return;
+  shopTs=new Date(v).getTime();
+  fbPatch(RP,{__shopTs:shopTs});
   toggleDateEdit();
   updateShopBar();render();
 }
 function updateShopBar(){
-  var lbl=document.getElementById("shop-date-lbl");
-  var sub=document.getElementById("shop-days-lbl");
-  if(!lastShopTs){lbl.textContent="Nie ustawiono daty zakupów";sub.textContent="";return;}
-  var d=new Date(lastShopTs);
-  var days=Math.floor((Date.now()-lastShopTs)/86400000);
-  lbl.textContent="Zakupy: "+d.toLocaleDateString("pl-PL",{weekday:"long",day:"numeric",month:"long"});
-  sub.textContent=days===0?"dziś 🛍️":days===1?"wczoraj":days+" dni temu";
+  var l=document.getElementById("shop-lbl"),a=document.getElementById("shop-ago");
+  if(!shopTs){l.textContent="Nie ustawiono daty zakupów";a.textContent="";return;}
+  var d=new Date(shopTs);
+  var days=Math.floor((Date.now()-shopTs)/86400000);
+  l.textContent="Zakupy: "+d.toLocaleDateString("pl-PL",{weekday:"long",day:"numeric",month:"long"});
+  a.textContent=days===0?"dziś 🛍️":days===1?"wczoraj":days+" dni temu";
 }
 
-// ── FRESHNESS ─────────────────────────────────────────────────────────────────
 function getDaysLeft(it){
-  var key=fbKey("expiry",it.n);
-  // Priorytet: indywidualna data przydatności z Firebase
-  if(expiry[key]){
-    return Math.round((expiry[key]-Date.now())/86400000);
-  }
-  // Fallback: data zakupów + domyślna trwałość
-  if(it.days && lastShopTs){
-    return Math.round(it.days-(Date.now()-lastShopTs)/86400000);
-  }
+  var ek=fbk("e",it.n);
+  if(expiry[ek])return Math.round((expiry[ek]-Date.now())/86400000);
+  if(it.days&&shopTs)return Math.round(it.days-(Date.now()-shopTs)/86400000);
   return null;
 }
-function freshHtml(it){
+function fHtml(it){
   var d=getDaysLeft(it);
   if(d===null)return"";
   if(d<=0)return'<div class="fresh-bad">⚠️ Przeterminowane!</div>';
@@ -503,81 +430,184 @@ function freshHtml(it){
   if(d<=2)return'<div class="fresh-warn">🟡 Zostają '+d+' dni</div>';
   return'<div class="fresh-ok">✅ Świeże — '+d+' dni</div>';
 }
-function isExpiringSoon(it){
-  var d=getDaysLeft(it);
-  return d!==null && d<=3;
-}
+function expiringSoon(it){var d=getDaysLeft(it);return d!==null&&d<=3;}
 
-// ── EXPIRY MODAL ──────────────────────────────────────────────────────────────
-function openExpiry(itemName){
-  expiryTarget=itemName;
-  document.getElementById("exp-modal-name").textContent=itemName;
-  var key=fbKey("expiry",itemName);
+function openExpiry(name){
+  expiryItem=name;
+  document.getElementById("exp-name").textContent=name;
+  var ek=fbk("e",name);
   var inp=document.getElementById("exp-date-inp");
-  if(expiry[key]){
-    var d=new Date(expiry[key]);
+  if(expiry[ek]){
+    var d=new Date(expiry[ek]);
     inp.value=d.toISOString().slice(0,10);
-  } else {
-    inp.value="";
-  }
-  document.getElementById("photo-preview").style.display="none";
+  }else{inp.value="";}
+  document.getElementById("exp-photo").style.display="none";
   document.getElementById("exp-overlay").classList.add("show");
 }
-function closeExpiry(){document.getElementById("exp-overlay").classList.remove("show");expiryTarget=null;}
-function takePhoto(){document.getElementById("photo-input").click();}
-function handlePhoto(input){
-  if(!input.files||!input.files[0])return;
-  var reader=new FileReader();
-  reader.onload=function(e){
-    var img=document.getElementById("photo-preview");
-    img.src=e.target.result;
-    img.style.display="block";
-  };
-  reader.readAsDataURL(input.files[0]);
-}
+function closeExpiry(){document.getElementById("exp-overlay").classList.remove("show");}
 function saveExpiry(){
-  var val=document.getElementById("exp-date-inp").value;
-  if(!val){alert("Wpisz datę przydatności");return;}
-  var ts=new Date(val).getTime();
-  var key=fbKey("expiry",expiryTarget);
-  expiry[key]=ts;
-  var patch={};patch[key]=ts;
-  fbPatch(EPATH,patch);
+  var v=document.getElementById("exp-date-inp").value;
+  if(!v){alert("Wpisz datę");return;}
+  var ts=new Date(v).getTime();
+  var ek=fbk("e",expiryItem);
+  expiry[ek]=ts;
+  var p={};p[ek]=ts;
+  fbPatch(EP,p);
   closeExpiry();render();
 }
 function clearExpiry(){
-  var key=fbKey("expiry",expiryTarget);
-  delete expiry[key];
-  var patch={};patch[key]=null;
-  fbPatch(EPATH,patch);
+  var ek=fbk("e",expiryItem);
+  delete expiry[ek];
+  var p={};p[ek]=null;
+  fbPatch(EP,p);
   closeExpiry();render();
 }
 
+// ── SCANNER ───────────────────────────────────────────────────────────────────
+function openScannerFromExpiry(){
+  scanFromExpiry=true;
+  closeExpiry();
+  openScanner();
+}
+function openScanner(){
+  if(!localStorage.getItem(LS_KEY)){alert("Dodaj klucz API w ustawieniach ⚙️");openSettings();return;}
+  document.getElementById("scan-img").style.display="none";
+  document.getElementById("scan-loading").style.display="none";
+  document.getElementById("scan-result").style.display="none";
+  document.getElementById("scan-apply").style.display="none";
+  scanData=null;
+  document.getElementById("scan-overlay").classList.add("show");
+}
+function closeScanner(){document.getElementById("scan-overlay").classList.remove("show");}
+function triggerScanPhoto(){document.getElementById("scan-file").click();}
+function handleScanPhoto(input){
+  if(!input.files||!input.files[0])return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var img=document.getElementById("scan-img");
+    img.src=e.target.result;
+    img.style.display="block";
+    document.getElementById("scan-result").style.display="none";
+    document.getElementById("scan-apply").style.display="none";
+    document.getElementById("scan-loading").style.display="block";
+    var b64=e.target.result.split(",")[1];
+    var mime=input.files[0].type||"image/jpeg";
+    callClaude(b64,mime);
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+function callClaude(b64,mime){
+  var key=localStorage.getItem(LS_KEY);
+  fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "x-api-key":key,
+      "anthropic-version":"2023-06-01",
+      "anthropic-dangerous-direct-browser-ipc":"true"
+    },
+    body:JSON.stringify({
+      model:"claude-sonnet-4-20250514",
+      max_tokens:200,
+      messages:[{role:"user",content:[
+        {type:"image",source:{type:"base64",media_type:mime,data:b64}},
+        {type:"text",text:'Przeanalizuj zdjęcie produktu spożywczego. Odpowiedz TYLKO JSON bez markdown:\n{"produkt":"nazwa po polsku","data":"DD.MM.YYYY lub null","uwaga":"opcjonalna uwaga"}'}
+      ]}]
+    })
+  }).then(function(r){return r.json();}).then(function(data){
+    document.getElementById("scan-loading").style.display="none";
+    var txt=data.content&&data.content[0]&&data.content[0].text;
+    if(!txt){showScanErr("Brak odpowiedzi");return;}
+    try{
+      var parsed=JSON.parse(txt.replace(/```json|```/g,"").trim());
+      scanData=parsed;
+      document.getElementById("scan-product").textContent=parsed.produkt||"Nieznany produkt";
+      document.getElementById("scan-date-txt").textContent=parsed.data&&parsed.data!=="null"?"📅 Data: "+parsed.data:"❌ Brak daty na zdjęciu";
+      document.getElementById("scan-note").textContent=parsed.uwaga||"";
+      document.getElementById("scan-result").style.display="block";
+      if(parsed.data&&parsed.data!=="null")document.getElementById("scan-apply").style.display="block";
+    }catch(e){showScanErr("Błąd parsowania");}
+  }).catch(function(e){
+    document.getElementById("scan-loading").style.display="none";
+    showScanErr("Błąd: "+e.message);
+  });
+}
+function showScanErr(msg){
+  document.getElementById("scan-product").textContent=msg;
+  document.getElementById("scan-date-txt").textContent="Sprawdź klucz API w ⚙️";
+  document.getElementById("scan-note").textContent="";
+  document.getElementById("scan-result").style.display="block";
+}
+function applyScan(){
+  if(!scanData||!scanData.data||scanData.data==="null")return;
+  var parts=scanData.data.split(".");
+  if(parts.length!==3)return;
+  var iso=parts[2]+"-"+parts[1]+"-"+parts[0];
+  closeScanner();
+  if(scanFromExpiry&&expiryItem){
+    document.getElementById("exp-overlay").classList.add("show");
+    setTimeout(function(){document.getElementById("exp-date-inp").value=iso;},50);
+    scanFromExpiry=false;
+  } else {
+    var name=scanData.produkt||"";
+    var found=null;
+    CATS.forEach(function(cat){
+      cat.items.forEach(function(it){
+        if(!found&&it.n.toLowerCase().indexOf(name.toLowerCase().slice(0,6))!==-1)found=it.n;
+      });
+    });
+    if(found){openExpiry(found);setTimeout(function(){document.getElementById("exp-date-inp").value=iso;},50);}
+    else{alert("Produkt: "+name+"\nData: "+scanData.data+"\n\nWybierz produkt ręcznie.");}
+  }
+}
+
+// ── SETTINGS ──────────────────────────────────────────────────────────────────
+function openSettings(){
+  var k=localStorage.getItem(LS_KEY)||"";
+  document.getElementById("api-key-inp").value=k?k.slice(0,20)+"...":"";
+  var row=document.getElementById("api-status-row");
+  if(k){row.style.display="block";row.className="api-row";row.textContent="✅ Klucz zapisany — skaner aktywny";}
+  else{row.style.display="none";}
+  document.getElementById("settings-overlay").classList.add("show");
+}
+function closeSettings(){document.getElementById("settings-overlay").classList.remove("show");}
+function saveApiKey(){
+  var v=document.getElementById("api-key-inp").value.trim();
+  if(!v||v.indexOf("...")>-1){alert("Wpisz pełny klucz API");return;}
+  if(!v.startsWith("sk-ant-")){alert("Nieprawidłowy klucz — powinien zaczynać się od sk-ant-");return;}
+  localStorage.setItem(LS_KEY,v);
+  var row=document.getElementById("api-status-row");
+  row.style.display="block";row.className="api-row";row.textContent="✅ Klucz zapisany!";
+  setTimeout(closeSettings,1000);
+}
+function clearApiKey(){
+  localStorage.removeItem(LS_KEY);
+  document.getElementById("api-key-inp").value="";
+  var row=document.getElementById("api-status-row");
+  row.style.display="block";row.className="api-row none";row.textContent="❌ Klucz usunięty";
+}
+
 // ── LOG ───────────────────────────────────────────────────────────────────────
-function addLog(what,old,nv){fbPost(LPATH,{who:userName,what:what,delta:nv-old,newVal:nv,ts:Date.now()});}
+function addLog(w,o,n){fbPost(LP,{who:userName,what:w,delta:n-o,newVal:n,ts:Date.now()});}
 function openLog(){document.getElementById("log-overlay").classList.add("show");renderLog();}
 function closeLog(){document.getElementById("log-overlay").classList.remove("show");}
 function renderLog(){
-  var body=document.getElementById("log-body");
-  body.innerHTML='<div class="log-empty">⏳ Ładowanie...</div>';
-  fbGet(LPATH).then(function(data){
-    if(!data){body.innerHTML='<div class="log-empty"><div>📋</div>Brak zmian</div>';return;}
-    var entries=Object.values(data).sort(function(a,b){return b.ts-a.ts;}).slice(0,200);
-    body.innerHTML=entries.map(function(e){
+  var b=document.getElementById("log-body");
+  b.innerHTML='<div class="log-empty">⏳ Ładowanie...</div>';
+  fbGet(LP).then(function(data){
+    if(!data){b.innerHTML='<div class="log-empty">📋 Brak zmian</div>';return;}
+    var en=Object.values(data).sort(function(a,b){return b.ts-a.ts;}).slice(0,200);
+    b.innerHTML=en.map(function(e){
       var d=new Date(e.ts);
-      var gdy=d.toLocaleDateString("pl-PL",{day:"2-digit",month:"2-digit"})+" "+d.toLocaleTimeString("pl-PL",{hour:"2-digit",minute:"2-digit"});
+      var g=d.toLocaleDateString("pl-PL",{day:"2-digit",month:"2-digit"})+" "+d.toLocaleTimeString("pl-PL",{hour:"2-digit",minute:"2-digit"});
       var delta=e.delta||0;
-      var badge=delta>0?'<span class="log-badge up">+'+delta+'</span>':'<span class="log-badge down">'+delta+'</span>';
-      var co=delta>0?"dodał/a":"zabrał/a";
-      return'<div class="log-entry">'+
-        '<div class="log-avatar" style="background:'+nameColor(e.who||"?")+'">'+nameInitial(e.who||"?")+'</div>'+
-        '<div class="log-info">'+
-          '<div class="log-who">'+(e.who||"?")+'</div>'+
-          '<div class="log-what">'+co+" "+Math.abs(delta)+" × "+(e.what||"?")+'</div>'+
-          '<div class="log-when">'+gdy+'</div>'+
-        '</div>'+badge+'</div>';
+      var badge=delta>0?'<span class="lbadge up">+'+delta+"</span>":'<span class="lbadge dn">'+delta+"</span>";
+      return'<div class="log-entry"><div class="log-av" style="background:'+nc(e.who||"?")+'">'
+        +ni(e.who||"?")+'</div><div class="log-info"><div class="log-who">'+(e.who||"?")
+        +'</div><div class="log-what">'+(delta>0?"dodał/a":"zabrał/a")+" "+Math.abs(delta)+" × "+(e.what||"?")
+        +'</div><div class="log-when">'+g+"</div></div>"+badge+"</div>";
     }).join("");
-  }).catch(function(){body.innerHTML='<div class="log-empty">❌ Błąd</div>';});
+  }).catch(function(){b.innerHTML='<div class="log-empty">❌ Błąd</div>';});
 }
 
 // ── LOGIN ─────────────────────────────────────────────────────────────────────
@@ -594,69 +624,53 @@ function doLogin(){
 
 // ── START ─────────────────────────────────────────────────────────────────────
 function startApp(){
-  Promise.all([fbGet(RPATH),fbGet(EPATH)]).then(function(results){
-    var remote=results[0], expiryData=results[1];
+  Promise.all([fbGet(RP),fbGet(EP)]).then(function(res){
+    var remote=res[0],exp=res[1];
     state=mkState();
-    if(remote){
-      Object.keys(remote).forEach(function(k){
-        if(k in state)state[k]=remote[k]||0;
-        if(k==="__shopTs")lastShopTs=remote[k];
-      });
-    } else {
-      fbPatch(RPATH,state);
-    }
+    if(remote){Object.keys(remote).forEach(function(k){
+      if(k in state)state[k]=remote[k]||0;
+      if(k==="__shopTs")shopTs=remote[k];
+    });}
+    else{fbPatch(RP,state);}
     expiry={};
-    if(expiryData){
-      Object.keys(expiryData).forEach(function(k){expiry[k]=expiryData[k];});
-    }
+    if(exp)Object.keys(exp).forEach(function(k){if(exp[k])expiry[k]=exp[k];});
     document.getElementById("splash").style.display="none";
     document.getElementById("app").style.display="block";
     updateShopBar();setSyncUI("ok");render();
     setInterval(function(){
-      Promise.all([fbGet(RPATH),fbGet(EPATH)]).then(function(res){
-        var r=res[0],e=res[1];
-        var ch=false;
+      Promise.all([fbGet(RP),fbGet(EP)]).then(function(res){
+        var r=res[0],e=res[1];var ch=false;
         if(r){Object.keys(r).forEach(function(k){
           if(k in state&&r[k]!==state[k]){state[k]=r[k]||0;ch=true;}
-          if(k==="__shopTs"&&r[k]!==lastShopTs){lastShopTs=r[k];updateShopBar();ch=true;}
+          if(k==="__shopTs"&&r[k]!==shopTs){shopTs=r[k];updateShopBar();ch=true;}
         });}
         expiry={};
-        if(e){Object.keys(e).forEach(function(k){expiry[k]=e[k];ch=true;});}
+        if(e)Object.keys(e).forEach(function(k){if(e[k])expiry[k]=e[k];});
         if(ch)render();setSyncUI("ok");
       }).catch(function(){setSyncUI("err");});
     },3000);
   }).catch(function(e){
     document.querySelector(".spin").style.display="none";
     document.getElementById("splash-lbl").innerHTML=
-      "❌ "+e.message+
-      "<br><br><button onclick='startApp()' style='background:#16A34A;color:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:14px;font-weight:800;cursor:pointer'>🔄 Spróbuj ponownie</button>"+
-      "<br><br><button onclick='goOffline()' style='background:#334155;color:#94A3B8;border:none;border-radius:10px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px'>Otwórz bez synchronizacji</button>";
+      "❌ "+e.message+"<br><br>"+
+      "<button onclick='startApp()' style='background:#16A34A;color:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:14px;font-weight:800;cursor:pointer'>🔄 Spróbuj ponownie</button><br><br>"+
+      "<button onclick='goOffline()' style='background:#334155;color:#94A3B8;border:none;border-radius:10px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;margin-top:4px'>Otwórz bez synchronizacji</button>";
   });
 }
-function goOffline(){
-  state=mkState();
-  document.getElementById("splash").style.display="none";
-  document.getElementById("app").style.display="block";
-  setSyncUI("err");render();
-}
+function goOffline(){state=mkState();document.getElementById("splash").style.display="none";document.getElementById("app").style.display="block";setSyncUI("err");render();}
+function resetAll(){if(!confirm("Reset?\n(wszyscy zobaczą)"))return;state=mkState();render();fbPatch(RP,state).then(function(){addLog("🗑️ RESET",0,0);});}
 
 // ── ACTIONS ───────────────────────────────────────────────────────────────────
-function change(id,delta,max,productName,btn){
+function change(id,delta,max,name,btn){
   if(btn){btn.disabled=true;setTimeout(function(){btn.disabled=false;},500);}
-  var old=state[id]||0;
-  var nv=Math.min(max*2,Math.max(0,old+delta));
-  if(nv===old)return;
+  var o=state[id]||0,nv=Math.min(max*2,Math.max(0,o+delta));
+  if(nv===o)return;
   state[id]=nv;render();
   clearTimeout(saveTimer);setSyncUI("saving");
   saveTimer=setTimeout(function(){
     var p={};p[id]=nv;
-    fbPatch(RPATH,p).then(function(){addLog(productName,old,nv);setSyncUI("ok");}).catch(function(){setSyncUI("err");});
+    fbPatch(RP,p).then(function(){addLog(name,o,nv);setSyncUI("ok");}).catch(function(){setSyncUI("err");});
   },600);
-}
-function resetAll(){
-  if(!confirm("Zresetować wszystkie stany do zera?\n(wszyscy zobaczą reset)"))return;
-  state=mkState();render();
-  fbPatch(RPATH,state).then(function(){addLog("🗑️ RESET",0,0);});
 }
 function setFilter(f){
   filter=f;
@@ -670,26 +684,25 @@ function setFilter(f){
 }
 function onSearch(q){searchQ=q.toLowerCase().trim();document.getElementById("xbtn").style.display=q?"block":"none";render();}
 function clearSearch(){document.getElementById("sinp").value="";onSearch("");}
-function cls(cur,target){return cur>=target?"grn":cur>0?"low":"red";}
+function cls(c,t){return c>=t?"grn":c>0?"low":"red";}
 
 // ── RENDER ────────────────────────────────────────────────────────────────────
 function render(){
   var body=document.getElementById("body");
   var nR=0,nG=0,tot=0;
   CATS.forEach(function(c){c.items.forEach(function(it){
-    cls(state[fbKey(c.id,it.n)]||0,it.target)==="grn"?nG++:nR++;tot++;
+    cls(state[fbk(c.id,it.n)]||0,it.target)==="grn"?nG++:nR++;tot++;
   });});
   document.getElementById("n-red").textContent=nR;
   document.getElementById("n-grn").textContent=nG;
   document.getElementById("n-all").textContent=tot;
-
   var html="",any=false;
   CATS.forEach(function(cat){
     var vis=cat.items.filter(function(it){
-      var c=cls(state[fbKey(cat.id,it.n)]||0,it.target);
+      var c=cls(state[fbk(cat.id,it.n)]||0,it.target);
       if(filter==="red"&&c==="grn")return false;
       if(filter==="grn"&&c!=="grn")return false;
-      if(filter==="exp"&&!isExpiringSoon(it))return false;
+      if(filter==="exp"&&!expiringSoon(it))return false;
       if(searchQ&&it.n.toLowerCase().indexOf(searchQ)===-1)return false;
       return true;
     });
@@ -697,207 +710,51 @@ function render(){
     any=true;
     html+='<div class="cat"><div class="cat-hdr"><span>'+cat.ic+"</span>"+cat.label+"</div>";
     vis.forEach(function(it){
-      var id=fbKey(cat.id,it.n);
-      var ie=id.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
-      var ne=it.n.replace(/'/g,"\\'").replace(/\\/g,"\\\\");
-      var cur=state[id]||0;
-      var c=cls(cur,it.target);
+      var id=fbk(cat.id,it.n);
+      var ie=id.replace(/'/g,"\\'");
+      var ne=it.n.replace(/'/g,"\\'");
+      var cur=state[id]||0,c=cls(cur,it.target);
       var pct=Math.min(100,Math.round(cur/it.target*100));
       var brak=Math.max(0,it.target-cur);
       var bt=c==="grn"?"✅ JEST":"KUP "+brak;
       var bs=c==="grn"?"":it.unit;
-      var ql=c==="grn"
-        ?'<span style="color:#22C55E">✅ Wystarczy</span>'
-        :c==="low"
-          ?'<span style="color:#F59E0B">🟡 Kup jeszcze '+brak+" "+it.unit+"</span>"
-          :'<span style="color:#EF4444">🔴 Brak — kup '+brak+" "+it.unit+"</span>";
+      var ql=c==="grn"?'<span style="color:#22C55E">✅ Wystarczy</span>'
+        :c==="low"?'<span style="color:#F59E0B">🟡 Kup '+brak+" "+it.unit+"</span>"
+        :'<span style="color:#EF4444">🔴 Brak — kup '+brak+" "+it.unit+"</span>";
       var nm=it.n;
-      if(searchQ){
-        var si=it.n.toLowerCase().indexOf(searchQ);
-        if(si>=0)nm=it.n.slice(0,si)+'<mark style="background:#FACC15;color:#0F172A;border-radius:3px;padding:0 2px">'+it.n.slice(si,si+searchQ.length)+"</mark>"+it.n.slice(si+searchQ.length);
-      }
-      var fh=it.days?freshHtml(it):"";
-      var hasExpiry=it.days?true:false;
-      var expiryBtn=hasExpiry?'<button class="exp-btn '+(getDaysLeft(it)!==null?(getDaysLeft(it)<=0?"exp-bad":getDaysLeft(it)<=2?"exp-warn":"exp-set"):"")+'" onclick="openExpiry(\''+ne+'\')">📅 '+(getDaysLeft(it)!==null?getDaysLeft(it)<=0?"Przeterminowane":getDaysLeft(it)+" dni":"Ustaw datę")+"</button>":"";
-
-      html+='<div class="item '+c+'">'+
-        '<div class="item-top">'+
-          '<div class="item-name">'+nm+fh+"</div>"+
-          '<div class="kup">'+bt+'<br><span style="font-size:12px;opacity:.9;font-weight:700">'+bs+"</span></div>"+
-        "</div>"+
-        '<div class="prog-row">'+
-          '<div class="prog-bg"><div class="prog-fill" style="width:'+pct+'%"></div></div>'+
-          '<div class="prog-txt">'+cur+" / "+it.target+" "+it.unit+"</div>"+
-        "</div>"+
-        '<div class="qty-row">'+
-          '<div class="qty-lbl">'+ql+"</div>"+
-          '<div class="qty-ctrl">'+
-            '<button class="qbtn" onclick="change(\''+ie+"',-1,"+it.target+",'"+ne+"',this)\">−</button>"+
-            '<div class="qnum"><div class="qnum-cur">'+cur+'</div><div class="qnum-unit">'+it.unit+"</div></div>"+
-            '<button class="qbtn" onclick="change(\''+ie+"',1,"+it.target+",'"+ne+"',this)\">+</button>"+
-          "</div>"+
-        "</div>"+
-        (expiryBtn?'<div class="expiry-row">'+expiryBtn+"</div>":"")+
-      "</div>";
+      if(searchQ){var si=it.n.toLowerCase().indexOf(searchQ);
+        if(si>=0)nm=it.n.slice(0,si)+'<mark style="background:#FACC15;color:#0F172A;border-radius:3px;padding:0 2px">'+it.n.slice(si,si+searchQ.length)+"</mark>"+it.n.slice(si+searchQ.length);}
+      var fh=it.days?fHtml(it):"";
+      var dl=getDaysLeft(it);
+      var expCls=dl===null?"":dl<=0?"bad":dl<=2?"warn":"ok";
+      var expTxt=dl===null?"Ustaw datę":dl<=0?"Przeterminowane":dl+" dni";
+      var expBtn=it.days?'<div class="exp-row"><button class="exp-btn '+expCls+'" onclick="openExpiry(\''+ne+'\')">📅 '+expTxt+"</button></div>":"";
+      html+='<div class="item '+c+'"><div class="item-top"><div class="item-name">'+nm+fh+"</div>"
+        +'<div class="kup">'+bt+'<br><span style="font-size:12px;opacity:.9;font-weight:700">'+bs+"</span></div></div>"
+        +'<div class="prog-row"><div class="prog-bg"><div class="prog-fill" style="width:'+pct+'%"></div></div>'
+        +'<div class="prog-txt">'+cur+" / "+it.target+" "+it.unit+"</div></div>"
+        +'<div class="qty-row"><div class="qty-lbl">'+ql+"</div>"
+        +'<div class="qty-ctrl">'
+        +'<button class="qbtn" onclick="change(\''+ie+"',-1,"+it.target+",'"+ne+"',this)\">−</button>"
+        +'<div class="qnum"><div class="qnum-cur">'+cur+'</div><div class="qnum-unit">'+it.unit+"</div></div>"
+        +'<button class="qbtn" onclick="change(\''+ie+"',1,"+it.target+",'"+ne+"',this)\">+</button>"
+        +"</div></div>"+expBtn+"</div>";
     });
     html+="</div>";
   });
   if(!any){
-    var ic=filter==="exp"?"⚠️":searchQ?"🔍":filter==="red"?"🎉":"📦";
-    var ms=filter==="exp"?"Żaden produkt nie wygasa w ciągu 3 dni 🎉":searchQ?'Brak wyników dla "'+searchQ+'"':filter==="red"?"Nic nie trzeba kupić!":"Brak produktów";
+    var ic=filter==="exp"?"🎉":searchQ?"🔍":filter==="red"?"🎉":"📦";
+    var ms=filter==="exp"?"Żaden produkt nie wygasa wkrótce":searchQ?"Brak wyników":filter==="red"?"Nic do kupienia!":"Brak produktów";
     html='<div class="empty"><div>'+ic+"</div>"+ms+"</div>";
   }
   body.innerHTML=html;
 }
 
-// ── API KEY SETTINGS ─────────────────────────────────────────────────────────
-var LS_APIKEY = "spiz_apikey";
-function getApiKey(){ return localStorage.getItem(LS_APIKEY)||""; }
-function openSettings(){
-  var inp = document.getElementById("api-key-inp");
-  var k = getApiKey();
-  inp.value = k ? k.slice(0,20)+"..." : "";
-  var st = document.getElementById("api-status");
-  if(k){ st.className="api-status ok"; st.textContent="✅ Klucz zapisany — skaner aktywny"; }
-  else { st.className="api-status"; st.style.display="none"; }
-  document.getElementById("settings-overlay").classList.add("show");
-}
-function closeSettings(){ document.getElementById("settings-overlay").classList.remove("show"); }
-function saveApiKey(){
-  var v = document.getElementById("api-key-inp").value.trim();
-  if(!v||v.indexOf("...")>-1){ alert("Wpisz pełny klucz API"); return; }
-  if(!v.startsWith("sk-ant-")){ alert("Nieprawidłowy klucz — powinien zaczynać się od sk-ant-"); return; }
-  localStorage.setItem(LS_APIKEY, v);
-  var st = document.getElementById("api-status");
-  st.className="api-status ok"; st.textContent="✅ Klucz zapisany — skaner aktywny";
-}
-function clearApiKey(){
-  localStorage.removeItem(LS_APIKEY);
-  document.getElementById("api-key-inp").value="";
-  var st = document.getElementById("api-status");
-  st.className="api-status err"; st.textContent="❌ Klucz usunięty";
-}
-
-// ── SCANNER ───────────────────────────────────────────────────────────────────
-var scanResult = null;
-function openScanner(){
-  var k = getApiKey();
-  if(!k){ alert("Najpierw dodaj klucz API w ustawieniach ⚙️"); openSettings(); return; }
-  document.getElementById("scan-preview").style.display="none";
-  document.getElementById("scan-result").style.display="none";
-  document.getElementById("scan-loading").style.display="none";
-  document.getElementById("scan-apply-btn").style.display="none";
-  scanResult=null;
-  document.getElementById("scanner-overlay").classList.add("show");
-}
-function closeScanner(){ document.getElementById("scanner-overlay").classList.remove("show"); }
-function startScan(){ document.getElementById("scan-input").click(); }
-
-function handleScan(input){
-  if(!input.files||!input.files[0])return;
-  var file = input.files[0];
-  var reader = new FileReader();
-  reader.onload = function(e){
-    var b64 = e.target.result.split(",")[1];
-    var mime = file.type || "image/jpeg";
-    var img = document.getElementById("scan-preview");
-    img.src = e.target.result;
-    img.style.display="block";
-    document.getElementById("scan-result").style.display="none";
-    document.getElementById("scan-apply-btn").style.display="none";
-    document.getElementById("scan-loading").style.display="block";
-    scanWithClaude(b64, mime);
-  };
-  reader.readAsDataURL(file);
-}
-
-function scanWithClaude(b64, mime){
-  var key = getApiKey();
-  fetch("https://api.anthropic.com/v1/messages",{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json",
-      "x-api-key": key,
-      "anthropic-version":"2023-06-01",
-      "anthropic-dangerous-direct-browser-ipc":"true"
-    },
-    body: JSON.stringify({
-      model:"claude-sonnet-4-20250514",
-      max_tokens:200,
-      messages:[{
-        role:"user",
-        content:[
-          {type:"image",source:{type:"base64",media_type:mime,data:b64}},
-          {type:"text",text:"Przeanalizuj to zdjęcie produktu spożywczego. Odpowiedz TYLKO w formacie JSON:
-{"produkt":"nazwa produktu po polsku","data":"DD.MM.YYYY lub null jeśli nie widać","uwaga":"krótka uwaga jeśli potrzebna"}
-Nie dodawaj nic poza JSON."}
-        ]
-      }]
-    })
-  }).then(function(r){ return r.json(); }).then(function(data){
-    document.getElementById("scan-loading").style.display="none";
-    var text = data.content && data.content[0] && data.content[0].text;
-    if(!text){ showScanError("Brak odpowiedzi z API"); return; }
-    try{
-      var clean = text.replace(/```json|```/g,"").trim();
-      var parsed = JSON.parse(clean);
-      scanResult = parsed;
-      document.getElementById("scan-product").textContent = parsed.produkt||"Nieznany produkt";
-      document.getElementById("scan-date").textContent = parsed.data ? "📅 Data: "+parsed.data : "❌ Nie znaleziono daty";
-      document.getElementById("scan-note").textContent = parsed.uwaga||"";
-      document.getElementById("scan-result").style.display="block";
-      if(parsed.data&&parsed.data!=="null"){
-        document.getElementById("scan-apply-btn").style.display="block";
-      }
-    }catch(e){ showScanError("Błąd parsowania: "+text); }
-  }).catch(function(e){
-    document.getElementById("scan-loading").style.display="none";
-    showScanError("Błąd API: "+e.message);
-  });
-}
-
-function showScanError(msg){
-  document.getElementById("scan-product").textContent=msg;
-  document.getElementById("scan-date").textContent="";
-  document.getElementById("scan-note").textContent="Sprawdź klucz API w ustawieniach ⚙️";
-  document.getElementById("scan-result").style.display="block";
-}
-
-function applyScanResult(){
-  if(!scanResult||!scanResult.data)return;
-  var parts = scanResult.data.split(".");
-  if(parts.length!==3)return;
-  var ts = new Date(parts[2]+"-"+parts[1]+"-"+parts[0]).getTime();
-  if(isNaN(ts))return;
-  // Otwórz modal daty przydatności z produktem
-  closeScanner();
-  // Znajdź produkt na liście
-  var found = null;
-  CATS.forEach(function(cat){
-    cat.items.forEach(function(it){
-      if(it.n.toLowerCase().indexOf((scanResult.produkt||"").toLowerCase().slice(0,8))!==-1){
-        if(!found) found=it;
-      }
-    });
-  });
-  if(found){
-    openExpiry(found.n);
-    setTimeout(function(){
-      document.getElementById("exp-date-inp").value = parts[2]+"-"+parts[1]+"-"+parts[0];
-    },100);
-  } else {
-    alert("Produkt: "+scanResult.produkt+"
-Data: "+scanResult.data+"
-
-Wybierz produkt ręcznie i ustaw datę.");
-  }
-}
-
 // ── INIT ──────────────────────────────────────────────────────────────────────
 document.getElementById("splash").style.display="none";
 document.getElementById("login").style.display="flex";
-var savedName=localStorage.getItem(LS_NAME);
-if(savedName)document.getElementById("name-inp").value=savedName;
+var sn=localStorage.getItem(LS_NAME);
+if(sn)document.getElementById("name-inp").value=sn;
 </script>
 </body>
 </html>
