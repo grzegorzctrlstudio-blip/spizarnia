@@ -7,22 +7,28 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0F172A;min-height:100vh;padding-bottom:40px}
+
+/* SPLASH */
 #splash{min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px}
 .spin{width:44px;height:44px;border:4px solid #334155;border-top-color:#22C55E;border-radius:50%;animation:rot 1s linear infinite}
 @keyframes rot{to{transform:rotate(360deg)}}
-.spin-lbl{font-size:13px;color:#64748B;font-weight:600;text-align:center;line-height:1.6;max-width:300px}
+.spin-lbl{font-size:13px;color:#64748B;font-weight:600;text-align:center;line-height:1.8;max-width:300px}
+
+/* LOGIN */
 #login{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;gap:16px}
-#login h2{font-size:26px;font-weight:900;color:#F1F5F9}
-#login p{font-size:13px;color:#64748B;text-align:center}
-.name-inp{width:100%;max-width:340px;background:#1E293B;border:2px solid #334155;border-radius:14px;padding:16px 18px;font-size:18px;color:#F1F5F9;outline:none;text-align:center;font-weight:700}
+#login h2{font-size:26px;font-weight:900;color:#fff}
+#login p{font-size:13px;color:#64748B}
+.name-inp{width:100%;max-width:340px;background:#1E293B;border:2px solid #334155;border-radius:14px;padding:16px 18px;font-size:18px;color:#fff;outline:none;text-align:center;font-weight:700}
 .name-inp:focus{border-color:#38BDF8}
 .name-inp::placeholder{color:#475569;font-weight:400}
 .login-btn{width:100%;max-width:340px;background:linear-gradient(135deg,#16A34A,#059669);color:#fff;border:none;border-radius:14px;padding:16px;font-size:17px;font-weight:900;cursor:pointer}
 .login-btn:active{transform:scale(.97)}
+
+/* HEADER */
 .hdr{background:linear-gradient(135deg,#1E293B,#334155);padding:14px 16px 12px;border-bottom:1px solid #334155;position:sticky;top:0;z-index:10}
 .hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .title-row{display:flex;align-items:center;gap:8px}
-.title-row h1{font-size:18px;font-weight:800;color:#F1F5F9}
+.title-row h1{font-size:18px;font-weight:800;color:#fff}
 .sync-pill{display:flex;align-items:center;gap:5px;background:#0F172A;border:1.5px solid #1E293B;border-radius:20px;padding:4px 10px}
 .sdot{width:8px;height:8px;border-radius:50%;background:#22C55E;flex-shrink:0}
 .sdot.pulse{animation:pulse 1s infinite}
@@ -34,61 +40,62 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .hbtn{background:#334155;border:none;border-radius:20px;padding:7px 12px;font-size:11px;font-weight:700;cursor:pointer;color:#94A3B8}
 .hbtn.log-btn{color:#818CF8}
 .hbtn.danger{color:#F87171}
+
+/* STATS */
 .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:10px}
 .stat{background:#0F172A;border-radius:11px;padding:9px 6px;text-align:center;border:1.5px solid #1E293B}
-.stat-n{font-size:24px;font-weight:900;line-height:1}
+.stat-n{font-size:24px;font-weight:900;line-height:1;color:#fff}
 .stat-l{font-size:9px;font-weight:700;margin-top:3px;text-transform:uppercase;letter-spacing:.8px}
 .stat.red{border-color:#7F1D1D}.stat.red .stat-n{color:#F87171}.stat.red .stat-l{color:#EF4444}
 .stat.grn{border-color:#14532D}.stat.grn .stat-n{color:#4ADE80}.stat.grn .stat-l{color:#22C55E}
-.stat.all .stat-n{color:#94A3B8}.stat.all .stat-l{color:#475569}
-.shop-bar{background:#0F172A;border:1.5px solid #334155;border-radius:12px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.stat.all .stat-n{color:#fff}.stat.all .stat-l{color:#475569}
+
+/* SHOP BAR */
+.shop-bar{background:#0F172A;border:1.5px solid #334155;border-radius:12px;padding:10px 14px;margin-bottom:10px}
+.shop-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
 .shop-date{font-size:11px;color:#94A3B8;font-weight:600;line-height:1.5}
-.shop-date strong{color:#F1F5F9;font-size:12px;display:block}
-.shop-btn{background:linear-gradient(135deg,#16A34A,#059669);border:none;color:#fff;border-radius:10px;padding:9px 14px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.shop-date strong{color:#fff;font-size:12px;display:block}
+.shop-btns{display:flex;gap:6px;flex-shrink:0}
+.shop-btn{background:linear-gradient(135deg,#16A34A,#059669);border:none;color:#fff;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap}
 .shop-btn:active{transform:scale(.95)}
+.shop-edit{background:#334155;border:none;color:#94A3B8;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.date-edit-row{display:flex;align-items:center;gap:8px;margin-top:2px}
+.date-inp{background:#1E293B;border:1.5px solid #334155;border-radius:8px;padding:6px 10px;font-size:12px;color:#fff;outline:none;flex:1}
+.date-inp:focus{border-color:#38BDF8}
+.date-save{background:#16A34A;border:none;color:#fff;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:800;cursor:pointer}
+.date-cancel{background:#334155;border:none;color:#94A3B8;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer}
+
+/* FRESH */
 .fresh-ok{font-size:10px;color:#22C55E;font-weight:700;margin-top:2px}
 .fresh-warn{font-size:10px;color:#F59E0B;font-weight:700;margin-top:2px}
 .fresh-bad{font-size:10px;color:#EF4444;font-weight:800;margin-top:2px}
+
+/* SEARCH */
 .search-row{margin-bottom:10px;position:relative}
 .sico{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none}
-.sinp{width:100%;background:#0F172A;border:1.5px solid #334155;border-radius:10px;padding:9px 36px 9px 34px;font-size:13px;color:#F1F5F9;outline:none}
+.sinp{width:100%;background:#0F172A;border:1.5px solid #334155;border-radius:10px;padding:9px 36px 9px 34px;font-size:13px;color:#fff;outline:none}
 .sinp:focus{border-color:#38BDF8}
 .sinp::placeholder{color:#475569}
 .xbtn{display:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#64748B;font-size:16px;cursor:pointer}
+
+/* FILTERS */
 .filters{display:flex;gap:6px}
 .f{flex:1;padding:8px 4px;border-radius:10px;border:none;font-weight:700;font-size:11px;cursor:pointer;transition:all .15s}
 .f.act{color:#fff}
 .f:not(.act){background:#1E293B;color:#64748B}
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;align-items:flex-end;justify-content:center}
-.overlay.show{display:flex}
-.log-modal{background:#1E293B;border-radius:20px 20px 0 0;width:100%;max-width:600px;max-height:80vh;display:flex;flex-direction:column;border-top:1px solid #334155}
-.log-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid #334155;flex-shrink:0}
-.log-hdr h3{font-size:16px;font-weight:800;color:#F1F5F9}
-.log-close{background:#334155;border:none;color:#94A3B8;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer}
-.log-body{overflow-y:auto;padding:12px 16px;flex:1}
-.log-entry{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #1E293B}
-.log-entry:last-child{border-bottom:none}
-.log-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;flex-shrink:0;color:#fff}
-.log-info{flex:1}
-.log-who{font-size:12px;font-weight:800;color:#F1F5F9}
-.log-what{font-size:11.5px;color:#94A3B8;margin-top:2px;line-height:1.4}
-.log-when{font-size:10px;color:#475569;margin-top:2px}
-.log-badge{font-size:11px;font-weight:800;border-radius:6px;padding:2px 8px;flex-shrink:0;margin-top:2px}
-.log-badge.up{background:#14532D;color:#4ADE80}
-.log-badge.down{background:#7F1D1D;color:#F87171}
-.log-empty{text-align:center;padding:40px 20px;color:#475569;font-size:13px}
+
+/* BODY */
 .body{padding:0 12px}
 .cat{margin-top:14px}
 .cat-hdr{font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#475569;margin-bottom:7px;padding:0 2px;display:flex;align-items:center;gap:6px}
+
+/* ITEMS */
 .item{background:#1E293B;border-radius:15px;margin-bottom:7px;padding:12px 13px;border:2px solid #334155}
 .item.red{border-color:#7F1D1D;background:#1C0A0A}
 .item.grn{border-color:#14532D;background:#0A1C0A}
 .item.low{border-color:#78350F;background:#1C130A}
 .item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:9px}
-.item-name{font-size:13px;font-weight:700;line-height:1.35;flex:1}
-.item.red .item-name{color:#FCA5A5}
-.item.grn .item-name{color:#86EFAC}
-.item.low .item-name{color:#FCD34D}
+.item-name{font-size:13px;font-weight:700;line-height:1.35;flex:1;color:#fff}
 .kup{flex-shrink:0;border-radius:11px;padding:7px 13px;font-size:15px;font-weight:900;text-align:center;line-height:1.2;white-space:nowrap}
 .item.red .kup{background:#DC2626;color:#fff}
 .item.low .kup{background:#D97706;color:#fff}
@@ -99,10 +106,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .item.red .prog-fill{background:linear-gradient(90deg,#DC2626,#EF4444)}
 .item.low .prog-fill{background:linear-gradient(90deg,#D97706,#F59E0B)}
 .item.grn .prog-fill{background:linear-gradient(90deg,#16A34A,#22C55E)}
-.prog-txt{font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0}
-.item.red .prog-txt{color:#F87171}
-.item.low .prog-txt{color:#FCD34D}
-.item.grn .prog-txt{color:#4ADE80}
+.prog-txt{font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0;color:#fff}
 .qty-row{display:flex;align-items:center;gap:8px}
 .qty-lbl{font-size:10.5px;flex:1}
 .qty-ctrl{display:flex;align-items:center;gap:4px}
@@ -112,11 +116,53 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .item.low .qbtn{background:#78350F;color:#FCD34D}
 .item.grn .qbtn{background:#14532D;color:#86EFAC}
 .qnum{min-width:48px;height:42px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0F172A;border-radius:10px}
-.qnum-cur{font-size:20px;font-weight:900;line-height:1}
-.item.red .qnum-cur{color:#FCA5A5}
-.item.low .qnum-cur{color:#FCD34D}
-.item.grn .qnum-cur{color:#4ADE80}
+.qnum-cur{font-size:20px;font-weight:900;line-height:1;color:#fff}
 .qnum-unit{font-size:8.5px;color:#475569;font-weight:600;margin-top:1px}
+
+/* EXPIRY DATE BUTTON ON ITEM */
+.expiry-row{display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap}
+.exp-lbl{font-size:10px;color:#475569}
+.exp-btn{background:#0F172A;border:1px solid #334155;border-radius:8px;padding:3px 8px;font-size:11px;color:#94A3B8;cursor:pointer;display:flex;align-items:center;gap:4px}
+.exp-btn:active{transform:scale(.95)}
+.exp-set{border-color:#16A34A;color:#4ADE80}
+.exp-warn{border-color:#D97706;color:#FCD34D}
+.exp-bad{border-color:#DC2626;color:#F87171}
+
+/* PHOTO MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;align-items:center;justify-content:center;padding:20px}
+.overlay.show{display:flex}
+.modal{background:#1E293B;border-radius:18px;padding:20px;width:100%;max-width:400px;border:1.5px solid #334155}
+.modal h3{font-size:16px;font-weight:800;color:#fff;margin-bottom:8px}
+.modal p{font-size:12px;color:#94A3B8;margin-bottom:12px;line-height:1.6}
+.modal-btns{display:flex;gap:8px;flex-wrap:wrap}
+.mbtn{flex:1;min-width:100px;padding:12px;border-radius:10px;border:none;font-weight:800;font-size:13px;cursor:pointer}
+.mbtn.ok{background:#16A34A;color:#fff}
+.mbtn.cam{background:#1D4ED8;color:#fff}
+.mbtn.cancel{background:#334155;color:#94A3B8}
+.photo-preview{width:100%;border-radius:12px;margin-bottom:12px;max-height:200px;object-fit:cover;display:none}
+.date-manual{width:100%;background:#0F172A;border:1.5px solid #334155;border-radius:10px;padding:12px;font-size:16px;color:#fff;outline:none;margin-bottom:10px;text-align:center}
+.date-manual:focus{border-color:#38BDF8}
+
+/* LOG MODAL */
+.log-modal{background:#1E293B;border-radius:20px 20px 0 0;width:100%;max-width:600px;max-height:80vh;display:flex;flex-direction:column;border-top:1px solid #334155}
+.log-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid #334155;flex-shrink:0}
+.log-hdr h3{font-size:16px;font-weight:800;color:#fff}
+.log-close{background:#334155;border:none;color:#94A3B8;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer}
+.log-body{overflow-y:auto;padding:12px 16px;flex:1}
+.log-entry{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #0F172A}
+.log-entry:last-child{border-bottom:none}
+.log-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;flex-shrink:0;color:#fff}
+.log-info{flex:1}
+.log-who{font-size:12px;font-weight:800;color:#fff}
+.log-what{font-size:11.5px;color:#94A3B8;margin-top:2px}
+.log-when{font-size:10px;color:#475569;margin-top:2px}
+.log-badge{font-size:11px;font-weight:800;border-radius:6px;padding:2px 8px;flex-shrink:0}
+.log-badge.up{background:#14532D;color:#4ADE80}
+.log-badge.down{background:#7F1D1D;color:#F87171}
+.log-empty{text-align:center;padding:40px 20px;color:#475569;font-size:13px}
+
+.log-overlay{align-items:flex-end}
+
 .empty{text-align:center;padding:40px 20px;color:#475569;font-size:13px}
 .empty div{font-size:36px;margin-bottom:8px}
 </style>
@@ -149,7 +195,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       </div>
       <div class="hdr-btns">
         <div class="user-pill" id="user-pill"></div>
-        <button class="hbtn log-btn" onclick="openLog()">📋 Historia</button>
+        <button class="hbtn log-btn" onclick="openLog()">📋</button>
         <button class="hbtn danger" onclick="resetAll()">🗑️</button>
       </div>
     </div>
@@ -158,12 +204,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="stat grn"><div class="stat-n" id="n-grn">0</div><div class="stat-l">🟢 Jest</div></div>
       <div class="stat all"><div class="stat-n" id="n-all">0</div><div class="stat-l">Produktów</div></div>
     </div>
+    <!-- SHOP BAR -->
     <div class="shop-bar">
-      <div class="shop-date">
-        <strong id="shop-date-lbl">Nie ustawiono daty zakupów</strong>
-        <span id="shop-days-lbl" style="font-size:11px;color:#64748B"></span>
+      <div class="shop-top">
+        <div class="shop-date">
+          <strong id="shop-date-lbl">Nie ustawiono daty zakupów</strong>
+          <span id="shop-days-lbl" style="font-size:11px;color:#64748B"></span>
+        </div>
+        <div class="shop-btns">
+          <button class="shop-edit" onclick="toggleDateEdit()">✏️ Edytuj</button>
+          <button class="shop-btn" onclick="markShopping()">🛍️ Byłem!</button>
+        </div>
       </div>
-      <button class="shop-btn" onclick="markShopping()">🛍️ Byłem w sklepie!</button>
+      <div class="date-edit-row" id="date-edit-row" style="display:none">
+        <input type="date" class="date-inp" id="date-inp">
+        <button class="date-save" onclick="saveDateEdit()">✓</button>
+        <button class="date-cancel" onclick="toggleDateEdit()">✕</button>
+      </div>
     </div>
     <div class="search-row">
       <span class="sico">🔍</span>
@@ -171,15 +228,33 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <button class="xbtn" id="xbtn" onclick="clearSearch()">✕</button>
     </div>
     <div class="filters">
-      <button class="f act" id="f-all" onclick="setFilter('all')" style="background:#334155">Wszystko</button>
-      <button class="f" id="f-red" onclick="setFilter('red')">🔴 Kupić</button>
-      <button class="f" id="f-grn" onclick="setFilter('grn')">🟢 Jest</button>
+      <button class="f act" id="f-all"  onclick="setFilter('all')"  style="background:#334155">Wszystko</button>
+      <button class="f"     id="f-exp"  onclick="setFilter('exp')">⚠️ Wygasają</button>
+      <button class="f"     id="f-red"  onclick="setFilter('red')">🔴 Kupić</button>
+      <button class="f"     id="f-grn"  onclick="setFilter('grn')">🟢 Jest</button>
     </div>
   </div>
   <div class="body" id="body"></div>
 </div>
 
-<div class="overlay" id="log-overlay" onclick="if(event.target===this)closeLog()">
+<!-- EXPIRY MODAL -->
+<div class="overlay" id="exp-overlay" onclick="if(event.target===this)closeExpiry()">
+  <div class="modal">
+    <h3 id="exp-modal-title">📅 Data przydatności</h3>
+    <p id="exp-modal-name" style="color:#94A3B8;font-size:12px;margin-bottom:12px"></p>
+    <img class="photo-preview" id="photo-preview" alt="Zdjęcie produktu">
+    <input type="date" class="date-manual" id="exp-date-inp" placeholder="DD.MM.RRRR">
+    <div class="modal-btns">
+      <button class="mbtn cam" onclick="takePhoto()">📷 Zdjęcie</button>
+      <button class="mbtn ok"  onclick="saveExpiry()">✅ Zapisz</button>
+      <button class="mbtn cancel" onclick="clearExpiry()">🗑️ Usuń</button>
+    </div>
+    <input type="file" id="photo-input" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(this)">
+  </div>
+</div>
+
+<!-- LOG OVERLAY -->
+<div class="overlay log-overlay" id="log-overlay" onclick="if(event.target===this)closeLog()">
   <div class="log-modal">
     <div class="log-hdr">
       <h3>📋 Historia zmian</h3>
@@ -190,32 +265,34 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </div>
 
 <script>
-var FB = "https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
-var LS_NAME = "spiz_name";
-var ROOM = (location.hash.replace(/^#/,"").trim() || "room1");
-if (!location.hash) { location.hash = ROOM; }
-var ROOM_PATH = FB + "/rooms/" + ROOM;
-var LOG_PATH  = FB + "/logs/"  + ROOM;
+var FB       = "https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
+var LS_NAME  = "spiz_name";
+var ROOM     = location.hash.replace(/^#/,"").trim() || "room1";
+if (!location.hash) location.hash = ROOM;
+var RPATH    = FB + "/rooms/"  + ROOM;
+var LPATH    = FB + "/logs/"   + ROOM;
+var EPATH    = FB + "/expiry/" + ROOM; // individual expiry dates
 
+// ── PRODUKTY (z typowymi datami Biedronki) ────────────────────────────────────
 var CATS = [
   {id:"warzywa", label:"Warzywa i owoce", ic:"🥦", items:[
-    {n:"Papryka (czerwona/żółta)", target:2, unit:"szt.", days:7},
-    {n:"Pomidory",                 target:3, unit:"szt.", days:4},
-    {n:"Ogórek",                   target:3, unit:"szt.", days:4},
-    {n:"Cukinia",                  target:2, unit:"szt.", days:6},
-    {n:"Pieczarki",                target:1, unit:"opak. 500g", days:4},
-    {n:"Marchew",                  target:4, unit:"szt.", days:10},
-    {n:"Cebula biała (duża)",      target:2, unit:"szt.", days:14},
-    {n:"Czosnek",                  target:1, unit:"główka", days:21},
-    {n:"Sałata / rukola",          target:1, unit:"opak.", days:4},
-    {n:"Rzodkiewka",               target:1, unit:"pęczek", days:5},
-    {n:"Koperek",                  target:1, unit:"pęczek", days:4},
-    {n:"Jabłka",                   target:4, unit:"szt.", days:10},
-    {n:"Banany",                   target:4, unit:"szt.", days:4},
-    {n:"Truskawki / maliny",       target:1, unit:"opak. 500g", days:3},
-    {n:"Awokado",                  target:2, unit:"szt.", days:4},
-    {n:"Cytryna",                  target:1, unit:"szt.", days:14},
-    {n:"Bataty",                   target:4, unit:"szt.", days:14}
+    {n:"Papryka (czerwona/żółta)", target:2, unit:"szt.",        days:7},
+    {n:"Pomidory",                 target:3, unit:"szt.",        days:4},
+    {n:"Ogórek",                   target:3, unit:"szt.",        days:4},
+    {n:"Cukinia",                  target:2, unit:"szt.",        days:6},
+    {n:"Pieczarki",                target:1, unit:"opak. 500g",  days:4},
+    {n:"Marchew",                  target:4, unit:"szt.",        days:10},
+    {n:"Cebula biała (duża)",      target:2, unit:"szt.",        days:14},
+    {n:"Czosnek",                  target:1, unit:"główka",      days:21},
+    {n:"Sałata / rukola",          target:1, unit:"opak.",       days:4},
+    {n:"Rzodkiewka",               target:1, unit:"pęczek",      days:5},
+    {n:"Koperek",                  target:1, unit:"pęczek",      days:4},
+    {n:"Jabłka",                   target:4, unit:"szt.",        days:10},
+    {n:"Banany",                   target:4, unit:"szt.",        days:4},
+    {n:"Truskawki / maliny",       target:1, unit:"opak. 500g",  days:3},
+    {n:"Awokado",                  target:2, unit:"szt.",        days:4},
+    {n:"Cytryna",                  target:1, unit:"szt.",        days:14},
+    {n:"Bataty",                   target:4, unit:"szt.",        days:14}
   ]},
   {id:"piekarnia", label:"Piekarnia", ic:"🍞", items:[
     {n:"Chleb pełnoziarnisty", target:2, unit:"bochenek", days:5}
@@ -233,31 +310,31 @@ var CATS = [
     {n:"Musztarda miodowa / łagodna", target:1, unit:"słoik"}
   ]},
   {id:"tluszcze", label:"Orzechy i tłuszcze", ic:"🥜", items:[
-    {n:"Oliwa z oliwek",             target:1, unit:"butelka 500ml"},
-    {n:"Masło orzechowe Vitanella",  target:2, unit:"opak. 350g"},
-    {n:"Płatki migdałów",            target:1, unit:"opak. 200g"},
-    {n:"Orzechy włoskie/laskowe",    target:1, unit:"opak. 200g"},
-    {n:"Kakao (bez cukru)",          target:1, unit:"opak."}
+    {n:"Oliwa z oliwek",            target:1, unit:"butelka 500ml"},
+    {n:"Masło orzechowe Vitanella", target:2, unit:"opak. 350g"},
+    {n:"Płatki migdałów",           target:1, unit:"opak. 200g"},
+    {n:"Orzechy włoskie/laskowe",   target:1, unit:"opak. 200g"},
+    {n:"Kakao (bez cukru)",         target:1, unit:"opak."}
   ]},
   {id:"maki", label:"Mąki", ic:"🌾", items:[
     {n:"Mąka ryżowa",  target:1, unit:"opak. 400g"},
     {n:"Mąka jaglana", target:1, unit:"opak. 400g"}
   ]},
   {id:"mieso", label:"Mięso świeże", ic:"🥩", items:[
-    {n:"Pierś z kurczaka",        target:3, unit:"szt.",        days:3},
-    {n:"Wołowina mielona",        target:1, unit:"opak. 150g",  days:2},
-    {n:"Filet z łososia (świeży)",target:1, unit:"szt.",        days:2}
+    {n:"Pierś z kurczaka",         target:3, unit:"szt.",       days:3},
+    {n:"Wołowina mielona",         target:1, unit:"opak. 150g", days:2},
+    {n:"Filet z łososia (świeży)", target:1, unit:"szt.",       days:2}
   ]},
   {id:"nabial", label:"Nabiał", ic:"🥛", items:[
-    {n:"Skyr naturalny",                   target:4, unit:"opak. 350g", days:10},
-    {n:"Ser twarogowy chudy",              target:3, unit:"opak. 400g", days:7},
-    {n:"Serek wiejski light (0% tłuszczu)",target:3, unit:"opak. 400g", days:7},
-    {n:"Mozzarella light",                 target:2, unit:"opak.",      days:5},
-    {n:"Jogurt naturalny 2%",              target:1, unit:"opak. duży", days:7},
-    {n:"Mleko 0,5%",                       target:4, unit:"litr",       days:5}
+    {n:"Skyr naturalny",                    target:4, unit:"opak. 350g", days:10},
+    {n:"Ser twarogowy chudy",               target:3, unit:"opak. 400g", days:7},
+    {n:"Serek wiejski light (0% tłuszczu)", target:3, unit:"opak. 400g", days:7},
+    {n:"Mozzarella light",                  target:2, unit:"opak.",      days:5},
+    {n:"Jogurt naturalny 2%",               target:1, unit:"opak. duży", days:7},
+    {n:"Mleko 0,5%",                        target:4, unit:"litr",       days:5}
   ]},
   {id:"jaja", label:"Jaja", ic:"🥚", items:[
-    {n:"Jaja L", target:2, unit:"opak. 10 szt."}
+    {n:"Jaja L", target:2, unit:"opak. 10 szt.", days:21}
   ]},
   {id:"wedliny", label:"Wędliny i ryby", ic:"🍖", items:[
     {n:"Polędwica z indyka — Kraina Mięs (min. 97%)",    target:3, unit:"opak.", days:7},
@@ -268,309 +345,352 @@ var CATS = [
   ]}
 ];
 
-// ── HELPERS ──────────────────────────────────────────────────────────────────
+// ── HELPERS ───────────────────────────────────────────────────────────────────
 function fbKey(catId, name) {
-  return (catId + "__" + name).replace(/[.$#\[\]\/]/g, "_").replace(/\s+/g, "_");
+  return (catId+"__"+name).replace(/[.$#\[\]\/]/g,"_").replace(/\s+/g,"_");
 }
 function mkState() {
-  var s = {};
-  CATS.forEach(function(c) {
-    c.items.forEach(function(it) { s[fbKey(c.id, it.n)] = 0; });
-  });
+  var s={};
+  CATS.forEach(function(c){c.items.forEach(function(it){s[fbKey(c.id,it.n)]=0;});});
   return s;
 }
-var COLORS = ["#7C3AED","#DC2626","#D97706","#059669","#2563EB","#DB2777","#0891B2"];
-function nameColor(n) { var h=0; for(var i=0;i<n.length;i++) h=(h*31+n.charCodeAt(i))%COLORS.length; return COLORS[h]; }
-function nameInitial(n) { return n.trim().charAt(0).toUpperCase(); }
+var COLORS=["#7C3AED","#DC2626","#D97706","#059669","#2563EB","#DB2777","#0891B2"];
+function nameColor(n){var h=0;for(var i=0;i<n.length;i++)h=(h*31+n.charCodeAt(i))%COLORS.length;return COLORS[h];}
+function nameInitial(n){return n.trim().charAt(0).toUpperCase();}
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
-var state = {}, filter = "all", searchQ = "", userName = "", lastShopTs = 0, saveTimer = null;
+var state={}, expiry={}, filter="all", searchQ="", userName="", lastShopTs=0, saveTimer=null;
+var expiryTarget=null; // current item being edited
 
 // ── FIREBASE ──────────────────────────────────────────────────────────────────
-function setSyncUI(m) {
-  var d = document.getElementById("sdot"), l = document.getElementById("slbl");
-  if (m === "ok")     { d.className="sdot"; d.style.background="#22C55E"; l.textContent="zsync"; }
-  else if (m === "saving") { d.className="sdot pulse"; d.style.background="#F59E0B"; l.textContent="zapis..."; }
-  else                { d.className="sdot err"; d.style.background="#EF4444"; l.textContent="błąd"; }
+function setSyncUI(m){
+  var d=document.getElementById("sdot"),l=document.getElementById("slbl");
+  if(m==="ok"){d.className="sdot";d.style.background="#22C55E";l.textContent="zsync";}
+  else if(m==="saving"){d.className="sdot pulse";d.style.background="#F59E0B";l.textContent="zapis...";}
+  else{d.className="sdot err";d.style.background="#EF4444";l.textContent="błąd";}
+}
+function fbFetch(path,opts){
+  var ctrl=new AbortController();
+  var t=setTimeout(function(){ctrl.abort();},8000);
+  return fetch(path+".json",Object.assign({signal:ctrl.signal},opts||{}))
+    .then(function(r){clearTimeout(t);if(!r.ok)throw new Error("HTTP "+r.status);return r.json();})
+    .catch(function(e){clearTimeout(t);if(e.name==="AbortError")throw new Error("Timeout — brak odpowiedzi Firebase");throw e;});
+}
+function fbGet(p){return fbFetch(p);}
+function fbPatch(p,d){return fbFetch(p,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)});}
+function fbPost(p,d){return fbFetch(p,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)});}
+
+// ── SHOP DATE ─────────────────────────────────────────────────────────────────
+function markShopping(){
+  if(!confirm("Zaznaczyć że dziś byłeś/aś w sklepie?"))return;
+  lastShopTs=Date.now();
+  fbPatch(RPATH,{__shopTs:lastShopTs});
+  updateShopBar();render();
+}
+function toggleDateEdit(){
+  var row=document.getElementById("date-edit-row");
+  var inp=document.getElementById("date-inp");
+  if(row.style.display==="none"){
+    row.style.display="flex";
+    if(lastShopTs){
+      var d=new Date(lastShopTs);
+      inp.value=d.toISOString().slice(0,10);
+    }
+  } else {
+    row.style.display="none";
+  }
+}
+function saveDateEdit(){
+  var val=document.getElementById("date-inp").value;
+  if(!val)return;
+  lastShopTs=new Date(val).getTime();
+  fbPatch(RPATH,{__shopTs:lastShopTs});
+  toggleDateEdit();
+  updateShopBar();render();
+}
+function updateShopBar(){
+  var lbl=document.getElementById("shop-date-lbl");
+  var sub=document.getElementById("shop-days-lbl");
+  if(!lastShopTs){lbl.textContent="Nie ustawiono daty zakupów";sub.textContent="";return;}
+  var d=new Date(lastShopTs);
+  var days=Math.floor((Date.now()-lastShopTs)/86400000);
+  lbl.textContent="Zakupy: "+d.toLocaleDateString("pl-PL",{weekday:"long",day:"numeric",month:"long"});
+  sub.textContent=days===0?"dziś 🛍️":days===1?"wczoraj":days+" dni temu";
 }
 
-function fbFetch(path, opts) {
-  var ctrl = new AbortController();
-  var timer = setTimeout(function() { ctrl.abort(); }, 8000);
-  return fetch(path + ".json", Object.assign({signal: ctrl.signal}, opts || {}))
-    .then(function(r) { clearTimeout(timer); if (!r.ok) throw new Error(r.status); return r.json(); })
-    .catch(function(e) { clearTimeout(timer); if (e.name === "AbortError") throw new Error("Timeout — Firebase nie odpowiada"); throw e; });
+// ── FRESHNESS ─────────────────────────────────────────────────────────────────
+function getDaysLeft(it){
+  var key=fbKey("expiry",it.n);
+  // Priorytet: indywidualna data przydatności z Firebase
+  if(expiry[key]){
+    return Math.round((expiry[key]-Date.now())/86400000);
+  }
+  // Fallback: data zakupów + domyślna trwałość
+  if(it.days && lastShopTs){
+    return Math.round(it.days-(Date.now()-lastShopTs)/86400000);
+  }
+  return null;
+}
+function freshHtml(it){
+  var d=getDaysLeft(it);
+  if(d===null)return"";
+  if(d<=0)return'<div class="fresh-bad">⚠️ Przeterminowane!</div>';
+  if(d===1)return'<div class="fresh-bad">🔴 Zostaje 1 dzień!</div>';
+  if(d<=2)return'<div class="fresh-warn">🟡 Zostają '+d+' dni</div>';
+  return'<div class="fresh-ok">✅ Świeże — '+d+' dni</div>';
+}
+function isExpiringSoon(it){
+  var d=getDaysLeft(it);
+  return d!==null && d<=3;
 }
 
-function fbGet(path)  { return fbFetch(path); }
-function fbPatch(path, data) {
-  return fbFetch(path, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify(data) });
+// ── EXPIRY MODAL ──────────────────────────────────────────────────────────────
+function openExpiry(itemName){
+  expiryTarget=itemName;
+  document.getElementById("exp-modal-name").textContent=itemName;
+  var key=fbKey("expiry",itemName);
+  var inp=document.getElementById("exp-date-inp");
+  if(expiry[key]){
+    var d=new Date(expiry[key]);
+    inp.value=d.toISOString().slice(0,10);
+  } else {
+    inp.value="";
+  }
+  document.getElementById("photo-preview").style.display="none";
+  document.getElementById("exp-overlay").classList.add("show");
 }
-function fbPost(path, data) {
-  return fbFetch(path, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(data) });
+function closeExpiry(){document.getElementById("exp-overlay").classList.remove("show");expiryTarget=null;}
+function takePhoto(){document.getElementById("photo-input").click();}
+function handlePhoto(input){
+  if(!input.files||!input.files[0])return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var img=document.getElementById("photo-preview");
+    img.src=e.target.result;
+    img.style.display="block";
+  };
+  reader.readAsDataURL(input.files[0]);
 }
-
-// ── SHOPPING DATE ─────────────────────────────────────────────────────────────
-function markShopping() {
-  if (!confirm("Zaznaczyć że dziś byłeś/aś w sklepie?")) return;
-  lastShopTs = Date.now();
-  fbPatch(ROOM_PATH, {__shopTs: lastShopTs});
-  updateShopBar();
-  render();
+function saveExpiry(){
+  var val=document.getElementById("exp-date-inp").value;
+  if(!val){alert("Wpisz datę przydatności");return;}
+  var ts=new Date(val).getTime();
+  var key=fbKey("expiry",expiryTarget);
+  expiry[key]=ts;
+  var patch={};patch[key]=ts;
+  fbPatch(EPATH,patch);
+  closeExpiry();render();
 }
-
-function updateShopBar() {
-  var lbl = document.getElementById("shop-date-lbl");
-  var sub = document.getElementById("shop-days-lbl");
-  if (!lastShopTs) { lbl.textContent = "Nie ustawiono daty zakupów"; sub.textContent = ""; return; }
-  var d = new Date(lastShopTs);
-  var days = Math.floor((Date.now() - lastShopTs) / 86400000);
-  lbl.textContent = "Zakupy: " + d.toLocaleDateString("pl-PL", {weekday:"long", day:"numeric", month:"long"});
-  sub.textContent = days === 0 ? "dziś 🛍️" : days === 1 ? "wczoraj" : days + " dni temu";
-}
-
-function getFreshness(it) {
-  if (!it.days || !lastShopTs) return null;
-  return Math.round(it.days - (Date.now() - lastShopTs) / 86400000);
+function clearExpiry(){
+  var key=fbKey("expiry",expiryTarget);
+  delete expiry[key];
+  var patch={};patch[key]=null;
+  fbPatch(EPATH,patch);
+  closeExpiry();render();
 }
 
 // ── LOG ───────────────────────────────────────────────────────────────────────
-function addLog(productName, oldVal, newVal) {
-  fbPost(LOG_PATH, { who: userName, what: productName, delta: newVal - oldVal, newVal: newVal, ts: Date.now() });
-}
-
-function openLog() {
-  document.getElementById("log-overlay").classList.add("show");
-  renderLog();
-}
-function closeLog() { document.getElementById("log-overlay").classList.remove("show"); }
-
-function renderLog() {
-  var body = document.getElementById("log-body");
-  body.innerHTML = '<div class="log-empty">⏳ Ładowanie...</div>';
-  fbGet(LOG_PATH).then(function(data) {
-    if (!data) { body.innerHTML = '<div class="log-empty"><div>📋</div>Brak zmian</div>'; return; }
-    var entries = Object.values(data).sort(function(a,b){return b.ts-a.ts;}).slice(0, 200);
-    if (!entries.length) { body.innerHTML = '<div class="log-empty"><div>📋</div>Brak zmian</div>'; return; }
-    body.innerHTML = entries.map(function(e) {
-      var d = new Date(e.ts);
-      var gdy = d.toLocaleDateString("pl-PL",{day:"2-digit",month:"2-digit"}) + " " + d.toLocaleTimeString("pl-PL",{hour:"2-digit",minute:"2-digit"});
-      var delta = e.delta || 0;
-      var badge = delta > 0 ? '<span class="log-badge up">+'+delta+'</span>' : '<span class="log-badge down">'+delta+'</span>';
-      var color = nameColor(e.who || "?");
-      var co = delta > 0 ? "dodał/a" : "zabrał/a";
-      return '<div class="log-entry">' +
-        '<div class="log-avatar" style="background:'+color+'">'+nameInitial(e.who||"?")+'</div>' +
-        '<div class="log-info">' +
-          '<div class="log-who">'+(e.who||"?")+'</div>' +
-          '<div class="log-what">'+co+' '+Math.abs(delta)+' × '+(e.what||"?")+'</div>' +
-          '<div class="log-when">'+gdy+'</div>' +
-        '</div>' + badge + '</div>';
+function addLog(what,old,nv){fbPost(LPATH,{who:userName,what:what,delta:nv-old,newVal:nv,ts:Date.now()});}
+function openLog(){document.getElementById("log-overlay").classList.add("show");renderLog();}
+function closeLog(){document.getElementById("log-overlay").classList.remove("show");}
+function renderLog(){
+  var body=document.getElementById("log-body");
+  body.innerHTML='<div class="log-empty">⏳ Ładowanie...</div>';
+  fbGet(LPATH).then(function(data){
+    if(!data){body.innerHTML='<div class="log-empty"><div>📋</div>Brak zmian</div>';return;}
+    var entries=Object.values(data).sort(function(a,b){return b.ts-a.ts;}).slice(0,200);
+    body.innerHTML=entries.map(function(e){
+      var d=new Date(e.ts);
+      var gdy=d.toLocaleDateString("pl-PL",{day:"2-digit",month:"2-digit"})+" "+d.toLocaleTimeString("pl-PL",{hour:"2-digit",minute:"2-digit"});
+      var delta=e.delta||0;
+      var badge=delta>0?'<span class="log-badge up">+'+delta+'</span>':'<span class="log-badge down">'+delta+'</span>';
+      var co=delta>0?"dodał/a":"zabrał/a";
+      return'<div class="log-entry">'+
+        '<div class="log-avatar" style="background:'+nameColor(e.who||"?")+'">'+nameInitial(e.who||"?")+'</div>'+
+        '<div class="log-info">'+
+          '<div class="log-who">'+(e.who||"?")+'</div>'+
+          '<div class="log-what">'+co+" "+Math.abs(delta)+" × "+(e.what||"?")+'</div>'+
+          '<div class="log-when">'+gdy+'</div>'+
+        '</div>'+badge+'</div>';
     }).join("");
-  }).catch(function() {
-    body.innerHTML = '<div class="log-empty">❌ Błąd ładowania</div>';
-  });
+  }).catch(function(){body.innerHTML='<div class="log-empty">❌ Błąd</div>';});
 }
 
 // ── LOGIN ─────────────────────────────────────────────────────────────────────
-function doLogin() {
-  var n = document.getElementById("name-inp").value.trim();
-  if (!n) { document.getElementById("name-inp").style.borderColor="#EF4444"; return; }
-  userName = n;
-  localStorage.setItem(LS_NAME, n);
-  document.getElementById("user-pill").textContent = "👤 " + n;
-  document.getElementById("login").style.display = "none";
-  document.getElementById("splash").style.display = "flex";
+function doLogin(){
+  var n=document.getElementById("name-inp").value.trim();
+  if(!n){document.getElementById("name-inp").style.borderColor="#EF4444";return;}
+  userName=n;
+  localStorage.setItem(LS_NAME,n);
+  document.getElementById("user-pill").textContent="👤 "+n;
+  document.getElementById("login").style.display="none";
+  document.getElementById("splash").style.display="flex";
   startApp();
 }
 
-// ── START APP ─────────────────────────────────────────────────────────────────
-function startApp() {
-  fbGet(ROOM_PATH).then(function(remote) {
-    state = mkState();
-    if (remote) {
-      Object.keys(remote).forEach(function(k) {
-        if (k in state) state[k] = remote[k] || 0;
-        if (k === "__shopTs") lastShopTs = remote[k];
+// ── START ─────────────────────────────────────────────────────────────────────
+function startApp(){
+  Promise.all([fbGet(RPATH),fbGet(EPATH)]).then(function(results){
+    var remote=results[0], expiryData=results[1];
+    state=mkState();
+    if(remote){
+      Object.keys(remote).forEach(function(k){
+        if(k in state)state[k]=remote[k]||0;
+        if(k==="__shopTs")lastShopTs=remote[k];
       });
     } else {
-      fbPatch(ROOM_PATH, state);
+      fbPatch(RPATH,state);
     }
-    document.getElementById("splash").style.display = "none";
-    document.getElementById("app").style.display = "block";
-    updateShopBar();
-    setSyncUI("ok");
-    render();
-    setInterval(function() {
-      fbGet(ROOM_PATH).then(function(r) {
-        if (!r) return;
-        var ch = false;
-        Object.keys(r).forEach(function(k) {
-          if (k in state && r[k] !== state[k]) { state[k] = r[k] || 0; ch = true; }
-          if (k === "__shopTs" && r[k] !== lastShopTs) { lastShopTs = r[k]; updateShopBar(); ch = true; }
-        });
-        if (ch) render();
-        setSyncUI("ok");
-      }).catch(function() { setSyncUI("err"); });
-    }, 3000);
-  }).catch(function(e) {
-    document.querySelector(".spin").style.display = "none";
-    document.getElementById("splash-lbl").innerHTML =
-      "❌ " + e.message +
-      "<br><br><button onclick='startApp()' style='background:#16A34A;color:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:14px;font-weight:800;cursor:pointer'>🔄 Spróbuj ponownie</button>" +
-      "<br><br><button onclick='showAppOffline()' style='background:#334155;color:#94A3B8;border:none;border-radius:10px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer'>Otwórz bez synchronizacji</button>";
+    expiry={};
+    if(expiryData){
+      Object.keys(expiryData).forEach(function(k){expiry[k]=expiryData[k];});
+    }
+    document.getElementById("splash").style.display="none";
+    document.getElementById("app").style.display="block";
+    updateShopBar();setSyncUI("ok");render();
+    setInterval(function(){
+      Promise.all([fbGet(RPATH),fbGet(EPATH)]).then(function(res){
+        var r=res[0],e=res[1];
+        var ch=false;
+        if(r){Object.keys(r).forEach(function(k){
+          if(k in state&&r[k]!==state[k]){state[k]=r[k]||0;ch=true;}
+          if(k==="__shopTs"&&r[k]!==lastShopTs){lastShopTs=r[k];updateShopBar();ch=true;}
+        });}
+        expiry={};
+        if(e){Object.keys(e).forEach(function(k){expiry[k]=e[k];ch=true;});}
+        if(ch)render();setSyncUI("ok");
+      }).catch(function(){setSyncUI("err");});
+    },3000);
+  }).catch(function(e){
+    document.querySelector(".spin").style.display="none";
+    document.getElementById("splash-lbl").innerHTML=
+      "❌ "+e.message+
+      "<br><br><button onclick='startApp()' style='background:#16A34A;color:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:14px;font-weight:800;cursor:pointer'>🔄 Spróbuj ponownie</button>"+
+      "<br><br><button onclick='goOffline()' style='background:#334155;color:#94A3B8;border:none;border-radius:10px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px'>Otwórz bez synchronizacji</button>";
   });
 }
-
-function showAppOffline() {
-  state = mkState();
-  document.getElementById("splash").style.display = "none";
-  document.getElementById("app").style.display = "block";
-  setSyncUI("err");
-  render();
+function goOffline(){
+  state=mkState();
+  document.getElementById("splash").style.display="none";
+  document.getElementById("app").style.display="block";
+  setSyncUI("err");render();
 }
 
 // ── ACTIONS ───────────────────────────────────────────────────────────────────
-function change(id, delta, max, productName, btn) {
-  if (btn) { btn.disabled = true; setTimeout(function(){btn.disabled=false;}, 500); }
-  var oldVal = state[id] || 0;
-  var newVal = Math.min(max * 2, Math.max(0, oldVal + delta));
-  if (newVal === oldVal) return;
-  state[id] = newVal;
-  render();
-  clearTimeout(saveTimer);
-  setSyncUI("saving");
-  saveTimer = setTimeout(function() {
-    var patch = {};
-    patch[id] = newVal;
-    fbPatch(ROOM_PATH, patch).then(function() {
-      addLog(productName, oldVal, newVal);
-      setSyncUI("ok");
-    }).catch(function() { setSyncUI("err"); });
-  }, 600);
+function change(id,delta,max,productName,btn){
+  if(btn){btn.disabled=true;setTimeout(function(){btn.disabled=false;},500);}
+  var old=state[id]||0;
+  var nv=Math.min(max*2,Math.max(0,old+delta));
+  if(nv===old)return;
+  state[id]=nv;render();
+  clearTimeout(saveTimer);setSyncUI("saving");
+  saveTimer=setTimeout(function(){
+    var p={};p[id]=nv;
+    fbPatch(RPATH,p).then(function(){addLog(productName,old,nv);setSyncUI("ok");}).catch(function(){setSyncUI("err");});
+  },600);
 }
-
-function resetAll() {
-  if (!confirm("Zresetować wszystkie stany do zera?")) return;
-  state = mkState();
-  render();
-  fbPatch(ROOM_PATH, state).then(function() { addLog("🗑️ RESET", 0, 0); });
+function resetAll(){
+  if(!confirm("Zresetować wszystkie stany do zera?\n(wszyscy zobaczą reset)"))return;
+  state=mkState();render();
+  fbPatch(RPATH,state).then(function(){addLog("🗑️ RESET",0,0);});
 }
-
-function setFilter(f) {
-  filter = f;
-  var col = {all:"#334155", red:"#DC2626", grn:"#16A34A"};
-  ["all","red","grn"].forEach(function(x) {
-    var el = document.getElementById("f-" + x);
-    el.className = "f" + (x === f ? " act" : "");
-    el.style.background = x === f ? col[x] : "";
+function setFilter(f){
+  filter=f;
+  var col={all:"#334155",exp:"#D97706",red:"#DC2626",grn:"#16A34A"};
+  ["all","exp","red","grn"].forEach(function(x){
+    var el=document.getElementById("f-"+x);
+    el.className="f"+(x===f?" act":"");
+    el.style.background=x===f?col[x]:"";
   });
   render();
 }
-
-function onSearch(q) {
-  searchQ = q.toLowerCase().trim();
-  document.getElementById("xbtn").style.display = q ? "block" : "none";
-  render();
-}
-function clearSearch() { document.getElementById("sinp").value = ""; onSearch(""); }
-
-function cls(cur, target) { return cur >= target ? "grn" : cur > 0 ? "low" : "red"; }
+function onSearch(q){searchQ=q.toLowerCase().trim();document.getElementById("xbtn").style.display=q?"block":"none";render();}
+function clearSearch(){document.getElementById("sinp").value="";onSearch("");}
+function cls(cur,target){return cur>=target?"grn":cur>0?"low":"red";}
 
 // ── RENDER ────────────────────────────────────────────────────────────────────
-function render() {
-  var body = document.getElementById("body");
-  var nR = 0, nG = 0, tot = 0;
-  CATS.forEach(function(c) {
-    c.items.forEach(function(it) {
-      cls(state[fbKey(c.id, it.n)] || 0, it.target) === "grn" ? nG++ : nR++;
-      tot++;
-    });
-  });
-  document.getElementById("n-red").textContent = nR;
-  document.getElementById("n-grn").textContent = nG;
-  document.getElementById("n-all").textContent = tot;
+function render(){
+  var body=document.getElementById("body");
+  var nR=0,nG=0,tot=0;
+  CATS.forEach(function(c){c.items.forEach(function(it){
+    cls(state[fbKey(c.id,it.n)]||0,it.target)==="grn"?nG++:nR++;tot++;
+  });});
+  document.getElementById("n-red").textContent=nR;
+  document.getElementById("n-grn").textContent=nG;
+  document.getElementById("n-all").textContent=tot;
 
-  var html = "", any = false;
-  CATS.forEach(function(cat) {
-    var vis = cat.items.filter(function(it) {
-      var c = cls(state[fbKey(cat.id, it.n)] || 0, it.target);
-      if (filter === "red" && c === "grn") return false;
-      if (filter === "grn" && c !== "grn") return false;
-      if (searchQ && it.n.toLowerCase().indexOf(searchQ) === -1) return false;
+  var html="",any=false;
+  CATS.forEach(function(cat){
+    var vis=cat.items.filter(function(it){
+      var c=cls(state[fbKey(cat.id,it.n)]||0,it.target);
+      if(filter==="red"&&c==="grn")return false;
+      if(filter==="grn"&&c!=="grn")return false;
+      if(filter==="exp"&&!isExpiringSoon(it))return false;
+      if(searchQ&&it.n.toLowerCase().indexOf(searchQ)===-1)return false;
       return true;
     });
-    if (!vis.length) return;
-    any = true;
-    html += '<div class="cat"><div class="cat-hdr"><span>' + cat.ic + '</span>' + cat.label + '</div>';
-    vis.forEach(function(it) {
-      var id = fbKey(cat.id, it.n);
-      var ie = id.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
-      var ne = it.n.replace(/'/g,"\\'");
-      var cur = state[id] || 0;
-      var c = cls(cur, it.target);
-      var pct = Math.min(100, Math.round(cur / it.target * 100));
-      var brak = Math.max(0, it.target - cur);
-      var bt = c === "grn" ? "✅ JEST" : "KUP " + brak;
-      var bs = c === "grn" ? "" : it.unit;
-      var ql = c === "grn"
-        ? '<span style="color:#22C55E">✅ Wystarczy</span>'
-        : c === "low"
-          ? '<span style="color:#F59E0B">🟡 Mało — kup jeszcze ' + brak + ' ' + it.unit + '</span>'
-          : '<span style="color:#EF4444">🔴 Brak — kup ' + brak + ' ' + it.unit + '</span>';
-
-      var freshHtml = "";
-      var daysLeft = getFreshness(it);
-      if (daysLeft !== null) {
-        if (daysLeft <= 0)      freshHtml = '<div class="fresh-bad">⚠️ Przeterminowane!</div>';
-        else if (daysLeft === 1) freshHtml = '<div class="fresh-bad">🔴 Zostaje 1 dzień!</div>';
-        else if (daysLeft <= 2) freshHtml = '<div class="fresh-warn">🟡 Zostają ' + daysLeft + ' dni</div>';
-        else                    freshHtml = '<div class="fresh-ok">✅ Świeże — ' + daysLeft + ' dni</div>';
+    if(!vis.length)return;
+    any=true;
+    html+='<div class="cat"><div class="cat-hdr"><span>'+cat.ic+"</span>"+cat.label+"</div>";
+    vis.forEach(function(it){
+      var id=fbKey(cat.id,it.n);
+      var ie=id.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+      var ne=it.n.replace(/'/g,"\\'").replace(/\\/g,"\\\\");
+      var cur=state[id]||0;
+      var c=cls(cur,it.target);
+      var pct=Math.min(100,Math.round(cur/it.target*100));
+      var brak=Math.max(0,it.target-cur);
+      var bt=c==="grn"?"✅ JEST":"KUP "+brak;
+      var bs=c==="grn"?"":it.unit;
+      var ql=c==="grn"
+        ?'<span style="color:#22C55E">✅ Wystarczy</span>'
+        :c==="low"
+          ?'<span style="color:#F59E0B">🟡 Kup jeszcze '+brak+" "+it.unit+"</span>"
+          :'<span style="color:#EF4444">🔴 Brak — kup '+brak+" "+it.unit+"</span>";
+      var nm=it.n;
+      if(searchQ){
+        var si=it.n.toLowerCase().indexOf(searchQ);
+        if(si>=0)nm=it.n.slice(0,si)+'<mark style="background:#FACC15;color:#0F172A;border-radius:3px;padding:0 2px">'+it.n.slice(si,si+searchQ.length)+"</mark>"+it.n.slice(si+searchQ.length);
       }
+      var fh=it.days?freshHtml(it):"";
+      var hasExpiry=it.days?true:false;
+      var expiryBtn=hasExpiry?'<button class="exp-btn '+(getDaysLeft(it)!==null?(getDaysLeft(it)<=0?"exp-bad":getDaysLeft(it)<=2?"exp-warn":"exp-set"):"")+'" onclick="openExpiry(\''+ne+'\')">📅 '+(getDaysLeft(it)!==null?getDaysLeft(it)<=0?"Przeterminowane":getDaysLeft(it)+" dni":"Ustaw datę")+"</button>":"";
 
-      var nm = it.n;
-      if (searchQ) {
-        var i = it.n.toLowerCase().indexOf(searchQ);
-        if (i >= 0) nm = it.n.slice(0,i) + '<mark style="background:#FACC15;color:#0F172A;border-radius:3px;padding:0 2px">' + it.n.slice(i, i+searchQ.length) + '</mark>' + it.n.slice(i+searchQ.length);
-      }
-
-      html += '<div class="item ' + c + '">' +
-        '<div class="item-top">' +
-          '<div class="item-name">' + nm + freshHtml + '</div>' +
-          '<div class="kup">' + bt + '<br><span style="font-size:12px;opacity:.9;font-weight:700">' + bs + '</span></div>' +
-        '</div>' +
-        '<div class="prog-row">' +
-          '<div class="prog-bg"><div class="prog-fill" style="width:' + pct + '%"></div></div>' +
-          '<div class="prog-txt">' + cur + ' / ' + it.target + ' ' + it.unit + '</div>' +
-        '</div>' +
-        '<div class="qty-row">' +
-          '<div class="qty-lbl">' + ql + '</div>' +
-          '<div class="qty-ctrl">' +
-            '<button class="qbtn" onclick="change(\'' + ie + '\',-1,' + it.target + ',\'' + ne + '\',this)">−</button>' +
-            '<div class="qnum"><div class="qnum-cur">' + cur + '</div><div class="qnum-unit">' + it.unit + '</div></div>' +
-            '<button class="qbtn" onclick="change(\'' + ie + '\',1,' + it.target + ',\'' + ne + '\',this)">+</button>' +
-          '</div>' +
-        '</div>' +
-      '</div>';
+      html+='<div class="item '+c+'">'+
+        '<div class="item-top">'+
+          '<div class="item-name">'+nm+fh+"</div>"+
+          '<div class="kup">'+bt+'<br><span style="font-size:12px;opacity:.9;font-weight:700">'+bs+"</span></div>"+
+        "</div>"+
+        '<div class="prog-row">'+
+          '<div class="prog-bg"><div class="prog-fill" style="width:'+pct+'%"></div></div>'+
+          '<div class="prog-txt">'+cur+" / "+it.target+" "+it.unit+"</div>"+
+        "</div>"+
+        '<div class="qty-row">'+
+          '<div class="qty-lbl">'+ql+"</div>"+
+          '<div class="qty-ctrl">'+
+            '<button class="qbtn" onclick="change(\''+ie+"',-1,"+it.target+",'"+ne+"',this)\">−</button>"+
+            '<div class="qnum"><div class="qnum-cur">'+cur+'</div><div class="qnum-unit">'+it.unit+"</div></div>"+
+            '<button class="qbtn" onclick="change(\''+ie+"',1,"+it.target+",'"+ne+"',this)\">+</button>"+
+          "</div>"+
+        "</div>"+
+        (expiryBtn?'<div class="expiry-row">'+expiryBtn+"</div>":"")+
+      "</div>";
     });
-    html += '</div>';
+    html+="</div>";
   });
-
-  if (!any) {
-    var ic = searchQ ? "🔍" : filter === "red" ? "🎉" : "📦";
-    var ms = searchQ ? 'Brak wyników dla "' + searchQ + '"' : filter === "red" ? "Nic nie trzeba kupić!" : "Brak produktów";
-    html = '<div class="empty"><div>' + ic + '</div>' + ms + '</div>';
+  if(!any){
+    var ic=filter==="exp"?"⚠️":searchQ?"🔍":filter==="red"?"🎉":"📦";
+    var ms=filter==="exp"?"Żaden produkt nie wygasa w ciągu 3 dni 🎉":searchQ?'Brak wyników dla "'+searchQ+'"':filter==="red"?"Nic nie trzeba kupić!":"Brak produktów";
+    html='<div class="empty"><div>'+ic+"</div>"+ms+"</div>";
   }
-  body.innerHTML = html;
+  body.innerHTML=html;
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
-document.getElementById("splash").style.display = "none";
-document.getElementById("login").style.display = "flex";
-var savedName = localStorage.getItem(LS_NAME);
-if (savedName) {
-  document.getElementById("name-inp").value = savedName;
-}
+document.getElementById("splash").style.display="none";
+document.getElementById("login").style.display="flex";
+var savedName=localStorage.getItem(LS_NAME);
+if(savedName)document.getElementById("name-inp").value=savedName;
 </script>
 </body>
 </html>
