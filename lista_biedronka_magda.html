@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>🛒 Lista zakupów – Biedronka</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F1F5F9;padding-bottom:32px}
+.hdr{background:linear-gradient(135deg,#16A34A,#059669 55%,#0D9488);padding:20px 16px 16px;color:#fff}
+.hdr h1{font-size:20px;font-weight:800;margin-bottom:4px}
+.hdr p{font-size:12px;opacity:.85;margin-bottom:14px;line-height:1.5}
+.pbg{background:rgba(255,255,255,.25);border-radius:20px;height:10px;margin-bottom:6px;overflow:hidden}
+.pfill{height:100%;background:#fff;border-radius:20px;transition:width .5s}
+.prow{display:flex;justify-content:space-between;align-items:center}
+.ptxt{font-size:12px;opacity:.9}
+.rst{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;cursor:pointer}
+.map{background:#1E293B;padding:12px;margin:12px;border-radius:14px;overflow-x:auto}
+.maplbl{font-size:10px;color:#94A3B8;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+.maprow{display:flex;align-items:center;gap:4px;min-width:max-content}
+.ms{border-radius:10px;padding:6px 8px;text-align:center;min-width:62px;border:2px solid #475569;background:#334155;font-size:10px;color:#94A3B8;line-height:1.3;white-space:pre-line;transition:all .3s}
+.ms.act{color:#fff;font-weight:800}
+.ms.ok{border-color:#16A34A;color:#4ADE80;background:#16A34A20}
+.mar{color:#475569;font-size:13px;flex-shrink:0}
+.sec{margin:0 12px 10px;border-radius:12px;overflow:hidden}
+.shdr{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer;border:none;width:100%;text-align:left}
+.snum{width:30px;height:30px;border-radius:50%;color:#fff;font-weight:900;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sinf{flex:1;margin-left:10px;text-align:left}
+.snm{font-weight:800;font-size:13px;line-height:1.3}
+.ssub{font-size:10.5px;margin-top:1px}
+.schv{font-size:18px;transition:transform .2s;flex-shrink:0}
+.sbdy{background:#fff;border:2px solid;border-top:none;border-radius:0 0 12px 12px;padding:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:8px}
+.card{display:flex;flex-direction:column;align-items:center;background:#fff;border-radius:14px;padding:10px 6px 9px;cursor:pointer;border:1.5px solid #E5E7EB;box-shadow:0 1px 4px rgba(0,0,0,.05);transition:all .18s;position:relative;-webkit-user-select:none;user-select:none}
+.card:active{transform:scale(.95)}
+.card.done{opacity:.65;background:#F0FDF4;border-color:#22C55E!important;box-shadow:0 2px 8px rgba(34,197,94,.12)!important}
+.tick{position:absolute;top:7px;right:7px;width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid #D1D5DB;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff}
+.card.done .tick{background:#22C55E;border:none}
+.imgbox{width:76px;height:76px;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;margin-bottom:8px;flex-shrink:0}
+.imgbox img{width:100%;height:100%;object-fit:contain;padding:3px}
+.fb{font-size:36px;line-height:1}
+.cnm{font-size:10.5px;font-weight:700;text-align:center;color:#1E293B;line-height:1.3;margin-bottom:2px}
+.card.done .cnm{color:#9CA3AF;text-decoration:line-through}
+.cinfo{font-size:10px;color:#94A3B8;font-family:monospace;text-align:center}
+.ftr{margin:6px 12px 0;background:#1E293B;border-radius:14px;padding:12px 16px;font-size:11px;color:#94A3B8;line-height:1.8}
+.ftr strong{color:#FCD34D}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <h1>🛒 Lista zakupów – Biedronka</h1>
+  <p>Ułożona zgodnie z trasą po sklepie. Idź po kolei!</p>
+  <div class="pbg"><div class="pfill" id="pf" style="width:0%"></div></div>
+  <div class="prow">
+    <span class="ptxt" id="pt">0 / 0 produktów</span>
+    <button class="rst" onclick="resetAll()">🔄 Resetuj</button>
+  </div>
+</div>
+<div class="map"><div class="maplbl">🗺️ Trasa zakupów</div><div class="maprow" id="mr"></div></div>
+<div id="S"></div>
+<div class="ftr">
+  <strong>💡 Kliknij produkt</strong> żeby odhaczyć. Sekcja zielenieje gdy wszystko kupione.<br>
+  Zdjęcia opakowań z Open Food Facts – widoczne po otwarciu w Chrome/Safari.
+</div>
+
+<script>
+const IMGS = {
+  skyr:      "https://images.openfoodfacts.org/images/products/590/053/100/4407/front_pl.15.400.jpg",
+  mozzarella:"https://images.openfoodfacts.org/images/products/800/043/090/0118/front_pl.4.200.jpg",
+  szynka_ind:"https://images.openfoodfacts.org/images/products/590/056/247/0516/front_pl.12.200.jpg",
+  losos_wdz: "https://images.openfoodfacts.org/images/products/590/347/546/0131/front_pl.13.200.jpg",
+  platki:    "https://images.openfoodfacts.org/images/products/590/682/702/1585/front_pl.4.200.jpg",
+  maslo_orz: "https://images.openfoodfacts.org/images/products/520/104/913/2300/front_pl.3.200.jpg",
+  ryz:       "https://images.openfoodfacts.org/images/products/590/097/701/1748/front_pl.3.200.jpg",
+  kasza:     "https://images.openfoodfacts.org/images/products/590/693/668/3704/front_pl.3.200.jpg",
+  jaja:      "https://images.openfoodfacts.org/images/products/590/780/976/0225/front_pl.4.200.jpg",
+};
+
+const T=[
+ {id:"s1",k:1,l:"Warzywa i owoce",o:"Zaraz przy wejściu",ic:"🥦",bg:"#DCFCE7",bd:"#16A34A",tx:"#14532D",
+  p:[{n:"Papryka (czerwona/żółta)",i:"2 szt.",     img:null,fb:"🫑"},
+     {n:"Pomidory",               i:"3 szt.",     img:null,fb:"🍅"},
+     {n:"Ogórek",                 i:"3 szt.",     img:null,fb:"🥒"},
+     {n:"Cukinia",                i:"2 szt.",     img:null,fb:"🥒"},
+     {n:"Pieczarki",              i:"500 g",      img:null,fb:"🍄"},
+     {n:"Marchew",                i:"4 szt.",     img:null,fb:"🥕"},
+     {n:"Cebula biała (duża)",    i:"2 szt.",     img:null,fb:"🧅"},
+     {n:"Czosnek",                i:"1 główka",   img:null,fb:"🧄"},
+     {n:"Sałata / rukola",        i:"1 opak.",    img:null,fb:"🥬"},
+     {n:"Rzodkiewka",             i:"1 pęczek",   img:null,fb:"🔴"},
+     {n:"Koperek",                i:"1 pęczek lub suszony", img:null,fb:"🌿"},
+     {n:"Jabłka",                 i:"4 szt.",     img:null,fb:"🍎"},
+     {n:"Banany",                 i:"4 szt.",     img:null,fb:"🍌"},
+     {n:"Truskawki / maliny",     i:"500 g",      img:null,fb:"🍓"},
+     {n:"Awokado",                i:"2 szt.",     img:null,fb:"🥑"},
+     {n:"Cytryna",                i:"1 szt.",     img:null,fb:"🍋"},
+     {n:"Bataty",                 i:"4 szt.",     img:null,fb:"🍠"},
+  ]},
+ {id:"s2",k:2,l:"Piekarnia",o:"Przy wejściu / warzywach",ic:"🍞",bg:"#FFF7ED",bd:"#EA580C",tx:"#7C2D12",
+  p:[{n:"Chleb pełnoziarnisty",   i:"2 bochenki", img:null,fb:"🍞"}]},
+ {id:"s3",k:3,l:"Alejka sucha — płatki, kasze, ryże",o:"Środkowe alejki",ic:"🌾",bg:"#FFFBEB",bd:"#F59E0B",tx:"#92400E",
+  p:[{n:"Płatki owsiane błyskawiczne",i:"3 × 500 g",img:"platki",fb:"🌾"},
+     {n:"Płatki jaglane",           i:"400 g",    img:null,fb:"🌾"},
+     {n:"Ryż basmati",              i:"1 kg",     img:"ryz",fb:"🍚"},
+     {n:"Kasza gryczana",           i:"500 g",    img:"kasza",fb:"🌰"},
+  ]},
+ {id:"s4",k:4,l:"Puszki i sosy",o:"Dalej w alejkach",ic:"🫙",bg:"#ECFDF5",bd:"#10B981",tx:"#064E3B",
+  p:[{n:"Ciecierzyca (puszka)",   i:"2 puszki",  img:null,fb:"🫘"},
+     {n:"Passata pomidorowa",     i:"1 opak.",   img:null,fb:"🍅"},
+     {n:"Ketchup Słodka Ania",    i:"1 butelka",  img:null,fb:"🍅"},
+     {n:"Musztarda miodowa / łagodna",i:"1 słoik",img:null,fb:"🍯"},
+  ]},
+ {id:"s5",k:5,l:"Orzechy i tłuszcze",o:"Koniec alejek",ic:"🥜",bg:"#FFF1F2",bd:"#F43F5E",tx:"#881337",
+  p:[{n:"Oliwa z oliwek",         i:"500 ml",    img:null,fb:"🫒"},
+     {n:"Masło orzechowe Vitanella",i:"2 × 350 g",img:"maslo_orz",fb:"🥜"},
+     {n:"Płatki migdałów",        i:"200 g",     img:null,fb:"🌰"},
+     {n:"Orzechy włoskie/laskowe",i:"200 g",     img:null,fb:"🌰"},
+     {n:"Kakao (bez cukru)",      i:"1 opak.",   img:null,fb:"🍫"},
+  ]},
+ {id:"s6",k:6,l:"Mąki i pieczywo",o:"Przy suchych produktach",ic:"🌾",bg:"#F0F9FF",bd:"#0EA5E9",tx:"#0C4A6E",
+  p:[{n:"Mąka ryżowa",            i:"400 g",     img:null,fb:"🌾"},
+     {n:"Mąka jaglana",           i:"400 g",     img:null,fb:"🌾"},
+  ]},
+ {id:"s7",k:7,l:"Mięso świeże",o:"Dział mięsno-rybny",ic:"🥩",bg:"#FFF0F0",bd:"#DC2626",tx:"#7F1D1D",
+  p:[{n:"Pierś z kurczaka",       i:"3–4 szt.",  img:null,fb:"🍗"},
+     {n:"Wołowina mielona",       i:"1 opak. (150 g)", img:null,fb:"🥩"},
+     {n:"Filet z łososia (świeży)",i:"1–2 szt.", img:null,fb:"🐟"},
+  ]},
+ {id:"s8",k:8,l:"Nabiał — ściana chłodnicza",o:"Lewa lub tylna ściana",ic:"🥛",bg:"#FEF3C7",bd:"#F59E0B",tx:"#92400E",
+  p:[{n:"Skyr naturalny",         i:"4 × 350 g", img:"skyr",fb:"🍶"},
+     {n:"Ser twarogowy chudy",    i:"3 × 400 g", img:null,fb:"🧀"},
+     {n:"Serek wiejski light (0% tłuszczu)",i:"3 × 400 g",img:null,fb:"🫙"},
+     {n:"Mozzarella light",       i:"2 opak.",   img:"mozzarella",fb:"🧀"},
+     {n:"Jogurt naturalny 2%",    i:"1 opak. duży",   img:null,fb:"🥛"},
+     {n:"Mleko 0,5%",             i:"4 litry",    img:null,fb:"🥛"},
+  ]},
+ {id:"s9",k:9,l:"Jaja",o:"Przy nabiałe",ic:"🥚",bg:"#FEF9C3",bd:"#EAB308",tx:"#713F12",
+  p:[{n:"Jaja L",                 i:"2 × 10 szt.",img:"jaja",fb:"🥚"}]},
+ {id:"s10",k:10,l:"Wędliny i ryby — chłodnia",o:"Czytaj etykietę: min. 97% mięsa",ic:"🍖",bg:"#FEE2E2",bd:"#EF4444",tx:"#7F1D1D",
+  p:[{n:"Polędwica z indyka — Kraina Mięs (min. 97%)",     i:"3–4 opak.", img:null,fb:"🦃"},
+     {n:"Szynka z indyka — Kraina Wędlin (min. 97%)",      i:"2 opak.",   img:"szynka_ind",fb:"🦃"},
+     {n:"Polędwica z kurczaka — Kraina Mięs (min. 97%)",   i:"2 opak.",   img:null,fb:"🍗"},
+     {n:"Filet z piersi kurczaka w plastrach (min. 97%)",  i:"2 opak.",   img:null,fb:"🍗"},
+     {n:"Łosoś wędzony 🐟",                                i:"2 opak.", img:"losos_wdz",fb:"🐟"},
+  ]},
+];
+
+const KEY="biedronka_v5";
+let done=JSON.parse(localStorage.getItem(KEY)||"{}");
+const open=Object.fromEntries(T.map(s=>[s.id,true]));
+function save(){localStorage.setItem(KEY,JSON.stringify(done));}
+function tot(){return T.reduce((a,s)=>a+s.p.length,0);}
+function doneN(){return Object.values(done).filter(Boolean).length;}
+function actId(){return T.find(s=>s.p.some((_,i)=>!done[s.id+"_"+i]))?.id??T[T.length-1].id;}
+
+function upd(){
+  const t=tot(),d=doneN(),p=t?Math.round(d/t*100):0;
+  document.getElementById("pf").style.width=p+"%";
+  document.getElementById("pt").textContent=d+" / "+t+" produktów ("+p+"%)";
+  updMap(); updHdrs();
+}
+
+function mkMap(){
+  const r=document.getElementById("mr"); r.innerHTML="";
+  const a=(el)=>r.appendChild(el);
+  T.forEach((s,i)=>{
+    const el=document.createElement("div");
+    el.className="ms"; el.id="m"+s.id;
+    el.textContent=s.ic+"\n"+s.l.split("—")[0].split("/")[0].trim().split(" ").slice(0,2).join(" ");
+    a(el);
+    if(i<T.length-1){const ar=document.createElement("div");ar.className="mar";ar.textContent="→";a(ar);}
+  });
+  const ar=document.createElement("div");ar.className="mar";ar.textContent="→";a(ar);
+  const k=document.createElement("div");k.className="ms";k.textContent="🛒\nKasa";a(k);
+  updMap();
+}
+
+function updMap(){
+  const act=actId();
+  T.forEach(s=>{
+    const el=document.getElementById("m"+s.id); if(!el) return;
+    const ok=s.p.every((_,i)=>done[s.id+"_"+i]);
+    el.className="ms"+(ok?" ok":(s.id===act?" act":""));
+    if(s.id===act){el.style.background=s.bd;el.style.borderColor=s.bd;el.style.boxShadow="0 0 10px "+s.bd+"80";}
+    else{el.style.background="";el.style.boxShadow="";el.style.borderColor="";}
+  });
+}
+
+function mkAll(){
+  const c=document.getElementById("S"); c.innerHTML="";
+  T.forEach(s=>{const el=document.createElement("div");el.className="sec";el.id="S"+s.id;c.appendChild(el);mkSec(s);});
+}
+
+function mkSec(s){
+  const el=document.getElementById("S"+s.id);
+  const kd=s.p.filter((_,i)=>done[s.id+"_"+i]).length;
+  const all=kd===s.p.length;
+  const op=open[s.id];
+  const hbg=all?"#F0FDF4":s.bg, hbd=all?"#22C55E":s.bd;
+  el.innerHTML=`
+<button class="shdr" id="H${s.id}" style="background:${hbg};border:2px solid ${hbd};border-radius:${op?"12px 12px 0 0":"12px"}" onclick="tog('${s.id}')">
+  <div class="snum" style="background:${all?"#22C55E":s.bd}">${all?"✓":s.k}</div>
+  <div class="sinf">
+    <div class="snm" style="color:${all?"#15803D":s.tx}">${s.ic} ${s.l}</div>
+    <div class="ssub" style="color:${all?"#16A34A":s.bd}">${all?"✅ Gotowe!":s.o} · ${kd}/${s.p.length} szt.</div>
+  </div>
+  <div class="schv" style="color:${s.bd};transform:${op?"rotate(90deg)":"none"}">›</div>
+</button>
+${op?`<div class="sbdy" style="border-color:${s.bd}"><div class="grid" id="G${s.id}"></div></div>`:""}`;
+  if(op) mkGrid(s);
+}
+
+function mkGrid(s){
+  const g=document.getElementById("G"+s.id); if(!g) return;
+  g.innerHTML="";
+  s.p.forEach((p,i)=>{
+    const key=s.id+"_"+i, isDone=!!done[key];
+    const card=document.createElement("div");
+    card.className="card"+(isDone?" done":"");
+    card.onclick=()=>togItem(s.id,i);
+    let imgH;
+    if(p.img && IMGS[p.img]){
+      imgH=`<div class="imgbox" style="border:1px solid #E5E7EB;background:#fff">
+        <img src="${IMGS[p.img]}" alt="${p.n}" onerror="this.parentNode.style.background='${s.bd}18';this.outerHTML='<span class=fb>${p.fb}</span>'">
+      </div>`;
+    } else {
+      imgH=`<div class="imgbox" style="background:${s.bd}18"><span class="fb">${p.fb}</span></div>`;
+    }
+    card.innerHTML=`<div class="tick">${isDone?"✓":""}</div>${imgH}<div class="cnm">${p.n}</div><div class="cinfo">${p.i}</div>`;
+    g.appendChild(card);
+  });
+}
+
+function updHdrs(){
+  T.forEach(s=>{
+    const h=document.getElementById("H"+s.id); if(!h) return;
+    const kd=s.p.filter((_,i)=>done[s.id+"_"+i]).length;
+    const all=kd===s.p.length;
+    h.style.background=all?"#F0FDF4":s.bg; h.style.borderColor=all?"#22C55E":s.bd;
+    const n=h.querySelector(".snum"),sub=h.querySelector(".ssub"),nm=h.querySelector(".snm");
+    if(n){n.style.background=all?"#22C55E":s.bd;n.textContent=all?"✓":s.k;}
+    if(nm)nm.style.color=all?"#15803D":s.tx;
+    if(sub){sub.style.color=all?"#16A34A":s.bd;sub.textContent=(all?"✅ Gotowe!":s.o)+" · "+kd+"/"+s.p.length+" szt.";}
+  });
+}
+
+function tog(id){open[id]=!open[id]; mkSec(T.find(s=>s.id===id));}
+
+function togItem(sid,idx){
+  const key=sid+"_"+idx;
+  done[key]=!done[key]; save();
+  mkGrid(T.find(s=>s.id===sid)); upd();
+}
+
+function resetAll(){
+  if(!confirm("Zresetować całą listę?")) return;
+  done={}; save(); mkAll(); upd();
+}
+
+mkMap(); mkAll(); upd();
+</script>
+</body>
+</html>

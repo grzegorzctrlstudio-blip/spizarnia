@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>🍽️ Plan diety – Grzegorz</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.23.3/babel.min.js"></script>
+<style>
+body{margin:0;background:#F8FAFC;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState } = React;
+
+
+
+// ─── MAKRO ───────────────────────────────────────────────────────────────────
+const MENU = {
+  1: {
+    sniadanie: [
+      {
+        name: "Jajka nadziewane z pastą awokado", time: "25 min",
+        skladniki: [
+          { name: "Jaja całe",               ile: "3 szt.",  B:21, W:1,  T:16, kcal:238 },
+          { name: "Awokado",                 ile: "50 g",    B:1,  W:4,  T:8,  kcal:81  },
+          { name: "Ser twarogowy chudy",     ile: "235 g",   B:42, W:8,  T:0,  kcal:202 },
+          { name: "Skyr naturalny",          ile: "150 g",   B:18, W:6,  T:0,  kcal:96  },
+          { name: "Oliwa z oliwek",          ile: "5 g",     B:0,  W:0,  T:5,  kcal:45  },
+          { name: "Warzywa wg listy",        ile: "150 g",   B:1,  W:3,  T:0,  kcal:23  },
+          { name: "Pieczywo pełnoziarniste", ile: "150 g",   B:13, W:73, T:3,  kcal:350 },
+        ],
+        przepis: {
+          kroki: [
+            "Jajka ugotuj na twardo (10 min), ostudź pod zimną wodą, obierz.",
+            "Przekrój wzdłuż na pół, wyjmij żółtka do miseczki.",
+            "Żółtka rozgnieć widelcem razem z awokado, twarogiem i skyrem.",
+            "Dopraw solą, pieprzem i kilkoma kroplami soku z cytryny (awokado nie ciemnieje).",
+            "Napełnij białka pastą, udekoruj warzywami.",
+            "Podawaj z pieczywem.",
+          ],
+          zakupy: ["jaja (6 szt.)", "awokado (1 szt.)", "ser twarogowy chudy", "skyr naturalny", "oliwa z oliwek", "ogórek / pomidor / rzodkiewka", "pieczywo pełnoziarniste"],
+        },
+      },
+      {
+        name: "Koktajl bananowy z masłem orzechowym", time: "5 min",
+        skladniki: [
+          { name: "Płatki owsiane błyskawiczne", ile: "90 g",  B:12, W:54, T:5,  kcal:327 },
+          { name: "Banan",                   ile: "40 g",    B:0,  W:9,  T:0,  kcal:36  },
+          { name: "Ser twarogowy chudy",     ile: "130 g",   B:23, W:5,  T:0,  kcal:112 },
+          { name: "Masło orzechowe",         ile: "45 g",    B:11, W:9,  T:23, kcal:265 },
+          { name: "Odżywka białkowa Izolat", ile: "50 g",    B:43, W:0,  T:0,  kcal:176 },
+          { name: "Mleko 0,5%",              ile: "150 g",   B:5,  W:7,  T:1,  kcal:63  },
+        ],
+        przepis: {
+          kroki: [
+            "Płatki zalej wrzątkiem lub gorącym mlekiem (ok. 100 ml), odstaw 3–4 minuty żeby spęczniały.",
+            "Gdy płatki gotowe — wrzuć wszystko do blendera.",
+            "Zmiksuj na gładko przez ok. 60 sekund.",
+            "Jeśli za gęste — dolej trochę zimnego mleka lub wody.",
+            "Przelej do kubka lub shakera i wypij od razu.",
+          ],
+          zakupy: ["płatki owsiane błyskawiczne", "banan (1 szt.)", "ser twarogowy chudy", "masło orzechowe", "odżywka białkowa Izolat", "mleko 0,5%"],
+        },
+      },
+      {
+        name: "Owsianka bananowa z masłem orzechowym", time: "10 min", nowe: true,
+        skladniki: [
+          { name: "Płatki owsiane błyskawiczne", ile: "100 g", B:13, W:60, T:6,  kcal:363 },
+          { name: "Skyr naturalny",          ile: "200 g",   B:24, W:8,  T:0,  kcal:128 },
+          { name: "Odżywka białkowa Izolat", ile: "45 g",    B:39, W:0,  T:0,  kcal:158 },
+          { name: "Banan",                   ile: "80 g",    B:1,  W:18, T:0,  kcal:71  },
+          { name: "Masło orzechowe",         ile: "20 g",    B:5,  W:3,  T:10, kcal:117 },
+          { name: "Mleko 0,5%",              ile: "150 g",   B:5,  W:7,  T:1,  kcal:63  },
+          { name: "Płatki migdałów",         ile: "20 g",    B:4,  W:2,  T:10, kcal:116 },
+        ],
+        przepis: {
+          kroki: [
+            "Płatki wsyp do miseczki, zalej gorącym mlekiem lub wrzątkiem.",
+            "Odstaw na 3 minuty żeby spęczniały.",
+            "Odżywkę białkową wymieszaj z łyżką zimnej wody na gładką pastę, dodaj do płatków.",
+            "Dodaj skyr i masło orzechowe, wymieszaj.",
+            "Udekoruj pokrojonym bananem i płatkami migdałów.",
+          ],
+          zakupy: ["płatki owsiane błyskawiczne", "mleko 0,5%", "skyr naturalny", "odżywka białkowa Izolat", "banan (1 szt.)", "masło orzechowe", "płatki migdałów"],
+        },
+      },
+    ],
+    obiad: [
+      {
+        name: "Gulasz wegetariański z ciecierzycą", time: "35 min",
+        skladniki: [
+          { name: "Ciecierzyca (puszka)",    ile: "190 g",   B:38, W:93, T:0,  kcal:581 },
+          { name: "Mozzarella light",        ile: "60 g",    B:12, W:1,  T:5,  kcal:100 },
+          { name: "Oliwa z oliwek",          ile: "20 g",    B:0,  W:0,  T:20, kcal:180 },
+          { name: "Jogurt naturalny 2%",     ile: "60 g",    B:2,  W:3,  T:1,  kcal:28  },
+          { name: "Warzywa wg listy",        ile: "200 g",   B:2,  W:5,  T:0,  kcal:30  },
+        ],
+        przepis: {
+          kroki: [
+            "Cebulę i paprykę pokrój w kostkę, pieczarki w plasterki.",
+            "Na oliwie podsmaż cebulę 2 min, dodaj paprykę i pieczarki.",
+            "Wrzuć ciecierzycę (odcedzoną) i 150 ml passaty pomidorowej.",
+            "Dopraw solą, pieprzem, kminem i papryką wędzoną.",
+            "Gotuj 15 minut na małym ogniu, co jakiś czas mieszając.",
+            "Zdejmij z ognia, wmieszaj jogurt naturalny.",
+            "Udekoruj mozzarellą i podawaj.",
+          ],
+          zakupy: ["ciecierzyca (1 puszka)", "mozzarella light", "oliwa z oliwek", "jogurt naturalny 2%", "papryka (1 szt.)", "pieczarki (150 g)", "cebula (1 szt.)", "passata pomidorowa"],
+        },
+      },
+      {
+        name: "Kasza gryczana z polędwicą indyczą i warzywami", time: "30 min", nowe: true,
+        skladniki: [
+          { name: "Kasza gryczana",          ile: "90 g",    B:10, W:62, T:2,  kcal:332 },
+          { name: "Polędwica z indyka",      ile: "100 g",   B:19, W:0,  T:1,  kcal:85  },
+          { name: "Jaja całe",               ile: "2 szt.",  B:14, W:1,  T:11, kcal:158 },
+          { name: "Mozzarella light",        ile: "80 g",    B:16, W:1,  T:7,  kcal:133 },
+          { name: "Oliwa z oliwek",          ile: "20 g",    B:0,  W:0,  T:20, kcal:180 },
+          { name: "Warzywa (cebula, pieczarki, marchew)", ile: "200 g", B:2, W:5, T:0, kcal:30 },
+          { name: "Jogurt naturalny 2%",      ile: "80 g",    B:4,  W:5,  T:2,  kcal:46  },
+          { name: "Truskawki / jabłko",      ile: "200 g",   B:1,  W:15, T:1,  kcal:64  },
+        ],
+        przepis: {
+          kroki: [
+            "Kaszę ugotuj wg przepisu na opakowaniu (~15 min), odsól.",
+            "Cebulę, marchew i pieczarki pokrój, podsmaż na oliwie 5 minut.",
+            "Wymieszaj ugotowaną kaszę z warzywami, dopraw do smaku.",
+            "Na tej samej patelni zrób jajka sadzone lub jajecznicę.",
+            "Na talerzu ułóż kaszę z warzywami, jajka, plastry polędwicy z indyka.",
+            "Połóż mozzarellę na ciepłą kaszę (lekko się roztopi).",
+            "Łyżkę jogurtu podaj jako sos obok. Owoce na deser.",
+          ],
+          zakupy: ["kasza gryczana", "polędwica z indyka (plastry)", "jaja (2 szt.)", "mozzarella light", "oliwa z oliwek", "cebula", "pieczarki (150 g)", "marchew (2 szt.)", "jogurt naturalny 2%", "jabłko / truskawki"],
+        },
+      },
+      {
+        name: "🐄 Wołowina mielona z ryżem i warzywami (piekarnik)", time: "50 min", nowe: true, nowy_przepis: true,
+        skladniki: [
+          { name: "Wołowina mielona",        ile: "130 g",   B:22, W:0,  T:26, kcal:325 },
+          { name: "Ryż basmati (suchy)",     ile: "90 g",    B:6,  W:70, T:1,  kcal:320 },
+          { name: "Oliwa z oliwek",          ile: "15 g",    B:0,  W:0,  T:15, kcal:135 },
+          { name: "Warzywa (papryka, cukinia, cebula)", ile: "200 g", B:2, W:5, T:0, kcal:30 },
+          { name: "Passata pomidorowa",      ile: "100 g",   B:2,  W:7,  T:0,  kcal:37  },
+          { name: "Mozzarella light",        ile: "50 g",    B:10, W:1,  T:4,  kcal:83  },
+          { name: "Serek wiejski 3%",        ile: "100 g",   B:11, W:4,  T:3,  kcal:97  },
+          { name: "Jabłko",                  ile: "100 g",   B:0,  W:12, T:0,  kcal:46  },
+        ],
+        przepis: {
+          kroki: [
+            "Piekarnik nagrzej do 200°C.",
+            "Ryż wsyp do naczynia żaroodpornego, zalej wodą (proporcja 1:1,5).",
+            "Paprykę, cukinię i cebulę pokrój w kostkę, rozłóż równomiernie na ryżu.",
+            "Wołowinę mieloną pokrusz na wierzchu warzyw.",
+            "Posyp wszystko solą, pieprzem, papryką słodką i czosnkiem w proszku.",
+            "Wylej passatę pomidorową równomiernie na całość, polej oliwą.",
+            "Przykryj folią aluminiową i piecz 35 minut.",
+            "Zdejmij folię, rozłóż mozzarellę, piecz jeszcze 10 minut aż się zarumieni.",
+            "Serek wiejski podaj jako sos obok. Jabłko na deser.",
+          ],
+          zakupy: ["wołowina mielona (130–150 g)", "ryż basmati", "mozzarella light", "oliwa z oliwek", "papryka (1 szt.)", "cukinia (1 szt.)", "cebula (1 szt.)", "passata pomidorowa", "serek wiejski 3%", "jabłko"],
+        },
+      },
+      {
+        name: "🍗 Kurczak pieczony z piekarnika z ryżem", time: "40 min", nowe: true, nowy_przepis: true,
+        skladniki: [
+          { name: "Pierś z kurczaka",        ile: "180 g",   B:38, W:0,  T:3,  kcal:189 },
+          { name: "Ryż basmati (suchy)",     ile: "100 g",   B:7,  W:78, T:1,  kcal:356 },
+          { name: "Oliwa z oliwek",          ile: "30 g",    B:0,  W:0,  T:30, kcal:270 },
+          { name: "Warzywa (papryka, pieczarki, cebula)", ile: "200 g", B:2, W:5, T:0, kcal:30 },
+          { name: "Jogurt naturalny 2%",      ile: "120 g",   B:6,  W:7,  T:2,  kcal:58  },
+          { name: "Mozzarella light",        ile: "30 g",    B:6,  W:0,  T:3,  kcal:50  },
+          { name: "Jabłko",                  ile: "100 g",   B:0,  W:12, T:0,  kcal:46  },
+        ],
+        przepis: {
+          kroki: [
+            "Piekarnik nagrzej do 200°C.",
+            "Pierś natrzyj solą, pieprzem, papryką słodką i czosnkiem w proszku, polej oliwą.",
+            "Paprykę, pieczarki i cebulę pokrój w grube kawałki, wsyp do naczynia żaroodpornego.",
+            "Połóż pierś na warzywach, polej resztą oliwy.",
+            "Piecz 25–30 minut aż sok z kurczaka będzie klarowny.",
+            "W tym czasie ugotuj ryż wg przepisu na opakowaniu.",
+            "W ostatnich 3 minutach połóż mozzarellę na kurczaku.",
+            "Sos: jogurt naturalny 2% + sól + koperek lub oregano. Jabłko na deser.",
+          ],
+          zakupy: ["pierś z kurczaka (180–200 g)", "ryż basmati", "mozzarella light", "oliwa z oliwek", "papryka (1 szt.)", "pieczarki (150 g)", "cebula (1 szt.)", "jogurt naturalny 2%", "jabłko"],
+        },
+      },
+    ],
+    kolacja: [
+      {
+        name: "Sałatka z łososiem wędzonym i grzankami", time: "20 min",
+        skladniki: [
+          { name: "Łosoś wędzony 🐟",        ile: "150 g",   B:38, W:2,  T:21, kcal:348 },
+          { name: "Pieczywo pełnoziarniste", ile: "130 g",   B:12, W:63, T:2,  kcal:303 },
+          { name: "Warzywa wg listy",        ile: "200 g",   B:2,  W:5,  T:0,  kcal:30  },
+          { name: "Skyr naturalny",          ile: "200 g",   B:24, W:8,  T:0,  kcal:128 },
+          { name: "Serek wiejski lekki 3%",  ile: "200 g",   B:22, W:5,  T:6,  kcal:162 },
+        ],
+        przepis: {
+          kroki: [
+            "Pieczywo pokrój w kostkę, wsyp na blachę i piecz w 180°C przez 10 minut na złoto.",
+            "Warzywa (rukola, ogórek, pomidor, papryka) pokrój lub porwij.",
+            "Łososia podziel widelcem na kawałki.",
+            "Wymieszaj warzywa z łososiem na talerzu.",
+            "Skyr wymieszaj z solą i pieprzem, polej sałatkę jako sos.",
+            "Udekoruj chrupiącymi grzankami.",
+          ],
+          zakupy: ["łosoś wędzony (150 g)", "pieczywo pełnoziarniste", "skyr naturalny", "serek wiejski 3%", "rukola / sałata", "ogórek", "pomidor", "papryka"],
+        },
+      },
+      {
+        name: "Miska z jajkami, polędwicą i twarożkiem", time: "10 min",
+        skladniki: [
+          { name: "Jaja całe",               ile: "3 szt.",  B:21, W:1,  T:16, kcal:238 },
+          { name: "Polędwica z indyka",      ile: "120 g",   B:23, W:0,  T:1,  kcal:102 },
+          { name: "Ser twarogowy chudy",     ile: "150 g",   B:27, W:5,  T:0,  kcal:129 },
+          { name: "Skyr naturalny",          ile: "100 g",   B:12, W:4,  T:0,  kcal:64  },
+          { name: "Warzywa (ogórek, pomidor, sałata, rzodkiewka)", ile: "200 g", B:2, W:5, T:0, kcal:30 },
+          { name: "Pieczywo pełnoziarniste", ile: "120 g",   B:10, W:58, T:3,  kcal:280 },
+          { name: "Oliwa z oliwek",          ile: "15 g",    B:0,  W:0,  T:15, kcal:135 },
+        ],
+        przepis: {
+          kroki: [
+            "Jajka ugotuj na twardo (10 min) lub usmaż sadzone — jak wolisz.",
+            "Warzywa pokrój w kostkę lub plasterki.",
+            "Twaróg wymieszaj ze skyrem, solą, pieprzem i oliwą — to kremowy sos.",
+            "W misce lub na talerzu ułóż warzywa, plastry polędwicy z indyka i jajka.",
+            "Polej sosem twarożkowym.",
+            "Pieczywo podaj obok do maczania lub pokrój w grzanki.",
+          ],
+          zakupy: ["jaja (3 szt.)", "polędwica z indyka (plastry)", "ser twarogowy chudy", "skyr naturalny", "ogórek", "pomidor", "sałata", "rzodkiewka", "pieczywo pełnoziarniste", "oliwa z oliwek"],
+        },
+      },
+      {
+        name: "Kanapki z twarożkiem, polędwicą i warzywami", time: "5 min",
+        skladniki: [
+          { name: "Pieczywo pełnoziarniste", ile: "120 g",   B:10, W:58, T:3,  kcal:280 },
+          { name: "Ser twarogowy chudy",     ile: "200 g",   B:36, W:7,  T:0,  kcal:172 },
+          { name: "Skyr naturalny",          ile: "150 g",   B:18, W:6,  T:0,  kcal:96  },
+          { name: "Polędwica z indyka",      ile: "120 g",   B:23, W:0,  T:1,  kcal:102 },
+          { name: "Warzywa (ogórek, pomidor, rzodkiewka)", ile: "150 g", B:1, W:4, T:0, kcal:22 },
+          { name: "Masło orzechowe",         ile: "30 g",    B:8,  W:5,  T:16, kcal:176 },
+          { name: "Oliwa z oliwek",          ile: "10 g",    B:0,  W:0,  T:10, kcal:90  },
+          { name: "Jabłko / truskawki",      ile: "80 g",    B:0,  W:10, T:0,  kcal:37  },
+        ],
+        przepis: {
+          kroki: [
+            "Twaróg wymieszaj ze skyrem i oliwą na kremową pastę.",
+            "Posmaruj kanapki grubą warstwą pasty twarożkowej.",
+            "Połóż plastry polędwicy z indyka.",
+            "Udekoruj pokrojonym ogórkiem, pomidorem i rzodkiewką.",
+            "Masło orzechowe posmaruj na osobnej kromce lub zjedz łyżką.",
+            "Jabłko lub truskawki na deser.",
+          ],
+          zakupy: ["pieczywo pełnoziarniste", "ser twarogowy chudy", "skyr naturalny", "polędwica z indyka (plastry)", "ogórek", "pomidor", "rzodkiewka", "masło orzechowe", "oliwa z oliwek", "jabłko / truskawki"],
+        },
+      },
+    ],
+  },
+  2: {
+    sniadanie: [
+      {
+        name: "Kanapki z szynką z indyka i jajkiem", time: "10 min", nowe: true,
+        skladniki: [
+          { name: "Pieczywo pełnoziarniste", ile: "180 g",   B:16, W:88, T:3,  kcal:419 },
+          { name: "Szynka z indyka (plastry)",ile: "180 g",  B:34, W:1,  T:2,  kcal:162 },
+          { name: "Jaja całe",               ile: "3 szt.",  B:21, W:1,  T:16, kcal:238 },
+          { name: "Warzywa wg listy",        ile: "150 g",   B:1,  W:3,  T:0,  kcal:23  },
+          { name: "Oliwa z oliwek",          ile: "5 g",     B:0,  W:0,  T:5,  kcal:45  },
+          { name: "Skyr naturalny",          ile: "150 g",   B:18, W:6,  T:0,  kcal:96  },
+        ],
+        przepis: {
+          kroki: [
+            "Jajka usmaż na jajecznicę lub ugotuj na twardo (~10 min).",
+            "Pieczywo posmaruj skyrem zamiast masła (kremowo i bogato w białko).",
+            "Połóż plastry szynki z indyka.",
+            "Dodaj warzywa (pomidor, ogórek, sałata, rzodkiewka).",
+            "Na wierzch połóż jajka.",
+          ],
+          zakupy: ["pieczywo pełnoziarniste", "szynka z indyka (plastry)", "jaja (3 szt.)", "skyr naturalny", "pomidor", "ogórek", "sałata", "oliwa z oliwek"],
+        },
+      },
+      {
+        name: "Kanapki z pastą twarogową i awokado", time: "10 min",
+        skladniki: [
+          { name: "Pieczywo pełnoziarniste", ile: "150 g",   B:13, W:73, T:3,  kcal:350 },
+          { name: "Ser twarogowy chudy",     ile: "300 g",   B:54, W:11, T:0,  kcal:258 },
+          { name: "Skyr naturalny",          ile: "200 g",   B:24, W:8,  T:0,  kcal:128 },
+          { name: "Oliwa z oliwek",          ile: "10 g",    B:0,  W:0,  T:10, kcal:90  },
+          { name: "Awokado",                 ile: "80 g",    B:2,  W:6,  T:12, kcal:129 },
+          { name: "Warzywa wg listy",        ile: "150 g",   B:1,  W:3,  T:0,  kcal:23  },
+          { name: "Orzechy włoskie/laskowe", ile: "10 g",    B:2,  W:2,  T:6,  kcal:63  },
+        ],
+        przepis: {
+          kroki: [
+            "Awokado przekrój, wyjmij pestkę, wyskrob miąższ łyżką.",
+            "Rozgnieć widelcem razem z twarogiem, skyrem i oliwą na kremową pastę.",
+            "Dodaj sól, pieprz i kilka kropel soku z cytryny (żeby pasta nie ciemniała).",
+            "Posmaruj kanapki grubą warstwą pasty.",
+            "Udekoruj warzywami (rzodkiewka, ogórek, pomidor, szczypiorek).",
+            "Posyp orzechami.",
+          ],
+          zakupy: ["pieczywo pełnoziarniste", "ser twarogowy chudy", "skyr naturalny", "awokado (1 szt.)", "oliwa z oliwek", "orzechy włoskie / laskowe", "ogórek", "rzodkiewka", "pomidor"],
+        },
+      },
+      {
+        name: "Skyr z granolą owsianą i owocami", time: "5 min", nowe: true,
+        skladniki: [
+          { name: "Skyr naturalny",          ile: "300 g",   B:36, W:12, T:0,  kcal:192 },
+          { name: "Płatki owsiane błyskawiczne", ile: "80 g",B:10, W:48, T:5,  kcal:290 },
+          { name: "Odżywka białkowa Izolat", ile: "40 g",    B:35, W:0,  T:0,  kcal:140 },
+          { name: "Truskawki / maliny",      ile: "200 g",   B:1,  W:15, T:1,  kcal:64  },
+          { name: "Masło orzechowe",         ile: "20 g",    B:5,  W:3,  T:10, kcal:117 },
+          { name: "Płatki migdałów",         ile: "20 g",    B:4,  W:2,  T:10, kcal:116 },
+          { name: "Banan",                   ile: "60 g",    B:1,  W:14, T:0,  kcal:53  },
+          { name: "Orzechy włoskie",         ile: "10 g",    B:2,  W:2,  T:6,  kcal:63  },
+        ],
+        przepis: {
+          kroki: [
+            "Skyr przełóż do dużej miseczki.",
+            "Odżywkę wymieszaj z łyżką zimnej wody, wmieszaj do skyru.",
+            "Płatki możesz podpiec 2–3 min na suchej patelni dla chrupkości (opcjonalne).",
+            "Wsyp płatki na skyr.",
+            "Udekoruj owocami, bananem w plasterkach, orzechami i płatkami migdałów.",
+            "Na końcu polej masłem orzechowym.",
+          ],
+          zakupy: ["skyr naturalny", "płatki owsiane błyskawiczne", "odżywka białkowa Izolat", "truskawki / maliny", "banan (1 szt.)", "masło orzechowe", "płatki migdałów", "orzechy włoskie"],
+        },
+      },
+    ],
+    obiad: [
+      {
+        name: "🐟 Łosoś pieczony z ryżem i warzywami (naczynie żaroodporne)", time: "35 min", nowy_przepis: true,
+        skladniki: [
+          { name: "Filet z łososia (świeży)", ile: "130 g",  B:26, W:0,  T:17, kcal:260 },
+          { name: "Ryż basmati (suchy)",     ile: "100 g",   B:7,  W:78, T:1,  kcal:356 },
+          { name: "Oliwa z oliwek",          ile: "15 g",    B:0,  W:0,  T:15, kcal:135 },
+          { name: "Warzywa (cukinia, cebula)", ile: "200 g", B:2,  W:5,  T:0,  kcal:30  },
+          { name: "Jogurt naturalny 2%",      ile: "120 g",   B:6,  W:7,  T:2,  kcal:58  },
+          { name: "Skyr naturalny",          ile: "150 g",   B:18, W:6,  T:0,  kcal:96  },
+          { name: "Jabłko",                  ile: "80 g",    B:0,  W:10, T:0,  kcal:37  },
+        ],
+        przepis: {
+          kroki: [
+            "Piekarnik nagrzej do 200°C.",
+            "Cukinię pokrój w półplasterki, cebulę w piórka — wrzuć do naczynia żaroodpornego.",
+            "Polej warzywa oliwą, posól i posyp papryką słodką.",
+            "Połóż filet z łososia na warzywach skórą do dołu.",
+            "Posyp solą, pieprzem cytrynowym i koperkiem, skrop sokiem z cytryny.",
+            "Piecz bez pokrywki 18–22 minuty — łosoś gotowy gdy mięso jest matowe w środku.",
+            "W tym czasie ugotuj ryż wg przepisu na opakowaniu (~15 min).",
+            "Sos: skyr wymieszaj ze śmietaną 18%, koperkiem i szczyptą soli.",
+            "Podawaj łososia z warzywami na ryżu, polej sosem. Jabłko na deser.",
+          ],
+          zakupy: ["filet z łososia świeżego (130–150 g)", "ryż basmati", "oliwa z oliwek", "cukinia (1 szt.)", "cebula (1 szt.)", "jogurt naturalny 2%", "skyr naturalny", "koperek", "cytryna (1 szt.)", "jabłko"],
+        },
+      },
+      {
+        name: "Kotleciki jaglane z ciecierzycą", time: "25 min",
+        skladniki: [
+          { name: "Jaja całe",               ile: "2 szt.",  B:14, W:1,  T:11, kcal:158 },
+          { name: "Białka jaj",              ile: "66 g",    B:7,  W:0,  T:0,  kcal:34  },
+          { name: "Ciecierzyca (puszka)",    ile: "120 g",   B:24, W:59, T:0,  kcal:367 },
+          { name: "Płatki jaglane",          ile: "50 g",    B:6,  W:36, T:2,  kcal:185 },
+          { name: "Oliwa z oliwek",          ile: "30 g",    B:0,  W:0,  T:30, kcal:270 },
+          { name: "Warzywa wg listy",        ile: "200 g",   B:2,  W:5,  T:0,  kcal:30  },
+        ],
+        przepis: {
+          kroki: [
+            "Płatki jaglane zalej wrzątkiem, odstaw 5 minut, odsącz nadmiar wody.",
+            "Ciecierzycę odcedź i rozgnieć widelcem — zostaw trochę kawałków, nie rób puree.",
+            "Wymieszaj ciecierzycę, płatki, całe jajka, białka, sól, pieprz i czosnek w proszku.",
+            "Formuj małe kotleciki (wielkości kulki bilardowej, spłaszczone).",
+            "Smaż na oliwie po 3–4 minuty z każdej strony na złoty kolor.",
+            "Podawaj z warzywami i łyżką skyru lub jogurtu jako sos.",
+          ],
+          zakupy: ["ciecierzyca (1 puszka)", "płatki jaglane", "jaja (4 szt.)", "oliwa z oliwek", "warzywa wg listy"],
+        },
+      },
+      {
+        name: "🍗 Kurczak z batami w sosie pomidorowym (naczynie żaroodporne)", time: "50 min", nowe: true, nowy_przepis: true,
+        skladniki: [
+          { name: "Pierś z kurczaka",        ile: "150 g",   B:32, W:0,  T:3,  kcal:158 },
+          { name: "Bataty",                  ile: "400 g",   B:4,  W:72, T:0,  kcal:288 },
+          { name: "Oliwa z oliwek",          ile: "25 g",    B:0,  W:0,  T:25, kcal:225 },
+          { name: "Warzywa (papryka, cukinia, cebula)", ile: "200 g", B:2, W:5, T:0, kcal:30 },
+          { name: "Passata pomidorowa",      ile: "100 g",   B:2,  W:7,  T:0,  kcal:37  },
+          { name: "Jogurt naturalny 2%",      ile: "150 g",   B:5,  W:8,  T:3,  kcal:69  },
+          { name: "Mozzarella light",        ile: "60 g",    B:12, W:1,  T:5,  kcal:100 },
+          { name: "Serek wiejski 3%",        ile: "50 g",    B:5,  W:2,  T:2,  kcal:49  },
+          { name: "Jabłko",                  ile: "80 g",    B:0,  W:10, T:0,  kcal:37  },
+        ],
+        przepis: {
+          kroki: [
+            "Piekarnik nagrzej do 190°C.",
+            "Bataty pokrój w plastry 1,5 cm (ze skórką, tylko umyj), paprykę i cukinię w grube kawałki, cebulę w piórka.",
+            "Wszystkie warzywa wrzuć do naczynia żaroodpornego, polej połową oliwy, posól i posyp papryką słodką.",
+            "Pierś z kurczaka pokrój w grube plastry (2–3 cm) lub zostaw w całości.",
+            "Natrzyj kurczaka solą, pieprzem, czosnkiem w proszku i oregano.",
+            "Połóż kurczaka na warzywach, polej resztą oliwy.",
+            "Passatę wymieszaj ze śmietaną i szczyptą soli — wylej równomiernie na całość.",
+            "Przykryj pokrywką naczynia lub folią i piecz 35 minut.",
+            "Zdejmij pokrywkę, rozłóż mozzarellę, piecz jeszcze 10–12 minut aż ser się zarumieni.",
+            "Serek wiejski podaj jako sos obok. Jabłko na deser.",
+          ],
+          zakupy: ["pierś z kurczaka (150–180 g)", "bataty (400–450 g)", "mozzarella light", "oliwa z oliwek", "papryka (1 szt.)", "cukinia (1 szt.)", "cebula (1 szt.)", "passata pomidorowa", "jogurt naturalny 2%", "serek wiejski 3%", "jabłko"],
+        },
+      },
+      {
+        name: "🍗 Kurczak pieczony z piekarnika z ziemniakami", time: "50 min", nowe: true, nowy_przepis: true,
+        skladniki: [
+          { name: "Pierś z kurczaka",        ile: "180 g",   B:38, W:0,  T:3,  kcal:189 },
+          { name: "Ziemniaki",               ile: "380 g",   B:8,  W:64, T:0,  kcal:296 },
+          { name: "Oliwa z oliwek",          ile: "30 g",    B:0,  W:0,  T:30, kcal:270 },
+          { name: "Warzywa (papryka, pieczarki, cebula)", ile: "200 g", B:2, W:5, T:0, kcal:30 },
+          { name: "Jogurt naturalny 2%",      ile: "150 g",   B:5,  W:8,  T:3,  kcal:69  },
+          { name: "Mozzarella light",        ile: "40 g",    B:8,  W:0,  T:4,  kcal:67  },
+          { name: "Jabłko",                  ile: "100 g",   B:0,  W:12, T:0,  kcal:46  },
+        ],
+        przepis: {
+          kroki: [
+            "Piekarnik nagrzej do 200°C.",
+            "Ziemniaki pokrój w ćwiartki (ze skórką, tylko umyj), warzywa w grube kawałki.",
+            "Kurczaka natrzyj solą, pieprzem, papryką wędzoną i czosnkiem w proszku.",
+            "W naczyniu żaroodpornym ułóż ziemniaki i warzywa, polej połową oliwy.",
+            "Połóż kurczaka na warzywach, polej resztą oliwy.",
+            "Piecz 40–45 minut, w połowie czasu obróć kurczaka i wymieszaj warzywa.",
+            "W ostatnich 5 minutach połóż mozzarellę na kurczaku.",
+            "Sos: jogurt naturalny 2% + musztarda łagodna + sól. Jabłko na deser.",
+          ],
+          zakupy: ["pierś z kurczaka (180–200 g)", "ziemniaki (400 g)", "mozzarella light", "oliwa z oliwek", "papryka (1 szt.)", "pieczarki (150 g)", "cebula (1 szt.)", "jogurt naturalny 2%", "jabłko"],
+        },
+      },
+    ],
+    kolacja: [
+      {
+        name: "Pizza z patelni z mozzarellą", time: "35 min",
+        skladniki: [
+          { name: "Jaja całe",               ile: "1 szt.",  B:7,  W:0,  T:5,  kcal:79  },
+          { name: "Białka jaj",              ile: "99 g",    B:11, W:0,  T:0,  kcal:51  },
+          { name: "Mąka ryżowa",             ile: "30 g",    B:2,  W:24, T:0,  kcal:110 },
+          { name: "Mąka jaglana",            ile: "50 g",    B:6,  W:35, T:2,  kcal:182 },
+          { name: "Mozzarella light",        ile: "240 g",   B:48, W:5,  T:22, kcal:401 },
+          { name: "Ketchup (mniej kcal)",    ile: "30 g",    B:0,  W:2,  T:0,  kcal:14  },
+          { name: "Warzywa (papryka, pieczarki)", ile: "200 g", B:2, W:5, T:0, kcal:30 },
+          { name: "Skyr naturalny",          ile: "150 g",   B:18, W:6,  T:0,  kcal:96  },
+        ],
+        przepis: {
+          kroki: [
+            "Do miksera wrzuć jajko, białka, mąki, sól, pieprz i odrobinę wody.",
+            "Dodaj kurkumę (kolor), paprykę słodką i czosnek w proszku.",
+            "Zmiksuj na gładką masę — konsystencja gęstszego naleśnika.",
+            "Wylej na dobrze rozgrzaną patelnię teflonową (bez tłuszczu).",
+            "Smaż na średnim ogniu 4 minuty aż spód będzie ścięty i łatwo odchodzi.",
+            "Przełóż patelnię do piekarnika 220°C na 3 minuty.",
+            "Posmaruj spód passatą wymieszaną z czosnkiem i oregano.",
+            "Posyp mozzarellą i warzywami, wstaw do piekarnika na 7–8 minut.",
+            "Polej ketchupem. Skyr podaj osobno jako sos.",
+          ],
+          zakupy: ["jaja (4–5 szt.)", "mąka ryżowa", "mąka jaglana", "mozzarella light", "skyr naturalny", "papryka (1 szt.)", "pieczarki (150 g)", "passata pomidorowa", "ketchup (mniej kalorii)"],
+        },
+      },
+      {
+        name: "Sałatka ryżowa z polędwicą indyczą", time: "15 min", nowe: true,
+        skladniki: [
+          { name: "Ryż basmati",             ile: "70 g",    B:5,  W:55, T:0,  kcal:249 },
+          { name: "Polędwica z indyka",      ile: "200 g",   B:38, W:0,  T:2,  kcal:170 },
+          { name: "Ser twarogowy chudy",     ile: "150 g",   B:27, W:5,  T:0,  kcal:129 },
+          { name: "Skyr naturalny",          ile: "100 g",   B:12, W:4,  T:0,  kcal:64  },
+          { name: "Warzywa (ogórek, pomidor)", ile: "200 g", B:2,  W:10, T:0,  kcal:46  },
+          { name: "Oliwa z oliwek",          ile: "10 g",    B:0,  W:0,  T:10, kcal:90  },
+          { name: "Płatki migdałów",         ile: "20 g",    B:4,  W:2,  T:10, kcal:116 },
+          { name: "Masło orzechowe",         ile: "20 g",    B:5,  W:3,  T:10, kcal:117 },
+        ],
+        przepis: {
+          kroki: [
+            "Ugotuj ryż wg przepisu, ostudź lub użyj wcześniej ugotowanego.",
+            "Ogórek i pomidor pokrój w kostkę.",
+            "Twaróg wymieszaj ze skyrem, solą i pieprzem — to kremowy sos.",
+            "W dużej misce wymieszaj ryż, warzywa i sos twarogowy.",
+            "Polej oliwą, posyp płatkami migdałów.",
+            "Rozłóż plastry polędwicy z indyka na wierzchu.",
+            "Masło orzechowe polej nitką na końcu.",
+          ],
+          zakupy: ["ryż basmati", "polędwica z indyka (plastry)", "ser twarogowy chudy", "skyr naturalny", "ogórek", "pomidor", "oliwa z oliwek", "płatki migdałów", "masło orzechowe"],
+        },
+      },
+      {
+        name: "Owsianka cynamonowa z jabłkiem", time: "10 min",
+        skladniki: [
+          { name: "Odżywka białkowa WPC",    ile: "70 g",    B:55, W:3,  T:4,  kcal:268 },
+          { name: "Płatki owsiane błyskawiczne", ile: "70 g",B:9,  W:42, T:4,  kcal:254 },
+          { name: "Cynamon",                 ile: "do smaku",B:0,  W:0,  T:0,  kcal:0   },
+          { name: "Jabłko",                  ile: "150 g",   B:1,  W:18, T:1,  kcal:69  },
+          { name: "Masło orzechowe",         ile: "45 g",    B:11, W:9,  T:23, kcal:265 },
+          { name: "Skyr naturalny",          ile: "150 g",   B:18, W:6,  T:0,  kcal:96  },
+        ],
+        przepis: {
+          kroki: [
+            "Płatki zalej gorącym skyrem lub wrzątkiem (100–150 ml), odstaw 3 minuty.",
+            "Odżywkę białkową wymieszaj z 2–3 łyżkami zimnej wody na pastę, dodaj do płatków.",
+            "Jabłko pokrój w drobną kostkę lub zetrzyj na tarce (ze skórką).",
+            "Dodaj masło orzechowe, cynamon i jabłko, wymieszaj.",
+            "Zjedz ciepłe — im cieplejsze tym lepiej smakuje masło orzechowe.",
+          ],
+          zakupy: ["płatki owsiane błyskawiczne", "odżywka białkowa WPC", "skyr naturalny", "jabłko (1 szt.)", "masło orzechowe", "cynamon"],
+        },
+      },
+    ],
+  },
+};
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+const sum = (arr, k) => arr.reduce((a, s) => a + (s[k] || 0), 0);
+const POSILEK = {
+  sniadanie: { label: "Śniadanie", emoji: "🌅", color: "#EA580C", light: "#FFF7ED" },
+  obiad:     { label: "Obiad",     emoji: "🍽️", color: "#16A34A", light: "#F0FDF4" },
+  kolacja:   { label: "Kolacja",   emoji: "🌙", color: "#2563EB", light: "#EFF6FF" },
+};
+
+// ─── COMPONENTS ───────────────────────────────────────────────────────────────
+function MealTable({ meal, num }) {
+  const [open, setOpen] = useState(false);
+  const B = sum(meal.skladniki, "B"), W = sum(meal.skladniki, "W");
+  const T = sum(meal.skladniki, "T"), K = sum(meal.skladniki, "kcal");
+  const isNew = meal.nowy_przepis;
+
+  return (
+    <div style={{
+      marginBottom: 16, borderRadius: 12, overflow: "hidden",
+      border: isNew ? "2.5px solid #EA580C" : meal.nowe ? "2px solid #A78BFA" : "1.5px solid #E2E8F0",
+      background: "#fff", boxShadow: isNew ? "0 4px 16px rgba(234,88,12,.12)" : "0 1px 4px rgba(0,0,0,.05)",
+    }}>
+      {/* Nagłówek */}
+      <div style={{
+        background: isNew ? "#FFF7ED" : meal.nowe ? "#F5F3FF" : "#F8FAFC",
+        padding: "9px 14px", borderBottom: "1px solid #E2E8F0",
+        display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8,
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 7, flexWrap: "wrap" }}>
+          <span style={{ fontWeight: 800, fontSize: 13, color: "#111" }}>Propozycja {num}: {meal.name}</span>
+          {isNew && <span style={{ background: "#EA580C", color: "#fff", borderRadius: 5, fontSize: 9, padding: "2px 7px", fontWeight: 800 }}>NOWE</span>}
+          {meal.nowe && !isNew && <span style={{ background: "#7C3AED", color: "#fff", borderRadius: 5, fontSize: 9, padding: "2px 7px", fontWeight: 800 }}>NOWE</span>}
+        </div>
+        <span style={{ fontSize: 11, color: "#94A3B8", whiteSpace: "nowrap" }}>⏱ {meal.time}</span>
+      </div>
+
+      {/* Tabela makro */}
+      <div style={{ overflowX: "auto" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr style={{ background: "#F1F5F9" }}>
+              {[["Składnik","left","#64748B"],["Ilość","right","#64748B"],["B g","right","#7C3AED"],["W g","right","#EA580C"],["T g","right","#16A34A"],["kcal","right","#0369A1"]].map(([l,a,c])=>(
+                <th key={l} style={{ padding:"5px 6px", fontWeight:700, fontSize:11, color:c, borderBottom:"1px solid #E2E8F0", textAlign:a, background:"#F1F5F9", whiteSpace:"nowrap" }}>{l}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {meal.skladniki.map((s, i) => (
+              <tr key={i} style={{ background: i%2===0?"#fff":"#FAFAFA", borderBottom:"1px solid #F1F5F9" }}>
+                <td style={{ padding:"6px 14px", fontSize:12, color:"#1E293B" }}>{s.name}</td>
+                <td style={{ padding:"6px 6px", fontSize:11, color:"#64748B", textAlign:"right", fontFamily:"monospace", whiteSpace:"nowrap" }}>{s.ile}</td>
+                {[["B",s.B,"#7C3AED"],["W",s.W,"#EA580C"],["T",s.T,"#16A34A"],["k",s.kcal,"#0369A1"]].map(([k,v,c])=>(
+                  <td key={k} style={{ padding:"6px 6px", textAlign:"right", fontFamily:"monospace", fontSize:12, color:v===0?"#CBD5E1":c, fontWeight:v===0?400:600 }}>{v}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr style={{ background:"#1E293B" }}>
+              <td colSpan={2} style={{ padding:"7px 14px", color:"#94A3B8", fontWeight:700, fontSize:11, letterSpacing:0.5 }}>SUMA</td>
+              {[[B,"#C4B5FD"],[W,"#FDBA74"],[T,"#86EFAC"],[K,"#7DD3FC"]].map(([v,c],i)=>(
+                <td key={i} style={{ padding:"7px 6px", textAlign:"right", color:c, fontWeight:800, fontFamily:"monospace", fontSize:12 }}>{v}{i===3?" kcal":""}</td>
+              ))}
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      {/* Przepis */}
+      {meal.przepis && (
+        <>
+          <button onClick={() => setOpen(o => !o)} style={{
+            width: "100%", background: open ? "#FFF7ED" : "#F8FAFC",
+            border: "none", borderTop: "1px solid #E2E8F0",
+            padding: "9px 14px", cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            fontWeight: 700, fontSize: 12, color: open ? "#EA580C" : "#64748B",
+          }}>
+            <span>📋 Przepis + lista zakupów</span>
+            <span style={{ transition: ".2s", transform: open ? "rotate(90deg)" : "none" }}>›</span>
+          </button>
+          {open && (
+            <div style={{ padding: "14px 16px", background: "#FFFBF5", borderTop: "1px solid #FED7AA" }}>
+              {/* Kroki */}
+              <div style={{ fontWeight: 800, fontSize: 12, color: "#7C2D12", marginBottom: 8 }}>👨‍🍳 Jak zrobić:</div>
+              <ol style={{ paddingLeft: 18, marginBottom: 14 }}>
+                {meal.przepis.kroki.map((k, i) => (
+                  <li key={i} style={{ fontSize: 12.5, color: "#374151", lineHeight: 1.6, marginBottom: 4 }}>{k}</li>
+                ))}
+              </ol>
+              {/* Zakupy */}
+              <div style={{ fontWeight: 800, fontSize: 12, color: "#7C2D12", marginBottom: 8 }}>🛒 Co kupić do tego dania:</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {meal.przepis.zakupy.map((z, i) => (
+                  <span key={i} style={{
+                    background: "#FEF3C7", border: "1px solid #FCD34D",
+                    borderRadius: 20, padding: "3px 10px", fontSize: 11.5, color: "#78350F",
+                  }}>🛒 {z}</span>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+// ─── APP ──────────────────────────────────────────────────────────────────────
+function App() {
+  const [menu, setMenu] = useState(1);
+  const [tab, setTab] = useState("obiad");
+  const data = MENU[menu];
+
+  return (
+    <div style={{ maxWidth: 700, margin: "0 auto", padding: "14px 12px", background: "#F8FAFC", minHeight: "100vh", fontFamily: "system-ui, -apple-system, sans-serif" }}>
+
+      <div style={{ background: "linear-gradient(135deg,#1E3A8A,#4F46E5 55%,#7C3AED)", borderRadius: 18, padding: "18px 20px", marginBottom: 14, color: "#fff" }}>
+        <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", opacity: 0.65, marginBottom: 2 }}>Plan żywieniowy · Biedronka Edition</div>
+        <div style={{ fontWeight: 800, fontSize: 22, marginBottom: 6 }}>Grzegorz Skroński</div>
+        <div style={{ fontSize: 11.5, opacity: 0.85, lineHeight: 1.7, marginBottom: 10 }}>
+          ~3 060 kcal/dzień · produkty z Biedronki · 🐟 tylko łosoś wędzony<br/>
+          📋 Każda potrawa ma przepis i listę zakupów — kliknij żeby rozwinąć
+        </div>
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+          {["🐄 Wołowina mielona (M1 P3)", "🥩 Schab z batami (M2 P3)", "🍗 Kurczak z piekarnika (P4)", "✅ Wszystkie przepisy"].map(t => (
+            <span key={t} style={{ background: "rgba(255,255,255,.15)", borderRadius: 20, padding: "3px 10px", fontSize: 10, fontWeight: 600 }}>{t}</span>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+        {[1, 2].map(n => (
+          <button key={n} onClick={() => setMenu(n)} style={{
+            flex: 1, padding: "11px", borderRadius: 12, border: "none",
+            fontWeight: 800, fontSize: 14, cursor: "pointer",
+            background: menu === n ? "#1E3A8A" : "#E2E8F0",
+            color: menu === n ? "#fff" : "#64748B",
+            boxShadow: menu === n ? "0 4px 14px rgba(30,58,138,.28)" : "none",
+            transition: "all .2s",
+          }}>Menu {n}</button>
+        ))}
+      </div>
+
+      <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
+        {Object.entries(POSILEK).map(([key, p]) => (
+          <button key={key} onClick={() => setTab(key)} style={{
+            flex: 1, padding: "8px 4px", borderRadius: 10, border: "none",
+            fontWeight: 700, fontSize: 11, cursor: "pointer",
+            background: tab === key ? p.color : "#F1F5F9",
+            color: tab === key ? "#fff" : "#64748B",
+            transition: "all .2s",
+          }}>{p.emoji} {p.label}</button>
+        ))}
+      </div>
+
+      <div>
+        {data[tab].map((meal, i) => (
+          <MealTable key={i} meal={meal} num={i + 1} />
+        ))}
+      </div>
+
+      <div style={{ background: "#EFF6FF", border: "1.5px solid #93C5FD", borderRadius: 12, padding: "12px 14px", marginTop: 4, fontSize: 12, color: "#1E40AF", lineHeight: 1.8 }}>
+        <strong>💊 Suplementacja (masz już):</strong> Kreatyna 5–7 g/dzień · Omega-3 1g × 2/dzień · Wit. D3 2000 IU + K2MK7 50 mcg · Chrom 200 mcg/dzień · Kompleks witamin
+      </div>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>
