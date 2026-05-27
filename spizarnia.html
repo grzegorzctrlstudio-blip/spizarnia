@@ -191,6 +191,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .receipt-prod-skip{font-size:11px;color:#475569;margin-top:2px}
 .receipt-prod-qty{font-size:12px;font-weight:800;color:#F59E0B;flex-shrink:0}
 .receipt-apply-btn{width:100%;background:linear-gradient(135deg,#16A34A,#059669);border:none;color:#fff;border-radius:10px;padding:12px;font-size:14px;font-weight:800;cursor:pointer;margin-top:10px}
+.store-btn{border:none;border-radius:14px;padding:14px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;width:100%;transition:transform .15s}
+.store-btn:active{transform:scale(.95)}
 
 /* MODALS */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;align-items:center;justify-content:center;padding:20px}
@@ -344,11 +346,43 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <div id="receipt-items"></div>
         <button class="receipt-apply-btn" onclick="applyReceipt()">✅ Zaktualizuj spiżarnię</button>
       </div>
+      <!-- SKLEPY -->
+      <div style="margin-bottom:14px">
+        <div style="font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#475569;margin-bottom:8px">🛍️ Zamów online</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button class="store-btn" onclick="openStore('biedronka')" style="background:linear-gradient(135deg,#DC2626,#B91C1C)">
+            <div style="font-size:22px">🐞</div>
+            <div style="font-size:12px;font-weight:800;color:#fff">Biedronka Go</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.7)">Dostawa 2h</div>
+          </button>
+          <button class="store-btn" onclick="openStore('frisco')" style="background:linear-gradient(135deg,#16A34A,#15803D)">
+            <div style="font-size:22px">🛒</div>
+            <div style="font-size:12px;font-weight:800;color:#fff">Frisco.pl</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.7)">Dostawa nast. dzień</div>
+          </button>
+          <button class="store-btn" onclick="openStore('glovo')" style="background:linear-gradient(135deg,#F59E0B,#D97706)">
+            <div style="font-size:22px">🛵</div>
+            <div style="font-size:12px;font-weight:800;color:#fff">Glovo</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.7)">Dostawa ekspresowa</div>
+          </button>
+          <button class="store-btn" onclick="openStore('lisek')" style="background:linear-gradient(135deg,#7C3AED,#6D28D9)">
+            <div style="font-size:22px">🦊</div>
+            <div style="font-size:12px;font-weight:800;color:#fff">Lisek</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.7)">Dostawa 15 min</div>
+          </button>
+        </div>
+      </div>
+
       <!-- AI GENERATED LIST -->
       <button class="gen-btn" id="gen-btn" onclick="generateShopList()">
         <div class="gen-spin" id="gen-spin"></div>
         <span id="gen-btn-txt">🤖 Generuj listę zakupów AI</span>
       </button>
+      <div id="copy-bar" style="display:none;margin-bottom:12px">
+        <button onclick="copyShopList()" style="width:100%;background:#334155;border:1.5px solid #475569;border-radius:12px;padding:12px;font-size:13px;font-weight:800;color:#F1F5F9;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+          📋 Kopiuj listę zakupów (do wklejenia w Biedronka Go / Glovo)
+        </button>
+      </div>
       <div id="shop-list-content"></div>
     </div>
   </div>
@@ -939,6 +973,7 @@ function generateShopList(){
 
 function renderShopList(data){
   shopChecked={};
+  document.getElementById("copy-bar").style.display="block";
   var high=[],med=[],low=[];
   (data.produkty||[]).forEach(function(p){
     if(p.priorytet==="wysoki"||p.priorytet==="high")high.push(p);
@@ -966,6 +1001,54 @@ function renderShopList(data){
   html+=renderSection(med,"🟡 Ważne — kup przy okazji","med");
   html+=renderSection(low,"🔵 Warto mieć","low");
   document.getElementById("shop-list-content").innerHTML=html;
+}
+
+function openStore(store){
+  var urls={
+    biedronka:"https://biedronkago.pl",
+    frisco:"https://www.frisco.pl",
+    glovo:"https://glovoapp.com/pl/pl/warszawa/",
+    lisek:"https://lisek.app"
+  };
+  // Copy list to clipboard first
+  var copied=copyShopList(true);
+  var msg=copied?"Lista zakupów skopiowana do schowka! Możesz ją wkleić w wyszukiwarce.":"";
+  if(confirm((msg?msg+"
+
+":"")+"Otworzyć "+store+"?"))
+    window.open(urls[store],"_blank");
+}
+
+function copyShopList(silent){
+  var items=[];
+  // collect from generated list
+  document.querySelectorAll(".shop-item:not(.checked) .shop-item-name").forEach(function(el){
+    items.push("• "+el.textContent);
+  });
+  // if no generated list, use missing from pantry
+  if(!items.length){
+    CATS.forEach(function(cat){cat.items.forEach(function(it){
+      var cur=state[fbk(cat.id,it.n)]||0;
+      if(cur<it.target)items.push("• "+it.n+" ("+Math.max(0,it.target-cur)+" "+it.unit+")");
+    });});
+  }
+  if(!items.length){if(!silent)alert("Brak produktów na liście");return false;}
+  var text="Lista zakupów — Spiżarnia
+"+new Date().toLocaleDateString("pl-PL")+"
+
+"+items.join("
+");
+  navigator.clipboard.writeText(text).then(function(){
+    if(!silent)alert("✅ Skopiowano "+items.length+" produktów!
+
+Wklej listę w dowolną aplikację.");
+  }).catch(function(){
+    // fallback
+    var ta=document.createElement("textarea");ta.value=text;document.body.appendChild(ta);ta.select();
+    document.execCommand("copy");document.body.removeChild(ta);
+    if(!silent)alert("✅ Skopiowano "+items.length+" produktów!");
+  });
+  return true;
 }
 
 function toggleShopItem(id){
