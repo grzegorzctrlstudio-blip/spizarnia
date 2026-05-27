@@ -7,25 +7,18 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0F172A;min-height:100vh;padding-bottom:40px}
-
-/* ── SPLASH ── */
-#splash{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px}
+#splash{min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px}
 .spin{width:44px;height:44px;border:4px solid #334155;border-top-color:#22C55E;border-radius:50%;animation:rot 1s linear infinite}
 @keyframes rot{to{transform:rotate(360deg)}}
-.spin-lbl{font-size:13px;color:#64748B;font-weight:600;text-align:center}
-
-/* ── LOGIN ── */
-#login{min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;padding:28px;gap:16px}
-#login h2{font-size:24px;font-weight:900;color:#F1F5F9}
-#login p{font-size:13px;color:#64748B;text-align:center;line-height:1.6}
+.spin-lbl{font-size:13px;color:#64748B;font-weight:600;text-align:center;line-height:1.6;max-width:300px}
+#login{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;gap:16px}
+#login h2{font-size:26px;font-weight:900;color:#F1F5F9}
+#login p{font-size:13px;color:#64748B;text-align:center}
 .name-inp{width:100%;max-width:340px;background:#1E293B;border:2px solid #334155;border-radius:14px;padding:16px 18px;font-size:18px;color:#F1F5F9;outline:none;text-align:center;font-weight:700}
 .name-inp:focus{border-color:#38BDF8}
 .name-inp::placeholder{color:#475569;font-weight:400}
 .login-btn{width:100%;max-width:340px;background:linear-gradient(135deg,#16A34A,#059669);color:#fff;border:none;border-radius:14px;padding:16px;font-size:17px;font-weight:900;cursor:pointer}
 .login-btn:active{transform:scale(.97)}
-.login-btn:disabled{background:#334155;color:#64748B}
-
-/* ── HEADER ── */
 .hdr{background:linear-gradient(135deg,#1E293B,#334155);padding:14px 16px 12px;border-bottom:1px solid #334155;position:sticky;top:0;z-index:10}
 .hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .title-row{display:flex;align-items:center;gap:8px}
@@ -33,25 +26,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .sync-pill{display:flex;align-items:center;gap:5px;background:#0F172A;border:1.5px solid #1E293B;border-radius:20px;padding:4px 10px}
 .sdot{width:8px;height:8px;border-radius:50%;background:#22C55E;flex-shrink:0}
 .sdot.pulse{animation:pulse 1s infinite}
-.sdot.red{background:#EF4444}
+.sdot.err{background:#EF4444}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .slbl{font-size:10px;font-weight:700;color:#94A3B8}
 .user-pill{background:#1D4ED820;border:1.5px solid #1D4ED8;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:800;color:#60A5FA}
-
 .hdr-btns{display:flex;gap:6px}
 .hbtn{background:#334155;border:none;border-radius:20px;padding:7px 12px;font-size:11px;font-weight:700;cursor:pointer;color:#94A3B8}
-.hbtn.danger{color:#F87171}
 .hbtn.log-btn{color:#818CF8}
-.shop-bar{background:#0F172A;border:1.5px solid #334155;border-radius:12px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.shop-date{font-size:11px;color:#94A3B8;font-weight:600;line-height:1.5}
-.shop-date strong{color:#F1F5F9;font-size:12px;display:block}
-.shop-btn{background:linear-gradient(135deg,#16A34A,#059669);border:none;color:#fff;border-radius:10px;padding:9px 14px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0}
-.shop-btn:active{transform:scale(.95)}
-.fresh-ok{font-size:10px;color:#22C55E;font-weight:700;margin-top:3px}
-.fresh-warn{font-size:10px;color:#F59E0B;font-weight:700;margin-top:3px}
-.fresh-bad{font-size:10px;color:#EF4444;font-weight:800;margin-top:3px;animation:blink2 1s infinite}
-@keyframes blink2{0%,100%{opacity:1}50%{opacity:.5}}
-
+.hbtn.danger{color:#F87171}
 .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:10px}
 .stat{background:#0F172A;border-radius:11px;padding:9px 6px;text-align:center;border:1.5px solid #1E293B}
 .stat-n{font-size:24px;font-weight:900;line-height:1}
@@ -59,21 +41,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .stat.red{border-color:#7F1D1D}.stat.red .stat-n{color:#F87171}.stat.red .stat-l{color:#EF4444}
 .stat.grn{border-color:#14532D}.stat.grn .stat-n{color:#4ADE80}.stat.grn .stat-l{color:#22C55E}
 .stat.all .stat-n{color:#94A3B8}.stat.all .stat-l{color:#475569}
-
+.shop-bar{background:#0F172A;border:1.5px solid #334155;border-radius:12px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.shop-date{font-size:11px;color:#94A3B8;font-weight:600;line-height:1.5}
+.shop-date strong{color:#F1F5F9;font-size:12px;display:block}
+.shop-btn{background:linear-gradient(135deg,#16A34A,#059669);border:none;color:#fff;border-radius:10px;padding:9px 14px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.shop-btn:active{transform:scale(.95)}
+.fresh-ok{font-size:10px;color:#22C55E;font-weight:700;margin-top:2px}
+.fresh-warn{font-size:10px;color:#F59E0B;font-weight:700;margin-top:2px}
+.fresh-bad{font-size:10px;color:#EF4444;font-weight:800;margin-top:2px}
 .search-row{margin-bottom:10px;position:relative}
 .sico{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none}
 .sinp{width:100%;background:#0F172A;border:1.5px solid #334155;border-radius:10px;padding:9px 36px 9px 34px;font-size:13px;color:#F1F5F9;outline:none}
 .sinp:focus{border-color:#38BDF8}
 .sinp::placeholder{color:#475569}
 .xbtn{display:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#64748B;font-size:16px;cursor:pointer}
-
 .filters{display:flex;gap:6px}
 .f{flex:1;padding:8px 4px;border-radius:10px;border:none;font-weight:700;font-size:11px;cursor:pointer;transition:all .15s}
 .f.act{color:#fff}
 .f:not(.act){background:#1E293B;color:#64748B}
-
-/* ── LOG MODAL ── */
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;align-items:flex-end;justify-content:center;padding:0}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;align-items:flex-end;justify-content:center}
 .overlay.show{display:flex}
 .log-modal{background:#1E293B;border-radius:20px 20px 0 0;width:100%;max-width:600px;max-height:80vh;display:flex;flex-direction:column;border-top:1px solid #334155}
 .log-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid #334155;flex-shrink:0}
@@ -83,7 +69,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .log-entry{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #1E293B}
 .log-entry:last-child{border-bottom:none}
 .log-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;flex-shrink:0;color:#fff}
-.log-info{flex:1;min-width:0}
+.log-info{flex:1}
 .log-who{font-size:12px;font-weight:800;color:#F1F5F9}
 .log-what{font-size:11.5px;color:#94A3B8;margin-top:2px;line-height:1.4}
 .log-when{font-size:10px;color:#475569;margin-top:2px}
@@ -91,8 +77,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .log-badge.up{background:#14532D;color:#4ADE80}
 .log-badge.down{background:#7F1D1D;color:#F87171}
 .log-empty{text-align:center;padding:40px 20px;color:#475569;font-size:13px}
-
-/* ── BODY ── */
 .body{padding:0 12px}
 .cat{margin-top:14px}
 .cat-hdr{font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#475569;margin-bottom:7px;padding:0 2px;display:flex;align-items:center;gap:6px}
@@ -139,31 +123,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </head>
 <body>
 
-<!-- SPLASH -->
 <div id="splash">
   <div class="spin"></div>
-  <p class="spin-lbl" id="splash-lbl">Łączenie z spiżarnią...</p>
+  <p class="spin-lbl" id="splash-lbl">Łączenie z bazą danych...</p>
 </div>
 
-<!-- LOGIN -->
 <div id="login">
   <div style="font-size:52px">🏠</div>
   <h2>Spiżarnia</h2>
   <p>Jak masz na imię?</p>
   <input class="name-inp" id="name-inp" placeholder="Twoje imię..." maxlength="20"
-    onkeydown="if(event.key==='Enter') doLogin()">
-  <button class="login-btn" id="login-btn" onclick="doLogin()">Wejdź →</button>
+    onkeydown="if(event.key==='Enter')doLogin()">
+  <button class="login-btn" onclick="doLogin()">Wejdź →</button>
 </div>
 
-<!-- APP -->
 <div id="app" style="display:none">
   <div class="hdr">
     <div class="hdr-top">
       <div class="title-row">
         <h1>🏠 Spiżarnia</h1>
         <div class="sync-pill">
-          <div class="sdot pulse" id="sdot"></div>
-          <span class="slbl" id="slbl">sync...</span>
+          <div class="sdot" id="sdot"></div>
+          <span class="slbl" id="slbl">ok</span>
         </div>
       </div>
       <div class="hdr-btns">
@@ -180,7 +161,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="shop-bar">
       <div class="shop-date">
         <strong id="shop-date-lbl">Nie ustawiono daty zakupów</strong>
-        <span id="shop-days-lbl"></span>
+        <span id="shop-days-lbl" style="font-size:11px;color:#64748B"></span>
       </div>
       <button class="shop-btn" onclick="markShopping()">🛍️ Byłem w sklepie!</button>
     </div>
@@ -198,7 +179,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="body" id="body"></div>
 </div>
 
-<!-- LOG MODAL -->
 <div class="overlay" id="log-overlay" onclick="if(event.target===this)closeLog()">
   <div class="log-modal">
     <div class="log-hdr">
@@ -210,402 +190,386 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </div>
 
 <script>
-const FB   = "https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
-let lastShopTs = 0; // timestamp ostatnich zakupów
-const LS_NAME = "spiz_name";
+var FB = "https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
+var LS_NAME = "spiz_name";
+var ROOM = (location.hash.replace(/^#/,"").trim() || "room1");
+if (!location.hash) { location.hash = ROOM; }
+var ROOM_PATH = FB + "/rooms/" + ROOM;
+var LOG_PATH  = FB + "/logs/"  + ROOM;
 
-const CATS = [
-  {id:"warzywa",label:"Warzywa i owoce",ic:"🥦",items:[
-    {n:"Papryka (czerwona/żółta)",target:2,unit:"szt.",days:7},
-    {n:"Pomidory",target:3,unit:"szt.",days:4},
-    {n:"Ogórek",target:3,unit:"szt.",days:4},
-    {n:"Cukinia",target:2,unit:"szt.",days:6},
-    {n:"Pieczarki",target:1,unit:"opak. 500g",days:4},
-    {n:"Marchew",target:4,unit:"szt.",days:10},
-    {n:"Cebula biała (duża)",target:2,unit:"szt.",days:14},
-    {n:"Czosnek",target:1,unit:"główka",days:21},
-    {n:"Sałata / rukola",target:1,unit:"opak.",days:4},
-    {n:"Rzodkiewka",target:1,unit:"pęczek",days:5},
-    {n:"Koperek",target:1,unit:"pęczek",days:4},
-    {n:"Jabłka",target:4,unit:"szt.",days:10},
-    {n:"Banany",target:4,unit:"szt.",days:4},
-    {n:"Truskawki / maliny",target:1,unit:"opak. 500g",days:3},
-    {n:"Awokado",target:2,unit:"szt.",days:4},
-    {n:"Cytryna",target:1,unit:"szt.",days:14},
-    {n:"Bataty",target:4,unit:"szt.",days:14},
+var CATS = [
+  {id:"warzywa", label:"Warzywa i owoce", ic:"🥦", items:[
+    {n:"Papryka (czerwona/żółta)", target:2, unit:"szt.", days:7},
+    {n:"Pomidory",                 target:3, unit:"szt.", days:4},
+    {n:"Ogórek",                   target:3, unit:"szt.", days:4},
+    {n:"Cukinia",                  target:2, unit:"szt.", days:6},
+    {n:"Pieczarki",                target:1, unit:"opak. 500g", days:4},
+    {n:"Marchew",                  target:4, unit:"szt.", days:10},
+    {n:"Cebula biała (duża)",      target:2, unit:"szt.", days:14},
+    {n:"Czosnek",                  target:1, unit:"główka", days:21},
+    {n:"Sałata / rukola",          target:1, unit:"opak.", days:4},
+    {n:"Rzodkiewka",               target:1, unit:"pęczek", days:5},
+    {n:"Koperek",                  target:1, unit:"pęczek", days:4},
+    {n:"Jabłka",                   target:4, unit:"szt.", days:10},
+    {n:"Banany",                   target:4, unit:"szt.", days:4},
+    {n:"Truskawki / maliny",       target:1, unit:"opak. 500g", days:3},
+    {n:"Awokado",                  target:2, unit:"szt.", days:4},
+    {n:"Cytryna",                  target:1, unit:"szt.", days:14},
+    {n:"Bataty",                   target:4, unit:"szt.", days:14}
   ]},
-  {id:"piekarnia",label:"Piekarnia",ic:"🍞",items:[
-    {n:"Chleb pełnoziarnisty",target:2,unit:"bochenek",days:5},
+  {id:"piekarnia", label:"Piekarnia", ic:"🍞", items:[
+    {n:"Chleb pełnoziarnisty", target:2, unit:"bochenek", days:5}
   ]},
-  {id:"suche",label:"Płatki, kasze, ryże",ic:"🌾",items:[
-    {n:"Płatki owsiane błyskawiczne",target:3,unit:"opak. 500g"},
-    {n:"Płatki jaglane",target:1,unit:"opak."},
-    {n:"Ryż basmati",target:1,unit:"opak. 1kg"},
-    {n:"Kasza gryczana",target:1,unit:"opak. 500g"},
+  {id:"suche", label:"Płatki, kasze, ryże", ic:"🌾", items:[
+    {n:"Płatki owsiane błyskawiczne", target:3, unit:"opak. 500g"},
+    {n:"Płatki jaglane",              target:1, unit:"opak."},
+    {n:"Ryż basmati",                 target:1, unit:"opak. 1kg"},
+    {n:"Kasza gryczana",              target:1, unit:"opak. 500g"}
   ]},
-  {id:"puszki",label:"Puszki i sosy",ic:"🫙",items:[
-    {n:"Ciecierzyca (puszka)",target:2,unit:"puszka"},
-    {n:"Passata pomidorowa",target:1,unit:"opak."},
-    {n:"Ketchup Słodka Ania",target:1,unit:"butelka"},
-    {n:"Musztarda miodowa / łagodna",target:1,unit:"słoik"},
+  {id:"puszki", label:"Puszki i sosy", ic:"🫙", items:[
+    {n:"Ciecierzyca (puszka)",        target:2, unit:"puszka"},
+    {n:"Passata pomidorowa",          target:1, unit:"opak."},
+    {n:"Ketchup Słodka Ania",         target:1, unit:"butelka"},
+    {n:"Musztarda miodowa / łagodna", target:1, unit:"słoik"}
   ]},
-  {id:"tluszcze",label:"Orzechy i tłuszcze",ic:"🥜",items:[
-    {n:"Oliwa z oliwek",target:1,unit:"butelka 500ml"},
-    {n:"Masło orzechowe Vitanella",target:2,unit:"opak. 350g"},
-    {n:"Płatki migdałów",target:1,unit:"opak. 200g"},
-    {n:"Orzechy włoskie/laskowe",target:1,unit:"opak. 200g"},
-    {n:"Kakao (bez cukru)",target:1,unit:"opak."},
+  {id:"tluszcze", label:"Orzechy i tłuszcze", ic:"🥜", items:[
+    {n:"Oliwa z oliwek",             target:1, unit:"butelka 500ml"},
+    {n:"Masło orzechowe Vitanella",  target:2, unit:"opak. 350g"},
+    {n:"Płatki migdałów",            target:1, unit:"opak. 200g"},
+    {n:"Orzechy włoskie/laskowe",    target:1, unit:"opak. 200g"},
+    {n:"Kakao (bez cukru)",          target:1, unit:"opak."}
   ]},
-  {id:"maki",label:"Mąki",ic:"🌾",items:[
-    {n:"Mąka ryżowa",target:1,unit:"opak. 400g"},
-    {n:"Mąka jaglana",target:1,unit:"opak. 400g"},
+  {id:"maki", label:"Mąki", ic:"🌾", items:[
+    {n:"Mąka ryżowa",  target:1, unit:"opak. 400g"},
+    {n:"Mąka jaglana", target:1, unit:"opak. 400g"}
   ]},
-  {id:"mieso",label:"Mięso świeże",ic:"🥩",items:[
-    {n:"Pierś z kurczaka",target:3,unit:"szt.",days:3},
-    {n:"Wołowina mielona",target:1,unit:"opak. 150g",days:2},
-    {n:"Filet z łososia (świeży)",target:1,unit:"szt.",days:2},
+  {id:"mieso", label:"Mięso świeże", ic:"🥩", items:[
+    {n:"Pierś z kurczaka",        target:3, unit:"szt.",        days:3},
+    {n:"Wołowina mielona",        target:1, unit:"opak. 150g",  days:2},
+    {n:"Filet z łososia (świeży)",target:1, unit:"szt.",        days:2}
   ]},
-  {id:"nabial",label:"Nabiał",ic:"🥛",items:[
-    {n:"Skyr naturalny",target:4,unit:"opak. 350g",days:10},
-    {n:"Ser twarogowy chudy",target:3,unit:"opak. 400g",days:7},
-    {n:"Serek wiejski light (0% tłuszczu)",target:3,unit:"opak. 400g",days:7},
-    {n:"Mozzarella light",target:2,unit:"opak.",days:5},
-    {n:"Jogurt naturalny 2%",target:1,unit:"opak. duży",days:7},
-    {n:"Mleko 0,5%",target:4,unit:"litr",days:5},
+  {id:"nabial", label:"Nabiał", ic:"🥛", items:[
+    {n:"Skyr naturalny",                   target:4, unit:"opak. 350g", days:10},
+    {n:"Ser twarogowy chudy",              target:3, unit:"opak. 400g", days:7},
+    {n:"Serek wiejski light (0% tłuszczu)",target:3, unit:"opak. 400g", days:7},
+    {n:"Mozzarella light",                 target:2, unit:"opak.",      days:5},
+    {n:"Jogurt naturalny 2%",              target:1, unit:"opak. duży", days:7},
+    {n:"Mleko 0,5%",                       target:4, unit:"litr",       days:5}
   ]},
-  {id:"jaja",label:"Jaja",ic:"🥚",items:[
-    {n:"Jaja L",target:2,unit:"opak. 10 szt."},
+  {id:"jaja", label:"Jaja", ic:"🥚", items:[
+    {n:"Jaja L", target:2, unit:"opak. 10 szt."}
   ]},
-  {id:"wedliny",label:"Wędliny i ryby",ic:"🍖",items:[
-    {n:"Polędwica z indyka — Kraina Mięs (min. 97%)",target:3,unit:"opak."},
-    {n:"Szynka z indyka — Kraina Wędlin (min. 97%)",target:2,unit:"opak."},
-    {n:"Polędwica z kurczaka — Kraina Mięs (min. 97%)",target:2,unit:"opak."},
-    {n:"Filet z piersi kurczaka w plastrach (min. 97%)",target:2,unit:"opak."},
-    {n:"Łosoś wędzony",target:2,unit:"opak."},
-  ]},
+  {id:"wedliny", label:"Wędliny i ryby", ic:"🍖", items:[
+    {n:"Polędwica z indyka — Kraina Mięs (min. 97%)",    target:3, unit:"opak.", days:7},
+    {n:"Szynka z indyka — Kraina Wędlin (min. 97%)",     target:2, unit:"opak.", days:7},
+    {n:"Polędwica z kurczaka — Kraina Mięs (min. 97%)",  target:2, unit:"opak.", days:7},
+    {n:"Filet z piersi kurczaka w plastrach (min. 97%)", target:2, unit:"opak.", days:7},
+    {n:"Łosoś wędzony",                                  target:2, unit:"opak.", days:14}
+  ]}
 ];
 
-// ── HELPERS ───────────────────────────────────────────────────────────────────
-function fbKey(catId,name){
-  return (catId+"__"+name).replace(/[.$#\[\]/]/g,"_").replace(/\s+/g,"_");
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+function fbKey(catId, name) {
+  return (catId + "__" + name).replace(/[.$#\[\]\/]/g, "_").replace(/\s+/g, "_");
 }
-
-function mkState(){
-  const s={};
-  CATS.forEach(c=>c.items.forEach(it=>s[fbKey(c.id,it.n)]=0));
+function mkState() {
+  var s = {};
+  CATS.forEach(function(c) {
+    c.items.forEach(function(it) { s[fbKey(c.id, it.n)] = 0; });
+  });
   return s;
 }
-
-// avatar color based on name
-const COLORS=["#7C3AED","#DC2626","#D97706","#059669","#2563EB","#DB2777","#0891B2"];
-function nameColor(n){ let h=0; for(let c of n) h=(h*31+c.charCodeAt(0))%COLORS.length; return COLORS[h]; }
-function nameInitial(n){ return n.trim().charAt(0).toUpperCase(); }
+var COLORS = ["#7C3AED","#DC2626","#D97706","#059669","#2563EB","#DB2777","#0891B2"];
+function nameColor(n) { var h=0; for(var i=0;i<n.length;i++) h=(h*31+n.charCodeAt(i))%COLORS.length; return COLORS[h]; }
+function nameInitial(n) { return n.trim().charAt(0).toUpperCase(); }
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
-let state={}, filter="all", searchQ="", userName="";
-
-function getRoomId(){
-  let h=location.hash.replace(/^#/,"").trim();
-  if(!h){ h="room1"; history.replaceState(null,"",location.pathname+location.search+"#room1"); }
-  return h;
-}
-const roomId=getRoomId();
-const roomPath=FB+"/rooms/"+roomId;
-const logPath=FB+"/logs/"+roomId;
+var state = {}, filter = "all", searchQ = "", userName = "", lastShopTs = 0, saveTimer = null;
 
 // ── FIREBASE ──────────────────────────────────────────────────────────────────
-function setSyncUI(m){
-  const d=document.getElementById("sdot"),l=document.getElementById("slbl");
-  if(m==="ok"){d.className="sdot";d.style.background="#22C55E";l.textContent="zsync";}
-  else if(m==="saving"){d.className="sdot pulse";d.style.background="#F59E0B";l.textContent="zapis...";}
-  else{d.className="sdot red";l.textContent="błąd";}
+function setSyncUI(m) {
+  var d = document.getElementById("sdot"), l = document.getElementById("slbl");
+  if (m === "ok")     { d.className="sdot"; d.style.background="#22C55E"; l.textContent="zsync"; }
+  else if (m === "saving") { d.className="sdot pulse"; d.style.background="#F59E0B"; l.textContent="zapis..."; }
+  else                { d.className="sdot err"; d.style.background="#EF4444"; l.textContent="błąd"; }
 }
 
-async function fbGet(path){
-  const ctrl=new AbortController();
-  const t=setTimeout(()=>ctrl.abort(),8000);
-  try{
-    const r=await fetch(path+".json",{signal:ctrl.signal});
-    clearTimeout(t);
-    if(!r.ok) throw new Error("Firebase błąd "+r.status);
-    return r.json();
-  }catch(e){
-    clearTimeout(t);
-    if(e.name==="AbortError") throw new Error("Timeout — Firebase nie odpowiada. Sprawdź reguły bazy.");
-    throw e;
-  }
-}
-async function fbPatch(path,data){
-  const r=await fetch(path+".json",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
-  if(!r.ok) throw new Error(r.status);
-}
-async function fbPost(path,data){
-  const r=await fetch(path+".json",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
-  if(!r.ok) throw new Error(r.status);
+function fbFetch(path, opts) {
+  var ctrl = new AbortController();
+  var timer = setTimeout(function() { ctrl.abort(); }, 8000);
+  return fetch(path + ".json", Object.assign({signal: ctrl.signal}, opts || {}))
+    .then(function(r) { clearTimeout(timer); if (!r.ok) throw new Error(r.status); return r.json(); })
+    .catch(function(e) { clearTimeout(timer); if (e.name === "AbortError") throw new Error("Timeout — Firebase nie odpowiada"); throw e; });
 }
 
-// ── LOG ───────────────────────────────────────────────────────────────────────
-async function addLog(productName, oldVal, newVal){
-  const delta = newVal - oldVal;
-  await fbPost(logPath, {
-    who: userName,
-    what: productName,
-    delta: delta,
-    newVal: newVal,
-    ts: Date.now()
-  });
+function fbGet(path)  { return fbFetch(path); }
+function fbPatch(path, data) {
+  return fbFetch(path, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify(data) });
+}
+function fbPost(path, data) {
+  return fbFetch(path, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(data) });
 }
 
-function openLog(){
-  document.getElementById("log-overlay").classList.add("show");
-  renderLog();
-}
-function closeLog(){ document.getElementById("log-overlay").classList.remove("show"); }
-
-async function renderLog(){
-  const body=document.getElementById("log-body");
-  body.innerHTML=`<div class="log-empty" style="color:#475569">⏳ Ładowanie...</div>`;
-  try{
-    const data=await fbGet(logPath);
-    if(!data){ body.innerHTML=`<div class="log-empty"><div>📋</div>Brak zmian</div>`; return; }
-    // Firebase POST tworzy obiekty z kluczami push-ID — sortuj po ts
-    const entries=Object.values(data).sort((a,b)=>b.ts-a.ts).slice(0,200);
-    if(!entries.length){ body.innerHTML=`<div class="log-empty"><div>📋</div>Brak zmian</div>`; return; }
-    body.innerHTML=entries.map(e=>{
-      const d=new Date(e.ts);
-      const gdy=d.toLocaleDateString("pl-PL",{day:"2-digit",month:"2-digit"})+
-        " "+d.toLocaleTimeString("pl-PL",{hour:"2-digit",minute:"2-digit"});
-      const delta=e.delta||0;
-      const badge=delta>0
-        ?`<span class="log-badge up">+${delta}</span>`
-        :`<span class="log-badge down">${delta}</span>`;
-      const color=nameColor(e.who||"?");
-      const co=delta>0?"dodał/a":"zabrał/a";
-      const ile=Math.abs(delta);
-      return `<div class="log-entry">
-        <div class="log-avatar" style="background:${color}">${nameInitial(e.who||"?")}</div>
-        <div class="log-info">
-          <div class="log-who">${e.who||"?"}</div>
-          <div class="log-what">${co} ${ile} × ${e.what||"?"} <span style="color:#475569">(teraz: ${e.newVal})</span></div>
-          <div class="log-when">${gdy}</div>
-        </div>
-        ${badge}
-      </div>`;
-    }).join("");
-  }catch(err){
-    body.innerHTML=`<div class="log-empty">❌ Błąd ładowania</div>`;
-  }
-}
-
-// ── LOGIN ─────────────────────────────────────────────────────────────────────
-function doLogin(){
-  const n=document.getElementById("name-inp").value.trim();
-  if(!n){ document.getElementById("name-inp").style.borderColor="#EF4444"; return; }
-  userName=n;
-  localStorage.setItem(LS_NAME,n);
-  document.getElementById("login").style.display="none";
-  document.getElementById("splash").style.display="flex";
-  document.getElementById("splash-lbl").textContent="Łączenie z bazą danych...";
-  document.getElementById("user-pill").textContent="👤 "+n;
-  startApp();
-}
-
-// ── INIT ──────────────────────────────────────────────────────────────────────
-async function startApp(){
-  try{
-    const remote=await fbGet(roomPath);
-    state=mkState();
-    if(remote){
-      Object.keys(remote).forEach(k=>{ if(k in state) state[k]=remote[k]||0; });
-      if(remote.__shopTs) { lastShopTs=remote.__shopTs; }
-    }
-    updateShopBar();
-    else { await fbPatch(roomPath,state); }
-    document.getElementById("splash").style.display="none";
-    document.getElementById("app").style.display="block";
-    setSyncUI("ok");
-    render();
-    // polling co 3s
-    setInterval(async()=>{
-      try{
-        const r=await fbGet(roomPath); if(!r) return;
-        let ch=false;
-        Object.keys(r).forEach(k=>{ if(k in state && r[k]!==state[k]){state[k]=r[k]||0;ch=true;} });
-        if(r.__shopTs && r.__shopTs!==lastShopTs){lastShopTs=r.__shopTs;updateShopBar();ch=true;}
-        if(ch) render(); setSyncUI("ok");
-      }catch(e){ setSyncUI("err"); }
-    },3000);
-  }catch(e){
-    document.querySelector(".spin").style.display="none";
-    document.getElementById("splash-lbl").innerHTML="❌ Błąd: "+e.message+"<br><span style='font-size:11px;color:#475569'>Odśwież stronę (F5)</span>";
-  }
-}
-
-// ── SAVE ──────────────────────────────────────────────────────────────────────
-let saveTimer=null;
-function scheduleSave(patch, productName, oldVal, newVal){
-  setSyncUI("saving");
-  clearTimeout(saveTimer);
-  saveTimer=setTimeout(async()=>{
-    try{
-      await fbPatch(roomPath,patch);
-      await addLog(productName, oldVal, newVal);
-      setSyncUI("ok");
-    }catch(e){ setSyncUI("err"); }
-  },600);
-}
-
-// ── ACTIONS ───────────────────────────────────────────────────────────────────
-function change(id,delta,max,productName,btn){
-  if(btn){btn.disabled=true; setTimeout(()=>btn.disabled=false,500);}
-  const oldVal=state[id]||0;
-  const newVal=Math.min(max*2,Math.max(0,oldVal+delta));
-  if(newVal===oldVal) return;
-  state[id]=newVal;
-  render();
-  scheduleSave({[id]:state[id]}, productName, oldVal, state[id]);
-}
-
-function resetAll(){
-  if(!confirm("Zresetować wszystkie stany do zera?\n(wszyscy zobaczą reset)")) return;
-  state=mkState(); render();
-  fbPatch(roomPath,state).then(()=>addLog("🗑️ RESET przez "+userName,0,0));
-}
-
-function setFilter(f){
-  filter=f;
-  const col={all:"#334155",red:"#DC2626",grn:"#16A34A"};
-  ["all","red","grn"].forEach(x=>{
-    const el=document.getElementById("f-"+x);
-    el.className="f"+(x===f?" act":"");
-    el.style.background=x===f?col[x]:"";
-  });
-  render();
-}
-
-function onSearch(q){
-  searchQ=q.toLowerCase().trim();
-  document.getElementById("xbtn").style.display=q?"block":"none";
-  render();
-}
-function clearSearch(){ document.getElementById("sinp").value=""; onSearch(""); }
-
-function cls(cur,target){ return cur>=target?"grn":cur>0?"low":"red"; }
-
-function markShopping(){
-  if(!confirm("Zaznaczyć że dziś byłeś/aś w sklepie?")) return;
+// ── SHOPPING DATE ─────────────────────────────────────────────────────────────
+function markShopping() {
+  if (!confirm("Zaznaczyć że dziś byłeś/aś w sklepie?")) return;
   lastShopTs = Date.now();
-  fbPatch(roomPath, {__shopTs: lastShopTs});
+  fbPatch(ROOM_PATH, {__shopTs: lastShopTs});
   updateShopBar();
   render();
 }
 
-function updateShopBar(){
-  const lbl = document.getElementById("shop-date-lbl");
-  const sub = document.getElementById("shop-days-lbl");
-  if(!lastShopTs){ lbl.textContent="Nie ustawiono daty zakupów"; sub.textContent=""; return; }
-  const d = new Date(lastShopTs);
-  const days = Math.floor((Date.now()-lastShopTs)/(1000*60*60*24));
-  lbl.textContent = "Zakupy: "+d.toLocaleDateString("pl-PL",{weekday:"long",day:"numeric",month:"long"});
-  sub.textContent = days===0?"dziś 🛍️":days===1?"wczoraj":days+" dni temu";
+function updateShopBar() {
+  var lbl = document.getElementById("shop-date-lbl");
+  var sub = document.getElementById("shop-days-lbl");
+  if (!lastShopTs) { lbl.textContent = "Nie ustawiono daty zakupów"; sub.textContent = ""; return; }
+  var d = new Date(lastShopTs);
+  var days = Math.floor((Date.now() - lastShopTs) / 86400000);
+  lbl.textContent = "Zakupy: " + d.toLocaleDateString("pl-PL", {weekday:"long", day:"numeric", month:"long"});
+  sub.textContent = days === 0 ? "dziś 🛍️" : days === 1 ? "wczoraj" : days + " dni temu";
 }
 
-function getFreshness(it){
-  if(!it.days || !lastShopTs) return null;
-  const daysPassed = (Date.now()-lastShopTs)/(1000*60*60*24);
-  const daysLeft = Math.round(it.days - daysPassed);
-  return daysLeft;
+function getFreshness(it) {
+  if (!it.days || !lastShopTs) return null;
+  return Math.round(it.days - (Date.now() - lastShopTs) / 86400000);
 }
+
+// ── LOG ───────────────────────────────────────────────────────────────────────
+function addLog(productName, oldVal, newVal) {
+  fbPost(LOG_PATH, { who: userName, what: productName, delta: newVal - oldVal, newVal: newVal, ts: Date.now() });
+}
+
+function openLog() {
+  document.getElementById("log-overlay").classList.add("show");
+  renderLog();
+}
+function closeLog() { document.getElementById("log-overlay").classList.remove("show"); }
+
+function renderLog() {
+  var body = document.getElementById("log-body");
+  body.innerHTML = '<div class="log-empty">⏳ Ładowanie...</div>';
+  fbGet(LOG_PATH).then(function(data) {
+    if (!data) { body.innerHTML = '<div class="log-empty"><div>📋</div>Brak zmian</div>'; return; }
+    var entries = Object.values(data).sort(function(a,b){return b.ts-a.ts;}).slice(0, 200);
+    if (!entries.length) { body.innerHTML = '<div class="log-empty"><div>📋</div>Brak zmian</div>'; return; }
+    body.innerHTML = entries.map(function(e) {
+      var d = new Date(e.ts);
+      var gdy = d.toLocaleDateString("pl-PL",{day:"2-digit",month:"2-digit"}) + " " + d.toLocaleTimeString("pl-PL",{hour:"2-digit",minute:"2-digit"});
+      var delta = e.delta || 0;
+      var badge = delta > 0 ? '<span class="log-badge up">+'+delta+'</span>' : '<span class="log-badge down">'+delta+'</span>';
+      var color = nameColor(e.who || "?");
+      var co = delta > 0 ? "dodał/a" : "zabrał/a";
+      return '<div class="log-entry">' +
+        '<div class="log-avatar" style="background:'+color+'">'+nameInitial(e.who||"?")+'</div>' +
+        '<div class="log-info">' +
+          '<div class="log-who">'+(e.who||"?")+'</div>' +
+          '<div class="log-what">'+co+' '+Math.abs(delta)+' × '+(e.what||"?")+'</div>' +
+          '<div class="log-when">'+gdy+'</div>' +
+        '</div>' + badge + '</div>';
+    }).join("");
+  }).catch(function() {
+    body.innerHTML = '<div class="log-empty">❌ Błąd ładowania</div>';
+  });
+}
+
+// ── LOGIN ─────────────────────────────────────────────────────────────────────
+function doLogin() {
+  var n = document.getElementById("name-inp").value.trim();
+  if (!n) { document.getElementById("name-inp").style.borderColor="#EF4444"; return; }
+  userName = n;
+  localStorage.setItem(LS_NAME, n);
+  document.getElementById("user-pill").textContent = "👤 " + n;
+  document.getElementById("login").style.display = "none";
+  document.getElementById("splash").style.display = "flex";
+  startApp();
+}
+
+// ── START APP ─────────────────────────────────────────────────────────────────
+function startApp() {
+  fbGet(ROOM_PATH).then(function(remote) {
+    state = mkState();
+    if (remote) {
+      Object.keys(remote).forEach(function(k) {
+        if (k in state) state[k] = remote[k] || 0;
+        if (k === "__shopTs") lastShopTs = remote[k];
+      });
+    } else {
+      fbPatch(ROOM_PATH, state);
+    }
+    document.getElementById("splash").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    updateShopBar();
+    setSyncUI("ok");
+    render();
+    setInterval(function() {
+      fbGet(ROOM_PATH).then(function(r) {
+        if (!r) return;
+        var ch = false;
+        Object.keys(r).forEach(function(k) {
+          if (k in state && r[k] !== state[k]) { state[k] = r[k] || 0; ch = true; }
+          if (k === "__shopTs" && r[k] !== lastShopTs) { lastShopTs = r[k]; updateShopBar(); ch = true; }
+        });
+        if (ch) render();
+        setSyncUI("ok");
+      }).catch(function() { setSyncUI("err"); });
+    }, 3000);
+  }).catch(function(e) {
+    document.querySelector(".spin").style.display = "none";
+    document.getElementById("splash-lbl").innerHTML =
+      "❌ " + e.message +
+      "<br><br><button onclick='startApp()' style='background:#16A34A;color:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:14px;font-weight:800;cursor:pointer'>🔄 Spróbuj ponownie</button>" +
+      "<br><br><button onclick='showAppOffline()' style='background:#334155;color:#94A3B8;border:none;border-radius:10px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer'>Otwórz bez synchronizacji</button>";
+  });
+}
+
+function showAppOffline() {
+  state = mkState();
+  document.getElementById("splash").style.display = "none";
+  document.getElementById("app").style.display = "block";
+  setSyncUI("err");
+  render();
+}
+
+// ── ACTIONS ───────────────────────────────────────────────────────────────────
+function change(id, delta, max, productName, btn) {
+  if (btn) { btn.disabled = true; setTimeout(function(){btn.disabled=false;}, 500); }
+  var oldVal = state[id] || 0;
+  var newVal = Math.min(max * 2, Math.max(0, oldVal + delta));
+  if (newVal === oldVal) return;
+  state[id] = newVal;
+  render();
+  clearTimeout(saveTimer);
+  setSyncUI("saving");
+  saveTimer = setTimeout(function() {
+    var patch = {};
+    patch[id] = newVal;
+    fbPatch(ROOM_PATH, patch).then(function() {
+      addLog(productName, oldVal, newVal);
+      setSyncUI("ok");
+    }).catch(function() { setSyncUI("err"); });
+  }, 600);
+}
+
+function resetAll() {
+  if (!confirm("Zresetować wszystkie stany do zera?")) return;
+  state = mkState();
+  render();
+  fbPatch(ROOM_PATH, state).then(function() { addLog("🗑️ RESET", 0, 0); });
+}
+
+function setFilter(f) {
+  filter = f;
+  var col = {all:"#334155", red:"#DC2626", grn:"#16A34A"};
+  ["all","red","grn"].forEach(function(x) {
+    var el = document.getElementById("f-" + x);
+    el.className = "f" + (x === f ? " act" : "");
+    el.style.background = x === f ? col[x] : "";
+  });
+  render();
+}
+
+function onSearch(q) {
+  searchQ = q.toLowerCase().trim();
+  document.getElementById("xbtn").style.display = q ? "block" : "none";
+  render();
+}
+function clearSearch() { document.getElementById("sinp").value = ""; onSearch(""); }
+
+function cls(cur, target) { return cur >= target ? "grn" : cur > 0 ? "low" : "red"; }
 
 // ── RENDER ────────────────────────────────────────────────────────────────────
-function render(){
-  const body=document.getElementById("body");
-  let nR=0,nG=0,tot=0;
-  CATS.forEach(c=>c.items.forEach(it=>{
-    cls(state[fbKey(c.id,it.n)]||0,it.target)==="grn"?nG++:nR++;tot++;
-  }));
-  document.getElementById("n-red").textContent=nR;
-  document.getElementById("n-grn").textContent=nG;
-  document.getElementById("n-all").textContent=tot;
+function render() {
+  var body = document.getElementById("body");
+  var nR = 0, nG = 0, tot = 0;
+  CATS.forEach(function(c) {
+    c.items.forEach(function(it) {
+      cls(state[fbKey(c.id, it.n)] || 0, it.target) === "grn" ? nG++ : nR++;
+      tot++;
+    });
+  });
+  document.getElementById("n-red").textContent = nR;
+  document.getElementById("n-grn").textContent = nG;
+  document.getElementById("n-all").textContent = tot;
 
-  let html="",any=false;
-  CATS.forEach(cat=>{
-    const vis=cat.items.filter(it=>{
-      const c=cls(state[fbKey(cat.id,it.n)]||0,it.target);
-      if(filter==="red"&&c==="grn") return false;
-      if(filter==="grn"&&c!=="grn") return false;
-      if(searchQ&&!it.n.toLowerCase().includes(searchQ)) return false;
+  var html = "", any = false;
+  CATS.forEach(function(cat) {
+    var vis = cat.items.filter(function(it) {
+      var c = cls(state[fbKey(cat.id, it.n)] || 0, it.target);
+      if (filter === "red" && c === "grn") return false;
+      if (filter === "grn" && c !== "grn") return false;
+      if (searchQ && it.n.toLowerCase().indexOf(searchQ) === -1) return false;
       return true;
     });
-    if(!vis.length) return;
-    any=true;
-    html+=`<div class="cat"><div class="cat-hdr"><span>${cat.ic}</span>${cat.label}</div>`;
-    vis.forEach(it=>{
-      const id=fbKey(cat.id,it.n);
-      const ie=id.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
-      const nameEsc=it.n.replace(/'/g,"\\'");
-      const cur=state[id]||0;
-      const c=cls(cur,it.target);
-      const pct=Math.min(100,Math.round(cur/it.target*100));
-      const brak=Math.max(0,it.target-cur);
-      const bt=c==="grn"?"✅ JEST":`KUP ${brak}`;
-      const bs=c==="grn"?"":it.unit;
-      const ql=c==="grn"
-        ?`<span style="color:#22C55E">✅ Wystarczy na tydzień</span>`
-        :c==="low"
-          ?`<span style="color:#F59E0B">🟡 Mało — kup jeszcze ${brak} ${it.unit}</span>`
-          :`<span style="color:#EF4444">🔴 Brak — kup ${brak} ${it.unit}</span>`;
-      // Freshness
-      const daysLeft = getFreshness(it);
-      let freshHtml = "";
-      if(daysLeft !== null){
-        if(daysLeft <= 0) freshHtml=`<div class="fresh-bad">⚠️ Przeterminowane lub dziś!</div>`;
-        else if(daysLeft === 1) freshHtml=`<div class="fresh-bad">🔴 Zostaje 1 dzień!</div>`;
-        else if(daysLeft <= 2) freshHtml=`<div class="fresh-warn">🟡 Zostają ${daysLeft} dni</div>`;
-        else freshHtml=`<div class="fresh-ok">✅ Świeże — zostaje ${daysLeft} dni</div>`;
+    if (!vis.length) return;
+    any = true;
+    html += '<div class="cat"><div class="cat-hdr"><span>' + cat.ic + '</span>' + cat.label + '</div>';
+    vis.forEach(function(it) {
+      var id = fbKey(cat.id, it.n);
+      var ie = id.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+      var ne = it.n.replace(/'/g,"\\'");
+      var cur = state[id] || 0;
+      var c = cls(cur, it.target);
+      var pct = Math.min(100, Math.round(cur / it.target * 100));
+      var brak = Math.max(0, it.target - cur);
+      var bt = c === "grn" ? "✅ JEST" : "KUP " + brak;
+      var bs = c === "grn" ? "" : it.unit;
+      var ql = c === "grn"
+        ? '<span style="color:#22C55E">✅ Wystarczy</span>'
+        : c === "low"
+          ? '<span style="color:#F59E0B">🟡 Mało — kup jeszcze ' + brak + ' ' + it.unit + '</span>'
+          : '<span style="color:#EF4444">🔴 Brak — kup ' + brak + ' ' + it.unit + '</span>';
+
+      var freshHtml = "";
+      var daysLeft = getFreshness(it);
+      if (daysLeft !== null) {
+        if (daysLeft <= 0)      freshHtml = '<div class="fresh-bad">⚠️ Przeterminowane!</div>';
+        else if (daysLeft === 1) freshHtml = '<div class="fresh-bad">🔴 Zostaje 1 dzień!</div>';
+        else if (daysLeft <= 2) freshHtml = '<div class="fresh-warn">🟡 Zostają ' + daysLeft + ' dni</div>';
+        else                    freshHtml = '<div class="fresh-ok">✅ Świeże — ' + daysLeft + ' dni</div>';
       }
-      let nm=it.n;
-      if(searchQ){
-        const i=it.n.toLowerCase().indexOf(searchQ);
-        if(i>=0) nm=it.n.slice(0,i)+`<mark style="background:#FACC15;color:#0F172A;border-radius:3px;padding:0 2px">`+it.n.slice(i,i+searchQ.length)+`</mark>`+it.n.slice(i+searchQ.length);
+
+      var nm = it.n;
+      if (searchQ) {
+        var i = it.n.toLowerCase().indexOf(searchQ);
+        if (i >= 0) nm = it.n.slice(0,i) + '<mark style="background:#FACC15;color:#0F172A;border-radius:3px;padding:0 2px">' + it.n.slice(i, i+searchQ.length) + '</mark>' + it.n.slice(i+searchQ.length);
       }
-      html+=`<div class="item ${c}">
-        <div class="item-top">
-          <div class="item-name">${nm}${freshHtml}</div>
-          <div class="kup">${bt}<br><span style="font-size:12px;opacity:.9;font-weight:700">${bs}</span></div>
-        </div>
-        <div class="prog-row">
-          <div class="prog-bg"><div class="prog-fill" style="width:${pct}%"></div></div>
-          <div class="prog-txt">${cur} / ${it.target} ${it.unit}</div>
-        </div>
-        <div class="qty-row">
-          <div class="qty-lbl">${ql}</div>
-          <div class="qty-ctrl">
-            <button class="qbtn" onclick="change('${ie}',-1,${it.target},'${nameEsc}',this)">−</button>
-            <div class="qnum"><div class="qnum-cur">${cur}</div><div class="qnum-unit">${it.unit}</div></div>
-            <button class="qbtn" onclick="change('${ie}',1,${it.target},'${nameEsc}',this)">+</button>
-          </div>
-        </div>
-      </div>`;
+
+      html += '<div class="item ' + c + '">' +
+        '<div class="item-top">' +
+          '<div class="item-name">' + nm + freshHtml + '</div>' +
+          '<div class="kup">' + bt + '<br><span style="font-size:12px;opacity:.9;font-weight:700">' + bs + '</span></div>' +
+        '</div>' +
+        '<div class="prog-row">' +
+          '<div class="prog-bg"><div class="prog-fill" style="width:' + pct + '%"></div></div>' +
+          '<div class="prog-txt">' + cur + ' / ' + it.target + ' ' + it.unit + '</div>' +
+        '</div>' +
+        '<div class="qty-row">' +
+          '<div class="qty-lbl">' + ql + '</div>' +
+          '<div class="qty-ctrl">' +
+            '<button class="qbtn" onclick="change(\'' + ie + '\',-1,' + it.target + ',\'' + ne + '\',this)">−</button>' +
+            '<div class="qnum"><div class="qnum-cur">' + cur + '</div><div class="qnum-unit">' + it.unit + '</div></div>' +
+            '<button class="qbtn" onclick="change(\'' + ie + '\',1,' + it.target + ',\'' + ne + '\',this)">+</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
     });
-    html+=`</div>`;
+    html += '</div>';
   });
-  if(!any){
-    const ic=searchQ?"🔍":filter==="red"?"🎉":"📦";
-    const ms=searchQ?`Brak wyników dla "${searchQ}"`:filter==="red"?"Nic nie trzeba kupić!":"Brak produktów";
-    html=`<div class="empty"><div>${ic}</div>${ms}</div>`;
+
+  if (!any) {
+    var ic = searchQ ? "🔍" : filter === "red" ? "🎉" : "📦";
+    var ms = searchQ ? 'Brak wyników dla "' + searchQ + '"' : filter === "red" ? "Nic nie trzeba kupić!" : "Brak produktów";
+    html = '<div class="empty"><div>' + ic + '</div>' + ms + '</div>';
   }
-  body.innerHTML=html;
+  body.innerHTML = html;
 }
 
-// ── START ─────────────────────────────────────────────────────────────────────
-// Zawsze zaczynaj od ekranu logowania
-document.getElementById("splash").style.display="none";
-document.getElementById("login").style.display="flex";
-const savedName=localStorage.getItem(LS_NAME);
-if(savedName){
-  // Prefill imię jeśli zapamiętane
-  document.getElementById("name-inp").value=savedName;
+// ── INIT ──────────────────────────────────────────────────────────────────────
+document.getElementById("splash").style.display = "none";
+document.getElementById("login").style.display = "flex";
+var savedName = localStorage.getItem(LS_NAME);
+if (savedName) {
+  document.getElementById("name-inp").value = savedName;
 }
 </script>
 </body>
