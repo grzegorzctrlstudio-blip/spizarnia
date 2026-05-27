@@ -143,6 +143,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .date-manual{width:100%;background:#0F172A;border:1.5px solid #334155;border-radius:10px;padding:12px;font-size:16px;color:#fff;outline:none;margin-bottom:10px;text-align:center}
 .date-manual:focus{border-color:#38BDF8}
 
+/* SETTINGS */
+.settings-modal{background:#1E293B;border-radius:18px;padding:20px;width:100%;max-width:420px;border:1.5px solid #334155}
+.settings-modal h3{font-size:16px;font-weight:800;color:#fff;margin-bottom:6px}
+.settings-modal p{font-size:12px;color:#64748B;margin-bottom:12px;line-height:1.6}
+.api-inp{width:100%;background:#0F172A;border:1.5px solid #334155;border-radius:10px;padding:12px;font-size:12px;color:#fff;outline:none;font-family:monospace;margin-bottom:8px}
+.api-inp:focus{border-color:#38BDF8}
+.api-status{font-size:11px;margin-bottom:10px;padding:6px 10px;border-radius:8px;display:none}
+.api-status.ok{background:#14532D;color:#4ADE80;display:block}
+.api-status.err{background:#7F1D1D;color:#F87171;display:block}
+/* SCANNER */
+.scanner-overlay{background:rgba(0,0,0,.92)}
+.scanner-modal{background:#1E293B;border-radius:18px;padding:20px;width:100%;max-width:400px;border:1.5px solid #334155}
+.scanner-modal h3{font-size:16px;font-weight:800;color:#fff;margin-bottom:8px}
+.scan-preview{width:100%;border-radius:12px;max-height:220px;object-fit:cover;margin-bottom:12px;display:none;border:2px solid #334155}
+.scan-result{background:#0F172A;border-radius:10px;padding:12px;margin-bottom:12px;display:none}
+.scan-result-title{font-size:11px;color:#64748B;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.scan-product{font-size:14px;font-weight:800;color:#fff;margin-bottom:4px}
+.scan-date{font-size:13px;color:#4ADE80;font-weight:700}
+.scan-note{font-size:11px;color:#64748B;margin-top:4px}
+.scan-loading{display:none;text-align:center;padding:16px;color:#94A3B8;font-size:13px}
+.scan-spin{width:28px;height:28px;border:3px solid #334155;border-top-color:#38BDF8;border-radius:50%;animation:rot 1s linear infinite;margin:0 auto 8px}
 /* LOG MODAL */
 .log-modal{background:#1E293B;border-radius:20px 20px 0 0;width:100%;max-width:600px;max-height:80vh;display:flex;flex-direction:column;border-top:1px solid #334155}
 .log-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid #334155;flex-shrink:0}
@@ -196,6 +217,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="hdr-btns">
         <div class="user-pill" id="user-pill"></div>
         <button class="hbtn log-btn" onclick="openLog()">📋</button>
+        <button class="hbtn" onclick="openSettings()" style="color:#F59E0B">⚙️</button>
         <button class="hbtn danger" onclick="resetAll()">🗑️</button>
       </div>
     </div>
@@ -245,7 +267,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <img class="photo-preview" id="photo-preview" alt="Zdjęcie produktu">
     <input type="date" class="date-manual" id="exp-date-inp" placeholder="DD.MM.RRRR">
     <div class="modal-btns">
-      <button class="mbtn cam" onclick="takePhoto()">📷 Zdjęcie</button>
+      <button class="mbtn cam" onclick="closeExpiry();openScanner()">🔍 Skanuj AI</button>
       <button class="mbtn ok"  onclick="saveExpiry()">✅ Zapisz</button>
       <button class="mbtn cancel" onclick="clearExpiry()">🗑️ Usuń</button>
     </div>
@@ -261,6 +283,48 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <button class="log-close" onclick="closeLog()">Zamknij</button>
     </div>
     <div class="log-body" id="log-body"></div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="overlay" id="settings-overlay" onclick="if(event.target===this)closeSettings()">
+  <div class="settings-modal">
+    <h3>⚙️ Ustawienia — Skaner AI</h3>
+    <p>Wpisz swój klucz API Anthropic. Zapisuje się <strong style="color:#fff">tylko na tym urządzeniu</strong> — nie trafia do Firebase ani do kodu.</p>
+    <div class="api-status" id="api-status"></div>
+    <input class="api-inp" id="api-key-inp" type="password" placeholder="sk-ant-api03-...">
+    <div style="display:flex;gap:8px">
+      <button class="mbtn ok" style="flex:1;padding:11px;border-radius:10px;border:none;font-weight:800;font-size:13px;cursor:pointer;background:#16A34A;color:#fff" onclick="saveApiKey()">💾 Zapisz klucz</button>
+      <button class="mbtn cancel" style="flex:1;padding:11px;border-radius:10px;border:none;font-weight:800;font-size:13px;cursor:pointer;background:#334155;color:#94A3B8" onclick="clearApiKey()">🗑️ Usuń</button>
+    </div>
+    <div style="margin-top:10px">
+      <button style="width:100%;padding:11px;border-radius:10px;border:none;font-weight:800;font-size:13px;cursor:pointer;background:#334155;color:#94A3B8" onclick="closeSettings()">Zamknij</button>
+    </div>
+    <p style="margin-top:10px;font-size:10px;color:#334155">Klucz API: console.anthropic.com → API Keys → Create Key</p>
+  </div>
+</div>
+
+<!-- SCANNER MODAL -->
+<div class="overlay scanner-overlay" id="scanner-overlay" onclick="if(event.target===this)closeScanner()">
+  <div class="scanner-modal">
+    <h3>🔍 Skaner produktu</h3>
+    <img class="scan-preview" id="scan-preview" alt="">
+    <div class="scan-loading" id="scan-loading">
+      <div class="scan-spin"></div>
+      Claude analizuje zdjęcie...
+    </div>
+    <div class="scan-result" id="scan-result">
+      <div class="scan-result-title">Wynik skanowania</div>
+      <div class="scan-product" id="scan-product"></div>
+      <div class="scan-date" id="scan-date"></div>
+      <div class="scan-note" id="scan-note"></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="mbtn cam" style="flex:1;min-width:100px;padding:12px;border-radius:10px;border:none;font-weight:800;font-size:13px;cursor:pointer;background:#1D4ED8;color:#fff" onclick="startScan()">📷 Zdjęcie</button>
+      <button class="mbtn ok" id="scan-apply-btn" style="flex:1;min-width:100px;padding:12px;border-radius:10px;border:none;font-weight:800;font-size:13px;cursor:pointer;background:#16A34A;color:#fff;display:none" onclick="applyScanResult()">✅ Zastosuj</button>
+      <button class="mbtn cancel" style="flex:1;min-width:100px;padding:12px;border-radius:10px;border:none;font-weight:800;font-size:13px;cursor:pointer;background:#334155;color:#94A3B8" onclick="closeScanner()">Zamknij</button>
+    </div>
+    <input type="file" id="scan-input" accept="image/*" capture="environment" style="display:none" onchange="handleScan(this)">
   </div>
 </div>
 
@@ -684,6 +748,149 @@ function render(){
     html='<div class="empty"><div>'+ic+"</div>"+ms+"</div>";
   }
   body.innerHTML=html;
+}
+
+// ── API KEY SETTINGS ─────────────────────────────────────────────────────────
+var LS_APIKEY = "spiz_apikey";
+function getApiKey(){ return localStorage.getItem(LS_APIKEY)||""; }
+function openSettings(){
+  var inp = document.getElementById("api-key-inp");
+  var k = getApiKey();
+  inp.value = k ? k.slice(0,20)+"..." : "";
+  var st = document.getElementById("api-status");
+  if(k){ st.className="api-status ok"; st.textContent="✅ Klucz zapisany — skaner aktywny"; }
+  else { st.className="api-status"; st.style.display="none"; }
+  document.getElementById("settings-overlay").classList.add("show");
+}
+function closeSettings(){ document.getElementById("settings-overlay").classList.remove("show"); }
+function saveApiKey(){
+  var v = document.getElementById("api-key-inp").value.trim();
+  if(!v||v.indexOf("...")>-1){ alert("Wpisz pełny klucz API"); return; }
+  if(!v.startsWith("sk-ant-")){ alert("Nieprawidłowy klucz — powinien zaczynać się od sk-ant-"); return; }
+  localStorage.setItem(LS_APIKEY, v);
+  var st = document.getElementById("api-status");
+  st.className="api-status ok"; st.textContent="✅ Klucz zapisany — skaner aktywny";
+}
+function clearApiKey(){
+  localStorage.removeItem(LS_APIKEY);
+  document.getElementById("api-key-inp").value="";
+  var st = document.getElementById("api-status");
+  st.className="api-status err"; st.textContent="❌ Klucz usunięty";
+}
+
+// ── SCANNER ───────────────────────────────────────────────────────────────────
+var scanResult = null;
+function openScanner(){
+  var k = getApiKey();
+  if(!k){ alert("Najpierw dodaj klucz API w ustawieniach ⚙️"); openSettings(); return; }
+  document.getElementById("scan-preview").style.display="none";
+  document.getElementById("scan-result").style.display="none";
+  document.getElementById("scan-loading").style.display="none";
+  document.getElementById("scan-apply-btn").style.display="none";
+  scanResult=null;
+  document.getElementById("scanner-overlay").classList.add("show");
+}
+function closeScanner(){ document.getElementById("scanner-overlay").classList.remove("show"); }
+function startScan(){ document.getElementById("scan-input").click(); }
+
+function handleScan(input){
+  if(!input.files||!input.files[0])return;
+  var file = input.files[0];
+  var reader = new FileReader();
+  reader.onload = function(e){
+    var b64 = e.target.result.split(",")[1];
+    var mime = file.type || "image/jpeg";
+    var img = document.getElementById("scan-preview");
+    img.src = e.target.result;
+    img.style.display="block";
+    document.getElementById("scan-result").style.display="none";
+    document.getElementById("scan-apply-btn").style.display="none";
+    document.getElementById("scan-loading").style.display="block";
+    scanWithClaude(b64, mime);
+  };
+  reader.readAsDataURL(file);
+}
+
+function scanWithClaude(b64, mime){
+  var key = getApiKey();
+  fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "x-api-key": key,
+      "anthropic-version":"2023-06-01",
+      "anthropic-dangerous-direct-browser-ipc":"true"
+    },
+    body: JSON.stringify({
+      model:"claude-sonnet-4-20250514",
+      max_tokens:200,
+      messages:[{
+        role:"user",
+        content:[
+          {type:"image",source:{type:"base64",media_type:mime,data:b64}},
+          {type:"text",text:"Przeanalizuj to zdjęcie produktu spożywczego. Odpowiedz TYLKO w formacie JSON:
+{"produkt":"nazwa produktu po polsku","data":"DD.MM.YYYY lub null jeśli nie widać","uwaga":"krótka uwaga jeśli potrzebna"}
+Nie dodawaj nic poza JSON."}
+        ]
+      }]
+    })
+  }).then(function(r){ return r.json(); }).then(function(data){
+    document.getElementById("scan-loading").style.display="none";
+    var text = data.content && data.content[0] && data.content[0].text;
+    if(!text){ showScanError("Brak odpowiedzi z API"); return; }
+    try{
+      var clean = text.replace(/```json|```/g,"").trim();
+      var parsed = JSON.parse(clean);
+      scanResult = parsed;
+      document.getElementById("scan-product").textContent = parsed.produkt||"Nieznany produkt";
+      document.getElementById("scan-date").textContent = parsed.data ? "📅 Data: "+parsed.data : "❌ Nie znaleziono daty";
+      document.getElementById("scan-note").textContent = parsed.uwaga||"";
+      document.getElementById("scan-result").style.display="block";
+      if(parsed.data&&parsed.data!=="null"){
+        document.getElementById("scan-apply-btn").style.display="block";
+      }
+    }catch(e){ showScanError("Błąd parsowania: "+text); }
+  }).catch(function(e){
+    document.getElementById("scan-loading").style.display="none";
+    showScanError("Błąd API: "+e.message);
+  });
+}
+
+function showScanError(msg){
+  document.getElementById("scan-product").textContent=msg;
+  document.getElementById("scan-date").textContent="";
+  document.getElementById("scan-note").textContent="Sprawdź klucz API w ustawieniach ⚙️";
+  document.getElementById("scan-result").style.display="block";
+}
+
+function applyScanResult(){
+  if(!scanResult||!scanResult.data)return;
+  var parts = scanResult.data.split(".");
+  if(parts.length!==3)return;
+  var ts = new Date(parts[2]+"-"+parts[1]+"-"+parts[0]).getTime();
+  if(isNaN(ts))return;
+  // Otwórz modal daty przydatności z produktem
+  closeScanner();
+  // Znajdź produkt na liście
+  var found = null;
+  CATS.forEach(function(cat){
+    cat.items.forEach(function(it){
+      if(it.n.toLowerCase().indexOf((scanResult.produkt||"").toLowerCase().slice(0,8))!==-1){
+        if(!found) found=it;
+      }
+    });
+  });
+  if(found){
+    openExpiry(found.n);
+    setTimeout(function(){
+      document.getElementById("exp-date-inp").value = parts[2]+"-"+parts[1]+"-"+parts[0];
+    },100);
+  } else {
+    alert("Produkt: "+scanResult.produkt+"
+Data: "+scanResult.data+"
+
+Wybierz produkt ręcznie i ustaw datę.");
+  }
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
