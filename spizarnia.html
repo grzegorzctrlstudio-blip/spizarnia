@@ -97,6 +97,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .action-btn:active{transform:scale(.96);filter:brightness(.9)}
 .action-btn.primary{background:var(--green);color:#000}
 .action-btn.secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border2)}
+.action-btn.expiry-alert{background:var(--bg3);color:var(--amber);border:2px solid var(--amber);position:relative}
+.action-btn.expiry-alert.has-expiry{background:rgba(245,158,11,.15);animation:pulseBorder 2s infinite}
+.action-btn.expiry-alert.act{background:rgba(245,158,11,.25);border-color:var(--amber)}
+@keyframes pulseBorder{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.4)}50%{box-shadow:0 0 0 6px rgba(245,158,11,0)}}
+.exp-count-badge{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;border-radius:50%;width:20px;height:20px;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center}
 .action-btn.purple{background:var(--purple);color:#fff}
 .action-btn-ico{font-size:16px}
 
@@ -376,15 +381,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 
       <!-- STATS -->
       <div class="stats-row">
-        <div class="stat-card red">
+        <div class="stat-card red" onclick="setFilter(filter==='red'?'all':'red')" style="cursor:pointer" title="Filtruj: do kupienia">
           <div class="stat-icon">🛒</div>
           <div class="stat-n" id="n-red">0</div>
-          <div class="stat-label">Do kupienia</div>
+          <div class="stat-label">Brakuje</div>
         </div>
-        <div class="stat-card green">
+        <div class="stat-card green" onclick="setFilter(filter==='grn'?'all':'grn')" style="cursor:pointer" title="Filtruj: mamy">
           <div class="stat-icon">✅</div>
           <div class="stat-n" id="n-grn">0</div>
-          <div class="stat-label">Mamy</div>
+          <div class="stat-label">W lodówce</div>
         </div>
         <div class="stat-card neutral">
           <div class="stat-icon">📦</div>
@@ -395,31 +400,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 
       <!-- QUICK ACTIONS -->
       <div class="actions-bar">
-        <button class="action-btn primary" onclick="markShopping()">
+        <button class="action-btn primary" onclick="openShopModal()">
           <span class="action-btn-ico">🛍️</span>Byłem w sklepie
         </button>
-        <button class="action-btn purple" onclick="openReceipt()">
-          <span class="action-btn-ico">🧾</span>Paragon
-        </button>
-        <button class="action-btn secondary" onclick="toggleDateEdit()">
-          <span class="action-btn-ico">✏️</span>Data
+        <button class="action-btn expiry-alert" id="exp-alert-btn" onclick="setFilter(filter==='exp'?'all':'exp')">
+          <span class="action-btn-ico">⏰</span><span id="exp-alert-txt">Koniec ważności</span>
         </button>
       </div>
 
-      <!-- DATE CHIP -->
-      <div class="date-chip">
-        <div class="date-chip-left">
-          <span class="date-chip-ico">📅</span>
-          <div class="date-chip-text">
-            <strong id="shop-lbl">Nie ustawiono daty zakupów</strong>
-            <span id="shop-ago"></span>
-          </div>
+      <!-- DATE MINI CHIP -->
+      <div id="date-mini-chip" style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:8px 12px;background:var(--bg3);border-radius:10px;border:1px solid var(--border)">
+        <span style="font-size:16px">📅</span>
+        <div style="flex:1">
+          <div style="font-size:12px;font-weight:700;color:var(--text)" id="shop-lbl">Nie ustawiono daty zakupów</div>
+          <div style="font-size:11px;color:var(--text3)" id="shop-ago"></div>
         </div>
-      </div>
-      <div class="date-edit-row" id="date-edit-row" style="padding:0 0 10px">
-        <input type="date" class="date-inp" id="date-inp">
-        <button class="date-save" onclick="saveDateEdit()">✓ Zapisz</button>
-        <button class="date-cancel" onclick="toggleDateEdit()">✕</button>
       </div>
 
       <!-- SEARCH -->
@@ -436,13 +431,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
         </button>
       </div>
 
-      <!-- STATUS FILTERS -->
-      <div class="filters">
-        <button class="filter-btn act" id="f-all" onclick="setFilter('all')">Wszystkie</button>
-        <button class="filter-btn" id="f-exp" onclick="setFilter('exp')">⚠️ Wygasają</button>
-        <button class="filter-btn" id="f-red" onclick="setFilter('red')">🔴 Kupić</button>
-        <button class="filter-btn" id="f-grn" onclick="setFilter('grn')">🟢 Mamy</button>
-      </div>
+
     </div>
     <div class="body" id="body"></div>
   </div>
@@ -572,6 +561,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
   </div>
 </div>
 
+<!-- SHOP MODAL (Byłem w sklepie) -->
+<div class="overlay" id="shop-modal-overlay" onclick="if(event.target===this)closeShopModal()">
+  <div class="modal">
+    <h3>🛍️ Byłem w sklepie</h3>
+    <div id="shop-modal-date-info" style="background:var(--bg3);border-radius:10px;padding:12px;margin-bottom:14px;border:1px solid var(--border)">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:4px">Ostatnie zakupy</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text)" id="shop-modal-lbl">Nie ustawiono</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:2px" id="shop-modal-ago"></div>
+    </div>
+    <button class="mbtn ok" style="width:100%;margin-bottom:10px;padding:15px;font-size:15px" onclick="confirmShopping()">✅ Zaznacz dziś jako zakupy</button>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:10px;text-align:center">lub ustaw inną datę</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <input type="date" class="modal-inp" id="shop-modal-date-inp" style="margin-bottom:0;flex:1">
+      <button class="mbtn ok" style="flex-shrink:0;padding:13px 16px" onclick="saveShopModalDate()">✓</button>
+    </div>
+    <div style="height:1px;background:var(--border);margin-bottom:14px"></div>
+    <button class="mbtn purple" style="width:100%;margin-bottom:8px;padding:13px;background:var(--purple);color:#fff;border:none;border-radius:50px;font-weight:800;font-size:14px;cursor:pointer" onclick="closeShopModal();openReceipt()">🧾 Zeskanuj paragon</button>
+    <button class="mbtn cancel" style="width:100%" onclick="closeShopModal()">Zamknij</button>
+  </div>
+</div>
+
 <!-- RECEIPT MODAL -->
 <div class="overlay" id="receipt-overlay" onclick="if(event.target===this)closeReceiptModal()">
   <div class="modal">
@@ -612,8 +622,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
   <div class="modal">
     <h3>⚙️ Panel administratora</h3>
     <div class="admin-note" id="admin-api-status">Sprawdzam klucz API...</div>
-    <p>Klucz zapisuje się w chmurze — wszyscy korzystają automatycznie.<br>
-    <strong style="color:var(--blue)">console.anthropic.com</strong> → API Keys</p>
+
     <input class="modal-inp" id="api-key-inp" type="password" placeholder="sk-ant-api03-..." style="font-size:12px;font-family:monospace">
     <div class="modal-btns" style="margin-bottom:8px">
       <button class="mbtn ok" onclick="saveApiKey()">💾 Zapisz dla wszystkich</button>
@@ -843,20 +852,30 @@ function fbPost(p,d){return fbf(p,{method:"POST",headers:{"Content-Type":"applic
 function fbPut(p,d){return fbf(p,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)});}
 
 // ── SHOP DATE ─────────────────────────────────────────────────────────────────
-function markShopping(){
-  dlgConfirm("🛍️","Byłem w sklepie!","Zaznaczyć dzisiejszą datę jako dzień zakupów?",function(){
-    shopTs=Date.now(); fbPatch(RP,{__shopTs:shopTs}); updateShopBar(); render();
-  },"Tak");
+function markShopping(){ openShopModal(); }
+function openShopModal(){
+  var inp=document.getElementById("shop-modal-date-inp");
+  if(shopTs) inp.value=new Date(shopTs).toISOString().slice(0,10);
+  updateShopModalDate();
+  document.getElementById("shop-modal-overlay").classList.add("show");
 }
-function toggleDateEdit(){
-  var r=document.getElementById("date-edit-row"); r.classList.toggle("show");
-  if(r.classList.contains("show")&&shopTs)
-    document.getElementById("date-inp").value=new Date(shopTs).toISOString().slice(0,10);
+function closeShopModal(){ document.getElementById("shop-modal-overlay").classList.remove("show"); }
+function updateShopModalDate(){
+  var lbl=document.getElementById("shop-modal-lbl"),ago=document.getElementById("shop-modal-ago");
+  if(!shopTs){lbl.textContent="Nie ustawiono";ago.textContent="";return;}
+  var d=new Date(shopTs),days=Math.floor((Date.now()-shopTs)/86400000);
+  lbl.textContent=d.toLocaleDateString("pl-PL",{weekday:"long",day:"numeric",month:"long"});
+  ago.textContent=days===0?"dziś 🛍️":days===1?"wczoraj":days+" dni temu";
 }
-function saveDateEdit(){
-  var v=document.getElementById("date-inp").value; if(!v) return;
-  shopTs=new Date(v).getTime(); fbPatch(RP,{__shopTs:shopTs}); toggleDateEdit(); updateShopBar(); render();
+function confirmShopping(){
+  shopTs=Date.now(); fbPatch(RP,{__shopTs:shopTs}); updateShopBar(); updateShopModalDate(); render(); closeShopModal();
 }
+function saveShopModalDate(){
+  var v=document.getElementById("shop-modal-date-inp").value; if(!v) return;
+  shopTs=new Date(v).getTime(); fbPatch(RP,{__shopTs:shopTs}); updateShopBar(); updateShopModalDate(); render(); closeShopModal();
+}
+function toggleDateEdit(){} // keep for compat
+function saveDateEdit(){}
 function updateShopBar(){
   var l=document.getElementById("shop-lbl"),a=document.getElementById("shop-ago");
   if(!shopTs){ l.textContent="Nie ustawiono daty zakupów"; a.textContent=""; return; }
@@ -1361,10 +1380,6 @@ function change(id,delta,max,name,btn){
 }
 function setFilter(f){
   filter=f;
-  document.querySelectorAll(".filter-btn").forEach(function(el){el.className="filter-btn";});
-  var map={all:"all",exp:"amber",red:"red",grn:"green"};
-  var el=document.getElementById("f-"+f);
-  if(el) el.className="filter-btn act "+(map[f]||"");
   render();
 }
 function onSearch(q){
@@ -1458,6 +1473,28 @@ function render(){
     html='<div class="empty"><div class="empty-ico">'+ic+'</div>'+ms+'</div>';
   }
   body.innerHTML=html;
+
+  // Update expiry alert button
+  var expCount=0;
+  CATS.forEach(function(cat){cat.items.forEach(function(it){if(expiringSoon(it))expCount++;});});
+  var expBtn=document.getElementById("exp-alert-btn");
+  var expTxt=document.getElementById("exp-alert-txt");
+  if(expBtn){
+    if(expCount>0){
+      expBtn.classList.add("has-expiry");
+      expTxt.textContent="Kończy się ("+expCount+")";
+      // Add badge
+      var badge=expBtn.querySelector(".exp-count-badge");
+      if(!badge){badge=document.createElement("div");badge.className="exp-count-badge";expBtn.appendChild(badge);}
+      badge.textContent=expCount;
+    }else{
+      expBtn.classList.remove("has-expiry");
+      expTxt.textContent="Koniec ważności";
+      var badge2=expBtn.querySelector(".exp-count-badge");
+      if(badge2)badge2.remove();
+    }
+    expBtn.classList[filter==="exp"?"add":"remove"]("act");
+  }
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
