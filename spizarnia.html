@@ -506,11 +506,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
       <div id="scan-note" style="font-size:11px;color:var(--text3);margin-top:4px"></div>
     </div>
     <div class="modal-btns" style="margin-bottom:8px">
-      <button class="mbtn blue" onclick="triggerScanPhoto()">📷 Zdjęcie</button>
-      <button class="mbtn ok" id="scan-apply" style="display:none" onclick="applyScan()">✅ Zastosuj</button>
+      <button class="mbtn blue" onclick="triggerScanPhoto()">📷 Nowe zdjęcie</button>
+      <button class="mbtn ok" id="scan-apply" style="display:none" onclick="applyScan()">✅ Zastosuj datę</button>
     </div>
     <button class="mbtn cancel" style="width:100%" onclick="closeScanner()">Zamknij</button>
-    <input type="file" id="scan-file" accept="image/*" capture="environment" style="display:none" onchange="handleScanPhoto(this)">
+    <input type="file" id="scan-file" accept="image/*" style="display:none" onchange="handleScanPhoto(this)">
   </div>
 </div>
 
@@ -526,7 +526,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
       <button class="mbtn blue" onclick="triggerReceiptPhoto()">📷 Zrób zdjęcie</button>
       <button class="mbtn cancel" onclick="closeReceiptModal()">Zamknij</button>
     </div>
-    <input type="file" id="receipt-file" accept="image/*" capture="environment" style="display:none" onchange="handleReceiptPhoto(this)">
+    <input type="file" id="receipt-file" accept="image/*" style="display:none" onchange="handleReceiptPhoto(this)">
   </div>
 </div>
 
@@ -1166,7 +1166,7 @@ function compressPhoto(dataUrl,cb){
   img.onerror=function(){cb(dataUrl);};
   img.src=dataUrl;
 }
-function openPhoto(name){
+function openPhoto(name,evt){
   photoItem=name;
   document.getElementById("photo-modal-name").textContent=name;
   updateSlotUI(name);
@@ -1402,8 +1402,16 @@ function startApp(){
         setStore(userProfile.stores==="both"?storePreference:userProfile.stores);
         updateAISys();
       }else{
-        setStore(storePreference);
-        showOb(); // show onboarding for new user
+        // Check if we have a preset for this user
+        var preset=applyPresetProfile(userName);
+        if(preset){
+          saveUserProfile(preset);
+          setStore(preset.stores);
+          updateAISys();
+        }else{
+          setStore(storePreference);
+          showOb(); // show onboarding for new user
+        }
       }
     });
     setInterval(function(){
@@ -1529,7 +1537,7 @@ function render(){
       var nm=it.n;
       if(searchQ){var si=it.n.toLowerCase().indexOf(searchQ);
         if(si>=0)nm=it.n.slice(0,si)+'<mark style="background:var(--amber);color:#000;border-radius:3px;padding:0 2px">'+it.n.slice(si,si+searchQ.length)+"</mark>"+it.n.slice(si+searchQ.length);}
-      html+='<div class="item '+c+'" style="border-left:5px solid '+catColor+';border-left-color:'+catColor+'">'
+      html+='<div class="item '+c+'" style="border-left:5px solid '+catColor+';background-image:linear-gradient(135deg,'+catColor+'11 0%,transparent 40%)">'
         +'<div class="item-main">'+photoEl
         +'<div class="item-info"><div class="item-name">'+nm+'</div>'+fh+'</div>'
         +'<div class="item-badge"><div class="item-badge-main">'+bt+'</div><div class="item-badge-sub">'+bs+'</div></div>'
@@ -1558,7 +1566,7 @@ function render(){
 // ── USER PROFILES ─────────────────────────────────────────────────────────────
 var userProfile = null;
 var obSelections = {activity:null,goal:null,stores:null};
-var OB_STEPS = 5;
+var OB_STEPS = 6;
 var obCurrentStep = 0;
 
 function profileKey(name){
@@ -1585,6 +1593,20 @@ function saveUserProfile(profile){
   var key=profileKey(userName);
   userProfile=profile;
   fbPut(PROFILES+"/"+key, profile);
+}
+
+function applyPresetProfile(name){
+  // Preset profiles for known users
+  var presets={
+    "grzes skronski":{age:30,weight:85,height:180,gender:"m",activity:"active",goal:"gain",stores:"biedronka",exclude:"ryby (tylko losos)",kcal:3060,prot:244,fat:107,carb:281,tdee:2660},
+  };
+  var key=name.toLowerCase().trim();
+  for(var k in presets){
+    if(key.indexOf(k)!==-1||k.indexOf(key.split(" ")[0])!==-1){
+      return presets[k];
+    }
+  }
+  return null;
 }
 
 function calcProfile(){
@@ -1642,6 +1664,16 @@ function renderObStep(){
   }
 }
 
+var obMethod = "manual"; // or "ai"
+var aiParsedProfile = null;
+
+function selectMethod(method, el){
+  obMethod = method;
+  el.parentElement.querySelectorAll(".ob-opt").forEach(function(o){o.classList.remove("sel");});
+  el.classList.add("sel");
+  document.getElementById("ai-diet-input").style.display = method==="ai" ? "block" : "none";
+}
+
 function selectOpt(type, val, el){
   obSelections[type]=val;
   var parent=el.parentElement;
@@ -1650,20 +1682,82 @@ function selectOpt(type, val, el){
 }
 
 function obNext(){
+  // Step 0: method selection
   if(obCurrentStep===0){
+    if(!obMethod){dlgAlert("⚠️","Wybierz metodę","Zaznacz jak chcesz ustawić profil");return;}
+    if(obMethod==="ai"){
+      var txt=document.getElementById("ob-diet-text").value.trim();
+      if(!txt){dlgAlert("⚠️","Brak treści","Wklej tekst swojego planu diety");return;}
+      // Parse with AI
+      var status=document.getElementById("ai-parse-status");
+      status.textContent="⏳ Claude analizuje plan diety...";
+      status.style.color="var(--amber)";
+      document.getElementById("ob-next-btn").disabled=true;
+      callAPI([{role:"user",content:"Przeanalizuj ten plan diety i wyciagnij z niego dane. Odpowiedz TYLKO JSON:
+{"kcal":3060,"prot":244,"carb":281,"fat":107,"sklep":"Biedronka lub Lidl lub oba lub nieznany","wykluczenia":"np. ryby, laktoza lub brak","cel":"redukcja lub utrzymanie lub masa lub nieznany"}
+
+Plan diety:
+"+txt}],
+        "Jestes dietetykiem. Wyciagnij z tekstu kalorie i makroskaldniki. Odpowiedz TYLKO JSON.",
+        function(res){
+          try{
+            var p=JSON.parse(res.replace(/```json|```/g,"").trim());
+            aiParsedProfile=p;
+            status.textContent="✅ Dane wczytane: "+p.kcal+" kcal, B:"+p.prot+"g W:"+p.carb+"g T:"+p.fat+"g";
+            status.style.color="var(--green)";
+            document.getElementById("ob-next-btn").disabled=false;
+            // Skip to stores step (step 4)
+            obCurrentStep=4;
+            renderObStep();
+          }catch(e){
+            status.textContent="❌ Nie udało się — spróbuj wpisać ręcznie";
+            status.style.color="var(--red)";
+            document.getElementById("ob-next-btn").disabled=false;
+          }
+        },
+        function(err){
+          status.textContent="❌ Błąd: "+err;
+          status.style.color="var(--red)";
+          document.getElementById("ob-next-btn").disabled=false;
+        }
+      );
+      return;
+    }
+    // manual: go to step 1
+    obCurrentStep++;
+    renderObStep();
+    return;
+  }
+  // Step 1: basic info
+  if(obCurrentStep===1){
     var age=document.getElementById("ob-age").value;
     var weight=document.getElementById("ob-weight").value;
     var height=document.getElementById("ob-height").value;
     if(!age||!weight||!height){dlgAlert("⚠️","Uzupełnij dane","Wpisz wiek, wagę i wzrost");return;}
   }
-  if(obCurrentStep===1&&!obSelections.activity){dlgAlert("⚠️","Wybierz aktywność","Zaznacz poziom aktywności");return;}
-  if(obCurrentStep===2&&!obSelections.goal){dlgAlert("⚠️","Wybierz cel","Zaznacz swój cel");return;}
-  if(obCurrentStep===3&&!obSelections.stores){dlgAlert("⚠️","Wybierz sklep","Zaznacz preferowany sklep");return;}
+  if(obCurrentStep===2&&!obSelections.activity){dlgAlert("⚠️","Wybierz aktywność","Zaznacz poziom aktywności");return;}
+  if(obCurrentStep===3&&!obSelections.goal){dlgAlert("⚠️","Wybierz cel","Zaznacz swój cel");return;}
+  if(obCurrentStep===4&&!obSelections.stores){dlgAlert("⚠️","Wybierz sklep","Zaznacz preferowany sklep");return;}
   if(obCurrentStep===OB_STEPS-1){
-    // Save profile
-    var profile=calcProfile();
+    var profile;
+    if(obMethod==="ai"&&aiParsedProfile){
+      // Use AI-parsed values, supplement with manual stores selection
+      var storesVal=obSelections.stores||"biedronka";
+      var excludeVal=document.getElementById("ob-exclude").value||aiParsedProfile.wykluczenia||"";
+      profile={
+        kcal:aiParsedProfile.kcal||2000,
+        prot:aiParsedProfile.prot||150,
+        carb:aiParsedProfile.carb||200,
+        fat:aiParsedProfile.fat||70,
+        stores:storesVal,
+        exclude:excludeVal,
+        goal:aiParsedProfile.cel||"maintain",
+        activity:"mod",age:30,weight:75,height:175,gender:"m",tdee:aiParsedProfile.kcal||2000
+      };
+    }else{
+      profile=calcProfile();
+    }
     saveUserProfile(profile);
-    // Set store preference
     setStore(profile.stores==="both"?"biedronka":profile.stores);
     hideOb();
     updateAISys();
@@ -1709,8 +1803,34 @@ if(sn){
     <p class="ob-sub" id="ob-sub">Odpowiedz na kilka pytań — dobierzemy dla Ciebie idealną dietę i listę zakupów</p>
     <div class="ob-progress" id="ob-progress"></div>
 
-    <!-- STEP 1: basic info -->
+    <!-- STEP 0: choose method -->
     <div class="ob-step show" id="ob-step-0">
+      <label class="ob-label" style="margin-top:0">Jak chcesz ustawić profil?</label>
+      <div class="ob-opts">
+        <div class="ob-opt" onclick="selectMethod('manual',this)">
+          <span class="ob-opt-ico">✍️</span>
+          <div class="ob-opt-text">
+            <div class="ob-opt-title">Wypełnij ręcznie</div>
+            <div class="ob-opt-sub">Wpisz wiek, wagę, cel — kalkulator policzy kalorie</div>
+          </div>
+        </div>
+        <div class="ob-opt" onclick="selectMethod('ai',this)">
+          <span class="ob-opt-ico">🤖</span>
+          <div class="ob-opt-text">
+            <div class="ob-opt-title">Wgraj plan diety AI</div>
+            <div class="ob-opt-sub">Wklej tekst swojego planu żywieniowego — AI wyciągnie kalorie i makro</div>
+          </div>
+        </div>
+      </div>
+      <div id="ai-diet-input" style="display:none;margin-top:12px">
+        <label class="ob-label">Wklej treść planu diety</label>
+        <textarea id="ob-diet-text" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px;font-size:13px;color:var(--text);outline:none;min-height:120px;font-family:inherit;resize:vertical" placeholder="Wklej tekst z planu żywieniowego np. kalorie 3060 kcal, białko 244g, węglowodany 281g, tłuszcze 107g..."></textarea>
+        <div id="ai-parse-status" style="font-size:11px;color:var(--text3);margin-top:6px"></div>
+      </div>
+    </div>
+
+    <!-- STEP 1: basic info -->
+    <div class="ob-step" id="ob-step-2">
       <div class="ob-row">
         <div>
           <label class="ob-label">Wiek</label>
@@ -1737,7 +1857,7 @@ if(sn){
     </div>
 
     <!-- STEP 2: activity -->
-    <div class="ob-step" id="ob-step-1">
+    <div class="ob-step" id="ob-step-2">
       <label class="ob-label" style="margin-top:0">Poziom aktywności fizycznej</label>
       <div class="ob-opts" id="ob-activity-opts">
         <div class="ob-opt" onclick="selectOpt('activity','sed',this)"><span class="ob-opt-ico">🛋️</span><div class="ob-opt-text"><div class="ob-opt-title">Siedzący tryb życia</div><div class="ob-opt-sub">Praca biurowa, brak sportu</div></div></div>
@@ -1749,7 +1869,7 @@ if(sn){
     </div>
 
     <!-- STEP 3: goal -->
-    <div class="ob-step" id="ob-step-2">
+    <div class="ob-step" id="ob-step-3">
       <label class="ob-label" style="margin-top:0">Twój cel</label>
       <div class="ob-opts">
         <div class="ob-opt" onclick="selectOpt('goal','lose',this)"><span class="ob-opt-ico">📉</span><div class="ob-opt-text"><div class="ob-opt-title">Redukcja tkanki tłuszczowej</div><div class="ob-opt-sub">Deficyt kaloryczny -400 kcal</div></div></div>
@@ -1759,7 +1879,7 @@ if(sn){
     </div>
 
     <!-- STEP 4: stores -->
-    <div class="ob-step" id="ob-step-3">
+    <div class="ob-step" id="ob-step-4">
       <label class="ob-label" style="margin-top:0">Gdzie robisz zakupy?</label>
       <div class="ob-opts">
         <div class="ob-opt" onclick="selectOpt('stores','biedronka',this)"><span class="ob-opt-ico">🐞</span><div class="ob-opt-text"><div class="ob-opt-title">Biedronka</div><div class="ob-opt-sub">Głównie produkty z Biedronki</div></div></div>
@@ -1771,7 +1891,7 @@ if(sn){
     </div>
 
     <!-- STEP 5: results -->
-    <div class="ob-step" id="ob-step-4">
+    <div class="ob-step" id="ob-step-5">
       <p style="font-size:13px;color:var(--text2);margin-bottom:10px">Na podstawie Twoich danych obliczono:</p>
       <div class="ob-result">
         <div class="ob-result-row"><span class="ob-result-lbl">🔥 Zapotrzebowanie kaloryczne</span><span class="ob-result-val" id="ob-res-kcal">—</span></div>
