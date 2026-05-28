@@ -1055,7 +1055,7 @@ function deleteSlotPhoto(slotIdx){
   fbPatch(PP,p).then(function(){updateSlotUI(photoItem);render();});
 }
 
-function compressPhoto(dataUrl,cb){function compressPhoto(dataUrl,cb){
+function compressPhoto(dataUrl,cb){
   var img=new Image();
   img.onload=function(){
     try{
