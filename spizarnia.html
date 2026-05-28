@@ -606,7 +606,7 @@ var RP=FB+"/rooms/"+ROOM, LP=FB+"/logs/"+ROOM, EP=FB+"/expiry/"+ROOM;
 var PP=FB+"/photos/"+ROOM, CP=FB+"/config/apikey";
 
 var CATS = [
-  {id:"warzywa",label:"Warzywa i owoce",ic:"🥦",noScan:true,items:[
+  {id:"warzywa",label:"Warzywa i owoce",ic:"🥦",noScan:true,color:"#16A34A",items:[
     {n:"Papryka (czerwona/żółta)",target:2,unit:"szt.",days:5},
     {n:"Pomidory",target:2,unit:"szt.",days:4},
     {n:"Ogórek",target:2,unit:"szt.",days:4},
@@ -625,38 +625,38 @@ var CATS = [
     {n:"Cytryna",target:1,unit:"szt.",days:14},
     {n:"Bataty",target:2,unit:"szt.",days:30}
   ]},
-  {id:"piekarnia",label:"Piekarnia",ic:"🍞",scan:true,items:[
+  {id:"piekarnia",label:"Piekarnia",ic:"🍞",scan:true,color:"#D97706",items:[
     {n:"Chleb pełnoziarnisty",target:2,unit:"bochenek",days:5}
   ]},
-  {id:"suche",label:"Płatki, kasze, ryże",ic:"🌾",scan:true,items:[
+  {id:"suche",label:"Płatki, kasze, ryże",ic:"🌾",scan:true,color:"#B45309",items:[
     {n:"Płatki owsiane błyskawiczne",target:2,unit:"opak. 500g",days:180},
     {n:"Płatki jaglane",target:1,unit:"opak.",days:180},
     {n:"Ryż basmati",target:1,unit:"opak. 1kg",days:365},
     {n:"Kasza gryczana",target:1,unit:"opak. 500g",days:365}
   ]},
-  {id:"puszki",label:"Puszki i sosy",ic:"🫙",scan:true,items:[
+  {id:"puszki",label:"Puszki i sosy",ic:"🫙",scan:true,color:"#0891B2",items:[
     {n:"Ciecierzyca (puszka)",target:2,unit:"puszka",days:730},
     {n:"Passata pomidorowa",target:1,unit:"opak.",days:365},
     {n:"Ketchup Słodka Ania",target:1,unit:"butelka",days:180},
     {n:"Musztarda miodowa / łagodna",target:1,unit:"słoik",days:365}
   ]},
-  {id:"tluszcze",label:"Orzechy i tłuszcze",ic:"🥜",scan:true,items:[
+  {id:"tluszcze",label:"Orzechy i tłuszcze",ic:"🥜",scan:true,color:"#7C3AED",items:[
     {n:"Oliwa z oliwek",target:1,unit:"butelka 500ml",days:365},
     {n:"Masło orzechowe Vitanella",target:2,unit:"opak. 350g",days:180},
     {n:"Płatki migdałów",target:1,unit:"opak. 200g",days:180},
     {n:"Orzechy włoskie/laskowe",target:1,unit:"opak. 200g",days:180},
     {n:"Kakao (bez cukru)",target:1,unit:"opak.",days:365}
   ]},
-  {id:"maki",label:"Mąki",ic:"🌾",scan:true,items:[
+  {id:"maki",label:"Mąki",ic:"🌾",scan:true,color:"#9333EA",items:[
     {n:"Mąka ryżowa",target:1,unit:"opak. 400g",days:365},
     {n:"Mąka jaglana",target:1,unit:"opak. 400g",days:365}
   ]},
-  {id:"mieso",label:"Mięso świeże",ic:"🥩",scan:true,items:[
+  {id:"mieso",label:"Mięso świeże",ic:"🥩",scan:true,color:"#DC2626",items:[
     {n:"Pierś z kurczaka",target:2,unit:"szt.",days:3},
     {n:"Wołowina mielona",target:1,unit:"opak. 150g",days:2},
     {n:"Filet z łososia (świeży)",target:1,unit:"szt.",days:2}
   ]},
-  {id:"nabial",label:"Nabiał",ic:"🥛",scan:true,items:[
+  {id:"nabial",label:"Nabiał",ic:"🥛",scan:true,color:"#2563EB",items:[
     {n:"Skyr naturalny",target:4,unit:"opak. 350g",days:10},
     {n:"Ser twarogowy chudy",target:3,unit:"opak. 400g",days:7},
     {n:"Serek wiejski light (0% tłuszczu)",target:3,unit:"opak. 400g",days:7},
@@ -664,10 +664,10 @@ var CATS = [
     {n:"Jogurt naturalny 2%",target:1,unit:"opak. duży",days:7},
     {n:"Mleko 0,5%",target:2,unit:"litr",days:5}
   ]},
-  {id:"jaja",label:"Jaja",ic:"🥚",scan:true,items:[
+  {id:"jaja",label:"Jaja",ic:"🥚",scan:true,color:"#CA8A04",items:[
     {n:"Jaja L",target:2,unit:"opak. 10 szt.",days:28}
   ]},
-  {id:"wedliny",label:"Wędliny i ryby",ic:"🍖",scan:true,items:[
+  {id:"wedliny",label:"Wędliny i ryby",ic:"🍖",scan:true,color:"#E11D48",items:[
     {n:"Polędwica z indyka — Kraina Mięs (min. 97%)",target:3,unit:"opak.",days:7},
     {n:"Szynka z indyka — Kraina Wędlin (min. 97%)",target:2,unit:"opak.",days:7},
     {n:"Polędwica z kurczaka — Kraina Mięs (min. 97%)",target:2,unit:"opak.",days:7},
@@ -1427,10 +1427,11 @@ function render(){
     });
     if(!vis.length)return;
     any=true;
+    var catColor=cat.color||"var(--text3)";
     var catSub=catMissing>0
       ?'<span style="font-size:10px;color:var(--red);font-weight:700;margin-left:4px">brakuje '+catMissing+'</span>'
       :'<span style="font-size:10px;color:var(--green);margin-left:4px">✓</span>';
-    html+='<div class="cat-section"><div class="cat-section-hdr"><span>'+cat.ic+'</span>'+cat.label+catSub+'</div>';
+    html+='<div class="cat-section"><div class="cat-section-hdr" style="color:'+catColor+'"><span>'+cat.ic+'</span>'+cat.label+catSub+'</div>';
     vis.forEach(function(it){
       var id=fbk(cat.id,it.n),ie=id.replace(/'/g,"\\'"),ne=it.n.replace(/'/g,"\\'");
       var cur=state[id]||0,c=cls(cur,it.target);
