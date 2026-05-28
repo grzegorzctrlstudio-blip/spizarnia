@@ -225,7 +225,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .modal{background:var(--bg2);border-radius:20px;padding:22px;width:100%;max-width:420px;border:1px solid var(--border2)}
 .modal h3{font-size:17px;font-weight:800;color:var(--text);margin-bottom:6px}
 .modal p{font-size:12px;color:var(--text3);margin-bottom:14px;line-height:1.6}
-.modal-inp{width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--radius-sm);padding:13px 15px;font-size:14px;color:var(--text);outline:none;margin-bottom:12px;transition:border .2s}
+.modal-inp{width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--radius-sm);padding:13px 15px;font-size:14px;color:var(--text);outline:none;margin-bottom:12px;transition:border .2s;color-scheme:dark}
 .modal-inp:focus{border-color:var(--green)}
 .modal-inp::placeholder{color:var(--text3)}
 .modal-btns{display:flex;gap:8px}
@@ -504,35 +504,43 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
     <h3>📷 Zdjęcia produktu</h3>
     <p id="photo-modal-name" style="color:var(--text2);margin-bottom:14px;font-weight:700"></p>
 
-    <!-- SLOT 0: data ważności -->
+    <!-- SLOT 0: data ważności — label triggers file input directly (iOS compatible) -->
     <div style="margin-bottom:14px">
-      <div style="font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:6px">📅 Zdjęcie daty ważności (wieczko/etykieta)</div>
+      <div style="font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:6px">📅 Data ważności (wieczko / spód opakowania)</div>
       <div style="display:flex;align-items:center;gap:10px">
-        <div id="slot0-thumb" onclick="openSlot(0)" style="width:72px;height:72px;border-radius:10px;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:var(--text3);font-size:11px;gap:3px"><span style="font-size:24px">📅</span>Dodaj</div>
-        <div style="flex:1;font-size:11px;color:var(--text3);line-height:1.6">Zrób zdjęcie miejsca gdzie widać datę ważności — wieczko, spód opakowania lub boczna etykieta.</div>
+        <div id="slot0-thumb" style="width:72px;height:72px;flex-shrink:0;position:relative">
+          <label for="slot0-file" style="width:72px;height:72px;border-radius:10px;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--text3);font-size:11px;gap:3px;position:absolute;inset:0"><span style="font-size:24px">📅</span>Dodaj</label>
+          <input type="file" id="slot0-file" accept="image/*" capture="environment" style="display:none" onchange="handleSlotPhoto(this,0)">
+        </div>
+        <div style="flex:1;font-size:11px;color:var(--text3);line-height:1.6">Zrób zdjęcie gdzie widać datę — wieczko, spód, boczna etykieta.</div>
       </div>
     </div>
 
-    <!-- SLOT 1: etykieta produktu -->
+    <!-- SLOT 1: etykieta -->
     <div style="margin-bottom:14px">
-      <div style="font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:6px">🏷️ Zdjęcie etykiety / opakowania</div>
+      <div style="font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:6px">🏷️ Etykieta / opakowanie produktu</div>
       <div style="display:flex;align-items:center;gap:10px">
-        <div id="slot1-thumb" onclick="openSlot(1)" style="width:72px;height:72px;border-radius:10px;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:var(--text3);font-size:11px;gap:3px"><span style="font-size:24px">🏷️</span>Dodaj</div>
-        <div style="flex:1;font-size:11px;color:var(--text3);line-height:1.6">Zrób zdjęcie całego opakowania lub etykiety z nazwą produktu — pomocne gdy nie widać co to.</div>
+        <div id="slot1-thumb" style="width:72px;height:72px;flex-shrink:0;position:relative">
+          <label for="slot1-file" style="width:72px;height:72px;border-radius:10px;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--text3);font-size:11px;gap:3px;position:absolute;inset:0"><span style="font-size:24px">🏷️</span>Dodaj</label>
+          <input type="file" id="slot1-file" accept="image/*" capture="environment" style="display:none" onchange="handleSlotPhoto(this,1)">
+        </div>
+        <div style="flex:1;font-size:11px;color:var(--text3);line-height:1.6">To zdjęcie pojawi się jako miniaturka na liście produktów.</div>
       </div>
     </div>
 
     <!-- SLOT 2: dodatkowe -->
     <div style="margin-bottom:16px">
-      <div style="font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:6px">📷 Dodatkowe zdjęcie <span style="color:var(--text3);font-weight:400;text-transform:none">(opcjonalne)</span></div>
+      <div style="font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:6px">📷 Dodatkowe <span style="font-weight:400;text-transform:none">(opcjonalne)</span></div>
       <div style="display:flex;align-items:center;gap:10px">
-        <div id="slot2-thumb" onclick="openSlot(2)" style="width:72px;height:72px;border-radius:10px;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:var(--text3);font-size:11px;gap:3px"><span style="font-size:24px">📷</span>Dodaj</div>
-        <div style="flex:1;font-size:11px;color:var(--text3);line-height:1.6">Np. zdjęcie składników lub wartości odżywczych.</div>
+        <div id="slot2-thumb" style="width:72px;height:72px;flex-shrink:0;position:relative">
+          <label for="slot2-file" style="width:72px;height:72px;border-radius:10px;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--text3);font-size:11px;gap:3px;position:absolute;inset:0"><span style="font-size:24px">📷</span>Dodaj</label>
+          <input type="file" id="slot2-file" accept="image/*" capture="environment" style="display:none" onchange="handleSlotPhoto(this,2)">
+        </div>
+        <div style="flex:1;font-size:11px;color:var(--text3);line-height:1.6">Np. skład lub wartości odżywcze.</div>
       </div>
     </div>
 
     <button class="mbtn cancel" style="width:100%" onclick="closePhoto()">Zamknij</button>
-    <input type="file" id="product-photo-file" accept="image/*" capture="environment" style="display:none" onchange="handleProductPhoto(this)">
   </div>
 </div>
 
@@ -1017,9 +1025,23 @@ function applyReceipt(){
 var currentSlot = 0; // which slot is being filled
 
 function openSlot(slotIdx){
-  currentSlot = slotIdx;
-  document.getElementById("product-photo-file").value="";
-  document.getElementById("product-photo-file").click();
+  currentSlot = slotIdx; // kept for compat
+}
+function handleSlotPhoto(input, slotIdx){
+  if(!input.files||!input.files[0])return;
+  var slot=slotIdx;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    compressPhoto(e.target.result,function(compressed){
+      var key=getSlotKey(photoItem,slot),p={};
+      photos[key]=compressed;p[key]=compressed;
+      try{localStorage.setItem("photo_"+key,compressed);}catch(e2){}
+      fbPatch(PP,p).catch(function(err){console.error("Photo save err:",err);});
+      updateSlotUI(photoItem);
+      render();
+    });
+  };
+  reader.readAsDataURL(input.files[0]);
 }
 
 function getSlotKey(name, slot){
@@ -1027,23 +1049,25 @@ function getSlotKey(name, slot){
 }
 
 function updateSlotUI(name){
+  var icons=["📅","🏷️","📷"];
   for(var s=0;s<3;s++){
     var key=getSlotKey(name,s);
     var src=photos[key]||null;
-    var el=document.getElementById("slot"+s+"-thumb");
-    if(!el)continue;
+    var thumb=document.getElementById("slot"+s+"-thumb");
+    var lbl=document.getElementById("slot"+s+"-file");
+    if(!thumb)continue;
     if(src){
-      el.innerHTML='<div style="position:relative;width:72px;height:72px">'
-        +'<img src="'+src+'" style="width:72px;height:72px;border-radius:10px;object-fit:cover;border:2px solid var(--green)">'
-        +'<button class="slot-del" onclick="deleteSlotPhoto('+s+')" style="position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;z-index:1">✕</button>'
-        +'</div>';
-      el.style.background="transparent";
-      el.style.border="none";
+      // Replace label with image + delete button, keep file input inside
+      thumb.innerHTML=
+        '<img src="'+src+'" style="width:72px;height:72px;border-radius:10px;object-fit:cover;border:2px solid var(--green);display:block">'
+        +'<button onclick="deleteSlotPhoto('+s+')" style="position:absolute;top:-7px;right:-7px;background:var(--red);color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer;z-index:2;display:flex;align-items:center;justify-content:center">✕</button>'
+        +'<label for="slot'+s+'-file" style="position:absolute;inset:0;cursor:pointer;border-radius:10px"></label>'
+        +'<input type="file" id="slot'+s+'-file" accept="image/*" capture="environment" style="display:none" onchange="handleSlotPhoto(this,'+s+')">';
     }else{
-      var icons=["📅","🏷️","📷"],labels=["Dodaj","Dodaj","Dodaj"];
-      el.style.background="var(--bg4)";
-      el.style.border="1.5px dashed var(--border2)";
-      el.innerHTML='<span style="font-size:24px">'+icons[s]+'</span><span style="font-size:11px;color:var(--text3)">'+labels[s]+'</span>';
+      thumb.innerHTML=
+        '<label for="slot'+s+'-file" style="width:72px;height:72px;border-radius:10px;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--text3);font-size:11px;gap:3px;position:absolute;inset:0"><span style="font-size:24px">'+icons[s]+'</span>Dodaj</label>'
+        +'<input type="file" id="slot'+s+'-file" accept="image/*" capture="environment" style="display:none" onchange="handleSlotPhoto(this,'+s+')">'
+      ;
     }
   }
 }
@@ -1052,7 +1076,7 @@ function deleteSlotPhoto(slotIdx){
   var key=getSlotKey(photoItem,slotIdx),p={};
   delete photos[key];p[key]=null;
   try{localStorage.removeItem("photo_"+key);}catch(e){}
-  fbPatch(PP,p).then(function(){updateSlotUI(photoItem);render();});
+  fbPatch(PP,p).then(function(){updateSlotUI(photoItem);render();}).catch(function(){updateSlotUI(photoItem);render();});
 }
 
 function compressPhoto(dataUrl,cb){
@@ -1082,28 +1106,8 @@ function openPhoto(name){
   document.getElementById("photo-overlay").classList.add("show");
 }
 function closePhoto(){document.getElementById("photo-overlay").classList.remove("show");}
-function triggerProductPhoto(){
-  document.getElementById("product-photo-file").value="";
-  document.getElementById("product-photo-file").click();
-}
-function handleProductPhoto(input){
-  if(!input.files||!input.files[0])return;
-  var reader=new FileReader();
-  reader.onload=function(e){
-    compressPhoto(e.target.result,function(compressed){
-      var key=getSlotKey(photoItem,currentSlot),p={};photos[key]=compressed;p[key]=compressed;
-      // Show immediately
-      try{localStorage.setItem("photo_"+key, compressed);}catch(e){}
-      updateSlotUI(photoItem);
-      render();
-      // Save to Firebase
-      fbPatch(PP,p).catch(function(err){
-        console.error("Photo save error:", err);
-      });
-    });
-  };
-  reader.readAsDataURL(input.files[0]);
-}
+function triggerProductPhoto(){} // replaced by label-based slots
+// handleProductPhoto replaced by handleSlotPhoto
 // deleteProductPhoto replaced by deleteSlotPhoto
 
 function openStore(store){
