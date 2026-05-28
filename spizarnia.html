@@ -1523,12 +1523,11 @@ function render(){
       var ql=c==="grn"?'<span style="color:var(--green)">✓ Wystarczy</span>'
         :c==="low"?'<span style="color:var(--amber)">Kup jeszcze '+brak+" "+it.unit+'</span>'
         :'<span style="color:var(--red)">Brak — kup '+brak+" "+it.unit+'</span>';
-      var photoKey=fbk("p",it.n),photoSrc=photos[photoKey]||"";
       var hasScan=cat.scan?true:false;
-      var photoClickFn=photoSrc?"openPhoto(\\'"+ne+"\\')":hasScan?"openScannerAndPhoto(\\'"+ne+"\\')":"openPhotoCamera(\\'"+ne+"\\')" ;
+      var photoSrc=photos[getSlotKey(it.n,1)]||photos[getSlotKey(it.n,0)]||photos[getSlotKey(it.n,2)]||"";
       var photoEl=photoSrc
-        ?'<img class="item-photo-thumb" src="'+photoSrc+'" onclick="'+photoClickFn+'">'
-        :'<div class="item-photo-empty" onclick="'+photoClickFn+'">'+(hasScan?"🔍":"📷")+'</div>';
+        ?'<img class="item-photo-thumb" src="'+photoSrc+'" onclick="openPhoto(\'"+ne+"\',event)">'
+        :'<div class="item-photo-empty" onclick="openPhoto(\'"+ne+"\',event)">'+(hasScan?"🔍":"📷")+'</div>';
       var fh=it.days?fHtml(it):"",dl=getDaysLeft(it);
       var expCls=dl===null?"":dl<=0?"bad":dl<=2?"warn":"ok";
       var expTxtItem=dl===null?"Ustaw datę":dl<=0?"Przeterminowane":dl+" dni";
