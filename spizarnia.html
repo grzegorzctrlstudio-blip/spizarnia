@@ -1560,9 +1560,9 @@ function render(){
         +'<div class="prog-wrap"><div class="prog-track"><div class="prog-fill" style="width:'+pct+'%"></div></div>'
         +'<div class="prog-label">'+cur+' / '+it.target+' '+it.unit+' · '+ql+'</div></div>'
         +'<div class="qty-ctrl">'
-        +'<button class="qty-btn minus" ontouchstart="handleQty(event,\'"+ie+"\'," +(-1)+ ","+it.target+",\'"+ne+"\')" onclick="handleQty(event,\'"+ie+"\',"+(-1)+","+it.target+",\'"+ne+"\')">−</button>"
+        +'<button class="qty-btn minus" onclick="change(\'"+ie+"\',-1,"+it.target+",\'"+ne+"\',this)">−</button>'
         +'<div class="qty-num"><div class="qty-val">'+cur+'</div><div class="qty-unit">'+it.unit+'</div></div>'
-        +'<button class="qty-btn plus" ontouchstart="handleQty(event,\'"+ie+"\',1,"+it.target+",\'"+ne+"\')" onclick="handleQty(event,\'"+ie+"\',1,"+it.target+",\'"+ne+"\')">+</button>"
+        +'<button class="qty-btn plus" onclick="change(\'"+ie+"\',1,"+it.target+",\'"+ne+"\',this)">+</button>'
         +'</div></div>'
         +(expChip||scanChip?'<div class="item-chips">'+expChip+scanChip+'</div>':'')
         +'</div>';
