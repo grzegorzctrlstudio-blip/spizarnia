@@ -292,7 +292,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
   <p class="login-sub">Twój domowy asystent zakupów</p>
   <input class="name-inp" id="name-inp" placeholder="Imię" maxlength="20" onkeydown="if(event.key==='Tab'||event.key==='Enter'){event.preventDefault();document.getElementById('surname-inp').focus()}" style="margin-bottom:0">
   <input class="name-inp" id="surname-inp" placeholder="Nazwisko" maxlength="30" onkeydown="if(event.key==='Enter')doLogin()" style="margin-top:0;border-top-left-radius:0;border-top-right-radius:0;border-top:1px solid var(--border)">
-  <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:-4px">Dzięki temu rozróżnimy dwóch Grzesków 😄</p>
+  <p style="font-size:12px;color:var(--text3);text-align:center;margin-top:-4px;line-height:1.6;max-width:300px">Na podstawie Twoich danych otrzymasz spersonalizowaną dietę i listę zakupów 🥗</p>
   <button class="login-btn" onclick="doLogin()">Wchodzę →</button>
 </div>
 
@@ -1283,12 +1283,14 @@ function cls(c,t){return c>=t?"grn":c>0?"low":"red";}
 function doLogin(){
   var first=document.getElementById("name-inp").value.trim();
   var last=document.getElementById("surname-inp").value.trim();
-  if(!first){document.getElementById("name-inp").style.borderColor="var(--red)";document.getElementById("name-inp").focus();return;}
-  if(!last){document.getElementById("surname-inp").style.borderColor="var(--red)";document.getElementById("surname-inp").focus();return;}
-  userName=first+" "+last;
+  if(!first){
+    document.getElementById("name-inp").style.borderColor="var(--red)";
+    document.getElementById("name-inp").focus();
+    return;
+  }
+  userName=last ? first+" "+last : first;
   localStorage.setItem("spiz_name",userName);
-  // Display as "Grzes S." in the pill to save space
-  var displayName=first+" "+last.charAt(0).toUpperCase()+".";
+  var displayName=last ? first+" "+last.charAt(0).toUpperCase()+"." : first;
   document.getElementById("user-pill").textContent="👤 "+displayName;
   document.getElementById("login").style.display="none";
   document.getElementById("splash").style.display="flex";
@@ -1473,7 +1475,11 @@ function render(){
 // INIT
 document.getElementById("login").style.display="flex";
 var sn=localStorage.getItem("spiz_name");
-if(sn)document.getElementById("name-inp").value=sn;
+if(sn){
+  var snParts=sn.trim().split(" ");
+  document.getElementById("name-inp").value=snParts[0]||"";
+  document.getElementById("surname-inp").value=snParts.slice(1).join(" ")||"";
+}
 </script>
 </body>
 </html>
