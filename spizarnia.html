@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>🏠 PEŁNA LODÓWKA</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;-webkit-touch-callout:none}
 :root{
   --bg:#0A0A0F;--bg2:#111118;--bg3:#1A1A24;--bg4:#22222F;
   --border:#2A2A3A;--border2:#33334A;
@@ -127,11 +127,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .item.grn .prog-fill{background:linear-gradient(90deg,var(--green2),var(--green))}
 .prog-label{font-size:10px;color:var(--text3);font-weight:600}
 .qty-ctrl{display:flex;align-items:center;gap:5px}
-.qty-btn{width:36px;height:36px;border:none;border-radius:50%;font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.qty-btn:active{transform:scale(.85)}
-.item.red .qty-btn{background:#FF4D4D22;color:var(--red)}
-.item.low .qty-btn{background:#F59E0B22;color:var(--amber)}
-.item.grn .qty-btn{background:#1ED76022;color:var(--green)}
+.qty-btn{width:54px;height:54px;border:none;border-radius:10px;font-size:28px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.qty-btn:active{opacity:.7}
+.qty-btn.minus{background:#DC2626;color:#fff}
+.qty-btn.plus{background:#16A34A;color:#fff}
 .qty-num{min-width:34px;text-align:center}
 .qty-val{font-size:20px;font-weight:900;line-height:1;color:var(--text)}
 .qty-unit{font-size:9px;color:var(--text3);font-weight:600}
@@ -1456,8 +1455,24 @@ function goOffline(){
 }
 function resetAll(){dlgConfirm("🗑️","Reset lodówki","Czy na pewno zresetować wszystkie stany do zera?",function(){state=mkState();render();fbPatch(RP,state).then(function(){addLog("🗑️ RESET",0,0);});},"Resetuj","danger");}
 
+var qtyBusy={};
+function handleQty(evt,id,delta,max,name){
+  evt.preventDefault();
+  evt.stopPropagation();
+  if(qtyBusy[id])return;
+  qtyBusy[id]=true;
+  setTimeout(function(){delete qtyBusy[id];},300);
+  var o=state[id]||0,nv=Math.min(max*2,Math.max(0,o+delta));
+  if(nv===o)return;
+  state[id]=nv;render();
+  clearTimeout(saveTimer);setSyncUI("saving");
+  saveTimer=setTimeout(function(){
+    var p={};p[id]=nv;
+    fbPatch(RP,p).then(function(){addLog(name,o,nv);setSyncUI("ok");}).catch(function(){setSyncUI("err");});
+  },600);
+}
 function change(id,delta,max,name,btn){
-  if(btn){btn.disabled=true;setTimeout(function(){btn.disabled=false;},500);}
+  if(btn){btn.disabled=true;setTimeout(function(){btn.disabled=false;},300);}
   var o=state[id]||0,nv=Math.min(max*2,Math.max(0,o+delta));
   if(nv===o)return;state[id]=nv;render();
   clearTimeout(saveTimer);setSyncUI("saving");
@@ -1545,9 +1560,9 @@ function render(){
         +'<div class="prog-wrap"><div class="prog-track"><div class="prog-fill" style="width:'+pct+'%"></div></div>'
         +'<div class="prog-label">'+cur+' / '+it.target+' '+it.unit+' · '+ql+'</div></div>'
         +'<div class="qty-ctrl">'
-        +'<button class="qty-btn" onclick="change(\''+ie+"',-1,"+it.target+",'"+ne+"',this)\">−</button>"
+        +'<button class="qty-btn minus" ontouchstart="handleQty(event,\'"+ie+"\'," +(-1)+ ","+it.target+",\'"+ne+"\')" onclick="handleQty(event,\'"+ie+"\',"+(-1)+","+it.target+",\'"+ne+"\')">−</button>"
         +'<div class="qty-num"><div class="qty-val">'+cur+'</div><div class="qty-unit">'+it.unit+'</div></div>'
-        +'<button class="qty-btn" onclick="change(\''+ie+"',1,"+it.target+",'"+ne+"',this)\">+</button>"
+        +'<button class="qty-btn plus" ontouchstart="handleQty(event,\'"+ie+"\',1,"+it.target+",\'"+ne+"\')" onclick="handleQty(event,\'"+ie+"\',1,"+it.target+",\'"+ne+"\')">+</button>"
         +'</div></div>'
         +(expChip||scanChip?'<div class="item-chips">'+expChip+scanChip+'</div>':'')
         +'</div>';
