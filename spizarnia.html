@@ -101,9 +101,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .cat-section-hdr{font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);padding:14px 0 7px;display:flex;align-items:center;gap:6px;border-top:1px solid var(--border)}
 .cat-section:first-child .cat-section-hdr{border-top:none;padding-top:6px}
 .item{background:var(--bg2);border-radius:var(--radius);margin-bottom:8px;padding:13px;border:1px solid var(--border)}
-.item.red{border-color:#FF4D4D22;background:rgba(255,77,77,.04)}
-.item.grn{border-color:#1ED76022;background:rgba(30,215,96,.03)}
-.item.low{border-color:#F59E0B22;background:rgba(245,158,11,.04)}
+.item.red{border-color:#FF4D4D22;background:rgba(255,77,77,.04);border-left-color:inherit}
+.item.grn{border-color:#1ED76022;background:rgba(30,215,96,.03);border-left-color:inherit}
+.item.low{border-color:#F59E0B22;background:rgba(245,158,11,.04);border-left-color:inherit}
 .item-main{display:flex;align-items:center;gap:11px;margin-bottom:9px}
 .item-photo-thumb{width:46px;height:46px;border-radius:10px;object-fit:cover;flex-shrink:0;border:1px solid var(--border);cursor:pointer}
 .item-photo-empty{width:46px;height:46px;border-radius:10px;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;flex-shrink:0;color:var(--text3)}
@@ -275,6 +275,38 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .photo-modal-empty{width:100%;height:140px;background:var(--bg3);border-radius:var(--radius-sm);border:2px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;color:var(--text3)}
 .slot-thumb-img{width:72px;height:72px;border-radius:10px;object-fit:cover;border:2px solid var(--green);cursor:pointer;flex-shrink:0}
 .slot-del{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* ONBOARDING */
+.ob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:150;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px}
+.ob-overlay.show{display:flex}
+.ob-box{background:var(--bg2);border-radius:20px;padding:24px;width:100%;max-width:440px;border:1px solid var(--border2);margin:auto}
+.ob-logo{text-align:center;font-size:48px;margin-bottom:8px}
+.ob-title{font-size:20px;font-weight:900;color:var(--text);text-align:center;margin-bottom:4px}
+.ob-sub{font-size:12px;color:var(--text3);text-align:center;margin-bottom:20px;line-height:1.6}
+.ob-step{display:none}.ob-step.show{display:block}
+.ob-label{font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);margin-bottom:6px;margin-top:14px;display:block}
+.ob-inp{width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px 14px;font-size:16px;color:var(--text);outline:none;transition:border .2s;color-scheme:dark}
+.ob-inp:focus{border-color:var(--green)}
+.ob-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ob-opts{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.ob-opt{background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .2s}
+.ob-opt.sel{border-color:var(--green);background:rgba(30,215,96,.08)}
+.ob-opt-ico{font-size:20px}
+.ob-opt-text{flex:1}
+.ob-opt-title{font-size:13px;font-weight:700;color:var(--text)}
+.ob-opt-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.ob-result{background:var(--bg3);border-radius:12px;padding:16px;margin-top:14px;border:1px solid var(--border)}
+.ob-result-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)}
+.ob-result-row:last-child{border-bottom:none}
+.ob-result-lbl{font-size:12px;color:var(--text3)}
+.ob-result-val{font-size:14px;font-weight:800;color:var(--green)}
+.ob-progress{display:flex;gap:6px;margin-bottom:20px;justify-content:center}
+.ob-dot{width:8px;height:8px;border-radius:50%;background:var(--border2)}
+.ob-dot.act{background:var(--green)}
+.ob-nav{display:flex;gap:10px;margin-top:20px}
+.ob-next{flex:1;background:var(--green);color:#000;border:none;border-radius:50px;padding:14px;font-size:15px;font-weight:900;cursor:pointer}
+.ob-next:active{filter:brightness(.9)}
+.ob-back{background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:50px;padding:14px 18px;font-size:14px;font-weight:700;cursor:pointer}
 </style>
 </head>
 <body>
@@ -1262,6 +1294,7 @@ function buildCatChips(){
     var btn=document.createElement("button");
     btn.className="cat-chip";btn.id="chip-"+cat.id;
     btn.innerHTML='<span>'+cat.ic+'</span>'+cat.label;
+    btn.style.borderColor=cat.color||"var(--border)";
     btn.onclick=(function(id){return function(){setCatFilter(id);};})(cat.id);
     wrap.appendChild(btn);
   });
@@ -1299,6 +1332,7 @@ function doLogin(){
   localStorage.setItem("spiz_name",userName);
   var displayName=last ? first+" "+last.charAt(0).toUpperCase()+"." : first;
   document.getElementById("user-pill").textContent="👤 "+displayName;
+  setUserRoom(userName); // each user gets own room
   document.getElementById("login").style.display="none";
   document.getElementById("splash").style.display="flex";
   startApp();
@@ -1329,8 +1363,17 @@ function startApp(){
     document.getElementById("splash").style.display="none";
     document.getElementById("app").style.display="block";
     buildCatChips();
-    setStore(storePreference);
     updateShopBar();setSyncUI("ok");render();
+    // Load user profile
+    loadUserProfile(userName,function(hasProfile){
+      if(hasProfile){
+        setStore(userProfile.stores==="both"?storePreference:userProfile.stores);
+        updateAISys();
+      }else{
+        setStore(storePreference);
+        showOb(); // show onboarding for new user
+      }
+    });
     setInterval(function(){
       Promise.all([fbGet(RP),fbGet(EP),fbGet(CP),fbGet(PP)]).then(function(res){
         var r=res[0],e=res[1],k=res[2],p=res[3],ch=false;
@@ -1454,7 +1497,7 @@ function render(){
       var nm=it.n;
       if(searchQ){var si=it.n.toLowerCase().indexOf(searchQ);
         if(si>=0)nm=it.n.slice(0,si)+'<mark style="background:var(--amber);color:#000;border-radius:3px;padding:0 2px">'+it.n.slice(si,si+searchQ.length)+"</mark>"+it.n.slice(si+searchQ.length);}
-      html+='<div class="item '+c+'">'
+      html+='<div class="item '+c+'" style="border-left:5px solid '+catColor+';border-left-color:'+catColor+'">'
         +'<div class="item-main">'+photoEl
         +'<div class="item-info"><div class="item-name">'+nm+'</div>'+fh+'</div>'
         +'<div class="item-badge"><div class="item-badge-main">'+bt+'</div><div class="item-badge-sub">'+bs+'</div></div>'
@@ -1480,6 +1523,143 @@ function render(){
   body.innerHTML=html;
 }
 
+// ── USER PROFILES ─────────────────────────────────────────────────────────────
+var userProfile = null;
+var obSelections = {activity:null,goal:null,stores:null};
+var OB_STEPS = 5;
+var obCurrentStep = 0;
+
+function profileKey(name){
+  return name.toLowerCase().replace(/[^a-z0-9]/g,"_").replace(/__+/g,"_");
+}
+
+function loadUserProfile(name, onDone){
+  var key = profileKey(name);
+  fbGet(PROFILES+"/"+key).then(function(p){
+    if(p&&p.kcal){
+      userProfile=p;
+      onDone(true); // profile exists
+    }else{
+      userProfile=null;
+      onDone(false); // no profile - show onboarding
+    }
+  }).catch(function(){
+    userProfile=null;
+    onDone(false);
+  });
+}
+
+function saveUserProfile(profile){
+  var key=profileKey(userName);
+  userProfile=profile;
+  fbPut(PROFILES+"/"+key, profile);
+}
+
+function calcProfile(){
+  var age=parseInt(document.getElementById("ob-age").value)||30;
+  var weight=parseInt(document.getElementById("ob-weight").value)||75;
+  var height=parseInt(document.getElementById("ob-height").value)||175;
+  var gender=document.getElementById("ob-gender").value||"m";
+  var activity=obSelections.activity||"mod";
+  var goal=obSelections.goal||"maintain";
+  var stores=obSelections.stores||"both";
+  var exclude=document.getElementById("ob-exclude").value||"";
+  // BMR Mifflin-St Jeor
+  var bmr=gender==="m"
+    ?10*weight+6.25*height-5*age+5
+    :10*weight+6.25*height-5*age-161;
+  var actMult={sed:1.2,light:1.375,mod:1.55,active:1.725,vactive:1.9};
+  var tdee=Math.round(bmr*(actMult[activity]||1.55));
+  var goalAdj={lose:-400,maintain:0,gain:400};
+  var kcal=tdee+(goalAdj[goal]||0);
+  // Macros: high protein approach
+  var prot=Math.round(weight*2);
+  var fat=Math.round(kcal*0.27/9);
+  var carb=Math.round((kcal-prot*4-fat*9)/4);
+  return{age:age,weight:weight,height:height,gender:gender,activity:activity,goal:goal,stores:stores,exclude:exclude,kcal:kcal,prot:prot,fat:fat,carb:carb,tdee:tdee};
+}
+
+function showOb(){
+  obCurrentStep=0;obSelections={activity:null,goal:null,stores:null};
+  renderObStep();
+  document.getElementById("ob-overlay").classList.add("show");
+}
+function hideOb(){document.getElementById("ob-overlay").classList.remove("show");}
+
+function renderObStep(){
+  for(var i=0;i<OB_STEPS;i++){
+    var el=document.getElementById("ob-step-"+i);
+    if(el)el.className="ob-step"+(i===obCurrentStep?" show":"");
+  }
+  // Progress dots
+  var dots="";
+  for(var j=0;j<OB_STEPS;j++) dots+='<div class="ob-dot'+(j===obCurrentStep?" act":"")+'" ></div>';
+  document.getElementById("ob-progress").innerHTML=dots;
+  document.getElementById("ob-back-btn").style.display=obCurrentStep>0?"block":"none";
+  var nextBtn=document.getElementById("ob-next-btn");
+  nextBtn.textContent=obCurrentStep===OB_STEPS-1?"✅ Zaczynam!":"Dalej →";
+  // Update results on step 4
+  if(obCurrentStep===OB_STEPS-1){
+    var p=calcProfile();
+    var storeNames={biedronka:"🐞 Biedronka",lidl:"🏪 Lidl",both:"🛒 Oba sklepy"};
+    document.getElementById("ob-res-kcal").textContent=p.kcal+" kcal";
+    document.getElementById("ob-res-prot").textContent=p.prot+"g";
+    document.getElementById("ob-res-carb").textContent=p.carb+"g";
+    document.getElementById("ob-res-fat").textContent=p.fat+"g";
+    document.getElementById("ob-res-store").textContent=storeNames[p.stores]||p.stores;
+  }
+}
+
+function selectOpt(type, val, el){
+  obSelections[type]=val;
+  var parent=el.parentElement;
+  parent.querySelectorAll(".ob-opt").forEach(function(o){o.classList.remove("sel");});
+  el.classList.add("sel");
+}
+
+function obNext(){
+  if(obCurrentStep===0){
+    var age=document.getElementById("ob-age").value;
+    var weight=document.getElementById("ob-weight").value;
+    var height=document.getElementById("ob-height").value;
+    if(!age||!weight||!height){dlgAlert("⚠️","Uzupełnij dane","Wpisz wiek, wagę i wzrost");return;}
+  }
+  if(obCurrentStep===1&&!obSelections.activity){dlgAlert("⚠️","Wybierz aktywność","Zaznacz poziom aktywności");return;}
+  if(obCurrentStep===2&&!obSelections.goal){dlgAlert("⚠️","Wybierz cel","Zaznacz swój cel");return;}
+  if(obCurrentStep===3&&!obSelections.stores){dlgAlert("⚠️","Wybierz sklep","Zaznacz preferowany sklep");return;}
+  if(obCurrentStep===OB_STEPS-1){
+    // Save profile
+    var profile=calcProfile();
+    saveUserProfile(profile);
+    // Set store preference
+    setStore(profile.stores==="both"?"biedronka":profile.stores);
+    hideOb();
+    updateAISys();
+    return;
+  }
+  obCurrentStep++;
+  renderObStep();
+}
+function obBack(){
+  if(obCurrentStep>0){obCurrentStep--;renderObStep();}
+}
+
+function updateAISys(){
+  if(!userProfile)return;
+  var storeStr=userProfile.stores==="both"?"Biedronce i Lidlu":userProfile.stores==="lidl"?"Lidlu":"Biedronce";
+  var goalStr={lose:"redukcja tkanki tłuszczowej (deficyt kaloryczny)",maintain:"utrzymanie wagi (normokaloryczna)",gain:"budowanie masy mięśniowej (nadwyżka kaloryczna)"}[userProfile.goal]||"";
+  var excludeStr=userProfile.exclude?"Wykluczenia/alergie: "+userProfile.exclude+". ":"Brak wykluczeń. ";
+  SYS="Jestes agentem kulinarnym uzytkownika "+userName+". "+
+    "PROFIL UZYTKOWNIKA: wiek "+userProfile.age+"l, waga "+userProfile.weight+"kg, wzrost "+userProfile.height+"cm. "+
+    "CEL: "+goalStr+". "+
+    "ZAPOTRZEBOWANIE: "+userProfile.kcal+" kcal/dzien. "+
+    "MAKRO: bialko "+userProfile.prot+"g, weglowodany "+userProfile.carb+"g, tluszcze "+userProfile.fat+"g. "+
+    "SKLEPY: kupuje w "+storeStr+". "+
+    excludeStr+
+    "Odpowiadaj po polsku. Przy przepisie podaj: nazwe, skladniki z gramatura (produkty z "+storeStr+"), krotki przepis i makro (kcal/B/W/T). "+
+    "Proponuj 3 posilki dziennie: sniadanie ok "+(Math.round(userProfile.kcal*0.33))+" kcal, obiad ok "+(Math.round(userProfile.kcal*0.35))+" kcal, kolacja ok "+(Math.round(userProfile.kcal*0.32))+" kcal.";
+}
+
 // INIT
 document.getElementById("login").style.display="flex";
 var sn=localStorage.getItem("spiz_name");
@@ -1489,5 +1669,94 @@ if(sn){
   document.getElementById("surname-inp").value=snParts.slice(1).join(" ")||"";
 }
 </script>
+<!-- ONBOARDING MODAL -->
+<div class="ob-overlay" id="ob-overlay">
+  <div class="ob-box">
+    <div class="ob-logo">🏠</div>
+    <div class="ob-title">Witaj w PEŁNEJ LODÓWCE</div>
+    <p class="ob-sub" id="ob-sub">Odpowiedz na kilka pytań — dobierzemy dla Ciebie idealną dietę i listę zakupów</p>
+    <div class="ob-progress" id="ob-progress"></div>
+
+    <!-- STEP 1: basic info -->
+    <div class="ob-step show" id="ob-step-0">
+      <div class="ob-row">
+        <div>
+          <label class="ob-label">Wiek</label>
+          <input class="ob-inp" id="ob-age" type="number" placeholder="np. 30" min="15" max="80">
+        </div>
+        <div>
+          <label class="ob-label">Waga (kg)</label>
+          <input class="ob-inp" id="ob-weight" type="number" placeholder="np. 80" min="40" max="200">
+        </div>
+      </div>
+      <div class="ob-row" style="margin-top:10px">
+        <div>
+          <label class="ob-label">Wzrost (cm)</label>
+          <input class="ob-inp" id="ob-height" type="number" placeholder="np. 180" min="140" max="220">
+        </div>
+        <div>
+          <label class="ob-label">Płeć</label>
+          <select class="ob-inp" id="ob-gender">
+            <option value="m">Mężczyzna</option>
+            <option value="f">Kobieta</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: activity -->
+    <div class="ob-step" id="ob-step-1">
+      <label class="ob-label" style="margin-top:0">Poziom aktywności fizycznej</label>
+      <div class="ob-opts" id="ob-activity-opts">
+        <div class="ob-opt" onclick="selectOpt('activity','sed',this)"><span class="ob-opt-ico">🛋️</span><div class="ob-opt-text"><div class="ob-opt-title">Siedzący tryb życia</div><div class="ob-opt-sub">Praca biurowa, brak sportu</div></div></div>
+        <div class="ob-opt" onclick="selectOpt('activity','light',this)"><span class="ob-opt-ico">🚶</span><div class="ob-opt-text"><div class="ob-opt-title">Lekka aktywność</div><div class="ob-opt-sub">Sport 1-2× w tygodniu</div></div></div>
+        <div class="ob-opt" onclick="selectOpt('activity','mod',this)"><span class="ob-opt-ico">🏃</span><div class="ob-opt-text"><div class="ob-opt-title">Umiarkowana aktywność</div><div class="ob-opt-sub">Sport 3-5× w tygodniu</div></div></div>
+        <div class="ob-opt" onclick="selectOpt('activity','active',this)"><span class="ob-opt-ico">💪</span><div class="ob-opt-text"><div class="ob-opt-title">Wysoka aktywność</div><div class="ob-opt-sub">Ciężki trening 6-7× w tygodniu</div></div></div>
+        <div class="ob-opt" onclick="selectOpt('activity','vactive',this)"><span class="ob-opt-ico">🏋️</span><div class="ob-opt-text"><div class="ob-opt-title">Bardzo wysoka</div><div class="ob-opt-sub">Praca fizyczna + intensywny trening</div></div></div>
+      </div>
+    </div>
+
+    <!-- STEP 3: goal -->
+    <div class="ob-step" id="ob-step-2">
+      <label class="ob-label" style="margin-top:0">Twój cel</label>
+      <div class="ob-opts">
+        <div class="ob-opt" onclick="selectOpt('goal','lose',this)"><span class="ob-opt-ico">📉</span><div class="ob-opt-text"><div class="ob-opt-title">Redukcja tkanki tłuszczowej</div><div class="ob-opt-sub">Deficyt kaloryczny -400 kcal</div></div></div>
+        <div class="ob-opt" onclick="selectOpt('goal','maintain',this)"><span class="ob-opt-ico">⚖️</span><div class="ob-opt-text"><div class="ob-opt-title">Utrzymanie wagi</div><div class="ob-opt-sub">Dieta normokaloryczna</div></div></div>
+        <div class="ob-opt" onclick="selectOpt('goal','gain',this)"><span class="ob-opt-ico">💪</span><div class="ob-opt-text"><div class="ob-opt-title">Budowanie masy mięśniowej</div><div class="ob-opt-sub">Nadwyżka kaloryczna +400 kcal</div></div></div>
+      </div>
+    </div>
+
+    <!-- STEP 4: stores -->
+    <div class="ob-step" id="ob-step-3">
+      <label class="ob-label" style="margin-top:0">Gdzie robisz zakupy?</label>
+      <div class="ob-opts">
+        <div class="ob-opt" onclick="selectOpt('stores','biedronka',this)"><span class="ob-opt-ico">🐞</span><div class="ob-opt-text"><div class="ob-opt-title">Biedronka</div><div class="ob-opt-sub">Głównie produkty z Biedronki</div></div></div>
+        <div class="ob-opt" onclick="selectOpt('stores','lidl',this)"><span class="ob-opt-ico">🏪</span><div class="ob-opt-text"><div class="ob-opt-title">Lidl</div><div class="ob-opt-sub">Głównie produkty z Lidla</div></div></div>
+        <div class="ob-opt" onclick="selectOpt('stores','both',this)"><span class="ob-opt-ico">🛒</span><div class="ob-opt-text"><div class="ob-opt-title">Oba sklepy</div><div class="ob-opt-sub">Robię zakupy w obu sklepach</div></div></div>
+      </div>
+      <label class="ob-label">Alergie / wykluczenia (opcjonalnie)</label>
+      <input class="ob-inp" id="ob-exclude" placeholder="np. laktoza, orzechy, ryby...">
+    </div>
+
+    <!-- STEP 5: results -->
+    <div class="ob-step" id="ob-step-4">
+      <p style="font-size:13px;color:var(--text2);margin-bottom:10px">Na podstawie Twoich danych obliczono:</p>
+      <div class="ob-result">
+        <div class="ob-result-row"><span class="ob-result-lbl">🔥 Zapotrzebowanie kaloryczne</span><span class="ob-result-val" id="ob-res-kcal">—</span></div>
+        <div class="ob-result-row"><span class="ob-result-lbl">🥩 Białko</span><span class="ob-result-val" id="ob-res-prot">—</span></div>
+        <div class="ob-result-row"><span class="ob-result-lbl">🌾 Węglowodany</span><span class="ob-result-val" id="ob-res-carb">—</span></div>
+        <div class="ob-result-row"><span class="ob-result-lbl">🥑 Tłuszcze</span><span class="ob-result-val" id="ob-res-fat">—</span></div>
+        <div class="ob-result-row"><span class="ob-result-lbl">🛒 Sklep</span><span class="ob-result-val" id="ob-res-store">—</span></div>
+      </div>
+      <p style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.6">Agent AI będzie dobierał posiłki i listę zakupów na podstawie tych danych. Możesz je zmienić w ustawieniach.</p>
+    </div>
+
+    <div class="ob-nav">
+      <button class="ob-back" id="ob-back-btn" style="display:none" onclick="obBack()">← Wróć</button>
+      <button class="ob-next" id="ob-next-btn" onclick="obNext()">Dalej →</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
