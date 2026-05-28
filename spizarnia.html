@@ -868,9 +868,13 @@ function applyScan(){
   var iso=parts[2]+"-"+parts[1]+"-"+parts[0];
   closeScanner();
   if(scanFromExpiry&&expiryItem){
-    document.getElementById("exp-overlay").classList.add("show");
-    setTimeout(function(){document.getElementById("exp-date-inp").value=iso;},50);
+    // Save directly — skip confirmation modal
+    var ts=new Date(iso).getTime(),ek=fbk("e",expiryItem),p={};
+    expiry[ek]=ts;p[ek]=ts;
+    fbPatch(EP,p).then(function(){render();});
+    dlgAlert("✅","Data zapisana",expiryItem+"\n📅 "+scanData.data);
     scanFromExpiry=false;
+    expiryItem=null;
   }else{
     var name=scanData.produkt||"",found=null;
     CATS.forEach(function(cat){cat.items.forEach(function(it){
@@ -1015,14 +1019,17 @@ function handleProductPhoto(input){
   reader.onload=function(e){
     compressPhoto(e.target.result,function(compressed){
       var key=fbk("p",photoItem),p={};photos[key]=compressed;p[key]=compressed;
-      fbPatch(PP,p).then(function(){
-        document.getElementById("photo-modal-img").src=compressed;
-        document.getElementById("photo-modal-img").style.display="block";
-        document.getElementById("photo-modal-placeholder").style.display="none";
-        document.getElementById("photo-delete-btn").style.display="block";
-        render();
-      }).catch(function(err){
-        dlgAlert("❌","Błąd zapisu","Nie udało się zapisać zdjęcia: "+err.message);
+      // Show photo immediately (don't wait for Firebase)
+      document.getElementById("photo-modal-img").src=compressed;
+      document.getElementById("photo-modal-img").style.display="block";
+      document.getElementById("photo-modal-placeholder").style.display="none";
+      document.getElementById("photo-delete-btn").style.display="block";
+      // Save to localStorage backup cache
+      try{localStorage.setItem("photo_"+key, compressed);}catch(e){}
+      render(); // show thumbnail immediately
+      // Then save to Firebase
+      fbPatch(PP,p).catch(function(err){
+        console.error("Photo save error:", err);
       });
     });
   };
@@ -1030,6 +1037,7 @@ function handleProductPhoto(input){
 }
 function deleteProductPhoto(){
   var key=fbk("p",photoItem),p={};delete photos[key];p[key]=null;
+  try{localStorage.removeItem("photo_"+key);}catch(e){}
   fbPatch(PP,p).then(function(){
     document.getElementById("photo-modal-img").style.display="none";
     document.getElementById("photo-modal-placeholder").style.display="flex";
@@ -1232,7 +1240,19 @@ function startApp(){
       if(k==="__shopTs")shopTs=remote[k];
     });}else fbPatch(RP,state);
     expiry={};if(exp)Object.keys(exp).forEach(function(k){if(exp[k])expiry[k]=exp[k];});
-    photos={};if(ph)Object.keys(ph).forEach(function(k){if(ph[k])photos[k]=ph[k];});
+    photos={};
+    // Load from localStorage cache first (instant, no network)
+    try{
+      for(var i=0;i<localStorage.length;i++){
+        var lk=localStorage.key(i);
+        if(lk&&lk.startsWith("photo_")){
+          var fk=lk.replace("photo_","");
+          photos[fk]=localStorage.getItem(lk);
+        }
+      }
+    }catch(e){}
+    // Then overlay with Firebase data
+    if(ph)Object.keys(ph).forEach(function(k){if(ph[k])photos[k]=ph[k];});
     document.getElementById("splash").style.display="none";
     document.getElementById("app").style.display="block";
     buildCatChips();
@@ -1247,10 +1267,15 @@ function startApp(){
           if(key2==="__shopTs"&&r[key2]!==shopTs){shopTs=r[key2];updateShopBar();ch=true;}
         });}
         expiry={};if(e)Object.keys(e).forEach(function(key2){if(e[key2])expiry[key2]=e[key2];});
-        var oldPhotoKeys=Object.keys(photos).join(",");
-        photos={};if(p)Object.keys(p).forEach(function(key2){if(p[key2])photos[key2]=p[key2];});
-        var newPhotoKeys=Object.keys(photos).join(",");
-        if(ch||oldPhotoKeys!==newPhotoKeys)render();setSyncUI("ok");
+        // Only update photos if Firebase returned actual data (don't wipe local cache on null)
+        if(p){
+          var oldPhotoKeys=Object.keys(photos).join(",");
+          photos={};
+          Object.keys(p).forEach(function(key2){if(p[key2])photos[key2]=p[key2];});
+          var newPhotoKeys=Object.keys(photos).join(",");
+          if(ch||oldPhotoKeys!==newPhotoKeys)render();
+        }else if(ch)render();
+        setSyncUI("ok");
       }).catch(function(){setSyncUI("err");});
     },3000);
   }).catch(function(e){
@@ -1260,7 +1285,19 @@ function startApp(){
       "<button onclick='goOffline()' style='background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:50px;padding:10px 20px;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px'>Bez synchronizacji</button>";
   });
 }
-function goOffline(){state=mkState();document.getElementById("splash").style.display="none";document.getElementById("app").style.display="block";buildCatChips();setStore(storePreference);setSyncUI("err");render();}
+function goOffline(){
+  state=mkState();
+  // Load photos from localStorage
+  try{
+    for(var i=0;i<localStorage.length;i++){
+      var lk=localStorage.key(i);
+      if(lk&&lk.startsWith("photo_")){photos[lk.replace("photo_","")]=localStorage.getItem(lk);}
+    }
+  }catch(e){}
+  document.getElementById("splash").style.display="none";
+  document.getElementById("app").style.display="block";
+  buildCatChips();setStore(storePreference);setSyncUI("err");render();
+}
 function resetAll(){dlgConfirm("🗑️","Reset lodówki","Czy na pewno zresetować wszystkie stany do zera?",function(){state=mkState();render();fbPatch(RP,state).then(function(){addLog("🗑️ RESET",0,0);});},"Resetuj","danger");}
 
 function change(id,delta,max,name,btn){
