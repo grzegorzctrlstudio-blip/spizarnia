@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>🏠 Pełna Lodówka</title>
+<title>🏠 PEŁNA LODÓWKA</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 :root{
@@ -238,6 +238,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .stores-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
 .store-card{border:none;border-radius:var(--radius);padding:16px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:transform .15s,filter .15s}
 .store-card:active{transform:scale(.95);filter:brightness(.9)}
+.store-toggle{display:flex;gap:0;margin-bottom:16px;background:var(--bg3);border-radius:50px;padding:4px;border:1px solid var(--border)}
+.store-toggle-btn{flex:1;padding:10px;border-radius:50px;border:none;font-size:13px;font-weight:800;cursor:pointer;transition:all .2s;color:var(--text3);background:transparent}
+.store-toggle-btn.act{background:var(--green);color:#000}
 .store-card-ico{font-size:28px}
 .store-card-name{font-size:13px;font-weight:800;color:#fff}
 .store-card-sub{font-size:10px;color:rgba(255,255,255,.65)}
@@ -347,14 +350,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 
 <div id="splash" style="display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;min-height:100vh;background:radial-gradient(ellipse at 50% 0%,#1a1a2e,var(--bg))">
   <div class="splash-logo">🏠</div>
-  <div class="splash-name">Pełna Lodówka</div>
+  <div class="splash-name">PEŁNA LODÓWKA</div>
   <div class="spin" style="margin-top:8px"></div>
   <p class="splash-sub" id="splash-lbl">Łączenie z bazą danych...</p>
 </div>
 
 <div id="login" style="display:flex">
   <div class="login-logo">🏠</div>
-  <div class="login-title">Pełna Lodówka</div>
+  <div class="login-title">PEŁNA LODÓWKA</div>
   <p class="login-sub">Twój domowy asystent zakupów</p>
   <input class="name-inp" id="name-inp" placeholder="Jak masz na imię?" maxlength="20" onkeydown="if(event.key==='Enter')doLogin()">
   <button class="login-btn" onclick="doLogin()">Wchodzę →</button>
@@ -368,7 +371,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
       <div class="hdr-top">
         <div class="hdr-brand">
           <span class="hdr-logo">🏠</span>
-          <span class="hdr-title">Pełna Lodówka</span>
+          <span class="hdr-title">PEŁNA LODÓWKA</span>
           <div class="sync-dot" id="sdot"></div>
         </div>
         <div class="hdr-right">
@@ -404,7 +407,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
           <span class="action-btn-ico">🛍️</span>Byłem w sklepie
         </button>
         <button class="action-btn expiry-alert" id="exp-alert-btn" onclick="setFilter(filter==='exp'?'all':'exp')">
-          <span class="action-btn-ico">⏰</span><span id="exp-alert-txt">Koniec ważności</span>
+          <span class="action-btn-ico">⏰</span><span id="exp-alert-txt">Data ważności</span>
         </button>
       </div>
 
@@ -469,6 +472,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
     </div>
     <div class="shop-body">
       <div style="font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:10px">🛍️ Zamów online</div>
+      <!-- STORE SELECTOR -->
+      <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px">Generuj listę zakupów dla:</div>
+      <div class="store-toggle" style="margin-bottom:14px">
+        <button class="store-toggle-btn act" id="stg-biedronka" onclick="setStorePreference('biedronka')">🐞 Biedronka</button>
+        <button class="store-toggle-btn" id="stg-lidl" onclick="setStorePreference('lidl')">🏪 Lidl</button>
+      </div>
       <div class="stores-grid">
         <button class="store-card" onclick="openStore('biedronka')" style="background:linear-gradient(135deg,#DC2626,#991B1B)">
           <span class="store-card-ico">🐞</span>
@@ -531,8 +540,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
     <p id="exp-name" style="color:var(--text2);margin-bottom:12px"></p>
     <input type="date" class="modal-inp" id="exp-date-inp">
     <div class="modal-btns" style="margin-bottom:8px">
-      <button class="mbtn blue" onclick="openScannerFromExpiry()">🔍 Skanuj</button>
-      <button class="mbtn ok" onclick="saveExpiry()">✅ Zapisz</button>
+      <button class="mbtn ok" onclick="saveExpiry()" style="flex:2">✅ Zapisz datę</button>
     </div>
     <div class="modal-btns">
       <button class="mbtn del" onclick="clearExpiry()">🗑️ Usuń datę</button>
@@ -1038,7 +1046,10 @@ function handleReceiptPhoto(input){
     document.getElementById("receipt-scan-result").style.display="none";
     var b64=e.target.result.split(",")[1],mime=input.files[0].type||"image/jpeg";
     var allProducts=[]; CATS.forEach(function(c){c.items.forEach(function(it){allProducts.push(it.n);});});
-    var prompt="To paragon z Biedronki. Lista produktow w lodowce:\n"+allProducts.join(", ")+"\n\nOdpowiedz TYLKO JSON:\n{\"produkty\":[{\"nazwa_z_paragonu\":\"oryg\",\"dopasowanie\":\"nazwa z listy lub null\",\"ilosc\":1}]}";
+    var prompt="Przeanalizuj ten paragon. Wyciagnij: nazwe sklepu, date zakupu i liste produktow spozywczych.\n"+
+      "Lista produktow ktore sledze w lodowce:\n"+allProducts.join(", ")+"\n\n"+
+      "Odpowiedz TYLKO JSON bez markdown:\n"+
+      "{\"sklep\":\"nazwa sklepu\",\"data_zakupu\":\"DD.MM.YYYY lub null\",\"produkty\":[{\"nazwa_z_paragonu\":\"oryg\",\"dopasowanie\":\"nazwa z listy lub null jesli nie pasuje\",\"ilosc\":1}]}";
     callAPI([{role:"user",content:[
       {type:"image",source:{type:"base64",media_type:mime,data:b64}},
       {type:"text",text:prompt}
@@ -1046,7 +1057,17 @@ function handleReceiptPhoto(input){
       document.getElementById("receipt-loading").style.display="none";
       try{
         var parsed=JSON.parse(txt.replace(/```json|```/g,"").trim());
-        receiptData=parsed.produkty||[]; closeReceiptModal(); showReceiptResults();
+        receiptData=parsed.produkty||[];
+        receiptMeta={sklep:parsed.sklep||null,data_zakupu:parsed.data_zakupu||null};
+        // If receipt has purchase date, use it as shopTs
+        if(parsed.data_zakupu&&parsed.data_zakupu!=="null"){
+          var parts=parsed.data_zakupu.split(".");
+          if(parts.length===3){
+            var ts=new Date(parts[2]+"-"+parts[1]+"-"+parts[0]).getTime();
+            if(!isNaN(ts)){shopTs=ts;}
+          }
+        }
+        closeReceiptModal(); showReceiptResults();
       }catch(e){
         document.getElementById("receipt-result-txt").textContent="Błąd: "+e.message;
         document.getElementById("receipt-scan-result").style.display="block";
@@ -1059,11 +1080,22 @@ function handleReceiptPhoto(input){
   };
   reader.readAsDataURL(input.files[0]);
 }
+var receiptMeta = {sklep: null, data_zakupu: null};
+
 function showReceiptResults(){
   if(!receiptData||!receiptData.length) return;
   showPage("shop");
-  document.getElementById("receipt-results").style.display="block";
-  document.getElementById("receipt-items").innerHTML=receiptData.map(function(p){
+  var container = document.getElementById("receipt-results");
+  container.style.display="block";
+  // Show store and date info
+  var metaHtml = '';
+  if(receiptMeta.sklep||receiptMeta.data_zakupu){
+    metaHtml = '<div style="background:var(--bg4);border-radius:10px;padding:10px 12px;margin-bottom:12px;border:1px solid var(--border)">';
+    if(receiptMeta.sklep) metaHtml+='<div style="font-size:12px;font-weight:800;color:var(--text)">🏪 '+receiptMeta.sklep+'</div>';
+    if(receiptMeta.data_zakupu) metaHtml+='<div style="font-size:11px;color:var(--green);margin-top:3px">📅 Data zakupu: '+receiptMeta.data_zakupu+' — daty ważności liczone od tej daty</div>';
+    metaHtml+='</div>';
+  }
+  document.getElementById("receipt-items").innerHTML=metaHtml+receiptData.map(function(p){
     var m=p.dopasowanie&&p.dopasowanie!=="null";
     return '<div class="rp-item"><div class="rp-info"><div class="rp-name">'+p.nazwa_z_paragonu+'</div>'+(m?'<div class="rp-mapped">→ '+p.dopasowanie+'</div>':'<div class="rp-skip">Nie dopasowano</div>')+'</div><div class="rp-qty">×'+(p.ilosc||1)+'</div></div>';
   }).join("");
@@ -1081,11 +1113,18 @@ function applyReceipt(){
     });});
   });
   if(Object.keys(patch).length){
-    shopTs=Date.now(); patch.__shopTs=shopTs;
+    // Use receipt date if available, otherwise today
+    if(!patch.__shopTs) { patch.__shopTs = shopTs || Date.now(); shopTs = patch.__shopTs; }
     fbPatch(RP,patch).then(function(){addLog("🧾 PARAGON",0,Object.keys(patch).length);});
     updateShopBar(); render();
     document.getElementById("receipt-results").style.display="none";
-    dlgAlert("✅","Lodówka zaktualizowana","Dodano: "+updated.join(", "));
+    var info="";
+    if(receiptMeta.sklep) info+="
+Sklep: "+receiptMeta.sklep;
+    if(receiptMeta.data_zakupu) info+="
+Data zakupu: "+receiptMeta.data_zakupu+"
+Daty ważności liczone od tej daty ✓";
+    dlgAlert("✅","Lodówka zaktualizowana","Dodano: "+updated.join(", ")+info);
   }else dlgAlert("⚠️","Brak dopasowań","Nie znaleziono produktów z paragonu w lodówce.");
 }
 
@@ -1165,7 +1204,7 @@ function copyShopList(silent){
     });});
   }
   if(!items.length){if(!silent) dlgAlert("📋","Brak produktów","Wygeneruj najpierw listę AI");return false;}
-  var text="Pełna Lodówka — Lista zakupów\n"+new Date().toLocaleDateString("pl-PL")+"\n\n"+items.join("\n");
+  var text="PEŁNA LODÓWKA — Lista zakupów\n"+new Date().toLocaleDateString("pl-PL")+"\n\n"+items.join("\n");
   navigator.clipboard.writeText(text)
     .then(function(){if(!silent) dlgAlert("📋","Skopiowano!",items.length+" produktów skopiowanych do schowka.");})
     .catch(function(){
@@ -1177,6 +1216,14 @@ function copyShopList(silent){
 }
 
 // ── CHAT ──────────────────────────────────────────────────────────────────────
+var storePreference = localStorage.getItem('spiz_store') || 'biedronka';
+function setStorePreference(store) {
+  storePreference = store;
+  localStorage.setItem('spiz_store', store);
+  document.getElementById('stg-biedronka').classList[store==='biedronka'?'add':'remove']('act');
+  document.getElementById('stg-lidl').classList[store==='lidl'?'add':'remove']('act');
+}
+
 var SYS="Jestes agentem kulinarnym Grzegorza. DIETA: 3060 kcal/dzien, 244g bialka, 281g weglowodanow, 107g tluszczu. Kupuje w Biedronce. Nie je ryb poza lososiem wedzonym. MAKRO POSILKOW: sniadania ok 1030kcal/95B/98W/31T, obiady ok 1060kcal/54B/101W/44T, kolacje ok 985kcal/95B/82W/31T. Przyklady dan: jajka nadziewane, salatka z tunczykiem, ryz z serkiem, gulasz z ciecierzyca, kotleciki jaglane, salatka z lososiem, omlet piernikowy, koktajl bananowy, dorsz z ziemniakami, pizza z patelni, owsianka cynamonowa. Zamienniki: jogurt 2% zamiast smetany, bataty zamiast ziemniakow, mleko 0.5%, ketchup Slodka Ania, wedliny min 97% miesa. Odpowiadaj po polsku. Przy przepisie podaj: nazwe, skladniki z gramatura, krotki przepis i makro (kcal/B/W/T).";
 
 function addWelcome(){
@@ -1234,7 +1281,7 @@ function generateShopList(){
     if(cur<it.target) missing.push(it.n+"(mam:"+cur+",potrzeba:"+it.target+" "+it.unit+")");
     var d=getDaysLeft(it); if(d!==null&&d<=3&&cur>0) expiring.push(it.n+"("+d+"dni)");
   });});
-  var prompt="Stworz liste zakupow do Biedronki.\nBraki: "+missing.join("; ")+"\nWygasaja: "+(expiring.join("; ")||"nic")+"\n\nOdpowiedz TYLKO JSON:\n{\"komentarz\":\"krotka uwaga\",\"produkty\":[{\"nazwa\":\"...\",\"ilosc\":\"...\",\"priorytet\":\"wysoki/sredni/niski\",\"powod\":\"...\"}]}";
+  var prompt="Stworz liste zakupow do "+storePreference.charAt(0).toUpperCase()+storePreference.slice(1)+".\nBraki: "+missing.join("; ")+"\nWygasaja: "+(expiring.join("; ")||"nic")+"\n\nOdpowiedz TYLKO JSON:\n{\"komentarz\":\"krotka uwaga\",\"produkty\":[{\"nazwa\":\"...\",\"ilosc\":\"...\",\"priorytet\":\"wysoki/sredni/niski\",\"powod\":\"...\"}]}";
   callAPI([{role:"user",content:prompt}],SYS,function(result){
     btn.disabled=false; spin.style.display="none"; txt.textContent="🔄 Odśwież listę";
     try{renderShopList(JSON.parse(result.replace(/```json|```/g,"").trim()));}
@@ -1415,7 +1462,10 @@ function render(){
     });
     if(!vis.length) return;
     any=true;
-    html+='<div class="cat-section"><div class="cat-section-hdr"><span>'+cat.ic+'</span>'+cat.label+'</div>';
+    var catTotal=cat.items.length;
+      var catMissing=cat.items.filter(function(it){return (state[fbk(cat.id,it.n)]||0)<it.target;}).length;
+      var catSub=catMissing>0?'<span style="font-size:10px;color:var(--red);margin-left:6px;font-weight:700">brakuje '+catMissing+'</span>':'<span style="font-size:10px;color:var(--green);margin-left:6px">✓ komplet</span>';
+      html+='<div class="cat-section"><div class="cat-section-hdr"><span>'+cat.ic+'</span>'+cat.label+catSub+'</div>';
     vis.forEach(function(it){
       var id=fbk(cat.id,it.n),ie=id.replace(/'/g,"\\'"),ne=it.n.replace(/'/g,"\\'");
       var cur=state[id]||0,c=cls(cur,it.target);
@@ -1482,14 +1532,14 @@ function render(){
   if(expBtn){
     if(expCount>0){
       expBtn.classList.add("has-expiry");
-      expTxt.textContent="Kończy się ("+expCount+")";
+      expTxt.textContent="Data ważności ("+expCount+")";
       // Add badge
       var badge=expBtn.querySelector(".exp-count-badge");
       if(!badge){badge=document.createElement("div");badge.className="exp-count-badge";expBtn.appendChild(badge);}
       badge.textContent=expCount;
     }else{
       expBtn.classList.remove("has-expiry");
-      expTxt.textContent="Koniec ważności";
+      expTxt.textContent="Data ważności";
       var badge2=expBtn.querySelector(".exp-count-badge");
       if(badge2)badge2.remove();
     }
@@ -1501,6 +1551,9 @@ function render(){
 document.getElementById("login").style.display="flex";
 var sn=localStorage.getItem("spiz_name");
 if(sn) document.getElementById("name-inp").value=sn;
+// Init store preference
+var _sp=localStorage.getItem('spiz_store')||'biedronka';
+document.addEventListener('DOMContentLoaded',function(){setStorePreference(_sp);});
 </script>
 </body>
 </html>
