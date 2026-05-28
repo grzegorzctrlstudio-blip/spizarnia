@@ -49,6 +49,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .icon-btn{width:34px;height:34px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px}
 .icon-btn:active{background:var(--bg4)}
 .stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.unified-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:7px;margin-bottom:12px}
+.unified-row .stat-card{margin:0}
 .stat-card{background:var(--bg3);border-radius:var(--radius);padding:12px 10px;text-align:center;border:1px solid var(--border);position:relative;overflow:hidden;cursor:pointer}
 .stat-card:active{filter:brightness(1.1)}
 .stat-card.red{border-color:#FF4D4D33}.stat-card.red .stat-n{color:var(--red)}.stat-card.red .stat-label{color:var(--red)}
@@ -65,6 +67,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .action-btn.expiry-alert{background:var(--bg3);color:var(--amber);border:2px solid var(--amber);position:relative}
 .action-btn.expiry-alert.has-expiry{background:rgba(245,158,11,.1);animation:pulseBorder 2s infinite}
 .action-btn.expiry-alert.active-filter{background:rgba(245,158,11,.2)}
+.action-card{background:var(--bg3);border-radius:var(--radius);padding:10px 6px;text-align:center;border:1px solid var(--border);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;transition:filter .15s;position:relative}
+.action-card:active{filter:brightness(.9)}
+.action-card.primary{background:linear-gradient(135deg,var(--green2),var(--green));border-color:var(--green)}
+.action-card.expiry-alert{border:2px solid var(--amber);color:var(--amber)}
+.action-card.expiry-alert.has-expiry{background:rgba(245,158,11,.08);animation:pulseBorder 2s infinite}
+.action-card.expiry-alert.active-filter{background:rgba(245,158,11,.18)}
+.action-card-ico{font-size:18px;line-height:1}
+.action-card-lbl{font-size:9px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;line-height:1.3}
+.action-card.primary .action-card-lbl{color:#000}
+.action-card.expiry-alert .action-card-lbl{color:var(--amber)}
 @keyframes pulseBorder{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.4)}50%{box-shadow:0 0 0 6px rgba(245,158,11,0)}}
 .exp-badge{position:absolute;top:-7px;right:-7px;background:var(--red);color:#fff;border-radius:50%;width:20px;height:20px;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center}
 .date-mini{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:8px 12px;background:var(--bg3);border-radius:var(--radius-sm);border:1px solid var(--border)}
@@ -259,6 +271,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .dlg-btn.danger{background:var(--red);color:#fff}
 .photo-modal-img{width:100%;border-radius:var(--radius-sm);max-height:240px;object-fit:cover;margin-bottom:12px;display:none;border:1px solid var(--border)}
 .photo-modal-empty{width:100%;height:140px;background:var(--bg3);border-radius:var(--radius-sm);border:2px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;color:var(--text3)}
+.slot-thumb-img{width:72px;height:72px;border-radius:10px;object-fit:cover;border:2px solid var(--green);cursor:pointer;flex-shrink:0}
+.slot-del{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 </style>
 </head>
 <body>
@@ -295,7 +309,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
           <div class="icon-btn" onclick="resetAll()">🗑️</div>
         </div>
       </div>
-      <div class="stats-row">
+      <div class="unified-row">
         <div class="stat-card red" id="stat-red" onclick="toggleFilter('red')" title="Filtruj brakujące">
           <div class="stat-icon">🛒</div>
           <div class="stat-n" id="n-red">0</div>
@@ -311,13 +325,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
           <div class="stat-n" id="n-all">0</div>
           <div class="stat-label">Pozycji</div>
         </div>
-      </div>
-      <div class="actions-bar">
-        <button class="action-btn primary" onclick="openShopModal()">
-          <span style="font-size:16px">🛍️</span>Byłem w sklepie
+        <button class="action-card primary" onclick="openShopModal()">
+          <span class="action-card-ico">🛍️</span>
+          <span class="action-card-lbl">Byłem<br>w sklepie</span>
         </button>
-        <button class="action-btn expiry-alert" id="exp-alert-btn" onclick="toggleFilter('exp')">
-          <span style="font-size:16px">⏰</span><span id="exp-alert-txt">Data ważności</span>
+        <button class="action-card expiry-alert" id="exp-alert-btn" onclick="toggleFilter('exp')">
+          <span class="action-card-ico">⏰</span>
+          <span class="action-card-lbl" id="exp-alert-txt">Data<br>ważności</span>
         </button>
       </div>
       <div class="date-mini">
@@ -483,14 +497,36 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 <!-- PHOTO MODAL -->
 <div class="overlay" id="photo-overlay" onclick="if(event.target===this)closePhoto()">
   <div class="modal">
-    <h3>📷 Zdjęcie produktu</h3>
-    <p id="photo-modal-name" style="color:var(--text2);margin-bottom:12px"></p>
-    <img class="photo-modal-img" id="photo-modal-img" alt="">
-    <div class="photo-modal-empty" id="photo-modal-placeholder"><span style="font-size:38px">📷</span><span style="font-size:12px;font-weight:600">Brak zdjęcia</span></div>
-    <div class="modal-btns" style="margin-bottom:8px">
-      <button class="mbtn blue" onclick="triggerProductPhoto()">📷 Zrób zdjęcie</button>
-      <button class="mbtn del" id="photo-delete-btn" style="display:none" onclick="deleteProductPhoto()">🗑️ Usuń</button>
+    <h3>📷 Zdjęcia produktu</h3>
+    <p id="photo-modal-name" style="color:var(--text2);margin-bottom:14px;font-weight:700"></p>
+
+    <!-- SLOT 0: data ważności -->
+    <div style="margin-bottom:14px">
+      <div style="font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:6px">📅 Zdjęcie daty ważności (wieczko/etykieta)</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div id="slot0-thumb" onclick="openSlot(0)" style="width:72px;height:72px;border-radius:10px;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:var(--text3);font-size:11px;gap:3px"><span style="font-size:24px">📅</span>Dodaj</div>
+        <div style="flex:1;font-size:11px;color:var(--text3);line-height:1.6">Zrób zdjęcie miejsca gdzie widać datę ważności — wieczko, spód opakowania lub boczna etykieta.</div>
+      </div>
     </div>
+
+    <!-- SLOT 1: etykieta produktu -->
+    <div style="margin-bottom:14px">
+      <div style="font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:6px">🏷️ Zdjęcie etykiety / opakowania</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div id="slot1-thumb" onclick="openSlot(1)" style="width:72px;height:72px;border-radius:10px;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:var(--text3);font-size:11px;gap:3px"><span style="font-size:24px">🏷️</span>Dodaj</div>
+        <div style="flex:1;font-size:11px;color:var(--text3);line-height:1.6">Zrób zdjęcie całego opakowania lub etykiety z nazwą produktu — pomocne gdy nie widać co to.</div>
+      </div>
+    </div>
+
+    <!-- SLOT 2: dodatkowe -->
+    <div style="margin-bottom:16px">
+      <div style="font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:6px">📷 Dodatkowe zdjęcie <span style="color:var(--text3);font-weight:400;text-transform:none">(opcjonalne)</span></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div id="slot2-thumb" onclick="openSlot(2)" style="width:72px;height:72px;border-radius:10px;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:var(--text3);font-size:11px;gap:3px"><span style="font-size:24px">📷</span>Dodaj</div>
+        <div style="flex:1;font-size:11px;color:var(--text3);line-height:1.6">Np. zdjęcie składników lub wartości odżywczych.</div>
+      </div>
+    </div>
+
     <button class="mbtn cancel" style="width:100%" onclick="closePhoto()">Zamknij</button>
     <input type="file" id="product-photo-file" accept="image/*" capture="environment" style="display:none" onchange="handleProductPhoto(this)">
   </div>
@@ -556,28 +592,28 @@ var PP=FB+"/photos/"+ROOM, CP=FB+"/config/apikey";
 var CATS = [
   {id:"warzywa",label:"Warzywa i owoce",ic:"🥦",noScan:true,items:[
     {n:"Papryka (czerwona/żółta)",target:2,unit:"szt.",days:5},
-    {n:"Pomidory",target:3,unit:"szt.",days:4},
-    {n:"Ogórek",target:3,unit:"szt.",days:4},
+    {n:"Pomidory",target:2,unit:"szt.",days:4},
+    {n:"Ogórek",target:2,unit:"szt.",days:4},
     {n:"Cukinia",target:2,unit:"szt.",days:5},
     {n:"Pieczarki",target:1,unit:"opak. 500g",days:4},
-    {n:"Marchew",target:4,unit:"szt.",days:21},
-    {n:"Cebula biała (duża)",target:2,unit:"szt.",days:30},
+    {n:"Marchew",target:2,unit:"szt.",days:21},
+    {n:"Cebula biała (duża)",target:1,unit:"szt.",days:30},
     {n:"Czosnek",target:1,unit:"główka",days:60},
     {n:"Sałata / rukola",target:1,unit:"opak.",days:3},
     {n:"Rzodkiewka",target:1,unit:"pęczek",days:5},
     {n:"Koperek",target:1,unit:"pęczek",days:3},
-    {n:"Jabłka",target:4,unit:"szt.",days:21},
-    {n:"Banany",target:4,unit:"szt.",days:4},
+    {n:"Jabłka",target:2,unit:"szt.",days:21},
+    {n:"Banany",target:2,unit:"szt.",days:4},
     {n:"Truskawki / maliny",target:1,unit:"opak. 500g",days:2},
     {n:"Awokado",target:2,unit:"szt.",days:4},
     {n:"Cytryna",target:1,unit:"szt.",days:14},
-    {n:"Bataty",target:4,unit:"szt.",days:30}
+    {n:"Bataty",target:2,unit:"szt.",days:30}
   ]},
   {id:"piekarnia",label:"Piekarnia",ic:"🍞",scan:true,items:[
     {n:"Chleb pełnoziarnisty",target:2,unit:"bochenek",days:5}
   ]},
   {id:"suche",label:"Płatki, kasze, ryże",ic:"🌾",scan:true,items:[
-    {n:"Płatki owsiane błyskawiczne",target:3,unit:"opak. 500g",days:180},
+    {n:"Płatki owsiane błyskawiczne",target:2,unit:"opak. 500g",days:180},
     {n:"Płatki jaglane",target:1,unit:"opak.",days:180},
     {n:"Ryż basmati",target:1,unit:"opak. 1kg",days:365},
     {n:"Kasza gryczana",target:1,unit:"opak. 500g",days:365}
@@ -600,7 +636,7 @@ var CATS = [
     {n:"Mąka jaglana",target:1,unit:"opak. 400g",days:365}
   ]},
   {id:"mieso",label:"Mięso świeże",ic:"🥩",scan:true,items:[
-    {n:"Pierś z kurczaka",target:3,unit:"szt.",days:3},
+    {n:"Pierś z kurczaka",target:2,unit:"szt.",days:3},
     {n:"Wołowina mielona",target:1,unit:"opak. 150g",days:2},
     {n:"Filet z łososia (świeży)",target:1,unit:"szt.",days:2}
   ]},
@@ -610,7 +646,7 @@ var CATS = [
     {n:"Serek wiejski light (0% tłuszczu)",target:3,unit:"opak. 400g",days:7},
     {n:"Mozzarella light",target:2,unit:"opak.",days:5},
     {n:"Jogurt naturalny 2%",target:1,unit:"opak. duży",days:7},
-    {n:"Mleko 0,5%",target:4,unit:"litr",days:5}
+    {n:"Mleko 0,5%",target:2,unit:"litr",days:5}
   ]},
   {id:"jaja",label:"Jaja",ic:"🥚",scan:true,items:[
     {n:"Jaja L",target:2,unit:"opak. 10 szt.",days:28}
@@ -857,7 +893,9 @@ function applyScan(){
     var si=document.getElementById("scan-img");
     if(si&&si.src&&si.src.startsWith("data:")){
       compressPhoto(si.src,function(compressed){
-        var key=fbk("p",photoItem),p={};photos[key]=compressed;p[key]=compressed;
+        var key=getSlotKey(photoItem,0),p={};// slot 0 = date photo
+        photos[key]=compressed;p[key]=compressed;
+        try{localStorage.setItem("photo_"+key,compressed);}catch(e){}
         fbPatch(PP,p).then(function(){render();});
       });
     }
@@ -972,7 +1010,48 @@ function applyReceipt(){
   }else dlgAlert("⚠️","Brak dopasowań","Nie znaleziono produktów z paragonu.");
 }
 
-function compressPhoto(dataUrl,cb){
+var currentSlot = 0; // which slot is being filled
+
+function openSlot(slotIdx){
+  currentSlot = slotIdx;
+  document.getElementById("product-photo-file").value="";
+  document.getElementById("product-photo-file").click();
+}
+
+function getSlotKey(name, slot){
+  return fbk("ph"+slot, name);
+}
+
+function updateSlotUI(name){
+  for(var s=0;s<3;s++){
+    var key=getSlotKey(name,s);
+    var src=photos[key]||null;
+    var el=document.getElementById("slot"+s+"-thumb");
+    if(!el)continue;
+    if(src){
+      el.innerHTML='<div style="position:relative;width:72px;height:72px">'
+        +'<img src="'+src+'" style="width:72px;height:72px;border-radius:10px;object-fit:cover;border:2px solid var(--green)">'
+        +'<button class="slot-del" onclick="deleteSlotPhoto('+s+')" style="position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;z-index:1">✕</button>'
+        +'</div>';
+      el.style.background="transparent";
+      el.style.border="none";
+    }else{
+      var icons=["📅","🏷️","📷"],labels=["Dodaj","Dodaj","Dodaj"];
+      el.style.background="var(--bg4)";
+      el.style.border="1.5px dashed var(--border2)";
+      el.innerHTML='<span style="font-size:24px">'+icons[s]+'</span><span style="font-size:11px;color:var(--text3)">'+labels[s]+'</span>';
+    }
+  }
+}
+
+function deleteSlotPhoto(slotIdx){
+  var key=getSlotKey(photoItem,slotIdx),p={};
+  delete photos[key];p[key]=null;
+  try{localStorage.removeItem("photo_"+key);}catch(e){}
+  fbPatch(PP,p).then(function(){updateSlotUI(photoItem);render();});
+}
+
+function compressPhoto(dataUrl,cb){function compressPhoto(dataUrl,cb){
   var img=new Image();
   img.onload=function(){
     try{
@@ -995,22 +1074,12 @@ function compressPhoto(dataUrl,cb){
 function openPhoto(name){
   photoItem=name;
   document.getElementById("photo-modal-name").textContent=name;
-  var key=fbk("p",name),ex=photos[key];
-  if(ex){
-    document.getElementById("photo-modal-img").src=ex;
-    document.getElementById("photo-modal-img").style.display="block";
-    document.getElementById("photo-modal-placeholder").style.display="none";
-    document.getElementById("photo-delete-btn").style.display="block";
-  }else{
-    document.getElementById("photo-modal-img").style.display="none";
-    document.getElementById("photo-modal-placeholder").style.display="flex";
-    document.getElementById("photo-delete-btn").style.display="none";
-  }
+  updateSlotUI(name);
   document.getElementById("photo-overlay").classList.add("show");
 }
 function closePhoto(){document.getElementById("photo-overlay").classList.remove("show");}
 function triggerProductPhoto(){
-  document.getElementById("product-photo-file").value=""; // reset so same file can be picked again
+  document.getElementById("product-photo-file").value="";
   document.getElementById("product-photo-file").click();
 }
 function handleProductPhoto(input){
@@ -1018,16 +1087,12 @@ function handleProductPhoto(input){
   var reader=new FileReader();
   reader.onload=function(e){
     compressPhoto(e.target.result,function(compressed){
-      var key=fbk("p",photoItem),p={};photos[key]=compressed;p[key]=compressed;
-      // Show photo immediately (don't wait for Firebase)
-      document.getElementById("photo-modal-img").src=compressed;
-      document.getElementById("photo-modal-img").style.display="block";
-      document.getElementById("photo-modal-placeholder").style.display="none";
-      document.getElementById("photo-delete-btn").style.display="block";
-      // Save to localStorage backup cache
+      var key=getSlotKey(photoItem,currentSlot),p={};photos[key]=compressed;p[key]=compressed;
+      // Show immediately
       try{localStorage.setItem("photo_"+key, compressed);}catch(e){}
-      render(); // show thumbnail immediately
-      // Then save to Firebase
+      updateSlotUI(photoItem);
+      render();
+      // Save to Firebase
       fbPatch(PP,p).catch(function(err){
         console.error("Photo save error:", err);
       });
@@ -1035,16 +1100,7 @@ function handleProductPhoto(input){
   };
   reader.readAsDataURL(input.files[0]);
 }
-function deleteProductPhoto(){
-  var key=fbk("p",photoItem),p={};delete photos[key];p[key]=null;
-  try{localStorage.removeItem("photo_"+key);}catch(e){}
-  fbPatch(PP,p).then(function(){
-    document.getElementById("photo-modal-img").style.display="none";
-    document.getElementById("photo-modal-placeholder").style.display="flex";
-    document.getElementById("photo-delete-btn").style.display="none";
-    render();
-  });
-}
+// deleteProductPhoto replaced by deleteSlotPhoto
 
 function openStore(store){
   var urls={biedronka:"https://biedronkago.pl",frisco:"https://www.frisco.pl",glovo:"https://glovoapp.com/pl/pl/warszawa/",lisek:"https://lisek.app"};
@@ -1246,8 +1302,7 @@ function startApp(){
       for(var i=0;i<localStorage.length;i++){
         var lk=localStorage.key(i);
         if(lk&&lk.startsWith("photo_")){
-          var fk=lk.replace("photo_","");
-          photos[fk]=localStorage.getItem(lk);
+          photos[lk.replace("photo_","")]=localStorage.getItem(lk);
         }
       }
     }catch(e){}
