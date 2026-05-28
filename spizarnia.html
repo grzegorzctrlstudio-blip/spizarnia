@@ -504,39 +504,43 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
     <h3>📷 Zdjęcia produktu</h3>
     <p id="photo-modal-name" style="color:var(--text2);margin-bottom:14px;font-weight:700"></p>
 
-    <!-- SLOT 0: data ważności — label triggers file input directly (iOS compatible) -->
-    <div style="margin-bottom:14px">
-      <div style="font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:6px">📅 Data ważności (wieczko / spód opakowania)</div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <div id="slot0-thumb" style="width:72px;height:72px;flex-shrink:0;position:relative">
-          <label for="slot0-file" style="width:72px;height:72px;border-radius:10px;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--text3);font-size:11px;gap:3px;position:absolute;inset:0"><span style="font-size:24px">📅</span>Dodaj</label>
-          <input type="file" id="slot0-file" accept="image/*" capture="environment" style="display:none" onchange="handleSlotPhoto(this,0)">
-        </div>
-        <div style="flex:1;font-size:11px;color:var(--text3);line-height:1.6">Zrób zdjęcie gdzie widać datę — wieczko, spód, boczna etykieta.</div>
-      </div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:12px;line-height:1.5">
+      Dotknij pola żeby zrobić zdjęcie. Zdjęcie etykiety pojawi się jako miniaturka na liście.
     </div>
 
-    <!-- SLOT 1: etykieta -->
-    <div style="margin-bottom:14px">
-      <div style="font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:6px">🏷️ Etykieta / opakowanie produktu</div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <div id="slot1-thumb" style="width:72px;height:72px;flex-shrink:0;position:relative">
-          <label for="slot1-file" style="width:72px;height:72px;border-radius:10px;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--text3);font-size:11px;gap:3px;position:absolute;inset:0"><span style="font-size:24px">🏷️</span>Dodaj</label>
-          <input type="file" id="slot1-file" accept="image/*" capture="environment" style="display:none" onchange="handleSlotPhoto(this,1)">
+    <div style="display:flex;gap:10px;margin-bottom:16px">
+      <!-- SLOT 0 -->
+      <div style="flex:1;text-align:center">
+        <div style="font-size:9px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);margin-bottom:6px">📅 Data ważności</div>
+        <div id="slot0-thumb" style="position:relative;width:100%;padding-top:100%;border-radius:10px;overflow:hidden;background:var(--bg4);border:1.5px dashed var(--border2)">
+          <div id="slot0-inner" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;pointer-events:none">
+            <span style="font-size:26px">📅</span>
+            <span style="font-size:10px;color:var(--text3)">Dotknij</span>
+          </div>
+          <input type="file" accept="image/*" capture="environment" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:5" onchange="handleSlotPhoto(this,0)">
         </div>
-        <div style="flex:1;font-size:11px;color:var(--text3);line-height:1.6">To zdjęcie pojawi się jako miniaturka na liście produktów.</div>
       </div>
-    </div>
-
-    <!-- SLOT 2: dodatkowe -->
-    <div style="margin-bottom:16px">
-      <div style="font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:6px">📷 Dodatkowe <span style="font-weight:400;text-transform:none">(opcjonalne)</span></div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <div id="slot2-thumb" style="width:72px;height:72px;flex-shrink:0;position:relative">
-          <label for="slot2-file" style="width:72px;height:72px;border-radius:10px;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--text3);font-size:11px;gap:3px;position:absolute;inset:0"><span style="font-size:24px">📷</span>Dodaj</label>
-          <input type="file" id="slot2-file" accept="image/*" capture="environment" style="display:none" onchange="handleSlotPhoto(this,2)">
+      <!-- SLOT 1 -->
+      <div style="flex:1;text-align:center">
+        <div style="font-size:9px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);margin-bottom:6px">🏷️ Etykieta</div>
+        <div id="slot1-thumb" style="position:relative;width:100%;padding-top:100%;border-radius:10px;overflow:hidden;background:var(--bg4);border:1.5px dashed var(--border2)">
+          <div id="slot1-inner" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;pointer-events:none">
+            <span style="font-size:26px">🏷️</span>
+            <span style="font-size:10px;color:var(--text3)">Dotknij</span>
+          </div>
+          <input type="file" accept="image/*" capture="environment" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:5" onchange="handleSlotPhoto(this,1)">
         </div>
-        <div style="flex:1;font-size:11px;color:var(--text3);line-height:1.6">Np. skład lub wartości odżywcze.</div>
+      </div>
+      <!-- SLOT 2 -->
+      <div style="flex:1;text-align:center">
+        <div style="font-size:9px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);margin-bottom:6px">📷 Extra</div>
+        <div id="slot2-thumb" style="position:relative;width:100%;padding-top:100%;border-radius:10px;overflow:hidden;background:var(--bg4);border:1.5px dashed var(--border2)">
+          <div id="slot2-inner" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;pointer-events:none">
+            <span style="font-size:26px">📷</span>
+            <span style="font-size:10px;color:var(--text3)">Dotknij</span>
+          </div>
+          <input type="file" accept="image/*" capture="environment" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:5" onchange="handleSlotPhoto(this,2)">
+        </div>
       </div>
     </div>
 
@@ -1049,25 +1053,24 @@ function getSlotKey(name, slot){
 }
 
 function updateSlotUI(name){
-  var icons=["📅","🏷️","📷"];
   for(var s=0;s<3;s++){
     var key=getSlotKey(name,s);
     var src=photos[key]||null;
+    var inner=document.getElementById("slot"+s+"-inner");
     var thumb=document.getElementById("slot"+s+"-thumb");
-    var lbl=document.getElementById("slot"+s+"-file");
-    if(!thumb)continue;
+    if(!inner||!thumb)continue;
     if(src){
-      // Replace label with image + delete button, keep file input inside
-      thumb.innerHTML=
-        '<img src="'+src+'" style="width:72px;height:72px;border-radius:10px;object-fit:cover;border:2px solid var(--green);display:block">'
-        +'<button onclick="deleteSlotPhoto('+s+')" style="position:absolute;top:-7px;right:-7px;background:var(--red);color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer;z-index:2;display:flex;align-items:center;justify-content:center">✕</button>'
-        +'<label for="slot'+s+'-file" style="position:absolute;inset:0;cursor:pointer;border-radius:10px"></label>'
-        +'<input type="file" id="slot'+s+'-file" accept="image/*" capture="environment" style="display:none" onchange="handleSlotPhoto(this,'+s+')">';
+      // Show photo as background, keep file input on top for re-shooting
+      thumb.style.border="2px solid var(--green)";
+      inner.innerHTML=
+        '<img src="'+src+'" style="width:100%;height:100%;object-fit:cover;border-radius:9px;display:block;pointer-events:none">'
+        +'<button onclick="event.stopPropagation();deleteSlotPhoto('+s+')" style="position:absolute;top:4px;right:4px;background:var(--red);color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center">✕</button>';
     }else{
-      thumb.innerHTML=
-        '<label for="slot'+s+'-file" style="width:72px;height:72px;border-radius:10px;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--text3);font-size:11px;gap:3px;position:absolute;inset:0"><span style="font-size:24px">'+icons[s]+'</span>Dodaj</label>'
-        +'<input type="file" id="slot'+s+'-file" accept="image/*" capture="environment" style="display:none" onchange="handleSlotPhoto(this,'+s+')">'
-      ;
+      var icons=["📅","🏷️","📷"];
+      thumb.style.border="1.5px dashed var(--border2)";
+      inner.innerHTML=
+        '<span style="font-size:26px">'+icons[s]+'</span>'
+        +'<span style="font-size:10px;color:var(--text3)">Dotknij</span>';
     }
   }
 }
