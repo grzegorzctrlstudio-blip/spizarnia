@@ -583,7 +583,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 <!-- SETTINGS MODAL -->
 <div class="overlay" id="settings-overlay" onclick="if(event.target===this)closeSettings()">
   <div class="modal">
-    <h3>⚙️ Panel administratora</h3>
+    <h3>⚙️ Ustawienia</h3>
+    <!-- PROFILE SECTION -->
+    <div id="profile-section" style="display:none;margin-bottom:16px;background:var(--bg3);border-radius:12px;padding:14px;border:1px solid var(--border)">
+      <div style="font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:10px">👤 Mój profil</div>
+      <div id="profile-view" style="font-size:13px;color:var(--text2);line-height:2"></div>
+      <button class="mbtn blue" style="width:100%;margin-top:10px;padding:10px" onclick="closeSettings();showOb()">✏️ Edytuj profil</button>
+    </div>
+    <!-- ADMIN SECTION -->
+    <div style="font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:8px">🔑 Klucz API (admin)</div>
     <div class="admin-note" id="admin-api-status">Sprawdzam klucz API...</div>
     <input class="modal-inp" id="api-key-inp" type="password" placeholder="sk-ant-api03-..." style="font-size:12px;font-family:monospace">
     <div class="modal-btns" style="margin-bottom:8px">
@@ -632,10 +640,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 var FB    = "https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY = "https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
 var ADMIN_PASS = "spizarnia2025";
-var ROOM  = location.hash.replace(/^#/,"").trim() || "room1";
-if(!location.hash) location.hash = ROOM;
+var ROOM = "room1"; // overridden per user after login
 var RP=FB+"/rooms/"+ROOM, LP=FB+"/logs/"+ROOM, EP=FB+"/expiry/"+ROOM;
 var PP=FB+"/photos/"+ROOM, CP=FB+"/config/apikey";
+var PROFILES=FB+"/profiles";
+
+function setUserRoom(name){
+  ROOM="user_"+name.toLowerCase().replace(/[^a-z0-9]/g,"_").replace(/__+/g,"_");
+  RP=FB+"/rooms/"+ROOM;
+  LP=FB+"/logs/"+ROOM;
+  EP=FB+"/expiry/"+ROOM;
+  PP=FB+"/photos/"+ROOM;
+}
 
 var CATS = [
   {id:"warzywa",label:"Warzywa i owoce",ic:"🥦",noScan:true,color:"#16A34A",items:[
@@ -751,10 +767,26 @@ function checkAdminPass(){
   closeAdminPass();
   fbGet(CP).then(function(k){
     var el=document.getElementById("admin-api-status");
-    if(k){el.textContent="✅ Klucz API aktywny — wszyscy mają dostęp";el.style.color="var(--green)";}
+    if(k){el.textContent="✅ Klucz API aktywny";el.style.color="var(--green)";}
     else{el.textContent="⚠️ Brak klucza — funkcje AI nie działają";el.style.color="var(--amber)";}
-  }).catch(function(){document.getElementById("admin-api-status").textContent="❓ Nie można sprawdzić";});
+  }).catch(function(){});
   document.getElementById("api-key-inp").value="";
+  // Show profile section if user has profile
+  if(userProfile){
+    var goalNames={lose:"Redukcja",maintain:"Utrzymanie",gain:"Masa mięśniowa"};
+    var actNames={sed:"Siedzący",light:"Lekki",mod:"Umiarkowany",active:"Aktywny",vactive:"Bardzo aktywny"};
+    var storeNames={biedronka:"Biedronka",lidl:"Lidl",both:"Oba sklepy"};
+    document.getElementById("profile-view").innerHTML=
+      "🔥 <b>"+userProfile.kcal+" kcal/dzień</b><br>"+
+      "🥩 Białko: <b>"+userProfile.prot+"g</b> · 🌾 Węgle: <b>"+userProfile.carb+"g</b> · 🥑 Tłuszcze: <b>"+userProfile.fat+"g</b><br>"+
+      "🎯 Cel: <b>"+(goalNames[userProfile.goal]||userProfile.goal)+"</b><br>"+
+      "💪 Aktywność: <b>"+(actNames[userProfile.activity]||userProfile.activity)+"</b><br>"+
+      "🛒 Sklep: <b>"+(storeNames[userProfile.stores]||userProfile.stores)+"</b>"+
+      (userProfile.exclude?"<br>⚠️ Wykluczenia: <b>"+userProfile.exclude+"</b>":"");
+    document.getElementById("profile-section").style.display="block";
+  }else{
+    document.getElementById("profile-section").style.display="none";
+  }
   document.getElementById("settings-overlay").classList.add("show");
 }
 function closeSettings(){document.getElementById("settings-overlay").classList.remove("show");}
