@@ -517,7 +517,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
   <div class="modal" style="text-align:center">
     <div style="font-size:38px;margin-bottom:10px">🔐</div>
     <h3>Panel administratora</h3>
-    <p>Wpisz hasło żeby zarządzać kluczem API</p>
+    <p>Wpisz hasło administratora</p>
     <input class="modal-inp" id="admin-pass-inp" type="password" placeholder="Hasło administratora" onkeydown="if(event.key==='Enter')checkAdminPass()">
     <div class="modal-btns">
       <button class="mbtn cancel" onclick="closeAdminPass()">Anuluj</button>
@@ -767,7 +767,7 @@ function fHtml(it){
   if(d<=2)return'<div class="fresh-warn">⏳ Zostają '+d+' dni</div>';
   return'<div class="fresh-ok">✓ Świeże — '+d+' dni</div>';
 }
-function expiringSoon(it){var d=getDaysLeft(it);return d!==null&&d<=3;}
+function expiringSoon(it){var d=getDaysLeft(it);return d!==null&&d<=1;}
 
 function openExpiry(name){
   expiryItem=name;document.getElementById("exp-name").textContent=name;
@@ -971,13 +971,21 @@ function applyReceipt(){
 function compressPhoto(dataUrl,cb){
   var img=new Image();
   img.onload=function(){
-    var canvas=document.createElement("canvas"),size=120;
-    canvas.width=size;canvas.height=size;
-    var ctx=canvas.getContext("2d");
-    var s=Math.min(img.width,img.height),ox=(img.width-s)/2,oy=(img.height-s)/2;
-    ctx.drawImage(img,ox,oy,s,s,0,0,size,size);
-    cb(canvas.toDataURL("image/jpeg",.7));
+    try{
+      var canvas=document.createElement("canvas"),size=160;
+      canvas.width=size;canvas.height=size;
+      var ctx=canvas.getContext("2d");
+      var s=Math.min(img.width,img.height),ox=(img.width-s)/2,oy=(img.height-s)/2;
+      ctx.drawImage(img,ox,oy,s,s,0,0,size,size);
+      var result=canvas.toDataURL("image/jpeg",.75);
+      if(result&&result.length>100){cb(result);}
+      else{cb(dataUrl);} // fallback to original if canvas fails
+    }catch(e){
+      console.error("compress error",e);
+      cb(dataUrl); // fallback
+    }
   };
+  img.onerror=function(){cb(dataUrl);};
   img.src=dataUrl;
 }
 function openPhoto(name){
@@ -997,7 +1005,10 @@ function openPhoto(name){
   document.getElementById("photo-overlay").classList.add("show");
 }
 function closePhoto(){document.getElementById("photo-overlay").classList.remove("show");}
-function triggerProductPhoto(){document.getElementById("product-photo-file").click();}
+function triggerProductPhoto(){
+  document.getElementById("product-photo-file").value=""; // reset so same file can be picked again
+  document.getElementById("product-photo-file").click();
+}
 function handleProductPhoto(input){
   if(!input.files||!input.files[0])return;
   var reader=new FileReader();
@@ -1010,6 +1021,8 @@ function handleProductPhoto(input){
         document.getElementById("photo-modal-placeholder").style.display="none";
         document.getElementById("photo-delete-btn").style.display="block";
         render();
+      }).catch(function(err){
+        dlgAlert("❌","Błąd zapisu","Nie udało się zapisać zdjęcia: "+err.message);
       });
     });
   };
@@ -1173,7 +1186,7 @@ function buildCatChips(){
   CATS.forEach(function(cat){
     var btn=document.createElement("button");
     btn.className="cat-chip";btn.id="chip-"+cat.id;
-    btn.innerHTML='<span>'+cat.ic+'</span>'+cat.label.split(",")[0].split(" i ")[0];
+    btn.innerHTML='<span>'+cat.ic+'</span>'+cat.label;
     btn.onclick=(function(id){return function(){setCatFilter(id);};})(cat.id);
     wrap.appendChild(btn);
   });
@@ -1234,8 +1247,10 @@ function startApp(){
           if(key2==="__shopTs"&&r[key2]!==shopTs){shopTs=r[key2];updateShopBar();ch=true;}
         });}
         expiry={};if(e)Object.keys(e).forEach(function(key2){if(e[key2])expiry[key2]=e[key2];});
+        var oldPhotoKeys=Object.keys(photos).join(",");
         photos={};if(p)Object.keys(p).forEach(function(key2){if(p[key2])photos[key2]=p[key2];});
-        if(ch)render();setSyncUI("ok");
+        var newPhotoKeys=Object.keys(photos).join(",");
+        if(ch||oldPhotoKeys!==newPhotoKeys)render();setSyncUI("ok");
       }).catch(function(){setSyncUI("err");});
     },3000);
   }).catch(function(e){
