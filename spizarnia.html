@@ -1692,11 +1692,7 @@ function obNext(){
       status.textContent="⏳ Claude analizuje plan diety...";
       status.style.color="var(--amber)";
       document.getElementById("ob-next-btn").disabled=true;
-      callAPI([{role:"user",content:"Przeanalizuj ten plan diety i wyciagnij z niego dane. Odpowiedz TYLKO JSON:
-{"kcal":3060,"prot":244,"carb":281,"fat":107,"sklep":"Biedronka lub Lidl lub oba lub nieznany","wykluczenia":"np. ryby, laktoza lub brak","cel":"redukcja lub utrzymanie lub masa lub nieznany"}
-
-Plan diety:
-"+txt}],
+      callAPI([{role:"user",content:"Przeanalizuj plan diety i wyciagnij: kcal, bialko(prot), weglowodany(carb), tluszcze(fat), sklep, wykluczenia, cel. Plan diety: "+txt}],
         "Jestes dietetykiem. Wyciagnij z tekstu kalorie i makroskaldniki. Odpowiedz TYLKO JSON.",
         function(res){
           try{
