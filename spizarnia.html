@@ -217,6 +217,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .lbadge.dn{background:#7F1D1D;color:#F87171}
 .log-empty{text-align:center;padding:40px 20px;color:#475569;font-size:13px}
 .admin-note{background:#1E3A5F;border:1px solid #1D4ED8;border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:11px;color:#93C5FD}
+
+/* CUSTOM DIALOG */
+.dialog-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;padding:24px}
+.dialog-overlay.show{display:flex}
+.dialog-box{background:#1E293B;border-radius:18px;padding:24px;width:100%;max-width:340px;border:1.5px solid #334155;text-align:center}
+.dialog-ico{font-size:32px;margin-bottom:10px}
+.dialog-title{font-size:16px;font-weight:800;color:#fff;margin-bottom:6px}
+.dialog-msg{font-size:13px;color:#94A3B8;line-height:1.6;margin-bottom:18px}
+.dialog-btns{display:flex;gap:8px}
+.dialog-btn{flex:1;padding:12px;border-radius:12px;border:none;font-size:14px;font-weight:800;cursor:pointer}
+.dialog-btn.ok{background:linear-gradient(135deg,#16A34A,#059669);color:#fff}
+.dialog-btn.cancel{background:#334155;color:#94A3B8}
+.dialog-btn.danger{background:#DC2626;color:#fff}
 </style>
 </head>
 <body>
@@ -448,6 +461,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 </div>
 
+<!-- CUSTOM DIALOG -->
+<div class="dialog-overlay" id="dlg">
+  <div class="dialog-box">
+    <div class="dialog-ico" id="dlg-ico">❓</div>
+    <div class="dialog-title" id="dlg-title"></div>
+    <div class="dialog-msg" id="dlg-msg"></div>
+    <div class="dialog-btns" id="dlg-btns"></div>
+  </div>
+</div>
+
 <script>
 var FB    = "https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY = "https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -460,57 +483,59 @@ var EP = FB+"/expiry/"+ROOM;
 var CP = FB+"/config/apikey"; // admin API key stored here
 
 var CATS = [
-  {id:"warzywa",label:"Warzywa i owoce",ic:"🥦",items:[
-    {n:"Papryka (czerwona/żółta)",target:2,unit:"szt.",days:7},
+  // noScan:true = brak przycisku skanera AI (daty szacowane automatycznie od daty zakupów)
+  // scan:true   = przycisk skanera AI przy produkcie
+  {id:"warzywa",label:"Warzywa i owoce",ic:"🥦",noScan:true,items:[
+    {n:"Papryka (czerwona/żółta)",target:2,unit:"szt.",days:5},
     {n:"Pomidory",target:3,unit:"szt.",days:4},
     {n:"Ogórek",target:3,unit:"szt.",days:4},
-    {n:"Cukinia",target:2,unit:"szt.",days:6},
+    {n:"Cukinia",target:2,unit:"szt.",days:5},
     {n:"Pieczarki",target:1,unit:"opak. 500g",days:4},
-    {n:"Marchew",target:4,unit:"szt.",days:10},
-    {n:"Cebula biała (duża)",target:2,unit:"szt.",days:14},
-    {n:"Czosnek",target:1,unit:"główka",days:21},
-    {n:"Sałata / rukola",target:1,unit:"opak.",days:4},
+    {n:"Marchew",target:4,unit:"szt.",days:21},
+    {n:"Cebula biała (duża)",target:2,unit:"szt.",days:30},
+    {n:"Czosnek",target:1,unit:"główka",days:60},
+    {n:"Sałata / rukola",target:1,unit:"opak.",days:3},
     {n:"Rzodkiewka",target:1,unit:"pęczek",days:5},
-    {n:"Koperek",target:1,unit:"pęczek",days:4},
-    {n:"Jabłka",target:4,unit:"szt.",days:10},
+    {n:"Koperek",target:1,unit:"pęczek",days:3},
+    {n:"Jabłka",target:4,unit:"szt.",days:21},
     {n:"Banany",target:4,unit:"szt.",days:4},
-    {n:"Truskawki / maliny",target:1,unit:"opak. 500g",days:3},
+    {n:"Truskawki / maliny",target:1,unit:"opak. 500g",days:2},
     {n:"Awokado",target:2,unit:"szt.",days:4},
     {n:"Cytryna",target:1,unit:"szt.",days:14},
-    {n:"Bataty",target:4,unit:"szt.",days:14}
+    {n:"Bataty",target:4,unit:"szt.",days:30}
   ]},
-  {id:"piekarnia",label:"Piekarnia",ic:"🍞",items:[
+  {id:"piekarnia",label:"Piekarnia",ic:"🍞",scan:true,items:[
     {n:"Chleb pełnoziarnisty",target:2,unit:"bochenek",days:5}
   ]},
-  {id:"suche",label:"Płatki, kasze, ryże",ic:"🌾",items:[
-    {n:"Płatki owsiane błyskawiczne",target:3,unit:"opak. 500g"},
-    {n:"Płatki jaglane",target:1,unit:"opak."},
-    {n:"Ryż basmati",target:1,unit:"opak. 1kg"},
-    {n:"Kasza gryczana",target:1,unit:"opak. 500g"}
+  {id:"suche",label:"Płatki, kasze, ryże",ic:"🌾",scan:true,items:[
+    {n:"Płatki owsiane błyskawiczne",target:3,unit:"opak. 500g",days:180},
+    {n:"Płatki jaglane",target:1,unit:"opak.",days:180},
+    {n:"Ryż basmati",target:1,unit:"opak. 1kg",days:365},
+    {n:"Kasza gryczana",target:1,unit:"opak. 500g",days:365}
   ]},
-  {id:"puszki",label:"Puszki i sosy",ic:"🫙",items:[
-    {n:"Ciecierzyca (puszka)",target:2,unit:"puszka"},
-    {n:"Passata pomidorowa",target:1,unit:"opak."},
-    {n:"Ketchup Słodka Ania",target:1,unit:"butelka"},
-    {n:"Musztarda miodowa / łagodna",target:1,unit:"słoik"}
+  {id:"puszki",label:"Puszki i sosy",ic:"🫙",scan:true,items:[
+    {n:"Ciecierzyca (puszka)",target:2,unit:"puszka",days:730},
+    {n:"Passata pomidorowa",target:1,unit:"opak.",days:365},
+    {n:"Ketchup Słodka Ania",target:1,unit:"butelka",days:180},
+    {n:"Musztarda miodowa / łagodna",target:1,unit:"słoik",days:365}
   ]},
-  {id:"tluszcze",label:"Orzechy i tłuszcze",ic:"🥜",items:[
-    {n:"Oliwa z oliwek",target:1,unit:"butelka 500ml"},
-    {n:"Masło orzechowe Vitanella",target:2,unit:"opak. 350g"},
-    {n:"Płatki migdałów",target:1,unit:"opak. 200g"},
-    {n:"Orzechy włoskie/laskowe",target:1,unit:"opak. 200g"},
-    {n:"Kakao (bez cukru)",target:1,unit:"opak."}
+  {id:"tluszcze",label:"Orzechy i tłuszcze",ic:"🥜",scan:true,items:[
+    {n:"Oliwa z oliwek",target:1,unit:"butelka 500ml",days:365},
+    {n:"Masło orzechowe Vitanella",target:2,unit:"opak. 350g",days:180},
+    {n:"Płatki migdałów",target:1,unit:"opak. 200g",days:180},
+    {n:"Orzechy włoskie/laskowe",target:1,unit:"opak. 200g",days:180},
+    {n:"Kakao (bez cukru)",target:1,unit:"opak.",days:365}
   ]},
-  {id:"maki",label:"Mąki",ic:"🌾",items:[
-    {n:"Mąka ryżowa",target:1,unit:"opak. 400g"},
-    {n:"Mąka jaglana",target:1,unit:"opak. 400g"}
+  {id:"maki",label:"Mąki",ic:"🌾",scan:true,items:[
+    {n:"Mąka ryżowa",target:1,unit:"opak. 400g",days:365},
+    {n:"Mąka jaglana",target:1,unit:"opak. 400g",days:365}
   ]},
-  {id:"mieso",label:"Mięso świeże",ic:"🥩",items:[
+  {id:"mieso",label:"Mięso świeże",ic:"🥩",scan:true,items:[
     {n:"Pierś z kurczaka",target:3,unit:"szt.",days:3},
     {n:"Wołowina mielona",target:1,unit:"opak. 150g",days:2},
     {n:"Filet z łososia (świeży)",target:1,unit:"szt.",days:2}
   ]},
-  {id:"nabial",label:"Nabiał",ic:"🥛",items:[
+  {id:"nabial",label:"Nabiał",ic:"🥛",scan:true,items:[
     {n:"Skyr naturalny",target:4,unit:"opak. 350g",days:10},
     {n:"Ser twarogowy chudy",target:3,unit:"opak. 400g",days:7},
     {n:"Serek wiejski light (0% tłuszczu)",target:3,unit:"opak. 400g",days:7},
@@ -518,10 +543,10 @@ var CATS = [
     {n:"Jogurt naturalny 2%",target:1,unit:"opak. duży",days:7},
     {n:"Mleko 0,5%",target:4,unit:"litr",days:5}
   ]},
-  {id:"jaja",label:"Jaja",ic:"🥚",items:[
-    {n:"Jaja L",target:2,unit:"opak. 10 szt.",days:21}
+  {id:"jaja",label:"Jaja",ic:"🥚",scan:true,items:[
+    {n:"Jaja L",target:2,unit:"opak. 10 szt.",days:28}
   ]},
-  {id:"wedliny",label:"Wędliny i ryby",ic:"🍖",items:[
+  {id:"wedliny",label:"Wędliny i ryby",ic:"🍖",scan:true,items:[
     {n:"Polędwica z indyka — Kraina Mięs (min. 97%)",target:3,unit:"opak.",days:7},
     {n:"Szynka z indyka — Kraina Wędlin (min. 97%)",target:2,unit:"opak.",days:7},
     {n:"Polędwica z kurczaka — Kraina Mięs (min. 97%)",target:2,unit:"opak.",days:7},
@@ -529,6 +554,36 @@ var CATS = [
     {n:"Łosoś wędzony",target:2,unit:"opak.",days:14}
   ]}
 ];
+
+// ── CUSTOM DIALOGS ───────────────────────────────────────────────────────────
+var dlgCb = null;
+function showDlg(ico, title, msg, btns) {
+  document.getElementById("dlg-ico").textContent = ico;
+  document.getElementById("dlg-title").textContent = title;
+  document.getElementById("dlg-msg").textContent = msg;
+  var b = document.getElementById("dlg-btns");
+  b.innerHTML = "";
+  btns.forEach(function(btn) {
+    var el = document.createElement("button");
+    el.className = "dialog-btn " + (btn.cls||"ok");
+    el.textContent = btn.label;
+    el.onclick = function() {
+      document.getElementById("dlg").classList.remove("show");
+      if(btn.cb) btn.cb();
+    };
+    b.appendChild(el);
+  });
+  document.getElementById("dlg").classList.add("show");
+}
+function dlgConfirm(ico, title, msg, onOk, okLabel, okCls) {
+  showDlg(ico, title, msg, [
+    {label:"Anuluj", cls:"cancel", cb:null},
+    {label:okLabel||"OK", cls:okCls||"ok", cb:onOk}
+  ]);
+}
+function dlgAlert(ico, title, msg) {
+  showDlg(ico, title, msg, [{label:"OK", cls:"ok", cb:null}]);
+}
 
 function fbk(c,n){ return (c+"__"+n).replace(/[.$#\[\]\/]/g,"_").replace(/\s+/g,"_"); }
 function mkState(){ var s={}; CATS.forEach(function(c){ c.items.forEach(function(it){ s[fbk(c.id,it.n)]=0; }); }); return s; }
@@ -595,15 +650,15 @@ function closeSettings(){ document.getElementById("settings-overlay").classList.
 
 function saveApiKey() {
   var v = document.getElementById("api-key-inp").value.trim();
-  if(!v) { alert("Wpisz klucz API"); return; }
-  if(!v.startsWith("sk-ant-")) { alert("Nieprawidłowy klucz — musi zaczynać się od sk-ant-"); return; }
+  if(!v) { dlgAlert("🔑","Brak klucza","Wpisz klucz API z console.anthropic.com"); return; }
+  if(!v.startsWith("sk-ant-")) { dlgAlert("❌","Nieprawidłowy klucz","Klucz powinien zaczynać się od sk-ant-"); return; }
   fbPut(CP, v).then(function() {
     apiKey = v;
     var el = document.getElementById("admin-api-status");
     el.textContent = "✅ Klucz zapisany! Wszyscy użytkownicy mają teraz dostęp.";
     el.style.color = "#4ADE80";
     setTimeout(closeSettings, 1500);
-  }).catch(function(e){ alert("Błąd zapisu: "+e.message); });
+  }).catch(function(e){ dlgAlert("❌","Błąd","Nie udało się zapisać: "+e.message); });
 }
 function clearApiKey() {
   fbPut(CP, null).then(function() {
@@ -617,8 +672,9 @@ function clearApiKey() {
 
 // ── SHOP DATE ─────────────────────────────────────────────────────────────────
 function markShopping() {
-  if(!confirm("Zaznaczyć że dziś byłeś/aś w sklepie?")) return;
+  dlgConfirm("🛍️","Byłem w sklepie!","Zaznaczyć dzisiejszą datę jako dzień zakupów?",function(){
   shopTs=Date.now(); fbPatch(RP,{__shopTs:shopTs}); updateShopBar(); render();
+  },"Tak"); 
 }
 function toggleDateEdit() {
   var r=document.getElementById("date-edit-row"); r.classList.toggle("show");
@@ -662,7 +718,7 @@ function openExpiry(name) {
 }
 function closeExpiry(){ document.getElementById("exp-overlay").classList.remove("show"); }
 function saveExpiry() {
-  var v=document.getElementById("exp-date-inp").value; if(!v){ alert("Wpisz datę"); return; }
+  var v=document.getElementById("exp-date-inp").value; if(!v){ dlgAlert("📅","Brak daty","Wpisz lub zeskanuj datę przydatności"); return; }
   var ts=new Date(v).getTime(), ek=fbk("e",expiryItem), p={};
   expiry[ek]=ts; p[ek]=ts; fbPatch(EP,p); closeExpiry(); render();
 }
@@ -695,8 +751,9 @@ function callAPI(messages, system, onOk, onErr) {
 
 // ── SCANNER ───────────────────────────────────────────────────────────────────
 function openScannerFromExpiry(){ scanFromExpiry=true; closeExpiry(); openScanner(); }
+function openScannerFromExpiry2(name){ expiryItem=name; scanFromExpiry=true; openScanner(); }
 function openScanner() {
-  if(!getApiKey()){ alert("Skaner niedostępny — administrator musi skonfigurować klucz API (⚙️)"); return; }
+  if(!getApiKey()){ dlgAlert("🔒","Skaner niedostępny","Administrator nie skonfigurował jeszcze klucza API. Wróć później."); return; }
   document.getElementById("scan-img").style.display="none";
   document.getElementById("scan-loading").style.display="none";
   document.getElementById("scan-result").style.display="none";
@@ -756,13 +813,13 @@ function applyScan() {
       if(!found&&it.n.toLowerCase().indexOf(name.toLowerCase().slice(0,6))!==-1) found=it.n;
     }); });
     if(found){ openExpiry(found); setTimeout(function(){ document.getElementById("exp-date-inp").value=iso; },50); }
-    else alert("Produkt: "+name+"\nData: "+scanData.data+"\n\nWybierz ręcznie.");
+    else dlgAlert("📅","Znajdź produkt ręcznie","Wykryto: "+name+" | Data: "+scanData.data+". Kliknij 📅 przy produkcie i wpisz datę.");
   }
 }
 
 // ── RECEIPT ───────────────────────────────────────────────────────────────────
 function openReceipt() {
-  if(!getApiKey()){ alert("Skaner niedostępny — administrator musi skonfigurować klucz API (⚙️)"); return; }
+  if(!getApiKey()){ dlgAlert("🔒","Skaner niedostępny","Administrator nie skonfigurował jeszcze klucza API. Wróć później."); return; }
   document.getElementById("receipt-img").style.display="none";
   document.getElementById("receipt-loading").style.display="none";
   document.getElementById("receipt-scan-result").style.display="none";
@@ -833,16 +890,15 @@ function applyReceipt() {
     fbPatch(RP,patch).then(function(){ addLog("🧾 PARAGON",0,Object.keys(patch).length); });
     updateShopBar(); render();
     document.getElementById("receipt-results").style.display="none";
-    alert("✅ Zaktualizowano: "+updated.join(", "));
-  } else alert("Brak pasujących produktów.");
+    dlgAlert("✅","Spiżarnia zaktualizowana","Dodano: "+updated.join(", "));
+  } else dlgAlert("⚠️","Brak dopasowań","Nie znaleziono produktów z paragonu w spiżarni.");
 }
 
 // ── STORE BUTTONS ─────────────────────────────────────────────────────────────
 function openStore(store) {
   var urls={biedronka:"https://biedronkago.pl",frisco:"https://www.frisco.pl",glovo:"https://glovoapp.com/pl/pl/warszawa/",lisek:"https://lisek.app"};
   copyShopList(true);
-  if(confirm("Lista skopiowana!\nOtworzyć "+store+"?\n\n(Wklej listę w wyszukiwarce sklepu)"))
-    window.open(urls[store],"_blank");
+  dlgConfirm("🛒","Lista skopiowana!","Otworzyć "+store+"? (Wklej listę w wyszukiwarce sklepu)",function(){ window.open(urls[store],"_blank"); },"Otwórz");
 }
 function copyShopList(silent) {
   var items=[];
@@ -853,14 +909,14 @@ function copyShopList(silent) {
       if(cur<it.target) items.push("• "+it.n+" ("+Math.max(0,it.target-cur)+" "+it.unit+")");
     }); });
   }
-  if(!items.length){ if(!silent) alert("Brak produktów na liście"); return false; }
+  if(!items.length){ if(!silent) dlgAlert("📋","Brak produktów","Wygeneruj najpierw listę zakupów AI"); return false; }
   var text="Lista zakupów — Spiżarnia\n"+new Date().toLocaleDateString("pl-PL")+"\n\n"+items.join("\n");
   navigator.clipboard.writeText(text)
-    .then(function(){ if(!silent) alert("✅ Skopiowano "+items.length+" produktów!"); })
+    .then(function(){ if(!silent) dlgAlert("📋","Skopiowano!",items.length+" produktów skopiowanych do schowka. Wklej w aplikacji sklepu."); })
     .catch(function(){
       var ta=document.createElement("textarea"); ta.value=text; document.body.appendChild(ta); ta.select();
       document.execCommand("copy"); document.body.removeChild(ta);
-      if(!silent) alert("✅ Skopiowano!");
+      if(!silent) dlgAlert("📋","Skopiowano!","Lista zakupów skopiowana do schowka.");
     });
   return true;
 }
@@ -900,7 +956,7 @@ function getPantryCtx() {
 function sendChat() {
   if(chatBusy) return;
   var inp=document.getElementById("chat-inp"), text=inp.value.trim(); if(!text) return;
-  if(!getApiKey()){ alert("Agent AI niedostępny — administrator musi skonfigurować klucz API (⚙️)"); return; }
+  if(!getApiKey()){ dlgAlert("🔒","Agent AI niedostępny","Administrator nie skonfigurował jeszcze klucza API. Wróć później."); return; }
   inp.value=""; inp.style.height="auto";
   addMsg("user",text); chatBusy=true; document.getElementById("chat-send-btn").disabled=true; addTyping();
   callAPI([{role:"user",content:getPantryCtx()+"\n\nPytanie: "+text}], SYS, function(reply){
@@ -913,7 +969,7 @@ function sendSug(text){ document.getElementById("chat-inp").value=text; sendChat
 
 // ── SHOP LIST ─────────────────────────────────────────────────────────────────
 function generateShopList() {
-  if(!getApiKey()){ alert("Funkcja niedostępna — administrator musi skonfigurować klucz API (⚙️)"); return; }
+  if(!getApiKey()){ dlgAlert("🔒","Funkcja niedostępna","Administrator nie skonfigurował jeszcze klucza API. Wróć później."); return; }
   var btn=document.getElementById("gen-btn"), spin=document.getElementById("gen-spin"), txt=document.getElementById("gen-btn-txt");
   btn.disabled=true; spin.style.display="block"; txt.textContent="Generuję...";
   var missing=[], expiring=[];
@@ -1039,7 +1095,7 @@ function startApp() {
   });
 }
 function goOffline(){ state=mkState(); document.getElementById("splash").style.display="none"; document.getElementById("app").style.display="block"; setSyncUI("err"); render(); }
-function resetAll(){ if(!confirm("Reset?")) return; state=mkState(); render(); fbPatch(RP,state).then(function(){ addLog("🗑️ RESET",0,0); }); }
+function resetAll(){ dlgConfirm("🗑️","Reset spiżarni","Czy na pewno zresetować wszystkie stany do zera? Wszyscy zobaczą zmiany.",function(){ state=mkState(); render(); fbPatch(RP,state).then(function(){ addLog("🗑️ RESET",0,0); }); },"Resetuj","danger"); }
 
 // ── ACTIONS ───────────────────────────────────────────────────────────────────
 function change(id,delta,max,name,btn) {
