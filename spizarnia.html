@@ -218,6 +218,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .log-empty{text-align:center;padding:40px 20px;color:#475569;font-size:13px}
 .admin-note{background:#1E3A5F;border:1px solid #1D4ED8;border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:11px;color:#93C5FD}
 
+/* PRODUCT PHOTOS */
+.item-photo{width:52px;height:52px;border-radius:10px;object-fit:cover;flex-shrink:0;border:2px solid #334155;cursor:pointer}
+.item-photo-placeholder{width:52px;height:52px;border-radius:10px;background:#0F172A;border:2px dashed #334155;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;flex-shrink:0;color:#475569}
+.photo-modal-img{width:100%;border-radius:12px;max-height:260px;object-fit:cover;margin-bottom:12px;display:none;border:2px solid #334155}
+.photo-modal-placeholder{width:100%;height:160px;background:#0F172A;border-radius:12px;border:2px dashed #334155;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;color:#475569}
+
 /* CUSTOM DIALOG */
 .dialog-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;padding:24px}
 .dialog-overlay.show{display:flex}
@@ -437,6 +443,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 </div>
 
+<!-- PHOTO MODAL -->
+<div class="overlay" id="photo-overlay" onclick="if(event.target===this)closePhoto()">
+  <div class="modal">
+    <h3 id="photo-modal-title">📷 Zdjęcie produktu</h3>
+    <p id="photo-modal-name" style="color:#94A3B8;font-size:12px;margin-bottom:10px"></p>
+    <img class="photo-modal-img" id="photo-modal-img" alt="">
+    <div class="photo-modal-placeholder" id="photo-modal-placeholder">
+      <span style="font-size:36px">📷</span>
+      <span style="font-size:12px;font-weight:600">Brak zdjęcia</span>
+    </div>
+    <div class="modal-btns">
+      <button class="mbtn blue" onclick="triggerProductPhoto()">📷 Zrób zdjęcie</button>
+      <button class="mbtn del" id="photo-delete-btn" style="display:none" onclick="deleteProductPhoto()">🗑️ Usuń</button>
+      <button class="mbtn cancel" onclick="closePhoto()">Zamknij</button>
+    </div>
+    <input type="file" id="product-photo-file" accept="image/*" capture="environment" style="display:none" onchange="handleProductPhoto(this)">
+  </div>
+</div>
+
 <!-- SETTINGS MODAL -->
 <div class="overlay" id="settings-overlay" onclick="if(event.target===this)closeSettings()">
   <div class="modal">
@@ -480,6 +505,7 @@ if(!location.hash) location.hash = ROOM;
 var RP = FB+"/rooms/"+ROOM;
 var LP = FB+"/logs/"+ROOM;
 var EP = FB+"/expiry/"+ROOM;
+var PP = FB+"/photos/"+ROOM; // product photos
 var CP = FB+"/config/apikey"; // admin API key stored here
 
 var CATS = [
@@ -591,7 +617,7 @@ var CLR=["#7C3AED","#DC2626","#D97706","#059669","#2563EB","#DB2777","#0891B2"];
 function nc(n){ var h=0; for(var i=0;i<n.length;i++) h=(h*31+n.charCodeAt(i))%CLR.length; return CLR[h]; }
 function ni(n){ return n.trim().charAt(0).toUpperCase(); }
 
-var state={}, expiry={}, filter="all", searchQ="", userName="", shopTs=0, saveTimer=null;
+var state={}, expiry={}, photos={}, filter="all", searchQ="", userName="", shopTs=0, saveTimer=null;
 var expiryItem=null, scanData=null, scanFromExpiry=false;
 var chatHistory=[], chatBusy=false;
 var receiptData=null, shopChecked={};
@@ -1056,8 +1082,8 @@ function doLogin() {
 
 // ── START ─────────────────────────────────────────────────────────────────────
 function startApp() {
-  Promise.all([fbGet(RP), fbGet(EP), fbGet(CP)]).then(function(res){
-    var remote=res[0], exp=res[1], key=res[2];
+  Promise.all([fbGet(RP), fbGet(EP), fbGet(CP), fbGet(PP)]).then(function(res){
+    var remote=res[0], exp=res[1], key=res[2], ph=res[3];
     // Load API key
     if(key) apiKey=key;
     // Load state
@@ -1069,14 +1095,16 @@ function startApp() {
     // Load expiry
     expiry={};
     if(exp) Object.keys(exp).forEach(function(k){ if(exp[k]) expiry[k]=exp[k]; });
+    photos={};
+    if(ph) Object.keys(ph).forEach(function(k){ if(ph[k]) photos[k]=ph[k]; });
     // Show app
     document.getElementById("splash").style.display="none";
     document.getElementById("app").style.display="block";
     updateShopBar(); setSyncUI("ok"); render();
     // Poll every 3s
     setInterval(function(){
-      Promise.all([fbGet(RP), fbGet(EP), fbGet(CP)]).then(function(res){
-        var r=res[0], e=res[1], k=res[2], ch=false;
+      Promise.all([fbGet(RP), fbGet(EP), fbGet(CP), fbGet(PP)]).then(function(res){
+        var r=res[0], e=res[1], k=res[2], ph=res[3], ch=false;
         if(k) apiKey=k;
         if(r){ Object.keys(r).forEach(function(key){
           if(key in state && r[key]!==state[key]){ state[key]=r[key]||0; ch=true; }
@@ -1120,6 +1148,79 @@ function onSearch(q){ searchQ=q.toLowerCase().trim(); document.getElementById("x
 function clearSearch(){ document.getElementById("sinp").value=""; onSearch(""); }
 function cls(c,t){ return c>=t?"grn":c>0?"low":"red"; }
 
+// ── PRODUCT PHOTOS ───────────────────────────────────────────────────────────
+var photoItem = null;
+
+function compressPhoto(dataUrl, cb) {
+  var img = new Image();
+  img.onload = function() {
+    var canvas = document.createElement("canvas");
+    var size = 120;
+    canvas.width = size; canvas.height = size;
+    var ctx = canvas.getContext("2d");
+    // crop square from center
+    var s = Math.min(img.width, img.height);
+    var ox = (img.width - s) / 2, oy = (img.height - s) / 2;
+    ctx.drawImage(img, ox, oy, s, s, 0, 0, size, size);
+    cb(canvas.toDataURL("image/jpeg", 0.7));
+  };
+  img.src = dataUrl;
+}
+
+function openPhoto(itemName) {
+  photoItem = itemName;
+  var key = fbk("p", itemName);
+  document.getElementById("photo-modal-name").textContent = itemName;
+  document.getElementById("photo-modal-title").textContent = "📷 Zdjęcie produktu";
+  var existing = photos[key];
+  if(existing) {
+    document.getElementById("photo-modal-img").src = existing;
+    document.getElementById("photo-modal-img").style.display = "block";
+    document.getElementById("photo-modal-placeholder").style.display = "none";
+    document.getElementById("photo-delete-btn").style.display = "block";
+  } else {
+    document.getElementById("photo-modal-img").style.display = "none";
+    document.getElementById("photo-modal-placeholder").style.display = "flex";
+    document.getElementById("photo-delete-btn").style.display = "none";
+  }
+  document.getElementById("photo-overlay").classList.add("show");
+}
+function closePhoto() { document.getElementById("photo-overlay").classList.remove("show"); }
+
+function triggerProductPhoto() { document.getElementById("product-photo-file").click(); }
+
+function handleProductPhoto(input) {
+  if(!input.files||!input.files[0]) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    compressPhoto(e.target.result, function(compressed) {
+      var key = fbk("p", photoItem);
+      photos[key] = compressed;
+      var patch = {}; patch[key] = compressed;
+      fbPatch(PP, patch).then(function() {
+        document.getElementById("photo-modal-img").src = compressed;
+        document.getElementById("photo-modal-img").style.display = "block";
+        document.getElementById("photo-modal-placeholder").style.display = "none";
+        document.getElementById("photo-delete-btn").style.display = "block";
+        render();
+      });
+    });
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function deleteProductPhoto() {
+  var key = fbk("p", photoItem);
+  delete photos[key];
+  var patch = {}; patch[key] = null;
+  fbPatch(PP, patch).then(function() {
+    document.getElementById("photo-modal-img").style.display = "none";
+    document.getElementById("photo-modal-placeholder").style.display = "flex";
+    document.getElementById("photo-delete-btn").style.display = "none";
+    render();
+  });
+}
+
 // ── RENDER ────────────────────────────────────────────────────────────────────
 function render() {
   var body=document.getElementById("body"), nR=0, nG=0, tot=0;
@@ -1157,7 +1258,12 @@ function render() {
       var expCls=dl===null?"":dl<=0?"bad":dl<=2?"warn":"ok";
       var expTxt=dl===null?"Ustaw datę":dl<=0?"Przeterminowane":dl+" dni";
       var expBtn=it.days?'<div class="exp-row"><button class="exp-btn '+expCls+'" onclick="openExpiry(\''+ne+'\')">📅 '+expTxt+"</button></div>":"";
-      html+='<div class="item '+c+'"><div class="item-top"><div class="item-name">'+nm+fh+"</div>"
+      var photoKey=fbk("p",it.n);
+      var photoSrc=photos[photoKey]||"";
+      var photoEl=photoSrc
+        ? '<img class="item-photo" src="'+photoSrc+'" onclick="openPhoto(\'"+ne+"\')">'
+        : '<div class="item-photo-placeholder" onclick="openPhoto(\'"+ne+"\')" title="Dodaj zdjęcie">📷</div>';
+      html+='<div class="item '+c+'"><div class="item-top">'+photoEl+'<div class="item-name">'+nm+fh+"</div>"
         +'<div class="kup">'+bt+'<br><span style="font-size:12px;opacity:.9;font-weight:700">'+bs+"</span></div></div>"
         +'<div class="prog-row"><div class="prog-bg"><div class="prog-fill" style="width:'+pct+'%"></div></div><div class="prog-txt">'+cur+" / "+it.target+" "+it.unit+"</div></div>"
         +'<div class="qty-row"><div class="qty-lbl">'+ql+"</div><div class=\"qty-ctrl\">"
