@@ -699,19 +699,102 @@ function handleReceiptPhoto(input){
   if(!input.files||!input.files[0])return;
   var reader=new FileReader();
   reader.onload=function(e){
-    document.getElementById("receipt-img").src=e.target.result;document.getElementById("receipt-img").style.display="block";document.getElementById("receipt-loading").style.display="block";
+    document.getElementById("receipt-img").src=e.target.result;
+    document.getElementById("receipt-img").style.display="block";
+    document.getElementById("receipt-loading").style.display="block";
+    document.getElementById("receipt-scan-result").style.display="none";
     var b64=e.target.result.split(",")[1],mime=input.files[0].type||"image/jpeg";
-    var allP=[];CATS.forEach(function(c){c.items.forEach(function(it){allP.push(it.n);});});
-    callAPI([{role:"user",content:[{type:"image",source:{type:"base64",media_type:mime,data:b64}},{type:"text",text:"Paragon. Lista produktow: "+allP.join(",")+". JSON: {\"produkty\":[{\"nazwa_z_paragonu\":\"oryg\",\"dopasowanie\":\"z listy lub null\",\"ilosc\":1}]}"}]}],null,function(txt){
+    var allP=[];CATS.forEach(function(cat){cat.items.forEach(function(it){allP.push(it.n);});});
+    // Krotki prompt + wiecej tokenow = mniej szans na uciety JSON
+    var prompt="To jest paragon z Biedronki. Znajdz produkty ktore pasuja do tej listy: "+allP.join(", ")+". Zwroc TYLKO poprawny JSON (bez markdown): {\"produkty\":[{\"n\":\"nazwa z listy lub null\",\"ilosc\":1}]}. Jesli nie pasuje — pominij. Max 15 produktow. Odpowiedz krotko.";
+    callAPI([{role:"user",content:[
+      {type:"image",source:{type:"base64",media_type:mime,data:b64}},
+      {type:"text",text:prompt}
+    ]}],
+    "Jestes asystentem lodowki. TYLKO JSON. Bez markdown.",
+    function(txt){
       document.getElementById("receipt-loading").style.display="none";
-      try{var p=JSON.parse(txt.replace(/```json|```/g,"").trim());receiptData=p.produkty||[];closeReceiptModal();showReceiptResults();}
-      catch(e){document.getElementById("receipt-result-txt").textContent="Blad: "+e.message;document.getElementById("receipt-scan-result").style.display="block";}
-    },function(err){document.getElementById("receipt-loading").style.display="none";document.getElementById("receipt-result-txt").textContent="Blad: "+err;document.getElementById("receipt-scan-result").style.display="block";});
+      // Robust JSON extraction
+      var clean=txt.replace(/```json/gi,"").replace(/```/g,"").trim();
+      var s=clean.indexOf("{"),e=clean.lastIndexOf("}");
+      if(s===-1||e===-1){
+        document.getElementById("receipt-result-txt").textContent="Nie znaleziono produktow na paragonie.";
+        document.getElementById("receipt-scan-result").style.display="block";
+        return;
+      }
+      try{
+        // Fix common AI mistakes: trailing commas, unclosed strings
+        var jsonStr=clean.slice(s,e+1);
+        // Remove trailing commas before ] or }
+        jsonStr=jsonStr.replace(/,\s*([}\]])/g,"$1");
+        // Try to parse
+        var parsed=JSON.parse(jsonStr);
+        var products=parsed.produkty||[];
+        // Convert to old format for compatibility
+        receiptData=products.filter(function(p){return p.n&&p.n!=="null";}).map(function(p){
+          return{nazwa_z_paragonu:p.n,dopasowanie:p.n,ilosc:p.ilosc||1};
+        });
+        if(!receiptData.length){
+          document.getElementById("receipt-result-txt").textContent="Nie znaleziono pasujacych produktow.";
+          document.getElementById("receipt-scan-result").style.display="block";
+          return;
+        }
+        closeReceiptModal();
+        showReceiptResults();
+      }catch(err){
+        // Try to salvage partial JSON by extracting produkty array manually
+        var arrStart=clean.indexOf('"produkty"');
+        if(arrStart!==-1){
+          var arrS=clean.indexOf("[",arrStart),arrE=clean.lastIndexOf("]");
+          if(arrS!==-1&&arrE!==-1&&arrE>arrS){
+            try{
+              var partialArr=JSON.parse(clean.slice(arrS,arrE+1).replace(/,\s*([}\]])/g,"$1"));
+              receiptData=partialArr.filter(function(p){return p.n&&p.n!=="null";}).map(function(p){
+                return{nazwa_z_paragonu:p.n,dopasowanie:p.n,ilosc:p.ilosc||1};
+              });
+              if(receiptData.length){closeReceiptModal();showReceiptResults();return;}
+            }catch(e2){}
+          }
+        }
+        document.getElementById("receipt-result-txt").textContent="Blad odczytu: "+err.message.slice(0,60)+". Sprobuj ponownie.";
+        document.getElementById("receipt-scan-result").style.display="block";
+      }
+    },
+    function(err){
+      document.getElementById("receipt-loading").style.display="none";
+      document.getElementById("receipt-result-txt").textContent="Blad API: "+err;
+      document.getElementById("receipt-scan-result").style.display="block";
+    },
+    2000  // wiecej tokenow
+    );
   };
   reader.readAsDataURL(input.files[0]);
 }
 function showReceiptResults(){if(!receiptData||!receiptData.length)return;showPage("shop");document.getElementById("receipt-results").style.display="block";document.getElementById("receipt-items").innerHTML=receiptData.map(function(p){var m=p.dopasowanie&&p.dopasowanie!=="null";return'<div class="rp-item"><div class="rp-info"><div class="rp-name">'+p.nazwa_z_paragonu+'</div>'+(m?'<div class="rp-mapped">'+p.dopasowanie+'</div>':'<div class="rp-skip">Nie dopasowano</div>')+'</div><div class="rp-qty">x'+(p.ilosc||1)+'</div></div>';}).join("");}
-function applyReceipt(){if(!receiptData)return;var patch={},updated=[];receiptData.forEach(function(p){if(!p.dopasowanie||p.dopasowanie==="null")return;CATS.forEach(function(cat){cat.items.forEach(function(it){if(it.n===p.dopasowanie){var id=fbk(cat.id,it.n),cur=state[id]||0,nv=Math.min(it.target*2,cur+(parseInt(p.ilosc)||1));state[id]=nv;patch[id]=nv;updated.push(it.n);}});});});if(Object.keys(patch).length){shopTs=Date.now();patch.__shopTs=shopTs;fbPatch(RP,patch).then(function(){addLog("PARAGON",0,Object.keys(patch).length);});updateShopBar();render();document.getElementById("receipt-results").style.display="none";dlgAlert("OK","Lodowka zaktualizowana","Dodano: "+updated.join(", "));}else dlgAlert("?","Brak dopasowania","Nie znaleziono produktow z paragonu.");}
+function applyReceipt(){
+  if(!receiptData)return;
+  var patch={},updated=[];
+  receiptData.forEach(function(p){
+    var matchName=p.dopasowanie||p.nazwa_z_paragonu;
+    if(!matchName||matchName==="null")return;
+    CATS.forEach(function(cat){cat.items.forEach(function(it){
+      if(it.n===matchName||it.n.toLowerCase()===matchName.toLowerCase()){
+        var id=fbk(cat.id,it.n),cur=state[id]||0,nv=Math.min(it.target*2,cur+(parseInt(p.ilosc)||1));
+        state[id]=nv;patch[id]=nv;updated.push(it.n);
+      }
+    });});
+  });
+  if(Object.keys(patch).length){
+    shopTs=Date.now();patch.__shopTs=shopTs;
+    fbPatch(RP,patch).then(function(){addLog("PARAGON",0,Object.keys(patch).length);});
+    updateShopBar();render();
+    document.getElementById("receipt-results").style.display="none";
+    dlgAlert("OK","Lodowka zaktualizowana","Dodano "+updated.length+" produktow: "+updated.join(", "));
+
+  }else{
+    dlgAlert("?","Brak dopasowania","Produkty z paragonu nie pasuja do listy lodowki.");
+  }
+}
 
 // ── PHOTOS ────────────────────────────────────────────────────────────────────
 function compressPhoto(dataUrl,cb){var img=new Image();img.onload=function(){var canvas=document.createElement("canvas"),size=120;canvas.width=size;canvas.height=size;var ctx=canvas.getContext("2d");var s=Math.min(img.width,img.height),ox=(img.width-s)/2,oy=(img.height-s)/2;ctx.drawImage(img,ox,oy,s,s,0,0,size,size);cb(canvas.toDataURL("image/jpeg",.7));};img.onerror=function(){cb(dataUrl);};img.src=dataUrl;}
