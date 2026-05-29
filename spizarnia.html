@@ -1496,8 +1496,7 @@ function openEditMeal(section,idx){
   document.getElementById("edit-meal-prot").value=m.prot||"";
   document.getElementById("edit-meal-carb").value=m.carb||"";
   document.getElementById("edit-meal-fat").value=m.fat||"";
-  document.getElementById("edit-meal-ingr").value=(m.skladniki||[]).map(function(s){return s.n+" — "+s.il;}).join("
-");
+  document.getElementById("edit-meal-ingr").value=(m.skladniki||[]).map(function(s){return s.n+" - "+s.il;}).join("\n");
   document.getElementById("edit-meal-recipe").value=(m.przepis||"");
   document.getElementById("edit-meal-overlay").classList.add("show");
 }
@@ -1505,10 +1504,9 @@ function closeEditMeal(){document.getElementById("edit-meal-overlay").classList.
 function saveEditMeal(){
   var name=document.getElementById("edit-meal-name").value.trim();
   if(!name){dlgAlert("⚠️","Brak nazwy","Wpisz nazwę posiłku");return;}
-  var ingrRaw=document.getElementById("edit-meal-ingr").value.trim().split("
-").filter(function(l){return l.trim();});
+  var ingrRaw=document.getElementById("edit-meal-ingr").value.trim().split("\n").filter(function(l){return l.trim();});
   var skladniki=ingrRaw.map(function(line){
-    var parts=line.split(/—|\-/).map(function(x){return x.trim();});
+    var parts=line.split(/[—\-]/).map(function(x){return x.trim();});
     return{n:parts[0]||line.trim(),il:parts[1]||""};
   });
   var updated={
