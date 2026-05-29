@@ -415,16 +415,50 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
   </div>
 </div>
 
-<!-- PHOTO MODAL -->
+<!-- PHOTO MODAL — multi-slot -->
 <div class="overlay" id="photo-overlay" onclick="if(event.target===this)closePhoto()">
-  <div class="modal">
-    <h3>&#128247; Zdjęcie produktu</h3>
-    <p id="photo-modal-name" style="color:var(--text2);margin-bottom:12px;font-weight:700"></p>
-    <img id="photo-modal-img" alt="" style="width:100%;border-radius:10px;max-height:220px;object-fit:cover;margin-bottom:12px;display:none;border:1px solid var(--border)">
-    <div id="photo-modal-empty" style="width:100%;height:140px;background:var(--bg3);border-radius:10px;border:2px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;color:var(--text3)"><span style="font-size:40px">&#128247;</span><span style="font-size:12px;font-weight:600">Brak zdjęcia</span></div>
-    <label style="display:flex;align-items:center;justify-content:center;gap:8px;background:var(--blue);color:#fff;border-radius:50px;padding:13px;font-size:13px;font-weight:800;cursor:pointer;margin-bottom:8px">&#128247; Dodaj zdjęcie<input type="file" accept="image/*" style="display:none" onchange="handleProductPhoto(this)"></label>
-    <button class="mbtn del" id="photo-delete-btn" style="display:none;width:100%;margin-bottom:8px" onclick="deleteProductPhoto()">&#128465;&#65039; Usuń zdjecie</button>
-    <button class="mbtn cancel" style="width:100%" onclick="closePhoto()">Zamknij</button>
+  <div class="modal" style="max-width:460px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+      <h3 style="font-size:16px">&#128247; Zdjęcia produktu</h3>
+      <button onclick="closePhoto()" style="background:var(--bg3);border:none;color:var(--text2);border-radius:50%;width:30px;height:30px;font-size:15px;cursor:pointer">&#215;</button>
+    </div>
+    <p id="photo-modal-name" style="color:var(--green);margin-bottom:12px;font-weight:800;font-size:13px"></p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+      <div>
+        <div style="font-size:10px;font-weight:800;color:var(--text3);margin-bottom:5px;text-align:center;text-transform:uppercase;letter-spacing:.8px">Przód (ikona) &#11088;</div>
+        <div id="slot-front" class="photo-slot" onclick="triggerSlotPhoto('front')" style="position:relative;width:100%;height:110px;background:var(--bg3);border:2px dashed var(--green);border-radius:10px;cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center">
+          <img id="slot-front-img" style="display:none;width:100%;height:100%;object-fit:cover" alt="">
+          <span id="slot-front-empty" style="font-size:28px;color:var(--green)">&#128247;</span>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:800;color:var(--text3);margin-bottom:5px;text-align:center;text-transform:uppercase;letter-spacing:.8px">Bok &#128260;</div>
+        <div id="slot-side" class="photo-slot" onclick="triggerSlotPhoto('side')" style="position:relative;width:100%;height:110px;background:var(--bg3);border:2px dashed var(--border2);border-radius:10px;cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center">
+          <img id="slot-side-img" style="display:none;width:100%;height:100%;object-fit:cover" alt="">
+          <span id="slot-side-empty" style="font-size:28px;color:var(--text3)">&#128247;</span>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:800;color:var(--text3);margin-bottom:5px;text-align:center;text-transform:uppercase;letter-spacing:.8px">Góra &#128314;</div>
+        <div id="slot-top" class="photo-slot" onclick="triggerSlotPhoto('top')" style="position:relative;width:100%;height:110px;background:var(--bg3);border:2px dashed var(--border2);border-radius:10px;cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center">
+          <img id="slot-top-img" style="display:none;width:100%;height:100%;object-fit:cover" alt="">
+          <span id="slot-top-empty" style="font-size:28px;color:var(--text3)">&#128247;</span>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:800;color:var(--amber);margin-bottom:5px;text-align:center;text-transform:uppercase;letter-spacing:.8px">Data ważności &#128197;</div>
+        <div id="slot-expiry" class="photo-slot" onclick="triggerSlotPhotoAndScan('expiry')" style="position:relative;width:100%;height:110px;background:var(--bg3);border:2px dashed var(--amber);border-radius:10px;cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center">
+          <img id="slot-expiry-img" style="display:none;width:100%;height:100%;object-fit:cover" alt="">
+          <span id="slot-expiry-empty" style="font-size:28px;color:var(--amber)">&#128197;</span>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--text3);text-align:center;margin-bottom:12px;line-height:1.6">
+      Kliknij slot aby zrobić zdjęcie &#183; <b style="color:var(--green)">Przód</b> = ikona na liście<br>
+      <b style="color:var(--amber)">Data ważności</b> = AI automatycznie zeskanuje datę
+    </div>
+    <button class="mbtn cancel" style="width:100%" onclick="closePhoto()">Gotowe</button>
+    <input type="file" id="photo-slot-file" accept="image/*" capture="environment" style="display:none" onchange="handleSlotPhoto(this)">
   </div>
 </div>
 
@@ -506,6 +540,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 <!-- ONBOARDING -->
 <div class="overlay" id="ob-overlay" style="align-items:flex-start;overflow-y:auto;padding:20px">
   <div style="background:var(--bg2);border-radius:20px;padding:24px;width:100%;max-width:440px;border:1px solid var(--border2);margin:auto">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:4px">
+      <button onclick="hideOb()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text3);border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;line-height:1">&#215;</button>
+    </div>
     <div style="text-align:center;font-size:48px;margin-bottom:8px">&#127968;</div>
     <div style="font-size:20px;font-weight:900;color:var(--text);text-align:center;margin-bottom:4px">Witaj w Pełnej Lodówce</div>
     <p style="font-size:12px;color:var(--text3);text-align:center;margin-bottom:20px">Odpowiedz na kilka pytań — dobierzemy dietę i listę zakupów</p>
@@ -797,7 +834,7 @@ function handleScanPhoto(input){
     var b64=e.target.result.split(",")[1],mime=input.files[0].type||"image/jpeg";
     callAPI([{role:"user",content:[
       {type:"image",source:{type:"base64",media_type:mime,data:b64}},
-      {type:"text",text:"Przeanalizuj zdjecie produktu. Odpowiedz TYLKO JSON bez markdown:\n{\"produkt\":\"nazwa po polsku\",\"data\":\"DD.MM.YYYY lub null\",\"uwaga\":\"opcjonalna uwaga\"}"}
+      {type:"text",text:"Przeanalizuj to zdjecie produktu spozywczego. ZNAJDZ DATE PRZYDATNOSCI: Format polskich produktow: DD.MM.YYYY lub DD.MM.RR (dzien.miesiac.rok). PRZYKLAD: 14.06.28 = dzien 14, miesiac 06, rok 2028 (NIE 2014!). Rok dwucyfrowy 25-35 = 2025-2035. Dzien 01-31, Miesiac 01-12. Zwroc date jako DD.MM.YYYY. Odpowiedz TYLKO JSON: {\"produkt\":\"pelna nazwa po polsku\",\"data\":\"DD.MM.YYYY lub null\",\"uwaga\":\"krotka uwaga\"}"}
     ]}],null,function(txt){
       document.getElementById("scan-loading").style.display="none";
       try{
@@ -930,46 +967,112 @@ function compressPhoto(dataUrl,cb){
   img.onerror=function(){cb(dataUrl);};
   img.src=dataUrl;
 }
+// ── MULTI-SLOT PHOTOS ─────────────────────────────────────────────────────────
+var photoItem=null, activeSlot="front";
+var SLOTS=["front","side","top","expiry"];
+
 function openPhoto(name){
   photoItem=name;
   document.getElementById("photo-modal-name").textContent=name;
-  var key=fbk("p",name),ex=photos[key];
-  if(ex){
-    document.getElementById("photo-modal-img").src=ex;
-    document.getElementById("photo-modal-img").style.display="block";
-    document.getElementById("photo-modal-empty").style.display="none";
-    document.getElementById("photo-delete-btn").style.display="block";
-  }else{
-    document.getElementById("photo-modal-img").style.display="none";
-    document.getElementById("photo-modal-empty").style.display="flex";
-    document.getElementById("photo-delete-btn").style.display="none";
-  }
+  // Load all slots from Firebase/cache
+  SLOTS.forEach(function(slot){
+    var key=fbk("p_"+slot,name),src=photos[key]||null;
+    var img=document.getElementById("slot-"+slot+"-img");
+    var empty=document.getElementById("slot-"+slot+"-empty");
+    if(src&&img){img.src=src;img.style.display="block";if(empty)empty.style.display="none";}
+    else{if(img)img.style.display="none";if(empty)empty.style.display="flex";}
+  });
   document.getElementById("photo-overlay").classList.add("show");
 }
-function closePhoto(){document.getElementById("photo-overlay").classList.remove("show");}
-function handleProductPhoto(input){
+function closePhoto(){document.getElementById("photo-overlay").classList.remove("show");render();}
+
+function triggerSlotPhoto(slot){
+  activeSlot=slot;
+  document.getElementById("photo-slot-file").value="";
+  document.getElementById("photo-slot-file").click();
+}
+function triggerSlotPhotoAndScan(slot){
+  activeSlot=slot;
+  // Open scanner for expiry slot
+  expiryItem=photoItem;scanFromExpiry=true;scanSavesPhoto=true;
+  openScanner();
+}
+
+function handleSlotPhoto(input){
   if(!input.files||!input.files[0])return;
   var reader=new FileReader();
   reader.onload=function(e){
     compressPhoto(e.target.result,function(compressed){
-      var key=fbk("p",photoItem),p={};photos[key]=compressed;p[key]=compressed;
-      document.getElementById("photo-modal-img").src=compressed;
-      document.getElementById("photo-modal-img").style.display="block";
-      document.getElementById("photo-modal-empty").style.display="none";
-      document.getElementById("photo-delete-btn").style.display="block";
-      fbPatch(PP,p).then(function(){closePhoto();render();});
+      var slot=activeSlot;
+      var key=fbk("p_"+slot,photoItem),p={};
+      photos[key]=compressed;p[key]=compressed;
+      // Update slot UI
+      var img=document.getElementById("slot-"+slot+"-img");
+      var empty=document.getElementById("slot-"+slot+"-empty");
+      if(img){img.src=compressed;img.style.display="block";}
+      if(empty)empty.style.display="none";
+      // Save to Firebase
+      fbPatch(PP,p);
+      // Front slot = main thumbnail (legacy "p" key for render())
+      if(slot==="front"){
+        var mainKey=fbk("p",photoItem),mp={};
+        photos[mainKey]=compressed;mp[mainKey]=compressed;
+        fbPatch(PP,mp);
+      }
+      // Expiry slot = also trigger scan
+      if(slot==="expiry"){
+        scanSlotExpiry(e.target.result,photoItem,input.files[0].type||"image/jpeg");
+      }
+      render();
     });
   };
   reader.readAsDataURL(input.files[0]);
 }
+
+function scanSlotExpiry(dataUrl,productName,mime){
+  if(!apiKey)return;
+  var b64=dataUrl.split(",")[1];
+  callAPI([{role:"user",content:[
+    {type:"image",source:{type:"base64",media_type:mime,data:b64}},
+    {type:"text",text:"Znajdz date przydatnosci na tym zdjęciu produktu spożywczego.\nFormat polskich produktów: DD.MM.YYYY lub DD.MM.RR (dzień.miesiąc.rok)\nPrzykład: 14.06.28 = 14 czerwca 2028\nOdpowiedz TYLKO JSON: {\"data\":\"DD.MM.YYYY lub null\"}"}
+  ]}],null,function(txt){
+    try{
+      var clean=txt.replace(/```json|```/g,"").trim();
+      var j=JSON.parse(clean.slice(clean.indexOf("{"),clean.lastIndexOf("}")+1));
+      if(j.data&&j.data!=="null"){
+        var parts=j.data.split(".");
+        if(parts.length===3){
+          var yr=parts[2].length===2?"20"+parts[2]:parts[2];
+          var iso=yr+"-"+parts[1]+"-"+parts[0];
+          var ts=new Date(iso).getTime();
+          if(!isNaN(ts)){
+            var ek=fbk("e",productName),ep={};
+            expiry[ek]=ts;ep[ek]=ts;
+            fbPatch(EP,ep);
+            render();
+            dlgAlert("\uD83D\uDCC5","Data zeskanowana!","Data ważności "+j.data+" zapisana dla: "+productName);
+          }
+        }
+      }
+    }catch(e){}
+  },function(){});
+}
+
+// Compatibility: handleProductPhoto → alias
+function handleProductPhoto(input){handleSlotPhoto(input);}
 function deleteProductPhoto(){
-  var key=fbk("p",photoItem),p={};delete photos[key];p[key]=null;
-  fbPatch(PP,p).then(function(){
-    document.getElementById("photo-modal-img").style.display="none";
-    document.getElementById("photo-modal-empty").style.display="flex";
-    document.getElementById("photo-delete-btn").style.display="none";
-    render();
+  SLOTS.forEach(function(slot){
+    var key=fbk("p_"+slot,photoItem),p={};
+    delete photos[key];p[key]=null;fbPatch(PP,p);
   });
+  var mainKey=fbk("p",photoItem),mp={};delete photos[mainKey];mp[mainKey]=null;
+  fbPatch(PP,mp);
+  SLOTS.forEach(function(slot){
+    var img=document.getElementById("slot-"+slot+"-img");
+    var empty=document.getElementById("slot-"+slot+"-empty");
+    if(img)img.style.display="none";if(empty)empty.style.display="flex";
+  });
+  render();
 }
 
 // ADMIN
