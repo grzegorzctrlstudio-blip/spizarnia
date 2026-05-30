@@ -309,6 +309,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .photo-modal-img{width:100%;border-radius:var(--radius-sm);max-height:260px;object-fit:cover;margin-bottom:12px;display:none;border:1px solid var(--border)}
 .photo-modal-empty{width:100%;height:160px;background:var(--bg3);border-radius:var(--radius-sm);border:2px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;color:var(--text3)}
 
+/* ── UPDATE PANTRY MODAL — 3 duże pionowe opcje ── */
+#pantry-update-overlay{display:none;position:fixed;inset:0;z-index:380;background:rgba(0,0,0,.78);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px}
+#pantry-update-overlay.show{display:flex}
+.pu-modal{background:var(--bg2);border-radius:24px;padding:24px 22px;width:100%;max-width:460px;border:1px solid var(--border2);max-height:90vh;overflow-y:auto}
+.pu-hdr{text-align:center;margin-bottom:22px}
+.pu-ico{font-size:42px;margin-bottom:10px;line-height:1}
+.pu-title{font-size:20px;font-weight:900;color:var(--text);letter-spacing:-.4px;margin-bottom:4px}
+.pu-sub{font-size:13px;color:var(--text3);font-weight:600}
+.pu-opt{display:flex;align-items:center;gap:14px;width:100%;background:var(--bg3);border:1.5px solid var(--border);border-radius:18px;padding:18px;cursor:pointer;text-align:left;margin-bottom:10px;transition:all .15s}
+.pu-opt:hover{border-color:var(--green);background:var(--bg4)}
+.pu-opt:active{transform:scale(.98);filter:brightness(.92)}
+.pu-opt-ico{font-size:28px;flex-shrink:0;width:54px;height:54px;border-radius:14px;background:rgba(30,215,96,.12);display:flex;align-items:center;justify-content:center}
+.pu-opt.purple .pu-opt-ico{background:rgba(139,92,246,.15)}
+.pu-opt.blue .pu-opt-ico{background:rgba(61,139,255,.15)}
+.pu-opt-text{flex:1;min-width:0}
+.pu-opt-title{font-size:15px;font-weight:800;color:var(--text);margin-bottom:3px}
+.pu-opt-desc{font-size:12px;color:var(--text3);font-weight:500;line-height:1.4}
+.pu-opt-arrow{font-size:24px;color:var(--text3);flex-shrink:0}
+.pu-cancel{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text3);border-radius:50px;padding:13px;font-size:13px;font-weight:700;cursor:pointer;margin-top:6px}
+.pu-cancel:active{background:var(--bg4)}
+
 /* PHOTO SLOTS — front / side / top + optional expiry */
 .photo-slots{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
 .photo-slots.with-exp{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
@@ -546,10 +567,51 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
   <div class="page-flex" id="page-shop">
     <div class="shop-hdr">
       <h2>🛒 Zakupy</h2>
-      <p>Lista AI + szybkie zamówienie online</p>
+      <p>Lista z diety — pełne opakowania, gotowa do zakupów</p>
     </div>
     <div class="shop-body">
-      <div style="font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:10px">🛍️ Zamów online</div>
+      <!-- Wybór sklepu -->
+      <div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">🏪 Sklep</div>
+      <div class="shop-store-pick" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:14px">
+        <button class="shop-pill" id="shop-pill-biedronka" data-store="biedronka" onclick="setShopStore('biedronka')" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:14px;padding:12px 6px;font-size:13px;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .15s">
+          <span style="font-size:20px">🐝</span><span>Biedronka</span>
+        </button>
+        <button class="shop-pill" id="shop-pill-lidl" data-store="lidl" onclick="setShopStore('lidl')" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:14px;padding:12px 6px;font-size:13px;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .15s">
+          <span style="font-size:20px">🏪</span><span>Lidl</span>
+        </button>
+        <button class="shop-pill" id="shop-pill-both" data-store="both" onclick="setShopStore('both')" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:14px;padding:12px 6px;font-size:13px;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .15s">
+          <span style="font-size:20px">🛒</span><span>Oba</span>
+        </button>
+      </div>
+
+      <!-- Wybór dni -->
+      <div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">📅 Na ile dni</div>
+      <div class="shop-days-pick" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:14px">
+        <button class="shop-days" id="shop-days-1" data-days="1" onclick="setShopDays(1)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:12px;padding:11px 6px;font-size:13px;font-weight:800;cursor:pointer">1 dzień</button>
+        <button class="shop-days" id="shop-days-3" data-days="3" onclick="setShopDays(3)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:12px;padding:11px 6px;font-size:13px;font-weight:800;cursor:pointer">3 dni</button>
+        <button class="shop-days" id="shop-days-7" data-days="7" onclick="setShopDays(7)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:12px;padding:11px 6px;font-size:13px;font-weight:800;cursor:pointer">7 dni</button>
+        <button class="shop-days" id="shop-days-14" data-days="14" onclick="setShopDays(14)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:12px;padding:11px 6px;font-size:13px;font-weight:800;cursor:pointer">14 dni</button>
+      </div>
+
+      <!-- Główny przycisk -->
+      <button class="gen-btn" id="gen-btn" onclick="generateDietShoppingList(shopDays||7)" style="margin-bottom:8px">
+        <div class="gen-spin" id="gen-spin"></div>
+        <span id="gen-btn-txt">🛒 Wygeneruj listę z diety</span>
+      </button>
+      <button class="copy-btn" id="copy-btn" onclick="copyShopList()" style="margin-bottom:14px">📋 Kopiuj listę do schowka</button>
+
+      <!-- Wyniki listy zakupów -->
+      <div id="shop-list-content"></div>
+
+      <!-- Receipt results (after scan) -->
+      <div class="receipt-results" id="receipt-results">
+        <h4>🧾 Produkty z paragonu</h4>
+        <div id="receipt-items"></div>
+        <button class="receipt-apply" onclick="applyReceipt()">✅ Zaktualizuj lodówkę</button>
+      </div>
+
+      <!-- Sklepy online (na dole, mniej eksponowane) -->
+      <div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-top:24px;margin-bottom:10px">🛍️ Zamów online</div>
       <div class="stores-grid">
         <button class="store-card" onclick="openStore('biedronka')" style="background:linear-gradient(135deg,#DC2626,#991B1B)">
           <span class="store-card-ico">🐝</span>
@@ -572,22 +634,6 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
           <span class="store-card-sub">~15 minut</span>
         </button>
       </div>
-      <div class="receipt-drop" onclick="openReceipt()">
-        <div style="font-size:40px;margin-bottom:10px">🧾</div>
-        <div style="font-size:14px;color:var(--text2);font-weight:700">Zeskanuj paragon</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:5px">Zdjęcie paragonu → AI aktualizuje lodówkę</div>
-      </div>
-      <div class="receipt-results" id="receipt-results">
-        <h4>🧾 Produkty z paragonu</h4>
-        <div id="receipt-items"></div>
-        <button class="receipt-apply" onclick="applyReceipt()">✅ Zaktualizuj lodówkę</button>
-      </div>
-      <button class="gen-btn" id="gen-btn" onclick="generateShopList()">
-        <div class="gen-spin" id="gen-spin"></div>
-        <span id="gen-btn-txt">🛒 Generuj listę zakupów z diety</span>
-      </button>
-      <button class="copy-btn" id="copy-btn" onclick="copyShopList()">📋 Kopiuj listę do schowka</button>
-      <div id="shop-list-content"></div>
     </div>
   </div>
 
@@ -720,6 +766,46 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
   </div>
 </div>
 
+<!-- ══ UPDATE PANTRY MODAL ═══════════════════════════════════════════════ -->
+<div id="pantry-update-overlay" onclick="if(event.target===this)closePantryUpdateModal()">
+  <div class="pu-modal">
+    <div class="pu-hdr">
+      <div class="pu-ico">🏠</div>
+      <div class="pu-title">Aktualizuj stan lodówki</div>
+      <div class="pu-sub">Wybierz sposób aktualizacji</div>
+    </div>
+
+    <button class="pu-opt" onclick="closePantryUpdateModal();openPantryAudit()">
+      <div class="pu-opt-ico">🥗</div>
+      <div class="pu-opt-text">
+        <div class="pu-opt-title">Produkty z diety</div>
+        <div class="pu-opt-desc">Przejdź po liście składników, zaznacz ile masz</div>
+      </div>
+      <div class="pu-opt-arrow">›</div>
+    </button>
+
+    <button class="pu-opt purple" onclick="closePantryUpdateModal();openReceipt()">
+      <div class="pu-opt-ico">🧾</div>
+      <div class="pu-opt-text">
+        <div class="pu-opt-title">Skanuj paragon</div>
+        <div class="pu-opt-desc">Zdjęcie paragonu → AI rozpoznaje produkty</div>
+      </div>
+      <div class="pu-opt-arrow">›</div>
+    </button>
+
+    <button class="pu-opt blue" onclick="closePantryUpdateModal();openSingleProductPicker()">
+      <div class="pu-opt-ico">✏️</div>
+      <div class="pu-opt-text">
+        <div class="pu-opt-title">Ręcznie wybrany produkt</div>
+        <div class="pu-opt-desc">Wpisz nazwę i nową ilość konkretnego produktu</div>
+      </div>
+      <div class="pu-opt-arrow">›</div>
+    </button>
+
+    <button class="pu-cancel" onclick="closePantryUpdateModal()">Zamknij</button>
+  </div>
+</div>
+
 <!-- LOG MODAL -->
 <div class="overlay bottom" id="log-overlay" onclick="if(event.target===this)closeLog()">
   <div class="log-modal">
@@ -753,7 +839,7 @@ var state={},expiry={},photos={},filter="all",catFilter="all",searchQ="";
 var userName="",userFirstName="",userLastName="",userDisplayName="",shopTs=0,saveTimer=null,apiKey="";
 var expiryItem=null,scanData=null,scanFromExpiry=false,scanSavesPhoto=false;
 var photoItem=null,activeSlot="front",chatHistory=[],chatBusy=false;
-var receiptData=null,receiptAllProducts=[],receiptMeta={},shopChecked={},shopStore="biedronka";
+var receiptData=null,receiptAllProducts=[],receiptMeta={},shopChecked={},shopStore="biedronka",shopDays=7;
 var receiptAdjustments=[];
 var receiptUncertain=[];
 var pendingReceiptFingerprint="";
@@ -885,6 +971,13 @@ function showPage(p){
     var tb=document.getElementById("tnav-"+x);if(tb)tb.classList[x===p?"add":"remove"]("act");
   });
   if(p==="chat"&&chatHistory.length===0)addWelcome();
+  if(p==="shop"){
+    // Inicjalizuj pille sklepu (preferuj z profilu jeśli ustawiony)
+    var profileStore=userProfile&&userProfile.stores;
+    if(profileStore)shopStore=profileStore;
+    setShopStore(shopStore||"biedronka");
+    setShopDays(shopDays||7);
+  }
 }
 
 // ── API ───────────────────────────────────────────────────────────────────────
@@ -1476,6 +1569,30 @@ function clearSearch(){document.getElementById("sinp").value="";onSearch("");}
 
 // ── SHOP LIST ─────────────────────────────────────────────────────────────────
 function selectShopStore(store){shopStore=store;["biedronka","lidl","both"].forEach(function(s){var btn=document.getElementById("store-sel-"+s);if(!btn)return;btn.style.borderColor=s===store?"var(--green)":"var(--border)";btn.style.background=s===store?"rgba(30,215,96,.12)":"transparent";btn.style.color=s===store?"var(--green)":"var(--text3)";});}
+
+// Nowy wybór sklepu na stronie Zakupów (z pillami)
+function setShopStore(store){
+  shopStore=store||"biedronka";
+  ["biedronka","lidl","both"].forEach(function(s){
+    var btn=document.getElementById("shop-pill-"+s);
+    if(!btn)return;
+    var on=s===shopStore;
+    btn.style.borderColor=on?"var(--green)":"var(--border)";
+    btn.style.background=on?"rgba(30,215,96,.15)":"var(--bg3)";
+    btn.style.color=on?"var(--green)":"var(--text2)";
+  });
+}
+function setShopDays(days){
+  shopDays=Number(days)||7;
+  [1,3,7,14].forEach(function(d){
+    var btn=document.getElementById("shop-days-"+d);
+    if(!btn)return;
+    var on=d===shopDays;
+    btn.style.borderColor=on?"var(--green)":"var(--border)";
+    btn.style.background=on?"rgba(30,215,96,.15)":"var(--bg3)";
+    btn.style.color=on?"var(--green)":"var(--text2)";
+  });
+}
 function generateShopList(){if(!apiKey){dlgAlert("X","Niedostepne","Skonfiguruj klucz API");return;}var btn=document.getElementById("gen-btn"),spin=document.getElementById("gen-spin"),txt=document.getElementById("gen-btn-txt");btn.disabled=true;spin.style.display="block";txt.textContent="Generuje...";var missing=[],expiring=[];CATS.forEach(function(cat){cat.items.forEach(function(it){var cur=state[fbk(cat.id,it.n)]||0;if(cur<it.target)missing.push(it.n+"(mam:"+cur+",potrzeba:"+it.target+" "+it.unit+")");var d=getDaysLeft(it);if(d!==null&&d<=3&&cur>0)expiring.push(it.n+"("+d+"dni)");});});var storeName={biedronka:"Biedronka",lidl:"Lidl",both:"Biedronka i Lidl"}[shopStore]||"Biedronka";var prompt="Lista zakupow do "+storeName+". Braki w lodowce: "+missing.join("; ")+". Wygasaja wkrotce: "+(expiring.join("; ")||"nic")+". Jezeli uzytkownik ostatnio kupowal cos w Biedronce uwzgledniej te produkty przy priorytetach. TYLKO JSON: {\"komentarz\":\"\",\"produkty\":[{\"nazwa\":\"\",\"ilosc\":\"\",\"priorytet\":\"wysoki/sredni/niski\",\"powod\":\"\"}]}";callAPI([{role:"user",content:prompt}],SYS,function(res){btn.disabled=false;spin.style.display="none";txt.textContent="Odswiez liste";var clean=res.replace(/```json/gi,"").replace(/```/g,"").trim();var s=clean.indexOf("{"),e=clean.lastIndexOf("}");try{renderShopList(JSON.parse(s!==-1&&e!==-1?clean.slice(s,e+1):clean));}catch(ex){document.getElementById("shop-list-content").innerHTML='<div class="ai-note">'+res+'</div>';}},function(err){btn.disabled=false;spin.style.display="none";txt.textContent="Generuj liste AI";document.getElementById("shop-list-content").innerHTML='<div class="ai-note" style="color:var(--red)">Blad: '+err+'</div>';});}
 function renderShopList(data){shopChecked={};document.getElementById("copy-btn").classList.add("show");var high=[],med=[],low=[];(data.produkty||[]).forEach(function(p){if(p.priorytet==="wysoki"||p.priorytet==="high")high.push(p);else if(p.priorytet==="niski"||p.priorytet==="low")low.push(p);else med.push(p);});var html='<div class="ai-note">'+(data.komentarz||"")+'</div>';function sec(items,title,cls){if(!items.length)return"";var s='<div style="margin-bottom:14px"><div class="shop-sec-title">'+title+'</div>';items.forEach(function(p,i){var id="si-"+cls+i;s+='<div class="shop-item" id="'+id+'" onclick="toggleShopItem(this.id)"><div class="shop-item-check"></div><div class="shop-item-info"><div class="shop-item-name">'+p.nazwa+'</div><div class="shop-item-detail">'+p.ilosc+' - '+p.powod+'</div></div><span class="prio prio-'+cls+'">'+p.priorytet+'</span></div>';});return s+"</div>";}html+=sec(high,"Pilne","high")+sec(med,"Wazne","med")+sec(low,"Warto miec","low");document.getElementById("shop-list-content").innerHTML=html;}
 function toggleShopItem(id){var el=document.getElementById(id);if(!el)return;shopChecked[id]=!shopChecked[id];el.classList[shopChecked[id]?"add":"remove"]("checked");el.querySelector(".shop-item-check").textContent=shopChecked[id]?"v":"";}
@@ -2510,58 +2627,104 @@ function calculateShoppingListFromDiet(days){
 
 // Renderuj inteligentną listę zakupów
 function renderSmartShoppingList(list){
-  var html="";
-  var tooBuy=list.filter(function(i){return i.status==="MISSING";});
+  // Filtruj wg wybranego sklepu (jeśli "both" → zostaw wszystkie)
+  function shopMatch(prod){
+    if(!prod||!prod.shops)return true;
+    if(shopStore==="both")return true;
+    var sLabel=shopStore==="biedronka"?"Biedronka":shopStore==="lidl"?"Lidl":"";
+    return prod.shops.some(function(s){return String(s).toLowerCase().indexOf(sLabel.toLowerCase())!==-1;});
+  }
+  // Sortuj listy alfabetycznie
+  list=sortByNamePL(list,function(i){return i.name||"";});
+  var tooBuy=list.filter(function(i){return i.status==="MISSING"&&shopMatch(i.product);});
   var have=list.filter(function(i){return i.status==="OK";});
-  
   if(!tooBuy.length&&!have.length){
-    return'<div style="text-align:center;padding:30px;color:var(--text3)">Brak składników do obliczenia.<br>Wygeneruj najpierw dietę.</div>';
+    return'<div style="text-align:center;padding:30px;color:var(--text3)"><div style="font-size:40px;margin-bottom:10px">🍽️</div>Brak składników do obliczenia.<br><br>Wygeneruj najpierw dietę w sekcji <b>Moja dieta</b>.</div>';
   }
-  
-  // Nagłówek
-  if(userProfile&&userProfile.kcal){
-    html+='<div style="background:rgba(30,215,96,.08);border:1px solid rgba(30,215,96,.2);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:12px;color:var(--text2)">'
-      +'<div style="font-weight:800;color:var(--green);margin-bottom:4px">Lista zakupów z diety ('+list.filter(function(x){return x.status==="MISSING";}).length+' produktów do kupienia)</div>'
-      +'Baza: dieta użytkownika vs stan lodówki. Opakowania zaokrąglone w górę.</div>';
-  }
-  
-  // Produkty do kupienia
+  var html="";
+  // Nagłówek z podsumowaniem
+  var storeLabel={biedronka:"🐝 Biedronka",lidl:"🏪 Lidl",both:"🐝🏪 Biedronka + Lidl"}[shopStore]||"Biedronka";
+  html+='<div style="background:linear-gradient(135deg,rgba(139,92,246,.12),rgba(61,139,255,.08));border:1px solid rgba(139,92,246,.3);border-radius:14px;padding:14px 16px;margin-bottom:14px">';
+  html+='<div style="font-size:13px;font-weight:800;color:var(--purple);margin-bottom:6px">📊 Lista z diety</div>';
+  html+='<div style="font-size:12px;color:var(--text2);line-height:1.6">';
+  html+='<b style="color:var(--text)">'+tooBuy.length+'</b> produktów do kupienia &bull; <b style="color:var(--text)">'+have.length+'</b> już masz';
+  html+='<br>Sklep: <b style="color:var(--text)">'+storeLabel+'</b> &bull; Na <b style="color:var(--text)">'+(shopDays||7)+' dni</b>';
+  html+='</div></div>';
+  // Produkty DO KUPIENIA - karty z dużą informacją o opakowaniach
   if(tooBuy.length){
-    html+='<div style="font-size:10px;font-weight:800;color:var(--red);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Do kupienia ('+tooBuy.length+')</div>';
-    tooBuy.forEach(function(item){
-      var cat=item.product?item.product.cat:"";
-      html+='<div style="background:var(--bg2);border-radius:12px;padding:12px 14px;margin-bottom:8px;border:1px solid var(--border);border-left:4px solid var(--red)">';
-      html+='<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">';
-      html+='<div style="flex:1"><div style="font-size:13px;font-weight:800;color:var(--text)">'+item.name+'</div>';
-      if(item.buy){
-        html+='<div style="font-size:14px;font-weight:900;color:var(--green);margin:4px 0">Kup: '+item.buy.label+'</div>';
-        html+='<div style="font-size:11px;color:var(--text3)">Potrzebne: '+item.required+(item.product?item.product.unit:"g")
-          +' &bull; Masz: '+item.available+(item.product?item.product.unit:"g")
-          +' &bull; Brakuje: '+item.missing+(item.product?item.product.unit:"g")+'</div>';
-        if(item.buy.surplus>0)html+='<div style="font-size:11px;color:var(--amber);margin-top:2px">Nadwyżka po zakupie: +'+item.buy.surplus+(item.product?item.product.unit:"g")+'</div>';
+    html+='<div style="font-size:11px;font-weight:800;color:var(--red);margin-bottom:10px;text-transform:uppercase;letter-spacing:.6px">🛒 Do kupienia ('+tooBuy.length+')</div>';
+    tooBuy.forEach(function(item,idx){
+      var prod=item.product;
+      var unit=prod?prod.unit:"g";
+      var pkgUnit=prod?(prod.pkgUnit||"opak."):"";
+      var pkgSize=prod?(prod.pkgSize||0):0;
+      var buy=item.buy||{};
+      var pcs=buy.pcs||1;
+      var totalAmount=buy.total||item.missing;
+      var byWeight=buy.byWeight||!!prod&&prod.soldByWeight;
+      // Główna informacja: ile sztuk / opakowań kupić
+      var packLine="";
+      if(byWeight){
+        packLine='<span style="font-size:20px;font-weight:900;color:var(--green)">'+Math.ceil(totalAmount)+' '+unit+'</span><span style="font-size:13px;color:var(--text3);font-weight:600"> na wagę</span>';
+      }else if(prod&&prod.unit==="szt"){
+        // sprzedawane na sztuki w opakowaniach (np. jajka 10 szt)
+        packLine='<span style="font-size:20px;font-weight:900;color:var(--green)">'+pcs+' '+pkgUnit+'</span>'
+          +(pkgSize?'<span style="font-size:13px;color:var(--text3);font-weight:600"> × '+pkgSize+' szt = '+totalAmount+' szt</span>':'');
+      }else{
+        // paczkowane g/ml
+        packLine='<span style="font-size:20px;font-weight:900;color:var(--green)">'+pcs+' '+pkgUnit+'</span>'
+          +(pkgSize?'<span style="font-size:13px;color:var(--text3);font-weight:600"> × '+pkgSize+unit+' = '+totalAmount+unit+'</span>':'');
       }
-      if(item.meals&&item.meals.length)html+='<div style="font-size:10px;color:var(--text3);margin-top:4px">Do: '+item.meals.join(", ")+'</div>';
+      // Sklep badge
+      var shopBadge="";
+      if(prod&&prod.shops&&prod.shops.length){
+        var sh=prod.shops[0];
+        var color=sh.toLowerCase().indexOf("biedronka")!==-1?"#DC2626":sh.toLowerCase().indexOf("lidl")!==-1?"#1D4ED8":"#7C3AED";
+        shopBadge='<span style="background:'+color+'22;border:1px solid '+color+'66;color:'+color+';border-radius:50px;padding:3px 10px;font-size:10px;font-weight:800;margin-left:auto">'+sh+'</span>';
+      }
+      html+='<div style="background:var(--bg2);border-radius:16px;padding:14px 16px;margin-bottom:10px;border:1px solid var(--border);border-left:5px solid var(--red)">';
+      // Nagłówek produktu
+      html+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">';
+      html+='<input type="checkbox" id="shop-cb-'+idx+'" data-shop-cb style="width:20px;height:20px;accent-color:var(--green);cursor:pointer;flex-shrink:0" onchange="toggleShopItemChecked(this,'+idx+')">';
+      html+='<div style="font-size:16px;font-weight:800;color:var(--text);flex:1;line-height:1.2">'+item.name+'</div>';
+      html+=shopBadge;
       html+='</div>';
-      if(item.product&&item.product.shops){
-        var shop=item.product.shops[0];
-        html+='<div style="background:var(--bg3);border-radius:8px;padding:4px 8px;font-size:10px;font-weight:700;color:var(--blue);flex-shrink:0">'+shop+'</div>';
+      // Główna linia "Kup:"
+      html+='<div style="background:rgba(30,215,96,.08);border-radius:10px;padding:10px 12px;margin-bottom:8px"><div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Kup</div>'+packLine+'</div>';
+      // Bilans (potrzebne / masz / brakuje)
+      html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;font-size:11px;margin-bottom:6px">';
+      html+='<div style="background:var(--bg3);border-radius:8px;padding:6px 8px;text-align:center"><div style="color:var(--text3);font-weight:600">Potrzebne</div><div style="color:var(--text);font-weight:800;margin-top:2px">'+item.required+' '+unit+'</div></div>';
+      html+='<div style="background:var(--bg3);border-radius:8px;padding:6px 8px;text-align:center"><div style="color:var(--text3);font-weight:600">Masz</div><div style="color:var(--text);font-weight:800;margin-top:2px">'+item.available+' '+unit+'</div></div>';
+      html+='<div style="background:rgba(255,77,77,.08);border-radius:8px;padding:6px 8px;text-align:center"><div style="color:var(--red);font-weight:600">Brakuje</div><div style="color:var(--red);font-weight:800;margin-top:2px">'+item.missing+' '+unit+'</div></div>';
+      html+='</div>';
+      if(buy.surplus>0){
+        html+='<div style="font-size:11px;color:var(--amber);font-weight:600;margin-top:4px">+ Nadwyżka po zakupie: '+buy.surplus+' '+unit+' (na zapas)</div>';
       }
-      html+='</div></div>';
+      if(item.meals&&item.meals.length){
+        html+='<div style="font-size:10px;color:var(--text3);margin-top:6px;border-top:1px solid var(--border);padding-top:6px">Do posiłków: <i>'+item.meals.join(", ")+'</i></div>';
+      }
+      html+='</div>';
     });
   }
-  
-  // Masz już
+  // Już masz
   if(have.length){
-    html+='<div style="margin-top:12px;font-size:10px;font-weight:800;color:var(--green);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Masz wystarczająco ('+have.length+')</div>';
+    html+='<div style="margin-top:18px;font-size:11px;font-weight:800;color:var(--green);margin-bottom:8px;text-transform:uppercase;letter-spacing:.6px">✓ Masz wystarczająco ('+have.length+')</div>';
     have.forEach(function(item){
-      html+='<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(30,215,96,.05);border-radius:8px;margin-bottom:4px;border:1px solid rgba(30,215,96,.1)">';
-      html+='<span style="color:var(--green);font-size:14px">✓</span>';
-      html+='<span style="font-size:12px;font-weight:700;color:var(--text2)">'+item.name+'</span>';
-      html+='<span style="font-size:11px;color:var(--text3);margin-left:auto">'+item.available+(item.product?item.product.unit:"g")+' / '+item.required+(item.product?item.product.unit:"g")+'</span>';
+      var unit=item.product?item.product.unit:"g";
+      html+='<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(30,215,96,.05);border-radius:10px;margin-bottom:5px;border:1px solid rgba(30,215,96,.18)">';
+      html+='<span style="color:var(--green);font-size:16px;font-weight:900">✓</span>';
+      html+='<span style="font-size:13px;font-weight:700;color:var(--text2);flex:1">'+item.name+'</span>';
+      html+='<span style="font-size:11px;color:var(--text3);font-weight:600">'+item.available+'/'+item.required+' '+unit+'</span>';
       html+='</div>';
     });
   }
   return html;
+}
+// Toggle przy checkboxie listy zakupów
+function toggleShopItemChecked(cb,idx){
+  var label=cb.parentElement.querySelector('[style*="font-size:16px"]');
+  if(label)label.style.textDecoration=cb.checked?"line-through":"none";
+  if(label)label.style.opacity=cb.checked?".5":"1";
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -3629,12 +3792,12 @@ function savePantryAudit(){
 
 // ── showUpdatePantryModal — 3 opcje ───────────────────────────────────────
 function showUpdatePantryModal(){
-  showDlg("🏠","Aktualizuj stan lodówki","Wybierz sposób aktualizacji:",[
-    {label:"Produkty z diety",cls:"ok",cb:function(){openPantryAudit();}},
-    {label:"Skanuj paragon",cls:"ok",cb:function(){openReceipt();}},
-    {label:"Ręcznie wybrany produkt",cls:"ok",cb:function(){openSingleProductPicker();}},
-    {label:"Zamknij",cls:"cancel"}
-  ]);
+  var el=document.getElementById("pantry-update-overlay");
+  if(el)el.classList.add("show");
+}
+function closePantryUpdateModal(){
+  var el=document.getElementById("pantry-update-overlay");
+  if(el)el.classList.remove("show");
 }
 // Wybór jednego produktu do aktualizacji ręcznej
 function openSingleProductPicker(){
