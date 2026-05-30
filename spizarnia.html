@@ -315,6 +315,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 #admin-panel-overlay.show{display:flex;position:fixed;inset:0;z-index:500;background:var(--bg);overflow-y:auto;flex-direction:column}
 body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
+/* ── DIET OVERLAY ── */
+#diet-overlay{display:none}
+#diet-overlay.show{display:flex;position:fixed;inset:0;z-index:380;background:var(--bg);overflow-y:auto;flex-direction:column}
+.diet-hdr{position:sticky;top:0;background:rgba(13,13,18,.98);border-bottom:1px solid var(--border);padding:14px 18px;display:flex;align-items:center;gap:12px;z-index:5}
+.diet-tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0;scrollbar-width:none}
+.diet-tabs::-webkit-scrollbar{display:none}
+.dtab{flex:1;min-width:fit-content;background:none;border:none;color:var(--text3);padding:13px 14px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:color .15s}
+.dtab.act{color:var(--green);border-bottom-color:var(--green)}
+.meal-gen-btn{background:linear-gradient(135deg,var(--purple),#4F46E5);border:none;color:#fff;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer}
+
+/* ── ONBOARDING OVERLAY ── */
+#ob-overlay{display:none}
+#ob-overlay.show{display:flex;position:fixed;inset:0;z-index:400;background:var(--bg);overflow-y:auto;flex-direction:column;padding:24px 18px}
+.ob-step{display:none}
+.ob-title{font-size:22px;font-weight:900;color:var(--text);margin-bottom:6px;letter-spacing:-.5px}
+.ob-sub{font-size:13px;color:var(--text3);margin-bottom:20px;line-height:1.5}
+.ob-inp{width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:12px;padding:14px 16px;font-size:15px;color:var(--text);outline:none;margin-bottom:10px;color-scheme:dark;transition:border .2s}
+.ob-inp:focus{border-color:var(--green)}
+.ob-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.ob-opt{background:var(--bg3);border:1.5px solid var(--border);border-radius:12px;padding:14px 12px;text-align:left;color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
+.ob-opt:active{transform:scale(.97)}
+.ob-opt.sel{background:rgba(30,215,96,.12);border-color:var(--green);color:var(--green)}
+.ob-pill{display:inline-block;background:var(--bg3);border:1.5px solid var(--border);border-radius:50px;padding:8px 14px;font-size:12px;font-weight:700;color:var(--text3);cursor:pointer;margin:3px;transition:all .15s}
+.ob-pill.active{background:var(--green);border-color:var(--green);color:#000}
+
+/* ── EDIT MEAL OVERLAY ── */
+#edit-meal-overlay{display:none}
+#edit-meal-overlay.show{display:flex;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.8);align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+
 /* ── USER PANEL ── */
 #user-panel-overlay{display:none}
 #user-panel-overlay.show{display:flex;position:fixed;inset:0;z-index:450;background:var(--bg);overflow-y:auto;flex-direction:column}
@@ -613,6 +642,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
     </div>
     <button class="mbtn cancel" style="width:100%" onclick="closePhoto()">Zamknij</button>
     <input type="file" id="product-photo-file" accept="image/*" capture="environment" style="display:none" onchange="handleProductPhoto(this)">
+    <input type="file" id="photo-slot-file" accept="image/*" capture="environment" style="display:none" onchange="handleSlotPhoto(this)">
   </div>
 </div>
 
@@ -1371,6 +1401,22 @@ function showOb(){
   obSels={};
   obPrefs={liked:[],disliked:[]};
   obMethod="manual";
+  // Pre-populate first/last name from globals (from login screen)
+  var fn=document.getElementById("ob-first-name");if(fn)fn.value=userFirstName||"";
+  var ln=document.getElementById("ob-last-name");if(ln)ln.value=userLastName||"";
+  // Pre-populate goal/store/exclude if profile exists (edit mode)
+  if(userProfile){
+    if(userProfile.age){var a=document.getElementById("ob-age");if(a)a.value=userProfile.age;}
+    if(userProfile.weight){var w=document.getElementById("ob-weight");if(w)w.value=userProfile.weight;}
+    if(userProfile.height){var h=document.getElementById("ob-height");if(h)h.value=userProfile.height;}
+    if(userProfile.gender){var g=document.getElementById("ob-gender");if(g)g.value=userProfile.gender;}
+    if(userProfile.exclude){var ex=document.getElementById("ob-exclude");if(ex)ex.value=userProfile.exclude;}
+    if(userProfile.activity)obSels.activity=userProfile.activity;
+    if(userProfile.goal)obSels.goal=userProfile.goal;
+    if(userProfile.stores)obSels.stores=userProfile.stores;
+    if(userProfile.liked)obPrefs.liked=userProfile.liked.slice();
+    if(userProfile.disliked)obPrefs.disliked=userProfile.disliked.slice();
+  }
   renderObStep();
   document.getElementById("ob-overlay").classList.add("show");
 }
@@ -1444,16 +1490,28 @@ function togglePref(el,type){
 function obNext(){
   var step=OB_STEPS[obStepIndex];
   if(step==="0"){
+    // Walidacja imienia/nazwiska w kroku 0
+    var firstInp=document.getElementById("ob-first-name");
+    var lastInp=document.getElementById("ob-last-name");
+    var first=firstInp?firstInp.value.trim():"";
+    var last=lastInp?lastInp.value.trim():"";
+    if(!first){if(firstInp){firstInp.style.borderColor="var(--red)";firstInp.focus();}dlgAlert("ℹ️","Uzupełnij dane","Wpisz swoje imię.");return;}
+    if(!last){if(lastInp){lastInp.style.borderColor="var(--red)";lastInp.focus();}dlgAlert("ℹ️","Uzupełnij dane","Wpisz swoje nazwisko.");return;}
+    userFirstName=first;
+    userLastName=last;
+    userDisplayName=first+" "+last;
+    localStorage.setItem("spiz_first",first);
+    localStorage.setItem("spiz_last",last);
     if(!obMethod)return;
     if(obMethod==="ai"){
       var txt2=(document.getElementById("ob-diet-text")||{value:""}).value.trim();
-      if(!txt2)return;
+      if(!txt2){dlgAlert("ℹ️","Wklej plan","Wklej plan diety w pole tekstowe.");return;}
       var nextBtn=document.getElementById("ob-next-btn");
       if(nextBtn)nextBtn.disabled=true;
       var st=document.getElementById("ob-ai-status");
       if(st){st.textContent="Analizuje...";st.style.color="var(--amber)";}
       callAPI([{role:"user",content:'Przeanalizuj plan diety. TYLKO JSON: {"kcal":3060,"prot":244,"carb":281,"fat":107,"sklep":"biedronka","wykluczenia":"","cel":"gain"}. Plan: '+txt2}],
-        "Jestes dietetykiem. TYLKO JSON.",
+        "Jesteś dietetykiem. TYLKO JSON.",
         function(res){
           try{
             var p=JSON.parse(res.replace(/```json|```/g,"").trim());
@@ -1462,12 +1520,12 @@ function obNext(){
               activity:"mod",age:30,weight:75,height:175,gender:"m",liked:[],disliked:[]});
             hideOb();updateAISys();
           }catch(e){
-            if(st)st.textContent="Blad analizy";
+            if(st)st.textContent="Błąd analizy";
             if(nextBtn)nextBtn.disabled=false;
           }
         },
         function(){
-          if(st)st.textContent="Blad API";
+          if(st)st.textContent="Błąd API";
           if(nextBtn)nextBtn.disabled=false;
         }
       );
@@ -1477,12 +1535,12 @@ function obNext(){
   }
   if(step==="1"){
     if(!(document.getElementById("ob-age")||{}).value||!(document.getElementById("ob-weight")||{}).value){
-      dlgAlert("?","Uzupelnij dane","Wpisz wiek i wage.");return;
+      dlgAlert("ℹ️","Uzupełnij dane","Wpisz wiek i wagę.");return;
     }
   }
-  if(step==="2"&&!obSels.activity){dlgAlert("?","Wybierz aktywnosc","");return;}
-  if(step==="3"&&!obSels.goal){dlgAlert("?","Wybierz cel","");return;}
-  if(step==="4"&&!obSels.stores){dlgAlert("?","Wybierz sklep","");return;}
+  if(step==="2"&&!obSels.activity){dlgAlert("ℹ️","Wybierz aktywność","Wybierz poziom aktywności.");return;}
+  if(step==="3"&&!obSels.goal){dlgAlert("ℹ️","Wybierz cel","Zaznacz, co chcesz osiągnąć.");return;}
+  if(step==="4"&&!obSels.stores){dlgAlert("ℹ️","Wybierz sklep","Zaznacz sklep, w którym kupujesz.");return;}
   // Krok 4b — preferencje są opcjonalne, zawsze przechodzimy dalej
   if(step==="5"){
     var profile=calcProfile();
@@ -3338,6 +3396,190 @@ function closeAdminPanel(){
     </div>
 
     <div style="text-align:center;font-size:10px;color:var(--text3);margin-top:24px;font-family:monospace" id="up-version"></div>
+  </div>
+</div>
+
+<!-- ══ DIET OVERLAY ══════════════════════════════════════════════════════ -->
+<div id="diet-overlay">
+  <div class="diet-hdr">
+    <button onclick="closeDiet()" style="background:var(--bg3);border:none;color:var(--text3);border-radius:50%;width:38px;height:38px;font-size:18px;cursor:pointer;flex-shrink:0">&#8592;</button>
+    <div style="flex:1">
+      <div style="font-size:17px;font-weight:900;color:var(--text)">Moja dieta</div>
+      <div style="font-size:11px;color:var(--text3)"><span id="diet-user-name"></span></div>
+    </div>
+  </div>
+  <div class="diet-tabs">
+    <button id="dtab-0" class="dtab act" onclick="switchDietTab(0)">Przepisy</button>
+    <button id="dtab-1" class="dtab" onclick="switchDietTab(1)">Plan tygodnia</button>
+    <button id="dtab-2" class="dtab" onclick="switchDietTab(2)">Wgraj dietę</button>
+    <button id="dtab-3" class="dtab" onclick="switchDietTab(3)">Historia zakupów</button>
+    <button id="dtab-4" class="dtab" onclick="switchDietTab(4)">Analiza cen</button>
+  </div>
+  <div id="diet-body" style="padding:16px;flex:1"></div>
+</div>
+
+<!-- ══ ONBOARDING OVERLAY ═══════════════════════════════════════════════ -->
+<div id="ob-overlay">
+  <div style="max-width:480px;margin:0 auto;width:100%">
+    <div style="display:flex;justify-content:center;gap:6px;margin-bottom:24px" id="ob-progress"></div>
+
+    <!-- Step 0 — Imię i nazwisko + Metoda wprowadzenia diety -->
+    <div class="ob-step" id="ob-step-0" style="display:block">
+      <div class="ob-title">Powitanie</div>
+      <div class="ob-sub">Zacznijmy od podstawowych danych. Możesz wybrać sposób ustalenia diety: ręcznie albo wkleić istniejący plan, a AI go przeanalizuje.</div>
+      <input class="ob-inp" id="ob-first-name" placeholder="Imię">
+      <input class="ob-inp" id="ob-last-name" placeholder="Nazwisko">
+      <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin:14px 0 8px">Sposób utworzenia diety</div>
+      <div class="ob-grid">
+        <div class="ob-opt sel" id="ob-method-manual" onclick="selectObMethod('manual',this)">
+          <div style="font-size:22px;margin-bottom:6px">🧑‍🍳</div>
+          <div style="font-weight:800;color:var(--text)">Ręcznie</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px;font-weight:500">Wypełnię profil krok po kroku</div>
+        </div>
+        <div class="ob-opt" id="ob-method-ai" onclick="selectObMethod('ai',this)">
+          <div style="font-size:22px;margin-bottom:6px">🤖</div>
+          <div style="font-weight:800;color:var(--text)">AI z planu</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px;font-weight:500">Wkleję istniejący plan</div>
+        </div>
+      </div>
+      <div id="ob-ai-input" style="display:none">
+        <textarea id="ob-diet-text" placeholder="Wklej tutaj swój plan diety (kalorie, makro, posiłki)..." style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:12px;padding:14px;font-size:13px;color:var(--text);outline:none;min-height:140px;font-family:inherit;resize:vertical"></textarea>
+        <div id="ob-ai-status" style="font-size:12px;color:var(--text3);margin-top:8px"></div>
+      </div>
+    </div>
+
+    <!-- Step 1 — Wiek/Waga/Wzrost/Płeć -->
+    <div class="ob-step" id="ob-step-1">
+      <div class="ob-title">Twoje parametry</div>
+      <div class="ob-sub">Potrzebne do obliczenia zapotrzebowania kalorycznego.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:5px;font-weight:700">Wiek (lat)</div>
+          <input class="ob-inp" id="ob-age" type="number" placeholder="30" min="14" max="99" style="margin-bottom:0">
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:5px;font-weight:700">Waga (kg)</div>
+          <input class="ob-inp" id="ob-weight" type="number" placeholder="75" min="30" max="250" style="margin-bottom:0">
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:5px;font-weight:700">Wzrost (cm)</div>
+          <input class="ob-inp" id="ob-height" type="number" placeholder="175" min="120" max="220" style="margin-bottom:0">
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:5px;font-weight:700">Płeć</div>
+          <select class="ob-inp" id="ob-gender" style="margin-bottom:0;appearance:none;background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22><path d=%22M2 4l4 4 4-4%22 stroke=%22%236B6B85%22 fill=%22none%22 stroke-width=%222%22/></svg>');background-repeat:no-repeat;background-position:right 14px center;padding-right:36px">
+            <option value="m">Mężczyzna</option>
+            <option value="f">Kobieta</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2 — Aktywność -->
+    <div class="ob-step" id="ob-step-2">
+      <div class="ob-title">Poziom aktywności</div>
+      <div class="ob-sub">Jak dużo się ruszasz w ciągu dnia?</div>
+      <div class="ob-grid" style="grid-template-columns:1fr">
+        <div class="ob-opt" data-val="sed" onclick="selectOb('activity','sed',this)"><b style="color:var(--text)">Siedzący tryb życia</b><div style="font-size:11px;color:var(--text3);margin-top:3px">Praca biurowa, mało ruchu</div></div>
+        <div class="ob-opt" data-val="light" onclick="selectOb('activity','light',this)"><b style="color:var(--text)">Lekka aktywność</b><div style="font-size:11px;color:var(--text3);margin-top:3px">Spacery, lekkie ćwiczenia 1–3×/tydz.</div></div>
+        <div class="ob-opt" data-val="mod" onclick="selectOb('activity','mod',this)"><b style="color:var(--text)">Umiarkowana</b><div style="font-size:11px;color:var(--text3);margin-top:3px">Trening 3–5×/tydz.</div></div>
+        <div class="ob-opt" data-val="active" onclick="selectOb('activity','active',this)"><b style="color:var(--text)">Bardzo aktywny</b><div style="font-size:11px;color:var(--text3);margin-top:3px">Trening 6–7×/tydz., praca fizyczna</div></div>
+      </div>
+    </div>
+
+    <!-- Step 3 — Cel -->
+    <div class="ob-step" id="ob-step-3">
+      <div class="ob-title">Twój cel</div>
+      <div class="ob-sub">Co chcesz osiągnąć?</div>
+      <div class="ob-grid" style="grid-template-columns:1fr">
+        <div class="ob-opt" data-val="lose" onclick="selectOb('goal','lose',this)"><b style="color:var(--text)">Redukcja tłuszczu</b><div style="font-size:11px;color:var(--text3);margin-top:3px">Spalanie tłuszczu, deficyt kaloryczny</div></div>
+        <div class="ob-opt" data-val="maintain" onclick="selectOb('goal','maintain',this)"><b style="color:var(--text)">Utrzymanie wagi</b><div style="font-size:11px;color:var(--text3);margin-top:3px">Zdrowe odżywianie, zero zmian masy</div></div>
+        <div class="ob-opt" data-val="gain" onclick="selectOb('goal','gain',this)"><b style="color:var(--text)">Masa mięśniowa</b><div style="font-size:11px;color:var(--text3);margin-top:3px">Budowa mięśni, nadwyżka kaloryczna</div></div>
+      </div>
+    </div>
+
+    <!-- Step 4 — Sklep -->
+    <div class="ob-step" id="ob-step-4">
+      <div class="ob-title">Gdzie kupujesz?</div>
+      <div class="ob-sub">AI dobierze produkty z konkretnego sklepu.</div>
+      <div class="ob-grid" style="grid-template-columns:1fr">
+        <div class="ob-opt" data-val="biedronka" onclick="selectOb('stores','biedronka',this)"><b style="color:var(--text)">🐝 Biedronka</b></div>
+        <div class="ob-opt" data-val="lidl" onclick="selectOb('stores','lidl',this)"><b style="color:var(--text)">🏪 Lidl</b></div>
+        <div class="ob-opt" data-val="both" onclick="selectOb('stores','both',this)"><b style="color:var(--text)">Oba sklepy</b></div>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:5px;font-weight:700;margin-top:14px">Wykluczenia (opcjonalnie)</div>
+      <input class="ob-inp" id="ob-exclude" placeholder="np. wieprzowina, orzechy, gluten">
+    </div>
+
+    <!-- Step 4b — Preferencje -->
+    <div class="ob-step" id="ob-step-4b">
+      <div class="ob-title">Preferencje smakowe (opcjonalnie)</div>
+      <div class="ob-sub">Zaznacz produkty, które lubisz, a które nie. Możesz pominąć.</div>
+      <div style="font-size:11px;color:var(--green);font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Lubię</div>
+      <div style="margin-bottom:14px">
+        <span class="ob-pill" data-val="kurczak" onclick="togglePref(this,'liked')">Kurczak</span>
+        <span class="ob-pill" data-val="losos" onclick="togglePref(this,'liked')">Łosoś</span>
+        <span class="ob-pill" data-val="jaja" onclick="togglePref(this,'liked')">Jaja</span>
+        <span class="ob-pill" data-val="awokado" onclick="togglePref(this,'liked')">Awokado</span>
+        <span class="ob-pill" data-val="banany" onclick="togglePref(this,'liked')">Banany</span>
+        <span class="ob-pill" data-val="ryz" onclick="togglePref(this,'liked')">Ryż</span>
+        <span class="ob-pill" data-val="ciecierzyca" onclick="togglePref(this,'liked')">Ciecierzyca</span>
+        <span class="ob-pill" data-val="orzechy" onclick="togglePref(this,'liked')">Orzechy</span>
+        <span class="ob-pill" data-val="twarog" onclick="togglePref(this,'liked')">Twaróg</span>
+      </div>
+      <div style="font-size:11px;color:var(--red);font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Nie lubię</div>
+      <div>
+        <span class="ob-pill" data-val="ryby" onclick="togglePref(this,'disliked')">Ryby</span>
+        <span class="ob-pill" data-val="kasza_gryczana" onclick="togglePref(this,'disliked')">Kasza gryczana</span>
+        <span class="ob-pill" data-val="brokul" onclick="togglePref(this,'disliked')">Brokuł</span>
+        <span class="ob-pill" data-val="cytryna" onclick="togglePref(this,'disliked')">Cytryna</span>
+        <span class="ob-pill" data-val="szpinak" onclick="togglePref(this,'disliked')">Szpinak</span>
+        <span class="ob-pill" data-val="bataty" onclick="togglePref(this,'disliked')">Bataty</span>
+      </div>
+    </div>
+
+    <!-- Step 5 — Podsumowanie -->
+    <div class="ob-step" id="ob-step-5">
+      <div class="ob-title">Twój plan kaloryczny</div>
+      <div class="ob-sub">Obliczone na podstawie Twoich parametrów. Po kliknięciu „Zaczynamy!" AI wygeneruje Twoją dietę.</div>
+      <div style="background:var(--bg3);border-radius:14px;padding:18px;border:1px solid var(--border);margin-bottom:16px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div style="text-align:center"><div style="font-size:28px;font-weight:900;color:var(--amber)" id="ob-res-kcal">0 kcal</div><div style="font-size:11px;color:var(--text3);margin-top:4px">Kalorie / dzień</div></div>
+          <div style="text-align:center"><div style="font-size:28px;font-weight:900;color:#60A5FA" id="ob-res-prot">0g</div><div style="font-size:11px;color:var(--text3);margin-top:4px">Białko</div></div>
+          <div style="text-align:center"><div style="font-size:28px;font-weight:900;color:var(--green)" id="ob-res-carb">0g</div><div style="font-size:11px;color:var(--text3);margin-top:4px">Węglowodany</div></div>
+          <div style="text-align:center"><div style="font-size:28px;font-weight:900;color:#F9A8D4" id="ob-res-fat">0g</div><div style="font-size:11px;color:var(--text3);margin-top:4px">Tłuszcze</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div style="display:flex;gap:10px;margin-top:20px">
+      <button id="ob-back-btn" onclick="obBack()" style="flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:50px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;display:none">← Wstecz</button>
+      <button id="ob-next-btn" onclick="obNext()" style="flex:2;background:var(--green);border:none;color:#000;border-radius:50px;padding:14px;font-size:14px;font-weight:800;cursor:pointer">Dalej →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ EDIT MEAL OVERLAY ════════════════════════════════════════════════ -->
+<div id="edit-meal-overlay">
+  <div style="background:var(--bg2);border-radius:20px;padding:20px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;border:1px solid var(--border2)">
+    <div style="font-size:17px;font-weight:800;color:var(--text);margin-bottom:14px">Edycja posiłku</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:700">Nazwa</div>
+    <input class="ob-inp" id="edit-meal-name" style="margin-bottom:10px">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:10px">
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:3px;font-weight:700">Kcal</div><input class="ob-inp" id="edit-meal-kcal" type="number" style="margin-bottom:0;padding:10px"></div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:3px;font-weight:700">B (g)</div><input class="ob-inp" id="edit-meal-prot" type="number" style="margin-bottom:0;padding:10px"></div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:3px;font-weight:700">W (g)</div><input class="ob-inp" id="edit-meal-carb" type="number" style="margin-bottom:0;padding:10px"></div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:3px;font-weight:700">T (g)</div><input class="ob-inp" id="edit-meal-fat" type="number" style="margin-bottom:0;padding:10px"></div>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:700">Składniki (jeden na linię, format: nazwa - ilość)</div>
+    <textarea id="edit-meal-ingr" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:12px;padding:12px;font-size:13px;color:var(--text);outline:none;min-height:100px;font-family:inherit;resize:vertical;margin-bottom:10px;color-scheme:dark"></textarea>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:700">Przepis</div>
+    <textarea id="edit-meal-recipe" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:12px;padding:12px;font-size:13px;color:var(--text);outline:none;min-height:120px;font-family:inherit;resize:vertical;margin-bottom:14px;color-scheme:dark"></textarea>
+    <div style="display:flex;gap:8px">
+      <button onclick="closeEditMeal()" style="flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:50px;padding:13px;font-size:13px;font-weight:700;cursor:pointer">Anuluj</button>
+      <button onclick="saveEditMeal()" style="flex:2;background:var(--green);border:none;color:#000;border-radius:50px;padding:13px;font-size:13px;font-weight:800;cursor:pointer">Zapisz</button>
+    </div>
   </div>
 </div>
 
