@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>?? Pełna Lodówka</title>
+<title>Pełna Lodówka</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 :root{
@@ -336,19 +336,48 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 /* PHOTO MODAL */
 .photo-modal-img{width:100%;border-radius:var(--radius-sm);max-height:260px;object-fit:cover;margin-bottom:12px;display:none;border:1px solid var(--border)}
 .photo-modal-empty{width:100%;height:160px;background:var(--bg3);border-radius:var(--radius-sm);border:2px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;color:var(--text3)}
+
+/* ── ADMIN PANEL ── */
+#admin-login-overlay,#admin-panel-overlay{display:none}
+#admin-login-overlay.show{display:flex;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.85);align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(12px)}
+#admin-panel-overlay.show{display:flex;position:fixed;inset:0;z-index:500;background:var(--bg);overflow-y:auto;flex-direction:column}
+body.admin-open .bottom-nav{display:none}
+.admtab{flex:1;background:none;border:none;color:#6B6B85;padding:14px 12px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.admtab.act{color:var(--green);border-bottom-color:var(--green)}
+
+/* DASHBOARD 2x2 */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat-tile{background:var(--bg3);border-radius:var(--radius);padding:16px 12px;border:1px solid var(--border);cursor:pointer;text-align:left;position:relative;overflow:hidden;transition:transform .15s,filter .15s}
+.stat-tile:active{transform:scale(.97);filter:brightness(.9)}
+.stat-tile-ico{font-size:20px;margin-bottom:8px}
+.stat-tile-n{font-size:30px;font-weight:900;line-height:1;letter-spacing:-1px}
+.stat-tile-lbl{font-size:11px;font-weight:700;margin-top:6px;text-transform:uppercase;letter-spacing:.6px}
+.stat-tile.red .stat-tile-n,.stat-tile.red .stat-tile-lbl{color:var(--red)}
+.stat-tile.green .stat-tile-n,.stat-tile.green .stat-tile-lbl{color:var(--green)}
+.stat-tile.neutral .stat-tile-n{color:var(--text)}
+.stat-tile.neutral .stat-tile-lbl{color:var(--text3)}
+.stat-tile.amber .stat-tile-n,.stat-tile.amber .stat-tile-lbl{color:var(--amber)}
+
+/* PANTRY DATE CARD */
+.pantry-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.pantry-card-info{flex:1;min-width:0}
+.pantry-card-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.pantry-card-date{font-size:13px;font-weight:800;color:var(--text)}
+.pantry-card-btn{background:var(--green);color:#000;border:none;border-radius:50px;padding:10px 16px;font-size:12px;font-weight:800;cursor:pointer;flex-shrink:0;transition:filter .15s}
+.pantry-card-btn:active{filter:brightness(.9)}
 </style>
 </head>
 <body>
 
 <div id="splash" style="display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;min-height:100vh;background:radial-gradient(ellipse at 50% 0%,#1a1a2e,var(--bg))">
-  <div class="splash-logo">??</div>
+  <div class="splash-logo">🥦</div>
   <div class="splash-name">Pełna Lodówka</div>
   <div class="spin" style="margin-top:8px"></div>
   <p class="splash-sub" id="splash-lbl">Łączenie z bazą danych...</p>
 </div>
 
 <div id="login" style="display:flex">
-  <div class="login-logo">??</div>
+  <div class="login-logo">🥦</div>
   <div class="login-title">Pełna Lodówka</div>
   <p class="login-sub">Twój domowy asystent zakupów</p>
   <input class="name-inp" id="name-inp" placeholder="Jak masz na imię?" maxlength="20" onkeydown="if(event.key==='Enter')doLogin()">
@@ -362,64 +391,49 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
     <div class="hdr">
       <div class="hdr-top">
         <div class="hdr-brand">
-          <span class="hdr-logo">??</span>
+          <span class="hdr-logo">🥦</span>
           <span class="hdr-title">Pełna Lodówka</span>
           <div class="sync-dot" id="sdot"></div>
         </div>
         <div class="hdr-right">
-          <div class="user-chip" id="user-pill">??</div>
-          <div class="icon-btn" onclick="openSettingsModal()">⚙️</div>
-          <div class="icon-btn" onclick="openLog()">??</div>
-          <div class="icon-btn" onclick="resetAll()">??️</div>
+          <div class="user-chip" id="user-pill"></div>
+          <div class="icon-btn" onclick="openAdminLogin()" title="Panel administratora">⚙️</div>
+          <div class="icon-btn" onclick="openLog()" title="Historia zmian">📋</div>
+          <div class="icon-btn" onclick="resetAll()" title="Reset lodówki">🗑️</div>
         </div>
       </div>
 
-      <!-- STATS -->
-      <div class="stats-row">
-        <div class="stat-card red">
-          <div class="stat-icon">??</div>
-          <div class="stat-n" id="n-red">0</div>
-          <div class="stat-label">Do kupienia</div>
-        </div>
-        <div class="stat-card green">
-          <div class="stat-icon">✅</div>
-          <div class="stat-n" id="n-grn">0</div>
-          <div class="stat-label">Mamy</div>
-        </div>
-        <div class="stat-card neutral">
-          <div class="stat-icon">??</div>
-          <div class="stat-n" id="n-all">0</div>
-          <div class="stat-label">Pozycji</div>
-        </div>
-      </div>
-
-      <!-- QUICK ACTIONS -->
-      <div class="actions-bar">
-        <button class="action-btn primary" onclick="markShopping()">
-          <span class="action-btn-ico">??️</span>Byłem w sklepie
+      <!-- STATS 2x2 -->
+      <div class="stats-grid">
+        <button class="stat-tile red" onclick="setFilter('red')">
+          <div class="stat-tile-ico">🛒</div>
+          <div class="stat-tile-n" id="n-red">0</div>
+          <div class="stat-tile-lbl">Brakuje</div>
         </button>
-        <button class="action-btn purple" onclick="openReceipt()">
-          <span class="action-btn-ico">??</span>Paragon
+        <button class="stat-tile green" onclick="setFilter('grn')">
+          <div class="stat-tile-ico">✅</div>
+          <div class="stat-tile-n" id="n-grn">0</div>
+          <div class="stat-tile-lbl">W lodówce</div>
         </button>
-        <button class="action-btn secondary" onclick="toggleDateEdit()">
-          <span class="action-btn-ico">✏️</span>Data
+        <button class="stat-tile neutral" onclick="setFilter('all')">
+          <div class="stat-tile-ico">📦</div>
+          <div class="stat-tile-n" id="n-all">0</div>
+          <div class="stat-tile-lbl">Pozycji</div>
+        </button>
+        <button class="stat-tile amber" onclick="setFilter('exp')">
+          <div class="stat-tile-ico">⚠️</div>
+          <div class="stat-tile-n" id="n-exp">0</div>
+          <div class="stat-tile-lbl">Przeterminowane</div>
         </button>
       </div>
 
-      <!-- DATE CHIP -->
-      <div class="date-chip">
-        <div class="date-chip-left">
-          <span class="date-chip-ico">??</span>
-          <div class="date-chip-text">
-            <strong id="shop-lbl">Nie ustawiono daty zakupów</strong>
-            <span id="shop-ago"></span>
-          </div>
+      <!-- PANTRY UPDATE CARD -->
+      <div class="pantry-card">
+        <div class="pantry-card-info">
+          <div class="pantry-card-title">Stan lodówki na dzień</div>
+          <div class="pantry-card-date" id="pantry-update-lbl">Nie ustawiono daty aktualizacji lodówki</div>
         </div>
-      </div>
-      <div class="date-edit-row" id="date-edit-row" style="padding:0 0 10px">
-        <input type="date" class="date-inp" id="date-inp">
-        <button class="date-save" onclick="saveDateEdit()">✓ Zapisz</button>
-        <button class="date-cancel" onclick="toggleDateEdit()">✕</button>
+        <button class="pantry-card-btn" onclick="showUpdatePantryModal()">Zaktualizuj stan</button>
       </div>
 
       <!-- SEARCH -->
@@ -439,9 +453,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
       <!-- STATUS FILTERS -->
       <div class="filters">
         <button class="filter-btn act" id="f-all" onclick="setFilter('all')">Wszystkie</button>
-        <button class="filter-btn" id="f-exp" onclick="setFilter('exp')">⚠️ Wygasają</button>
-        <button class="filter-btn" id="f-red" onclick="setFilter('red')">?? Kupić</button>
-        <button class="filter-btn" id="f-grn" onclick="setFilter('grn')">?? Mamy</button>
+        <button class="filter-btn" id="f-exp" onclick="setFilter('exp')">⚠️ Przeterminowane</button>
+        <button class="filter-btn" id="f-red" onclick="setFilter('red')">🛒 Brakuje</button>
+        <button class="filter-btn" id="f-grn" onclick="setFilter('grn')">✅ W lodówce</button>
       </div>
     </div>
     <div class="body" id="body"></div>
@@ -457,11 +471,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
       <p>Przepisy, porady i zakupy — na bazie Twojej lodówki i diety</p>
     </div>
     <div class="chat-sugs">
-      <button class="sug-btn" onclick="sendSug('Co moge ugotowac z tego co mam?')">?? Co ugotować?</button>
-      <button class="sug-btn" onclick="sendSug('Zaproponuj mi obiad na dzis')">??️ Obiad dziś</button>
-      <button class="sug-btn" onclick="sendSug('Co wkrotce wygasnie i co z tym zrobic?')">⚠️ Co wygasa?</button>
-      <button class="sug-btn" onclick="sendSug('Nowe sniadanie - znudzila mi sie owsianka')">?? Nowe śniadanie</button>
-      <button class="sug-btn" onclick="sendSug('Zaproponuj lekka kolacje')">?? Lekka kolacja</button>
+      <button class="sug-btn" onclick="sendSug('Co mogę ugotować z tego co mam?')">🍳 Co ugotować?</button>
+      <button class="sug-btn" onclick="sendSug('Zaproponuj mi obiad na dziś')">🍽️ Obiad dziś</button>
+      <button class="sug-btn" onclick="sendSug('Co wkrótce wygaśnie i co z tym zrobić?')">⚠️ Co wygasa?</button>
+      <button class="sug-btn" onclick="sendSug('Nowe śniadanie - znudziła mi się owsianka')">🥣 Nowe śniadanie</button>
+      <button class="sug-btn" onclick="sendSug('Zaproponuj lekką kolację')">🥗 Lekka kolacja</button>
     </div>
     <div class="chat-msgs" id="chat-msgs"></div>
     <div class="chat-inp-row">
@@ -475,7 +489,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
   <!-- SHOPPING -->
   <div class="page-flex" id="page-shop">
     <div class="shop-hdr">
-      <h2>?? Zakupy</h2>
+      <h2>🛒 Zakupy</h2>
       <p>Lista AI + szybkie zamówienie online</p>
     </div>
     <div class="shop-body">
@@ -514,7 +528,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
       </div>
       <button class="gen-btn" id="gen-btn" onclick="generateShopList()">
         <div class="gen-spin" id="gen-spin"></div>
-        <span id="gen-btn-txt">?? Generuj listę zakupów AI</span>
+        <span id="gen-btn-txt">🛒 Generuj listę zakupów z diety</span>
       </button>
       <button class="copy-btn" id="copy-btn" onclick="copyShopList()">?? Kopiuj listę do schowka</button>
       <div id="shop-list-content"></div>
@@ -524,13 +538,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
   <!-- BOTTOM NAV -->
   <div class="bottom-nav">
     <button class="nav-btn act" id="nav-pantry" onclick="showPage('pantry')">
-      <span class="nav-ico">??</span><span class="nav-lbl">Lodówka</span>
+      <span class="nav-ico">🥬</span><span class="nav-lbl">Lodówka</span>
     </button>
     <button class="nav-btn" id="nav-chat" onclick="showPage('chat')">
-      <span class="nav-ico">??</span><span class="nav-lbl">Agent AI</span>
+      <span class="nav-ico">🤖</span><span class="nav-lbl">Agent AI</span>
     </button>
     <button class="nav-btn" id="nav-shop" onclick="showPage('shop')">
-      <span class="nav-ico">??</span><span class="nav-lbl">Zakupy</span>
+      <span class="nav-ico">🛒</span><span class="nav-lbl">Zakupy</span>
     </button>
   </div>
 </div>
@@ -607,26 +621,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
   </div>
 </div>
 
-<!-- SETTINGS MODAL -->
-<div class="overlay" id="settings-overlay" onclick="if(event.target===this)closeSettings()">
-  <div class="modal">
-    <h3>⚙️ Panel administratora</h3>
-    <div class="admin-note" id="admin-api-status">Sprawdzam klucz API...</div>
-    <p>Klucz zapisuje się w chmurze — wszyscy korzystają automatycznie.<br>
-    <strong style="color:var(--blue)">console.anthropic.com</strong> → API Keys</p>
-    <input class="modal-inp" id="api-key-inp" type="password" placeholder="sk-ant-api03-..." style="font-size:12px;font-family:monospace">
-    <div class="modal-btns" style="margin-bottom:8px">
-      <button class="mbtn ok" onclick="saveApiKey()">?? Zapisz dla wszystkich</button>
-    </div>
-    <div class="modal-btns">
-      <button class="mbtn del" onclick="clearApiKey()">??️ Usuń klucz</button>
-      <button class="mbtn cancel" onclick="closeSettings()">Zamknij</button>
-    </div>
-  </div>
-</div>
-
-<!-- ADMIN PASSWORD MODAL -->
-
 <!-- LOG MODAL -->
 <div class="overlay bottom" id="log-overlay" onclick="if(event.target===this)closeLog()">
   <div class="log-modal">
@@ -649,7 +643,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
-var ADMIN_PASS="spizarnia2025";
 var ROOM="room1",RP,LP,EP,PP;
 var CP=FB+"/config/apikey";
 var PH_PATH=""; // /purchaseHistory/{userId}
@@ -660,6 +653,12 @@ var userName="",shopTs=0,saveTimer=null,apiKey="";
 var expiryItem=null,scanData=null,scanFromExpiry=false,scanSavesPhoto=false;
 var photoItem=null,activeSlot="front",chatHistory=[],chatBusy=false;
 var receiptData=null,receiptAllProducts=[],receiptMeta={},shopChecked={},shopStore="biedronka";
+var receiptAdjustments=[];
+var receiptUncertain=[];
+var pendingReceiptFingerprint="";
+var pendingDuplicateReceipt=null;
+var pendingSimilarReceipt=null;
+var receiptLearningCache={};
 var userProfile=null,obStep=0,obSels={},obMethod="manual";
 var dietTab=0,dietMenu=1,expandedMeal=null,weekPlan={};
 var editMealCtx={section:null,idx:null};
@@ -798,17 +797,28 @@ function callAPI(messages,system,onOk,onErr,maxTok){
 }
 
 // ── SHOP DATE ─────────────────────────────────────────────────────────────────
-function openShopDateModal(){document.getElementById("shop-date-overlay").classList.add("show");}
-function closeShopDateModal(){document.getElementById("shop-date-overlay").classList.remove("show");}
-function markShopping(){dlgConfirm("?","Bylem w sklepie","Zaznaczyc dzisiejsza date?",function(){shopTs=Date.now();fbPatch(RP,{__shopTs:shopTs});updateShopBar();render();},"Tak");}
-function markShoppingNow(){shopTs=Date.now();fbPatch(RP,{__shopTs:shopTs});updateShopBar();render();closeShopDateModal();}
-function saveShopDate(){var v=document.getElementById("shop-date-inp").value;if(!v)return;shopTs=new Date(v).getTime();fbPatch(RP,{__shopTs:shopTs});updateShopBar();render();closeShopDateModal();}
+// Stare "Byłem w sklepie" / openShopDateModal zostały usunięte.
+// Zamiast tego używany jest przycisk "Zaktualizuj stan" → showUpdatePantryModal()
+// → openPantryAudit() / openReceipt(), a data jest zapisywana przez savePantryUpdateDate().
 function updateShopBar(){
-  var l=document.getElementById("shop-lbl"),a=document.getElementById("shop-ago");if(!l)return;
-  if(!shopTs){l.textContent="Nie ustawiono daty zakupow";if(a)a.textContent="";return;}
+  // Stary header z "Zakupy: ..." został zastąpiony kartą "Stan lodówki na dzień".
+  // Funkcja zostaje w kodzie żeby nie psuć innych miejsc, które ją wołają,
+  // ale teraz aktualizuje nowy element pantry-update-lbl.
+  updatePantryDateUI();
+}
+function updatePantryDateUI(){
+  var l=document.getElementById("pantry-update-lbl");
+  if(!l)return;
+  if(!shopTs){l.textContent="Nie ustawiono daty aktualizacji lodówki";return;}
   var d=new Date(shopTs),days=Math.floor((Date.now()-shopTs)/86400000);
-  l.textContent="Zakupy: "+d.toLocaleDateString("pl-PL",{weekday:"long",day:"numeric",month:"long"});
-  if(a)a.textContent=days===0?"dzis":days===1?"wczoraj":days+" dni temu";
+  var ago=days===0?" (dziś)":days===1?" (wczoraj)":" ("+days+" dni temu)";
+  l.textContent=d.toLocaleDateString("pl-PL",{day:"numeric",month:"long",year:"numeric"})+ago;
+}
+function savePantryUpdateDate(source,shop,note){
+  shopTs=Date.now();
+  fbPatch(RP,{__shopTs:shopTs}).catch(function(){});
+  updatePantryDateUI();
+  if(LP)fbPost(LP,{who:userName||"",what:"pantry_update",source:source||"manual",shop:shop||"",note:note||"",ts:shopTs}).catch(function(){});
 }
 
 // ── FRESHNESS ─────────────────────────────────────────────────────────────────
@@ -837,7 +847,7 @@ function openExpiryScanner(name){
 }
 
 function openScannerAndPhoto(name){expiryItem=name;scanFromExpiry=true;photoItem=name;scanSavesPhoto=true;openScanner();}
-function openScanner(){if(!apiKey){dlgAlert("X","Niedostepne","Skonfiguruj klucz API");return;}document.getElementById("scan-img").style.display="none";document.getElementById("scan-loading").style.display="none";document.getElementById("scan-result").style.display="none";document.getElementById("scan-apply").style.display="none";scanData=null;document.getElementById("scan-overlay").classList.add("show");}
+function openScanner(){if(!apiKey){dlgAlert("X","Niedostępne","Skonfiguruj klucz API w panelu administratora.");return;}document.getElementById("scan-img").style.display="none";document.getElementById("scan-loading").style.display="none";document.getElementById("scan-result").style.display="none";document.getElementById("scan-apply").style.display="none";scanData=null;document.getElementById("scan-overlay").classList.add("show");}
 function closeScanner(){document.getElementById("scan-overlay").classList.remove("show");scanSavesPhoto=false;}
 function triggerScanPhoto(){document.getElementById("scan-file").click();}
 function handleScanPhoto(input){
@@ -850,8 +860,8 @@ function handleScanPhoto(input){
     callAPI([{role:"user",content:[{type:"image",source:{type:"base64",media_type:mime,data:b64}},{type:"text",text:"Przeanalizuj zdjecie produktu. ZNAJDZ DATE PRZYDATNOSCI: Format polskich produktow DD.MM.YYYY lub DD.MM.RR. PRZYKLAD: 14.06.28 = dzien 14, miesiac 06, rok 2028 (NIE 2014!). Rok dwucyfrowy 25-35 = 2025-2035. TYLKO JSON: {\"produkt\":\"pelna nazwa\",\"data\":\"DD.MM.YYYY lub null\",\"uwaga\":\"\"}"}]}],null,function(txt){
       document.getElementById("scan-loading").style.display="none";
       try{var p=JSON.parse(txt.replace(/```json|```/g,"").trim());scanData=p;document.getElementById("scan-product").textContent=p.produkt||"Nieznany";document.getElementById("scan-date-txt").textContent=p.data&&p.data!=="null"?"Data: "+p.data:"Brak daty";document.getElementById("scan-note").textContent=p.uwaga||"";document.getElementById("scan-result").style.display="block";if(p.data&&p.data!=="null")document.getElementById("scan-apply").style.display="block";}
-      catch(e){document.getElementById("scan-product").textContent="Blad: "+txt.slice(0,80);document.getElementById("scan-result").style.display="block";}
-    },function(err){document.getElementById("scan-loading").style.display="none";document.getElementById("scan-product").textContent="Blad: "+err;document.getElementById("scan-result").style.display="block";});
+      catch(e){document.getElementById("scan-product").textContent="Błąd: "+txt.slice(0,80);document.getElementById("scan-result").style.display="block";}
+    },function(err){document.getElementById("scan-loading").style.display="none";document.getElementById("scan-product").textContent="Błąd: "+err;document.getElementById("scan-result").style.display="block";});
   };
   reader.readAsDataURL(input.files[0]);
 }
@@ -866,7 +876,7 @@ function applyScan(){
 }
 
 // ── RECEIPT ───────────────────────────────────────────────────────────────────
-function openReceipt(){if(!apiKey){dlgAlert("X","Niedostepne","Skonfiguruj klucz API");return;}document.getElementById("receipt-img").style.display="none";document.getElementById("receipt-loading").style.display="none";document.getElementById("receipt-scan-result").style.display="none";receiptData=null;document.getElementById("receipt-overlay").classList.add("show");}
+function openReceipt(){if(!apiKey){dlgAlert("X","Niedostępne","Skonfiguruj klucz API w panelu administratora.");return;}document.getElementById("receipt-img").style.display="none";document.getElementById("receipt-loading").style.display="none";document.getElementById("receipt-scan-result").style.display="none";receiptData=null;receiptAdjustments=[];receiptUncertain=[];pendingReceiptFingerprint="";pendingDuplicateReceipt=null;pendingSimilarReceipt=null;document.getElementById("receipt-overlay").classList.add("show");}
 function closeReceiptModal(){document.getElementById("receipt-overlay").classList.remove("show");}
 function triggerReceiptPhoto(){document.getElementById("receipt-file").click();}
 function handleReceiptPhoto(input){
@@ -878,85 +888,105 @@ function handleReceiptPhoto(input){
     document.getElementById("receipt-loading").style.display="block";
     document.getElementById("receipt-scan-result").style.display="none";
     var b64=e.target.result.split(",")[1],mime=input.files[0].type||"image/jpeg";
-    // Lista produktow z lodowki do dopasowania
     var allP=[];CATS.forEach(function(cat){cat.items.forEach(function(it){allP.push(it.n);});});
-    var prompt="Przeanalizuj paragon i zwroc 2 listy w JSON:\n"
-      +"1. 'dopasowane' - produkty ktore pasuja do listy lodowki: "+allP.join(", ")+"\n"
-      +"2. 'wszystkie' - WSZYSTKIE produkty z paragonu (nazwy, ilosci, ceny)\n"
+    var prompt="Przeanalizuj paragon i zwróć JSON z 3 listami: produkty (spożywcze), adjustments (rabaty/upusty/płatności), uncertainItems (pozycje niejasne).\n"
+      +"ZASADY:\n"
+      +"- OPUST, UPUST, RABAT, KUPON, PROMOCJA, OBNIŻKA, RESZTA, SUMA, RAZEM, GOTÓWKA, VISA, MASTERCARD, BLIK, KARTA, PŁATNOŚĆ nie są produktami — trafiają do adjustments.\n"
+      +"- Pozycje z ceną ujemną są rabatem/upustem (adjustments).\n"
+      +"- Niepewne, niejasne lub trudne do zaklasyfikowania pozycje trafiają do uncertainItems.\n"
+      +"- Produkty spożywcze trafiają wyłącznie do produkty.\n"
+      +"- Lista produktów z lodówki (do dopasowania nazw): "+allP.join(", ")+"\n"
       +"TYLKO JSON bez markdown:\n"
-      +'{"dopasowane":[{"n":"nazwa z listy lodowki","ilosc":1}],'
-      +'"wszystkie":[{"nazwa":"pelna nazwa z paragonu","ilosc":1,"cena":0.0,"jednostka":"szt"}],'
-      +'"suma":0.0,"sklep":"nazwa sklepu","data":"DD.MM.YYYY lub null"}';
+      +'{"sklep":"","data":"DD.MM.YYYY lub null","godzina":"HH:mm lub null","suma":0,'
+      +'"produkty":[{"rawName":"oryginalna z paragonu","matchedName":"dopasowana lub pusta","quantity":1,"unit":"szt.","totalPrice":0,"unitPrice":0}],'
+      +'"adjustments":[{"rawName":"OPUST","type":"discount","value":-1.5,"description":""}],'
+      +'"uncertainItems":[{"rawName":"","quantity":1,"unit":"szt.","totalPrice":0,"reason":""}]}';
     callAPI([
       {role:"user",content:[
         {type:"image",source:{type:"base64",media_type:mime,data:b64}},
         {type:"text",text:prompt}
       ]}
-    ],"Jestes asystentem analizy paragonow. TYLKO JSON. Bez markdown.",
+    ],"Jesteś asystentem analizy paragonów. TYLKO JSON. Bez markdown.",
     function(txt){
       document.getElementById("receipt-loading").style.display="none";
       var clean=txt.replace(/```json/gi,"").replace(/```/g,"").trim();
       var s=clean.indexOf("{"),e=clean.lastIndexOf("}");
       if(s===-1||e===-1){
-        document.getElementById("receipt-result-txt").textContent="Nie udało się odczytac paragonu.";
+        document.getElementById("receipt-result-txt").textContent="Nie udało się odczytać paragonu.";
         document.getElementById("receipt-scan-result").style.display="block";
         return;
       }
       try{
         var jsonStr=clean.slice(s,e+1).replace(/,\s*([}\]])/g,"$1");
         var parsed=JSON.parse(jsonStr);
-        receiptData=parsed.dopasowane||[];
-        receiptAllProducts=parsed.wszystkie||[];
-        receiptMeta={suma:parsed.suma||0,sklep:parsed.sklep||"",data:parsed.data||""};
-        // Zapisz paragon osobno w /purchaseHistory/ — nie w logach zmian
-        if(PH_PATH){
-          var receipt={
-            userId:profileKey(userName),
+        // Wsparcie dla starego formatu (dopasowane / wszystkie) — przemapowanie
+        if(!parsed.produkty&&(parsed.dopasowane||parsed.wszystkie)){
+          parsed.produkty=(parsed.wszystkie||[]).map(function(p){
+            return{rawName:p.nazwa||"",matchedName:p.nazwa||"",quantity:p.ilosc||1,unit:p.jednostka||"szt.",totalPrice:p.cena||0,unitPrice:0};
+          });
+          parsed.adjustments=parsed.adjustments||[];
+          parsed.uncertainItems=parsed.uncertainItems||[];
+        }
+        // Filtruj produkty: rabaty trafiają do adjustments
+        var products=[],adjustments=parsed.adjustments||[];
+        (parsed.produkty||[]).forEach(function(p){
+          var raw=p.rawName||p.nazwa||p.n||"";
+          if(isReceiptDiscount(raw)||Number(p.totalPrice||p.cena||0)<0){
+            adjustments.push({rawName:raw,type:"discount",value:Number(p.totalPrice||p.cena||0),description:"Upust / rabat"});
+            return;
+          }
+          products.push(p);
+        });
+        receiptData=products;
+        receiptAllProducts=products;
+        receiptAdjustments=adjustments;
+        receiptUncertain=parsed.uncertainItems||[];
+        receiptMeta={
+          sklep:parsed.sklep||"",
+          data:parsed.data||"",
+          godzina:parsed.godzina||"",
+          suma:parsed.suma||0
+        };
+        // Zastosuj nauczone wcześniej decyzje, potem fingerprint i sprawdzenie duplikatu
+        loadReceiptLearning().then(function(){
+          applyReceiptLearning();
+          var tmpReceipt={
             sklep:receiptMeta.sklep,
             data:receiptMeta.data,
             suma:receiptMeta.suma,
-            ts:Date.now(),
-            source:"scanner",
-            status:"confirmed",
-            produkty:(parsed.wszystkie||[]).map(function(p){
-              var prod=findProduct(p.nazwa||"");
-              return{
-                rawName:p.nazwa||"",
-                matchedProductId:prod?prod.id:"",
-                matchedName:prod?prod.name:(p.nazwa||""),
-                ilosc:p.ilosc||1,
-                jednostka:p.jednostka||"szt",
-                cenaCalkowita:p.cena||0,
-                cenaJednostkowa:p.cena&&p.ilosc?parseFloat((p.cena/p.ilosc).toFixed(2)):0,
-                kategoria:prod?prod.cat:"",
-                addToPantry:!!prod,
-                isDietProduct:!!prod,
-                isExtraProduct:!prod
-              };
-            })
+            produkty:receiptData
           };
-        }
-        closeReceiptModal();
-        showReceiptResults();
-      }catch(err){
-        // Proba odratowania czesciowego JSON
-        try{
-          var dStart=clean.indexOf('"dopasowane"');
-          if(dStart!==-1){
-            var aS=clean.indexOf("[",dStart),aE=clean.indexOf("]",aS);
-            if(aS!==-1&&aE!==-1){
-              receiptData=JSON.parse(clean.slice(aS,aE+1).replace(/,\s*]/g,"]")||"[]");
-              receiptAllProducts=[];receiptMeta={};
-              closeReceiptModal();showReceiptResults();return;
-            }
+          pendingReceiptFingerprint=createReceiptFingerprint(tmpReceipt);
+          pendingDuplicateReceipt=null;
+          pendingSimilarReceipt=null;
+          var userId=profileKey(userName||"");
+          if(userId){
+            checkDuplicateReceipt(userId,pendingReceiptFingerprint).then(function(dup){
+              if(dup){
+                pendingDuplicateReceipt=dup;
+                closeReceiptModal();
+                showReceiptResults();
+                dlgAlert("⚠️","Duplikat paragonu","Ten paragon jest już zapisany w historii. Produkty nie zostaną dodane drugi raz.");
+              }else{
+                closeReceiptModal();
+                showReceiptResults();
+              }
+            }).catch(function(){
+              closeReceiptModal();
+              showReceiptResults();
+            });
+          }else{
+            closeReceiptModal();
+            showReceiptResults();
           }
-        }catch(e2){}
-        document.getElementById("receipt-result-txt").textContent="Blad odczytu JSON. Sprobuj ponownie z lepszym oswietleniem.";
+        });
+      }catch(err){
+        document.getElementById("receipt-result-txt").textContent="Błąd odczytu JSON. Spróbuj ponownie z lepszym oświetleniem.";
         document.getElementById("receipt-scan-result").style.display="block";
       }
     },function(err){
       document.getElementById("receipt-loading").style.display="none";
-      document.getElementById("receipt-result-txt").textContent="Blad: "+err;
+      document.getElementById("receipt-result-txt").textContent="Błąd: "+err;
       document.getElementById("receipt-scan-result").style.display="block";
     },2500);
   };
@@ -968,72 +998,125 @@ function showReceiptResults(){
   showPage("shop");
   document.getElementById("receipt-results").style.display="block";
   var html="";
-  // Meta
-  if(receiptMeta&&(receiptMeta.sklep||receiptMeta.suma)){
-    html+='<div style="background:var(--bg4);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:var(--text3)">';
-    if(receiptMeta.sklep)html+='<b style="color:var(--text)">'+receiptMeta.sklep+'</b> ';
-    if(receiptMeta.data)html+=receiptMeta.data+' ';
-    if(receiptMeta.suma)html+='Suma: <b style="color:var(--amber)">'+receiptMeta.suma+' zl</b>';
-    html+='</div>';
+  // Meta z edytowalną datą
+  var isoDate=normalizeReceiptDate(receiptMeta.data||"")||new Date().toISOString().slice(0,10);
+  html+='<div style="background:var(--bg4);border-radius:10px;padding:12px;margin-bottom:10px;font-size:12px;color:var(--text3)">';
+  html+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">';
+  if(receiptMeta.sklep)html+='<b style="color:var(--text)">'+receiptMeta.sklep+'</b>';
+  if(receiptMeta.godzina)html+='<span>'+receiptMeta.godzina+'</span>';
+  if(receiptMeta.suma)html+='<span>Suma: <b style="color:var(--amber)">'+Number(receiptMeta.suma).toFixed(2)+' zł</b></span>';
+  html+='</div>';
+  html+='<div style="display:flex;gap:8px;align-items:center">';
+  html+='<span style="font-size:11px;color:var(--text3)">Data paragonu:</span>';
+  html+='<input type="date" id="receipt-date-edit" value="'+isoDate+'" style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--text);color-scheme:dark">';
+  html+='</div>';
+  html+='</div>';
+  // Komunikat o duplikacie
+  if(pendingDuplicateReceipt){
+    html+='<div style="background:rgba(255,77,77,.1);border:1px solid var(--red);border-radius:10px;padding:12px;margin-bottom:10px;font-size:12px;color:var(--red);font-weight:700">⚠️ Ten paragon jest już zapisany w historii. Produkty nie zostaną dodane drugi raz.</div>';
   }
-  // Dopasowane — z checkboxami
+  // Produkty
   if(receiptData&&receiptData.length){
-    html+='<div style="font-size:11px;font-weight:800;color:var(--green);margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">Dopasowane do lodowki ('+receiptData.length+') — zaznacz co dodac:</div>';
-    receiptData.forEach(function(p,i){
+    var sorted=sortByNamePL(receiptData,function(p){return p.matchedName||p.rawName||p.nazwa||p.n||"";});
+    html+='<div style="font-size:11px;font-weight:800;color:var(--green);margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">Produkty z paragonu ('+sorted.length+') — zaznacz co dodać:</div>';
+    sorted.forEach(function(p){
+      var i=receiptData.indexOf(p);
+      var name=p.matchedName||p.rawName||p.nazwa||p.n||"";
+      var qty=p.quantity||p.ilosc||1;
+      var price=p.totalPrice||p.cenaCalkowita||p.cena||0;
       html+='<div style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--bg3);border-radius:10px;margin-bottom:6px;border:1px solid var(--border)">';
       html+='<input type="checkbox" id="rp-cb-'+i+'" checked style="width:18px;height:18px;accent-color:var(--green);cursor:pointer;flex-shrink:0">';
-      html+='<label for="rp-cb-'+i+'" style="flex:1;cursor:pointer"><div style="font-size:13px;font-weight:700;color:var(--text)">'+p.n+'</div></label>';
-      html+='<div style="font-size:12px;font-weight:800;color:var(--amber)">x'+(p.ilosc||1)+'</div>';
+      html+='<label for="rp-cb-'+i+'" style="flex:1;cursor:pointer"><div style="font-size:13px;font-weight:700;color:var(--text)">'+name+'</div>';
+      html+='<div style="font-size:11px;color:var(--text3)">x'+qty+(price?' &bull; '+Number(price).toFixed(2)+' zł':'')+'</div></label>';
       html+='</div>';
     });
   }
-  // Pozostale
-  if(receiptAllProducts&&receiptAllProducts.length){
-    var notMatched=receiptAllProducts.filter(function(p){return!receiptData.some(function(r){return r.n===p.nazwa;});});
-    if(notMatched.length){
-      html+='<div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:6px;margin-top:14px;text-transform:uppercase;letter-spacing:.8px">Pozostale z paragonu — zapisane w historii ('+notMatched.length+')</div>';
-      notMatched.slice(0,12).forEach(function(p){
-        html+='<div style="display:flex;justify-content:space-between;padding:6px 10px;font-size:12px;color:var(--text3);border-bottom:1px solid var(--border)">';
-        html+='<span>'+p.nazwa+'</span>';
-        html+='<span>'+(p.cena?p.cena+' zl ':'')+' x'+(p.ilosc||1)+' '+p.jednostka+'</span>';
-        html+='</div>';
-      });
-      if(notMatched.length>12)html+='<div style="font-size:11px;color:var(--text3);text-align:center;padding:6px">... i '+(notMatched.length-12)+' wiecej</div>';
-    }
+  // Adjustments (rabaty / płatności)
+  if(receiptAdjustments&&receiptAdjustments.length){
+    html+='<div style="font-size:11px;font-weight:800;color:var(--amber);margin-top:12px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">Rabaty i opusty ('+receiptAdjustments.length+')</div>';
+    receiptAdjustments.forEach(function(a){
+      html+='<div style="display:flex;justify-content:space-between;padding:6px 10px;font-size:12px;background:rgba(245,158,11,.08);border-radius:8px;margin-bottom:4px">';
+      html+='<span style="color:var(--text2)">'+(a.rawName||a.description||"Rabat")+'</span>';
+      html+='<span style="color:var(--amber);font-weight:700">'+Number(a.value||0).toFixed(2)+' zł</span>';
+      html+='</div>';
+    });
+  }
+  // Niepewne pozycje
+  if(receiptUncertain&&receiptUncertain.length){
+    html+='<div style="font-size:11px;font-weight:800;color:var(--blue);margin-top:14px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">Pozycje wymagające potwierdzenia ('+receiptUncertain.length+')</div>';
+    receiptUncertain.forEach(function(u,i){
+      var raw=u.rawName||u.nazwa||u.name||"";
+      var price=u.totalPrice||u.cena||0;
+      html+='<div style="background:rgba(61,139,255,.08);border:1px solid rgba(61,139,255,.25);border-radius:10px;padding:10px;margin-bottom:8px">';
+      html+='<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">'+raw+'</div>';
+      html+='<div style="font-size:11px;color:var(--text3);margin-bottom:8px">'+(price?Number(price).toFixed(2)+' zł &bull; ':'')+(u.reason||"Sugerowany typ: produkt")+'</div>';
+      html+='<div style="display:flex;gap:6px;flex-wrap:wrap">';
+      html+='<button onclick="confirmUncertain('+i+',\'product\')" style="flex:1;min-width:80px;background:var(--green);color:#000;border:none;border-radius:8px;padding:7px;font-size:11px;font-weight:700;cursor:pointer">To produkt</button>';
+      html+='<button onclick="confirmUncertain('+i+',\'discount\')" style="flex:1;min-width:80px;background:var(--amber);color:#000;border:none;border-radius:8px;padding:7px;font-size:11px;font-weight:700;cursor:pointer">To rabat/upust</button>';
+      html+='<button onclick="confirmUncertain('+i+',\'ignore\')" style="flex:1;min-width:60px;background:var(--bg4);color:var(--text2);border:1px solid var(--border);border-radius:8px;padding:7px;font-size:11px;font-weight:700;cursor:pointer">Pomiń</button>';
+      html+='<button onclick="confirmUncertainManual('+i+')" style="flex:1;min-width:90px;background:var(--bg4);color:var(--text2);border:1px solid var(--border);border-radius:8px;padding:7px;font-size:11px;font-weight:700;cursor:pointer">Wpisz opis ręcznie</button>';
+      html+='</div>';
+      html+='</div>';
+    });
   }
   document.getElementById("receipt-items").innerHTML=html;
 }
 
 
 function applyReceiptSelected(){
+  if(pendingDuplicateReceipt){
+    dlgAlert("⚠️","Duplikat paragonu","Ten paragon jest już zapisany. Nie dodaję produktów drugi raz.");
+    return;
+  }
+  if(!PH_PATH){dlgAlert("X","Błąd","Brak ścieżki historii. Zaloguj się ponownie.");return;}
+  var dateInp=document.getElementById("receipt-date-edit");
+  var dateVal=(dateInp&&dateInp.value)?dateInp.value:normalizeReceiptDate(receiptMeta.data||"")||new Date().toISOString().slice(0,10);
+  var normalizedDate=normalizeReceiptDate(dateVal)||dateVal;
   var updated=[];
   var cbxs=document.querySelectorAll('[id^="rp-cb-"]');
-  cbxs.forEach(function(cb,i){
+  cbxs.forEach(function(cb){
     if(!cb.checked)return;
-    var p=receiptData[i];if(!p)return;
-    // Skip discounts
-    var name=p.n||p.matchedName||p.rawName||"";
+    var idx=Number(cb.id.replace("rp-cb-",""));
+    var p=receiptData[idx];if(!p)return;
+    var name=p.matchedName||p.rawName||p.nazwa||p.n||"";
     if(isReceiptDiscount(name))return;
     var prod=findProduct(name);
-    var amtG=prod?((p.ilosc||1)*prod.pkgSize):1;
-    addToPantry(prod,amtG,"receipt","");
+    var qty=p.quantity||p.ilosc||1;
+    var amtG=prod?(qty*(prod.pkgSize||100)):qty;
+    if(prod)addToPantry(prod,amtG,"receipt","");
     updated.push(name);
   });
-  if(!updated.length){dlgAlert("ℹ️","Brak zmian","Nie zaznaczono żadnych produktów.");return;}
-  // Zapisz paragon z fingerprintem dopiero TERAZ
+  if(!updated.length&&!receiptAdjustments.length){
+    dlgAlert("ℹ️","Brak zmian","Nie zaznaczono żadnych produktów.");
+    return;
+  }
+  var receiptId="r_"+Date.now();
   var receiptDoc={
-    userId:profileKey(userName),sklep:receiptMeta.sklep||"",
-    data:normalizeReceiptDate(receiptMeta.data||new Date().toLocaleDateString("pl-PL")),
-    displayDate:displayDatePL(normalizeReceiptDate(receiptMeta.data||"")),
-    suma:receiptMeta.suma||0,ts:Date.now(),source:"scanner",
-    produkty:receiptAllProducts,adjustments:receiptAdjustments
+    receiptId:receiptId,
+    userId:profileKey(userName),
+    sklep:receiptMeta.sklep||"",
+    data:normalizedDate,
+    displayDate:displayDatePL(normalizedDate),
+    godzina:receiptMeta.godzina||"",
+    suma:receiptMeta.suma||0,
+    produkty:receiptData||[],
+    adjustments:receiptAdjustments||[],
+    fingerprint:pendingReceiptFingerprint||createReceiptFingerprint({sklep:receiptMeta.sklep,data:normalizedDate,suma:receiptMeta.suma,produkty:receiptData}),
+    ts:Date.now(),
+    source:"scanner",
+    status:"confirmed"
   };
-  receiptDoc.fingerprint=createReceiptFingerprint(receiptDoc);
-  fbPost(PH_PATH,receiptDoc);
-  savePantryUpdateDate("receipt",receiptMeta.sklep||"","");
-  document.getElementById("receipt-results").style.display="none";
-  var extra=receiptAllProducts.length>receiptData.length?" Pozostałe "+(receiptAllProducts.length-receiptData.length)+" prod. w historii.":"";
-  dlgAlert("✅","Lodówka zaktualizowana","Dodano: "+updated.join(", ")+"."+extra);
+  fbPut(PH_PATH+"/"+receiptId,receiptDoc).then(function(){
+    savePantryUpdateDate("receipt",receiptMeta.sklep||"","");
+    document.getElementById("receipt-results").style.display="none";
+    // Reset
+    receiptData=null;receiptAllProducts=[];receiptAdjustments=[];receiptUncertain=[];receiptMeta={};
+    pendingReceiptFingerprint="";pendingDuplicateReceipt=null;pendingSimilarReceipt=null;
+    var msg="Dodano: "+updated.join(", ")+".";
+    dlgAlert("✅","Lodówka zaktualizowana",msg);
+  }).catch(function(err){
+    dlgAlert("X","Błąd","Nie udało się zapisać paragonu: "+err.message);
+  });
 }
 
 
@@ -1050,12 +1133,7 @@ function handleProductPhoto(input){handleSlotPhoto(input);}
 function deleteProductPhoto(){["front","side","top","expiry"].forEach(function(slot){var k=fbk("p_"+slot,photoItem),p={};delete photos[k];p[k]=null;fbPatch(PP,p);var img=document.getElementById("slot-"+slot+"-img"),empty=document.getElementById("slot-"+slot+"-empty");if(img)img.style.display="none";if(empty)empty.style.display="flex";});var mk=fbk("p",photoItem),mp={};delete photos[mk];mp[mk]=null;fbPatch(PP,mp);render();}
 
 // ── ADMIN ─────────────────────────────────────────────────────────────────────
-
-function closeAdminPass(){document.getElementById("admin-pass-overlay").classList.remove("show");}
-function checkAdminPass(){var p=document.getElementById("admin-pass-inp").value;if(p!==ADMIN_PASS){dlgAlert("X","Bledne haslo","Sprobuj ponownie.");return;}closeAdminPass();fbGet(CP).then(function(k){var el=document.getElementById("admin-api-status");if(k){el.textContent="Klucz API aktywny";el.style.color="var(--green)";}else{el.textContent="Brak klucza";el.style.color="var(--amber)";}}).catch(function(){});document.getElementById("api-key-inp").value="";document.getElementById("settings-overlay").classList.add("show");}
-function closeSettings(){document.getElementById("settings-overlay").classList.remove("show");}
-function saveApiKey(){var v=document.getElementById("api-key-inp").value.trim();if(!v||!v.startsWith("sk-ant-")){dlgAlert("X","Nieprawidlowy klucz","Klucz powinien zaczynac sie od sk-ant-");return;}fbPut(CP,v).then(function(){apiKey=v;var el=document.getElementById("admin-api-status");el.textContent="Klucz zapisany!";el.style.color="var(--green)";setTimeout(closeSettings,1500);}).catch(function(e){dlgAlert("X","Blad",e.message);});}
-function clearApiKey(){fbPut(CP,null).then(function(){apiKey="";document.getElementById("api-key-inp").value="";document.getElementById("admin-api-status").textContent="Klucz usuniety";document.getElementById("admin-api-status").style.color="var(--red)";});}
+// Nowy system admina znajduje się w sekcji "Admin panel wiring" poniżej.
 
 // ── LOG ───────────────────────────────────────────────────────────────────────
 function addLog(w,o,n){if(LP)fbPost(LP,{who:userName,what:w,delta:n-o,newVal:n,ts:Date.now()});}
@@ -1066,7 +1144,14 @@ function renderLog(){var b=document.getElementById("log-body");b.innerHTML='<div
 // ── CAT CHIPS ─────────────────────────────────────────────────────────────────
 function buildCatChips(){var wrap=document.getElementById("cat-chips");if(!wrap)return;wrap.innerHTML='<button class="cat-chip act" id="chip-all" onclick="setCatFilter(\'all\')">Wszystko</button>';CATS.forEach(function(cat){var btn=document.createElement("button");btn.className="cat-chip";btn.id="chip-"+cat.id;btn.innerHTML=cat.label;if(cat.color)btn.style.borderColor=cat.color;btn.onclick=(function(id){return function(){setCatFilter(id);};})(cat.id);wrap.appendChild(btn);});}
 function setCatFilter(id){catFilter=id;document.querySelectorAll(".cat-chip").forEach(function(el){el.classList.remove("act");});var el=document.getElementById("chip-"+(id==="all"?"all":id));if(el){el.classList.add("act");if(CATS.find(function(c){return c.id===id;})){var cat=CATS.find(function(c){return c.id===id;});el.style.background=cat.color||"var(--green)";el.style.borderColor=cat.color||"var(--green)";el.style.color="#000";}}render();}
-function setFilter(f){filter=f;render();}
+function setFilter(f){
+  filter=f;
+  ["all","exp","red","grn"].forEach(function(k){
+    var el=document.getElementById("f-"+k);if(!el)return;
+    el.classList.toggle("act",k===f);
+  });
+  render();
+}
 function onSearch(q){searchQ=q.toLowerCase().trim();document.getElementById("xbtn").classList[q?"add":"remove"]("show");render();}
 function clearSearch(){document.getElementById("sinp").value="";onSearch("");}
 
@@ -1079,7 +1164,7 @@ function copyShopList(silent){var items=[];document.querySelectorAll(".shop-item
 function openStore(store){var urls={biedronka:"https://biedronkago.pl",frisco:"https://www.frisco.pl",glovo:"https://glovoapp.com/pl/pl/warszawa/",lisek:"https://lisek.app"};copyShopList(true);dlgConfirm("?","Lista skopiowana","Otworzyc "+store+"?",function(){window.open(urls[store],"_blank");},"Otworz");}
 
 // ── CHAT ──────────────────────────────────────────────────────────────────────
-function addWelcome(){addMsg("ai","Czesc "+userName.split(" ")[0]+"! Znam zawartosc Twojej lodowki"+(userProfile?" i Twoja diete "+userProfile.kcal+" kcal.":". Wpisz co chcesz ugotowac!"));}
+function addWelcome(){addMsg("ai","Cześć "+userName.split(" ")[0]+"! Znam zawartość Twojej lodówki"+(userProfile?" i Twoją dietę "+userProfile.kcal+" kcal.":". Wpisz co chcesz ugotować!"));}
 function addMsg(role,text){var msgs=document.getElementById("chat-msgs");var div=document.createElement("div");div.className="msg "+role;var now=new Date().toLocaleTimeString("pl-PL",{hour:"2-digit",minute:"2-digit"});var ini=userName?ni(userName):"G";var bub=text.replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br>");div.innerHTML='<div class="msg-av">'+(role==="ai"?"AI":ini)+'</div><div><div class="msg-bub">'+bub+'</div><div class="msg-time">'+now+'</div></div>';msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;chatHistory.push({role:role==="ai"?"assistant":"user",content:text});}
 function addTyping(){var msgs=document.getElementById("chat-msgs");var div=document.createElement("div");div.className="msg ai";div.id="typing";div.innerHTML='<div class="msg-av">AI</div><div class="typing-bub"><span></span><span></span><span></span></div>';msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;}
 function removeTyping(){var el=document.getElementById("typing");if(el)el.remove();}
@@ -1614,7 +1699,7 @@ function startApp(){
   });
 }
 function goOffline(){state=mkState();document.getElementById("splash").style.display="none";document.getElementById("app").style.display="block";buildCatChips();setSyncUI("err");render();}
-function resetAll(){dlgConfirm("X","Reset lodowki","Zresetowac wszystkie stany do zera?",function(){state=mkState();render();fbPatch(RP,state).then(function(){addLog("RESET",0,0);});},"Resetuj","danger");}
+function resetAll(){dlgConfirm("X","Reset lodówki","Zresetować wszystkie stany do zera?",function(){state=mkState();render();fbPatch(RP,state).then(function(){addLog("RESET",0,0);});},"Resetuj","danger");}
 function loadUserProfile(name,cb){fbGet(FB+"/profiles/"+profileKey(name)).then(function(p){if(p&&p.kcal){userProfile=p;cb(true);}else{userProfile=null;cb(false);}}).catch(function(){userProfile=null;cb(false);});}
 function saveUserProfile(p){userProfile=p;if(RP)fbPut(FB+"/profiles/"+profileKey(userName),p);}
 
@@ -1654,7 +1739,8 @@ function loadPurchaseHistory(cb){
   if(!PH_PATH){purchaseHistory=[];if(cb)cb();return;}
   fbGet(PH_PATH).then(function(data){
     if(!data){purchaseHistory=[];if(cb)cb();return;}
-    purchaseHistory=Object.values(data)
+    purchaseHistory=Object.entries(data)
+      .map(function(e){var r=e[1]||{};r.receiptId=r.receiptId||e[0];return r;})
       .filter(function(e){return e.ts;})
       .sort(function(a,b){return b.ts-a.ts;})
       .slice(0,30);
@@ -1667,58 +1753,41 @@ function openPurchaseHistory(){
     var body=document.getElementById("diet-body");
     if(!body)return;
     if(!purchaseHistory.length){
-      body.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px">&#129534;</div>Brak zeskanowanych paragonow.<br><br>Uzyj skanera paragonu w zakladce Zakupy.</div>';
+      body.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px">🧾</div>Brak zeskanowanych paragonów.<br><br>Użyj skanera paragonu w zakładce Zakupy.</div>';
       return;
     }
-    var html='<div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px">'+purchaseHistory.length+' paragonow</div>';
-    // Price analysis
-    var priceMap={};
+    var html='<div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px">'+purchaseHistory.length+' paragonów</div>';
+    var uid=profileKey(userName||"");
     purchaseHistory.forEach(function(p){
-      (p.produkty||[]).forEach(function(prod){
-        if(!prod.nazwa||!prod.cena)return;
-        var key=prod.nazwa.toLowerCase();
-        if(!priceMap[key])priceMap[key]={name:prod.nazwa,prices:[],sklepy:{}};
-        priceMap[key].prices.push(prod.cena);
-        if(p.sklep){
-          if(!priceMap[key].sklepy[p.sklep])priceMap[key].sklepy[p.sklep]=[];
-          priceMap[key].sklepy[p.sklep].push(prod.cena);
-        }
-      });
-    });
-    // Show price insights if multiple shops
-    var insights=Object.values(priceMap).filter(function(p){return Object.keys(p.sklepy).length>1;});
-    if(insights.length){
-      html+='<div style="background:rgba(61,139,255,.08);border:1px solid rgba(61,139,255,.2);border-radius:var(--radius);padding:14px;margin-bottom:14px">';
-      html+='<div style="font-size:11px;font-weight:800;color:var(--blue);margin-bottom:10px;text-transform:uppercase;letter-spacing:.8px">Porownanie cen Biedronka vs Lidl</div>';
-      insights.slice(0,5).forEach(function(p){
-        html+='<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px">';
-        html+='<div style="font-weight:700;color:var(--text);margin-bottom:4px">'+p.name+'</div>';
-        Object.entries(p.sklepy).forEach(function(entry){
-          var sklep=entry[0],prices=entry[1];
-          var avg=(prices.reduce(function(a,b){return a+b;},0)/prices.length).toFixed(2);
-          html+='<span style="display:inline-block;margin-right:12px;color:var(--text3)">'+sklep+': <b style="color:var(--amber)">'+avg+' zl</b></span>';
-        });
-        html+='</div>';
-      });
-      html+='</div>';
-    }
-    // Receipts list
-    purchaseHistory.forEach(function(p,i){
-      var d=p.ts?new Date(p.ts).toLocaleDateString("pl-PL"):"?";
-      var skladCount=(p.produkty||[]).length;
+      var d=p.ts?new Date(p.ts).toLocaleDateString("pl-PL"):(p.displayDate||p.data||"?");
+      var products=sortByNamePL(p.produkty||[],function(prod){return prod.matchedName||prod.nazwa||prod.rawName||prod.n||"";});
+      var skladCount=products.length;
+      var rid=p.receiptId||"";
       html+='<div style="background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:10px;overflow:hidden">';
-      html+='<div onclick="toggleReceiptDetails(this)" style="padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:10px">';
-      html+='<div style="font-size:24px">&#129534;</div>';
-      html+='<div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--text)">'+(p.sklep||"Sklep")+'</div>';
-      html+='<div style="font-size:11px;color:var(--text3)">'+d+' &bull; '+skladCount+' produktow'+(p.suma?' &bull; <b style="color:var(--amber)">'+p.suma+' zl</b>':'')+'</div></div>';
-      html+='<span style="color:var(--text3);font-size:14px">v</span></div>';
+      html+='<div style="padding:12px 14px;display:flex;align-items:center;gap:10px">';
+      html+='<div style="font-size:24px;cursor:pointer" onclick="toggleReceiptDetails(this.parentElement)">🧾</div>';
+      html+='<div style="flex:1;cursor:pointer" onclick="toggleReceiptDetails(this.parentElement)"><div style="font-size:13px;font-weight:700;color:var(--text)">'+(p.sklep||"Sklep")+'</div>';
+      html+='<div style="font-size:11px;color:var(--text3)">'+d+' &bull; '+skladCount+' produktów'+(p.suma?' &bull; <b style="color:var(--amber)">'+Number(p.suma).toFixed(2)+' zł</b>':'')+'</div></div>';
+      html+='<button onclick="event.stopPropagation();deleteReceipt(\''+uid+'\',\''+rid+'\')" style="background:rgba(255,77,77,.1);border:1px solid rgba(255,77,77,.3);color:var(--red);border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer">Usuń</button>';
+      html+='</div>';
       html+='<div style="display:none;padding:0 14px 12px">';
-      (p.produkty||[]).forEach(function(prod){
+      products.forEach(function(prod){
+        var np=normalizeReceiptProduct(prod);
+        var name=np.matchedName||np.rawName||"Nieznany produkt";
         html+='<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bg3);font-size:12px">';
-        html+='<span style="color:var(--text2)">'+prod.nazwa+'</span>';
-        html+='<span style="color:var(--text3)">'+prod.ilosc+' '+prod.jednostka+(prod.cena?' &bull; <b style="color:var(--amber)">'+prod.cena+' zl</b>':'')+'</span>';
+        html+='<span style="color:var(--text2)">'+name+'</span>';
+        html+='<span style="color:var(--text3)">'+np.quantity+' '+np.unit+(np.totalPrice?' &bull; <b style="color:var(--amber)">'+Number(np.totalPrice).toFixed(2)+' zł</b>':'')+'</span>';
         html+='</div>';
       });
+      if(p.adjustments&&p.adjustments.length){
+        html+='<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:11px;color:var(--amber);font-weight:700">Rabaty:</div>';
+        p.adjustments.forEach(function(a){
+          html+='<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:11px;color:var(--text3)">';
+          html+='<span>'+(a.rawName||a.description||"Rabat")+'</span>';
+          html+='<span>'+Number(a.value||0).toFixed(2)+' zł</span>';
+          html+='</div>';
+        });
+      }
       html+='</div></div>';
     });
     body.innerHTML=html;
@@ -2316,412 +2385,28 @@ function convertToPurchaseUnits(product, missingAmount){
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// CMS — Panel Administratora
+// Stara sekcja CMS została usunięta — całe zarządzanie administracyjne
+// odbywa się przez Admin Panel (poniżej w pliku).
 // ══════════════════════════════════════════════════════════════════════════════
-var CMS_PASS = "spizarnia2025";
-var cmsTab = 0;
-var cmsUsers = {}; // {userId: profileData}
-var cmsSelectedUser = null;
 
-// ── Wejście do CMS ────────────────────────────────────────────────────────────
-function openCMS() {
-  document.getElementById("cms-pass-inp").value = "";
-  document.getElementById("cms-pass-overlay").classList.add("show");
-  setTimeout(function() { document.getElementById("cms-pass-inp").focus(); }, 100);
-}
 
-function checkCMSPass() {
-  var p = document.getElementById("cms-pass-inp").value;
-  if (p !== CMS_PASS) { dlgAlert("X", "Błędne hasło", ""); return; }
-  document.getElementById("cms-pass-overlay").classList.remove("show");
-  document.getElementById("cms-overlay").classList.add("show");
-  loadCMSData();
-}
 
-function closeCMS() {
-  document.getElementById("cms-overlay").classList.remove("show");
-}
-
-function closeCMSUser() {
-  document.getElementById("cms-user-overlay").classList.remove("show");
-}
-
-// ── Załaduj dane z Firebase ───────────────────────────────────────────────────
-function loadCMSData() {
-  var body = document.getElementById("cms-body");
-  body.innerHTML = '<div style="text-align:center;padding:40px;color:#6B6B85"><div class="spin" style="margin:0 auto 16px"></div>Ładowanie danych...</div>';
-  fbGet(FB + "/profiles").then(function(data) {
-    if (!data) { cmsUsers = {}; renderCMSTab(); return; }
-    cmsUsers = data;
-    renderCMSTab();
-  }).catch(function(e) {
-    body.innerHTML = '<div style="text-align:center;padding:40px;color:#FF4D4D">Błąd: ' + e.message + '</div>';
-  });
-}
-
-// ── Przełącz zakładkę ─────────────────────────────────────────────────────────
-function switchCMSTab(n) {
-  cmsTab = n;
-  for (var i = 0; i < 4; i++) {
-    var t = document.getElementById("cmstab-" + i);
-    if (t) {
-      t.style.borderBottom = i === n ? "2px solid #1ED760" : "2px solid transparent";
-      t.style.color = i === n ? "#1ED760" : "#6B6B85";
-    }
-  }
-  renderCMSTab();
-}
-
-function renderCMSTab() {
-  if (cmsTab === 0) renderCMSUsers();
-  else if (cmsTab === 1) renderCMSDiets();
-  else if (cmsTab === 2) renderCMSReceipts();
-  else renderCMSStats();
-}
-
-// ── Karta użytkownika (mini) ──────────────────────────────────────────────────
-function userCard(uid, p) {
-  var name = uid.replace(/_/g, " ").replace(/\b\w/g, function(l) { return l.toUpperCase(); });
-  var goal = { lose: "Redukcja", maintain: "Utrzymanie", gain: "Masa" }[p.goal] || p.goal || "?";
-  var store = { biedronka: "🐝 Biedronka", lidl: "🏪 Lidl", both: "Oba" }[p.stores] || p.stores || "?";
-  var hasDiet = !!(p.dietData && (p.dietData.menu1 || p.dietData.menu2));
-  return '<div onclick="openCMSUser(\'' + uid + '\')" style="background:#111118;border-radius:14px;padding:14px;margin-bottom:10px;border:1px solid #2A2A3A;cursor:pointer;transition:border .2s" onmouseover="this.style.borderColor=\'#1ED760\'" onmouseout="this.style.borderColor=\'#2A2A3A\'">'
-    + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
-    + '<div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#1ED760,#17A84A);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#000;flex-shrink:0">' + name.charAt(0) + '</div>'
-    + '<div style="flex:1"><div style="font-size:14px;font-weight:800;color:#fff">' + name + '</div>'
-    + '<div style="font-size:11px;color:#6B6B85">' + (p.age || "?") + ' lat &bull; ' + (p.weight || "?") + ' kg &bull; ' + (p.height || "?") + ' cm</div></div>'
-    + '<div style="text-align:right"><div style="font-size:13px;font-weight:900;color:#F59E0B">' + (p.kcal || "?") + ' kcal</div>'
-    + '<div style="font-size:10px;color:#6B6B85">' + goal + '</div></div></div>'
-    + '<div style="display:flex;gap:6px;flex-wrap:wrap">'
-    + '<span style="background:#1ED76015;border:1px solid #1ED76033;border-radius:50px;padding:3px 10px;font-size:10px;font-weight:700;color:#1ED760">B:' + (p.prot || "?") + 'g</span>'
-    + '<span style="background:#60A5FA15;border:1px solid #60A5FA33;border-radius:50px;padding:3px 10px;font-size:10px;font-weight:700;color:#60A5FA">W:' + (p.carb || "?") + 'g</span>'
-    + '<span style="background:#F9A8D415;border:1px solid #F9A8D433;border-radius:50px;padding:3px 10px;font-size:10px;font-weight:700;color:#F9A8D4">T:' + (p.fat || "?") + 'g</span>'
-    + '<span style="background:#7C3AED15;border:1px solid #7C3AED33;border-radius:50px;padding:3px 10px;font-size:10px;font-weight:700;color:#8B5CF6">' + store + '</span>'
-    + (hasDiet ? '<span style="background:#1ED76015;border:1px solid #1ED76044;border-radius:50px;padding:3px 10px;font-size:10px;font-weight:700;color:#1ED760">✓ Dieta</span>' : '<span style="background:#FF4D4D15;border:1px solid #FF4D4D33;border-radius:50px;padding:3px 10px;font-size:10px;font-weight:700;color:#FF4D4D">Brak diety</span>')
-    + '</div></div>';
-}
-
-// ══ ZAKŁADKA 1: Użytkownicy ════════════════════════════════════════════════════
-function renderCMSUsers() {
-  var body = document.getElementById("cms-body");
-  var users = Object.entries(cmsUsers);
-  if (!users.length) {
-    body.innerHTML = '<div style="text-align:center;padding:40px;color:#6B6B85">Brak użytkowników w bazie.</div>';
-    return;
-  }
-  var html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
-    + '<div style="font-size:13px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px">Wszyscy użytkownicy (' + users.length + ')</div>'
-    + '<button onclick="loadCMSData()" style="background:#1A1A24;border:1px solid #2A2A3A;color:#6B6B85;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer">Odśwież</button>'
-    + '</div>';
-  users.forEach(function(entry) {
-    html += userCard(entry[0], entry[1]);
-  });
-  body.innerHTML = html;
-}
-
-// ══ ZAKŁADKA 2: Diety ═════════════════════════════════════════════════════════
-function renderCMSDiets() {
-  var body = document.getElementById("cms-body");
-  var users = Object.entries(cmsUsers);
-  var withDiet = users.filter(function(e) { return e[1].dietData; });
-  var withoutDiet = users.filter(function(e) { return !e[1].dietData; });
-  var html = '<div style="margin-bottom:16px">';
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">';
-  html += '<div style="background:#111118;border-radius:12px;padding:14px;border:1px solid #2A2A3A;text-align:center"><div style="font-size:28px;font-weight:900;color:#1ED760">' + withDiet.length + '</div><div style="font-size:11px;color:#6B6B85;margin-top:4px">Z dietą</div></div>';
-  html += '<div style="background:#111118;border-radius:12px;padding:14px;border:1px solid #2A2A3A;text-align:center"><div style="font-size:28px;font-weight:900;color:#FF4D4D">' + withoutDiet.length + '</div><div style="font-size:11px;color:#6B6B85;margin-top:4px">Bez diety</div></div>';
-  html += '</div>';
-  if (withDiet.length) {
-    html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Użytkownicy z dietą</div>';
-    withDiet.forEach(function(e) {
-      var p = e[1]; var d = p.dietData;
-      var m1meals = (d.menu1 ? ((d.menu1.sniadania||[]).length + (d.menu1.obiady||[]).length + (d.menu1.kolacje||[]).length) : 0);
-      var m2meals = (d.menu2 ? ((d.menu2.sniadania||[]).length + (d.menu2.obiady||[]).length + (d.menu2.kolacje||[]).length) : 0);
-      var name = e[0].replace(/_/g, " ").replace(/\b\w/g, function(l) { return l.toUpperCase(); });
-      html += '<div onclick="openCMSUser(\'' + e[0] + '\')" style="background:#111118;border-radius:12px;padding:12px 14px;margin-bottom:8px;border:1px solid #2A2A3A;cursor:pointer;display:flex;align-items:center;gap:10px">';
-      html += '<div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#1ED760,#17A84A);display:flex;align-items:center;justify-content:center;font-weight:900;color:#000;flex-shrink:0">' + name.charAt(0) + '</div>';
-      html += '<div style="flex:1"><div style="font-size:13px;font-weight:700;color:#fff">' + name + '</div>';
-      html += '<div style="font-size:11px;color:#6B6B85">Menu 1: ' + m1meals + ' posiłków &bull; Menu 2: ' + m2meals + ' posiłków</div></div>';
-      html += '<div style="font-size:12px;font-weight:800;color:#F59E0B">' + (p.kcal || "?") + ' kcal</div>';
-      html += '</div>';
-    });
-  }
-  if (withoutDiet.length) {
-    html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;margin-top:14px">Bez diety</div>';
-    withoutDiet.forEach(function(e) {
-      var name = e[0].replace(/_/g, " ").replace(/\b\w/g, function(l) { return l.toUpperCase(); });
-      html += '<div style="background:#111118;border-radius:12px;padding:10px 14px;margin-bottom:6px;border:1px solid #FF4D4D22;display:flex;align-items:center;gap:8px">';
-      html += '<div style="width:28px;height:28px;border-radius:50%;background:#FF4D4D22;display:flex;align-items:center;justify-content:center;font-weight:900;color:#FF4D4D;font-size:12px">' + name.charAt(0) + '</div>';
-      html += '<span style="font-size:13px;color:#B0B0C8">' + name + '</span>';
-      html += '<span style="margin-left:auto;font-size:10px;color:#FF4D4D">Brak diety</span>';
-      html += '</div>';
-    });
-  }
-  html += '</div>';
-  body.innerHTML = html;
-}
-
-// ══ ZAKŁADKA 3: Paragony ══════════════════════════════════════════════════════
-function renderCMSReceipts() {
-  var body = document.getElementById("cms-body");
-  body.innerHTML = '<div style="text-align:center;padding:30px;color:#6B6B85"><div class="spin" style="margin:0 auto 16px"></div>Ładowanie paragonów...</div>';
-  var userIds = Object.keys(cmsUsers);
-  var allReceipts = [];
-  var loaded = 0;
-  if (!userIds.length) { body.innerHTML = '<div style="text-align:center;padding:40px;color:#6B6B85">Brak użytkowników.</div>'; return; }
-  userIds.forEach(function(uid) {
-    fbGet(FB + "/purchaseHistory/" + uid).then(function(data) {
-      if (data) {
-        Object.values(data).forEach(function(r) { allReceipts.push(Object.assign({}, r, { _userId: uid })); });
-      }
-      loaded++;
-      if (loaded === userIds.length) showCMSReceipts(allReceipts);
-    }).catch(function() {
-      loaded++;
-      if (loaded === userIds.length) showCMSReceipts(allReceipts);
-    });
-  });
-}
-
-function showCMSReceipts(receipts) {
-  var body = document.getElementById("cms-body");
-  receipts.sort(function(a, b) { return (b.ts || 0) - (a.ts || 0); });
-  if (!receipts.length) {
-    body.innerHTML = '<div style="text-align:center;padding:40px;color:#6B6B85"><div style="font-size:40px;margin-bottom:12px">🧾</div>Brak zeskanowanych paragonów.</div>';
-    return;
-  }
-  var totalSum = receipts.reduce(function(s, r) { return s + (r.suma || 0); }, 0);
-  var html = '<div style="background:#111118;border-radius:12px;padding:14px;margin-bottom:14px;border:1px solid #2A2A3A">';
-  html += '<div style="display:flex;justify-content:space-between;align-items:center">';
-  html += '<div><div style="font-size:24px;font-weight:900;color:#fff">' + receipts.length + '</div><div style="font-size:11px;color:#6B6B85">Paragonów łącznie</div></div>';
-  html += '<div style="text-align:right"><div style="font-size:20px;font-weight:900;color:#F59E0B">' + totalSum.toFixed(2) + ' zł</div><div style="font-size:11px;color:#6B6B85">Suma wydatków</div></div>';
-  html += '</div></div>';
-  receipts.forEach(function(r) {
-    var name = (r._userId || "").replace(/_/g, " ").replace(/\b\w/g, function(l) { return l.toUpperCase(); });
-    var d = r.ts ? new Date(r.ts).toLocaleDateString("pl-PL") : (r.data || "?");
-    var pCount = (r.produkty || []).length;
-    html += '<div style="background:#111118;border-radius:12px;padding:12px 14px;margin-bottom:8px;border:1px solid #2A2A3A">';
-    html += '<div style="display:flex;align-items:center;gap:10px">';
-    html += '<div style="font-size:26px">🧾</div>';
-    html += '<div style="flex:1">';
-    html += '<div style="font-size:13px;font-weight:800;color:#fff">' + (r.sklep || "Sklep") + '</div>';
-    html += '<div style="font-size:11px;color:#6B6B85">' + name + ' &bull; ' + d + ' &bull; ' + pCount + ' produktów</div>';
-    html += '</div>';
-    if (r.suma) html += '<div style="font-size:14px;font-weight:900;color:#F59E0B">' + r.suma + ' zł</div>';
-    html += '</div>';
-    if (pCount > 0) {
-      html += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid #1A1A24">';
-      (r.produkty || []).slice(0, 5).forEach(function(p) {
-        html += '<div style="display:flex;justify-content:space-between;font-size:11px;color:#6B6B85;padding:2px 0">';
-        html += '<span>' + (p.rawName || p.nazwa || p.matchedName || "?") + '</span>';
-        html += '<span>' + (p.cenaCalkowita || p.cena || "") + (p.cenaCalkowita ? " zł" : "") + '</span>';
-        html += '</div>';
-      });
-      if (pCount > 5) html += '<div style="font-size:10px;color:#6B6B85;text-align:center;margin-top:4px">... i ' + (pCount - 5) + ' więcej</div>';
-      html += '</div>';
-    }
-    html += '</div>';
-  });
-  body.innerHTML = html;
-}
-
-// ══ ZAKŁADKA 4: Statystyki ════════════════════════════════════════════════════
-function renderCMSStats() {
-  var body = document.getElementById("cms-body");
-  var users = Object.values(cmsUsers);
-  if (!users.length) { body.innerHTML = '<div style="text-align:center;padding:40px;color:#6B6B85">Brak danych.</div>'; return; }
-  var totalUsers = users.length;
-  var withDiet = users.filter(function(u) { return u.dietData; }).length;
-  var goals = { lose: 0, maintain: 0, gain: 0 };
-  var stores = { biedronka: 0, lidl: 0, both: 0 };
-  var avgKcal = 0, avgWeight = 0, avgAge = 0, counted = 0;
-  users.forEach(function(u) {
-    if (u.goal) goals[u.goal] = (goals[u.goal] || 0) + 1;
-    if (u.stores) stores[u.stores] = (stores[u.stores] || 0) + 1;
-    if (u.kcal) { avgKcal += u.kcal; counted++; }
-    if (u.weight) avgWeight += u.weight;
-    if (u.age) avgAge += u.age;
-  });
-  if (counted) { avgKcal = Math.round(avgKcal / counted); avgWeight = Math.round(avgWeight / counted); avgAge = Math.round(avgAge / counted); }
-
-  function statCard(label, value, color) {
-    return '<div style="background:#111118;border-radius:12px;padding:14px;border:1px solid #2A2A3A;text-align:center">'
-      + '<div style="font-size:26px;font-weight:900;color:' + (color || "#fff") + '">' + value + '</div>'
-      + '<div style="font-size:11px;color:#6B6B85;margin-top:4px">' + label + '</div></div>';
-  }
-  function bar(label, val, total, color) {
-    var pct = total > 0 ? Math.round(val / total * 100) : 0;
-    return '<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;color:#B0B0C8;margin-bottom:4px"><span>' + label + '</span><span style="font-weight:700;color:' + color + '">' + val + ' (' + pct + '%)</span></div>'
-      + '<div style="height:6px;background:#1A1A24;border-radius:4px"><div style="height:100%;width:' + pct + '%;background:' + color + ';border-radius:4px"></div></div></div>';
-  }
-
-  var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">';
-  html += statCard("Użytkownicy", totalUsers, "#1ED760");
-  html += statCard("Z dietą", withDiet, "#8B5CF6");
-  html += statCard("Śr. kcal/dzień", avgKcal || "?", "#F59E0B");
-  html += statCard("Śr. wiek", avgAge ? avgAge + " lat" : "?", "#60A5FA");
-  html += '</div>';
-  html += '<div style="background:#111118;border-radius:12px;padding:14px;border:1px solid #2A2A3A;margin-bottom:12px">';
-  html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Cele użytkowników</div>';
-  html += bar("Redukcja tłuszczu", goals.lose || 0, totalUsers, "#FF4D4D");
-  html += bar("Utrzymanie wagi", goals.maintain || 0, totalUsers, "#F59E0B");
-  html += bar("Masa mięśniowa", goals.gain || 0, totalUsers, "#1ED760");
-  html += '</div>';
-  html += '<div style="background:#111118;border-radius:12px;padding:14px;border:1px solid #2A2A3A;margin-bottom:12px">';
-  html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Sklepy</div>';
-  html += bar("Biedronka", stores.biedronka || 0, totalUsers, "#DC2626");
-  html += bar("Lidl", stores.lidl || 0, totalUsers, "#1D4ED8");
-  html += bar("Oba sklepy", stores.both || 0, totalUsers, "#7C3AED");
-  html += '</div>';
-  // Wykres kcal (SVG)
-  var kcalData = users.filter(function(u) { return u.kcal; }).map(function(u) { return u.kcal; }).sort(function(a,b){return a-b;});
-  if (kcalData.length > 1) {
-    var minK = kcalData[0], maxK = kcalData[kcalData.length-1], rangeK = maxK - minK || 1;
-    html += '<div style="background:#111118;border-radius:12px;padding:14px;border:1px solid #2A2A3A">';
-    html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Rozkład kalorii</div>';
-    html += '<svg width="100%" height="60" viewBox="0 0 300 60">';
-    kcalData.forEach(function(k, i) {
-      var x = Math.round(i / (kcalData.length - 1) * 280 + 10);
-      var h = Math.round((k - minK) / rangeK * 45 + 5);
-      html += '<rect x="' + (x-3) + '" y="' + (60-h) + '" width="6" height="' + h + '" fill="#1ED760" rx="2" opacity="0.8"/>';
-    });
-    html += '<text x="10" y="58" fill="#6B6B85" font-size="9">' + minK + ' kcal</text>';
-    html += '<text x="240" y="58" fill="#6B6B85" font-size="9">' + maxK + ' kcal</text>';
-    html += '</svg></div>';
-  }
-  body.innerHTML = html;
-}
-
-// ══ WIDOK SZCZEGÓŁOWY UŻYTKOWNIKA ═════════════════════════════════════════════
-function openCMSUser(uid) {
-  cmsSelectedUser = uid;
-  var p = cmsUsers[uid] || {};
-  var name = uid.replace(/_/g, " ").replace(/\b\w/g, function(l) { return l.toUpperCase(); });
-  document.getElementById("cms-user-name-hdr").textContent = name;
-  document.getElementById("cms-user-overlay").classList.add("show");
-  renderCMSUserDetail(uid, p);
-}
-
-function renderCMSUserDetail(uid, p) {
-  var body = document.getElementById("cms-user-body");
-  var name = uid.replace(/_/g, " ").replace(/\b\w/g, function(l) { return l.toUpperCase(); });
-  var html = "";
-
-  // Profil
-  html += '<div style="background:#111118;border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid #2A2A3A">';
-  html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Profil</div>';
-  var fields = [
-    ["Imię / ID", name], ["Wiek", p.age ? p.age + " lat" : "?"],
-    ["Waga", p.weight ? p.weight + " kg" : "?"], ["Wzrost", p.height ? p.height + " cm" : "?"],
-    ["Płeć", p.gender === "m" ? "Mężczyzna" : p.gender === "f" ? "Kobieta" : "?"],
-    ["Aktywność", {sed:"Siedzący",light:"Lekki",mod:"Umiarkowany",active:"Aktywny"}[p.activity] || p.activity || "?"],
-    ["Cel", {lose:"Redukcja",maintain:"Utrzymanie",gain:"Masa"}[p.goal] || p.goal || "?"],
-    ["Sklep", {biedronka:"Biedronka",lidl:"Lidl",both:"Oba sklepy"}[p.stores] || p.stores || "?"],
-    ["Wykluczenia", p.exclude || "Brak"],
-  ];
-  fields.forEach(function(f) {
-    html += '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1A1A24">';
-    html += '<span style="font-size:12px;color:#6B6B85">' + f[0] + '</span>';
-    html += '<span style="font-size:12px;font-weight:700;color:#fff">' + f[1] + '</span>';
-    html += '</div>';
-  });
-  html += '</div>';
-
-  // Makro
-  if (p.kcal) {
-    html += '<div style="background:#111118;border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid #2A2A3A">';
-    html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Cel kaloryczny i makro</div>';
-    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
-    [["Kalorie", p.kcal + " kcal", "#F59E0B"], ["Białko", (p.prot||"?") + "g", "#60A5FA"], ["Węglowodany", (p.carb||"?") + "g", "#1ED760"], ["Tłuszcze", (p.fat||"?") + "g", "#F9A8D4"]].forEach(function(m) {
-      html += '<div style="background:#0D0D15;border-radius:10px;padding:10px;text-align:center;border:1px solid #2A2A3A">';
-      html += '<div style="font-size:18px;font-weight:900;color:' + m[2] + '">' + m[1] + '</div>';
-      html += '<div style="font-size:10px;color:#6B6B85;margin-top:2px">' + m[0] + '</div></div>';
-    });
-    html += '</div></div>';
-  }
-
-  // Preferencje
-  if ((p.liked && p.liked.length) || (p.disliked && p.disliked.length)) {
-    html += '<div style="background:#111118;border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid #2A2A3A">';
-    html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Preferencje</div>';
-    if (p.liked && p.liked.length) {
-      html += '<div style="margin-bottom:8px"><span style="font-size:11px;color:#1ED760;font-weight:700">Lubi: </span>';
-      html += p.liked.map(function(x) { return '<span style="background:#1ED76015;border:1px solid #1ED76033;border-radius:50px;padding:2px 10px;font-size:11px;color:#1ED760;margin-right:4px">' + x + '</span>'; }).join("");
-      html += '</div>';
-    }
-    if (p.disliked && p.disliked.length) {
-      html += '<div><span style="font-size:11px;color:#FF4D4D;font-weight:700">Nie lubi: </span>';
-      html += p.disliked.map(function(x) { return '<span style="background:#FF4D4D15;border:1px solid #FF4D4D33;border-radius:50px;padding:2px 10px;font-size:11px;color:#FF4D4D;margin-right:4px">' + x + '</span>'; }).join("");
-      html += '</div>';
-    }
-    html += '</div>';
-  }
-
-  // Dieta — podsumowanie
-  if (p.dietData) {
-    html += '<div style="background:#111118;border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid #2A2A3A">';
-    html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Dieta</div>';
-    ["menu1", "menu2"].forEach(function(mk, mi) {
-      var menu = p.dietData[mk];
-      if (!menu) return;
-      html += '<div style="margin-bottom:10px"><div style="font-size:12px;font-weight:800;color:#8B5CF6;margin-bottom:6px">Menu ' + (mi + 1) + '</div>';
-      ["sniadania", "obiady", "kolacje"].forEach(function(t) {
-        (menu[t] || []).forEach(function(meal) {
-          html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:#0D0D15;border-radius:8px;margin-bottom:4px">';
-          html += '<span style="font-size:11px;color:#6B6B85;width:60px;flex-shrink:0">' + {sniadania:"Śniadanie",obiady:"Obiad",kolacje:"Kolacja"}[t] + '</span>';
-          html += '<span style="font-size:12px;font-weight:700;color:#fff;flex:1">' + (meal.nazwa || "?") + '</span>';
-          html += '<span style="font-size:11px;color:#F59E0B">' + (meal.kcal || "?") + ' kcal</span>';
-          html += '</div>';
-        });
-      });
-      html += '</div>';
-    });
-    html += '</div>';
-  }
-
-  // Historia zakupów
-  fbGet(FB + "/purchaseHistory/" + uid).then(function(data) {
-    var receipts = data ? Object.values(data).sort(function(a, b) { return (b.ts||0)-(a.ts||0); }) : [];
-    var extraHtml = '<div style="background:#111118;border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid #2A2A3A">';
-    extraHtml += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Historia zakupów (' + receipts.length + ' paragonów)</div>';
-    if (!receipts.length) {
-      extraHtml += '<div style="font-size:12px;color:#6B6B85;text-align:center;padding:10px">Brak paragonów</div>';
-    } else {
-      var totalSum = receipts.reduce(function(s, r) { return s + (r.suma || 0); }, 0);
-      extraHtml += '<div style="font-size:13px;font-weight:800;color:#F59E0B;margin-bottom:10px">Suma: ' + totalSum.toFixed(2) + ' zł</div>';
-      receipts.slice(0, 5).forEach(function(r) {
-        var d = r.ts ? new Date(r.ts).toLocaleDateString("pl-PL") : (r.data || "?");
-        extraHtml += '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:#0D0D15;border-radius:8px;margin-bottom:4px">';
-        extraHtml += '<div><div style="font-size:12px;font-weight:700;color:#fff">' + (r.sklep || "Sklep") + '</div><div style="font-size:10px;color:#6B6B85">' + d + ' &bull; ' + (r.produkty||[]).length + ' prod.</div></div>';
-        if (r.suma) extraHtml += '<span style="font-size:13px;font-weight:800;color:#F59E0B">' + r.suma + ' zł</span>';
-        extraHtml += '</div>';
-      });
-      if (receipts.length > 5) extraHtml += '<div style="font-size:11px;color:#6B6B85;text-align:center;padding:6px">... i ' + (receipts.length - 5) + ' więcej paragonów</div>';
-    }
-    extraHtml += '</div>';
-    document.getElementById("cms-user-body").innerHTML += extraHtml;
-  }).catch(function() {});
-
-  body.innerHTML = html;
-}
-
-// ── Otwórz CMS z URL hash lub przycisku ──────────────────────────────────────
-function checkCMSRoute() {
+// Hash-route do panelu admina (zachowane dla #admin / #cms)
+function checkAdminRoute() {
   if (window.location.hash === "#admin" || window.location.hash === "#cms") {
-    openCMS();
+    openAdminLogin();
     window.history.replaceState(null, "", window.location.pathname);
   }
 }
-window.addEventListener("load", checkCMSRoute);
-window.addEventListener("hashchange", function() {
-  if (window.location.hash === "#admin" || window.location.hash === "#cms") { checkCMSRoute(); }
-});
+window.addEventListener("load", checkAdminRoute);
+window.addEventListener("hashchange", checkAdminRoute);
 
 
 
 // ══════════════════════════════════════════════════════════════════════════════
 // ADMIN PANEL — kompletna logika
 // ══════════════════════════════════════════════════════════════════════════════
-var ADMIN_PASS_LOCAL = "spizarnia2025";
+var ADMIN_PASS = "spizarnia2025";
 var adminCurrentTab = 0;
 var adminUsersData = {};
 
@@ -2915,7 +2600,10 @@ function loadAdminReceipts() {
     var allReceipts = [], loaded = 0;
     uids.forEach(function(uid) {
       fbGet(FB + "/purchaseHistory/" + uid).then(function(d) {
-        if (d) Object.values(d).forEach(function(r) { allReceipts.push(Object.assign({}, r, {_uid: uid})); });
+        if (d) Object.entries(d).forEach(function(entry) {
+          var rid=entry[0],r=entry[1]||{};
+          allReceipts.push(Object.assign({}, r, {_uid: uid, _rid: r.receiptId||rid}));
+        });
         loaded++;
         if (loaded === uids.length) renderAdminReceipts(allReceipts);
       }).catch(function() { loaded++; if (loaded === uids.length) renderAdminReceipts(allReceipts); });
@@ -2937,21 +2625,23 @@ function renderAdminReceipts(receipts) {
     + '</div>';
   receipts.forEach(function(r) {
     var uid = r._uid || "";
+    var rid = r._rid || r.receiptId || "";
     var name = uid.replace(/_/g, " ").replace(/\b\w/g, function(l){ return l.toUpperCase(); });
-    var d = r.ts ? new Date(r.ts).toLocaleDateString("pl-PL") : (r.data||"?");
-    var products = (r.produkty||[]);
+    var d = r.ts ? new Date(r.ts).toLocaleDateString("pl-PL") : (r.displayDate||r.data||"?");
+    var products = sortByNamePL(r.produkty||[], function(p){return p.matchedName||p.rawName||p.nazwa||p.n||"";});
     html += '<div style="background:#111118;border-radius:14px;padding:12px 14px;margin-bottom:8px;border:1px solid rgba(255,255,255,.06)">'
-      + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">'
-      + '<div><div style="font-size:13px;font-weight:800;color:#fff">' + (r.sklep||"Sklep") + '</div>'
+      + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px">'
+      + '<div style="flex:1"><div style="font-size:13px;font-weight:800;color:#fff">' + (r.sklep||"Sklep") + '</div>'
       + '<div style="font-size:11px;color:#6B6B85">' + name + ' &bull; ' + d + '</div></div>'
       + (r.suma ? '<div style="font-size:14px;font-weight:900;color:#F59E0B">' + Number(r.suma).toFixed(2) + ' zł</div>' : '')
+      + '<button onclick="deleteReceipt(\''+uid+'\',\''+rid+'\')" style="background:rgba(255,77,77,.1);border:1px solid rgba(255,77,77,.3);color:#FF4D4D;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer">Usuń</button>'
       + '</div>';
     if (products.length) {
       html += '<div style="border-top:1px solid rgba(255,255,255,.06);padding-top:6px">';
       products.slice(0, 5).forEach(function(p) {
-        var np = typeof normalizeReceiptProduct === "function" ? normalizeReceiptProduct(p) : p;
-        var pname = (np.matchedName || np.rawName || np.nazwa || np.n || "Nieznany produkt").trim() || "Nieznany produkt";
-        var price = np.totalPrice || np.cena || 0;
+        var np = normalizeReceiptProduct(p);
+        var pname = (np.matchedName || np.rawName || "Nieznany produkt").trim() || "Nieznany produkt";
+        var price = np.totalPrice || 0;
         html += '<div style="display:flex;justify-content:space-between;font-size:11px;color:#6B6B85;padding:3px 0">'
           + '<span>' + pname + '</span>'
           + '<span>' + (price ? Number(price).toFixed(2) + " zł" : "") + '</span></div>';
@@ -3070,12 +2760,6 @@ function testAdminApi() {
   );
 }
 
-// Remove old CMS functions to avoid conflicts
-var openCMS = openAdminPanel;
-var closeCMS = closeAdminPanel;
-var switchCMSTab = switchAdminTab;
-var checkCMSPass = checkAdminPassword;
-
 // ── Sortowanie PL ─────────────────────────────────────────────────────────
 function sortByNamePL(items,getName){
   return items.slice().sort(function(a,b){
@@ -3113,6 +2797,24 @@ function displayDatePL(iso){
   var p=iso.split("-");
   if(p.length!==3)return iso;
   return p[2]+"."+p[1]+"."+p[0];
+}
+
+// ── Normalizacja produktu z paragonu ──────────────────────────────────────
+function normalizeReceiptProduct(p){
+  if(!p)return{rawName:"",matchedProductId:"",matchedName:"",quantity:1,unit:"szt.",totalPrice:0,unitPrice:0,category:"",addToPantry:true,isDietProduct:false,isExtraProduct:false};
+  return{
+    rawName:p.rawName||p.nazwa||p.n||p.name||"",
+    matchedProductId:p.matchedProductId||"",
+    matchedName:p.matchedName||p.nazwa||p.n||p.name||"",
+    quantity:Number(p.quantity||p.ilosc||p.qty||p.amount||1),
+    unit:p.unit||p.jednostka||"szt.",
+    totalPrice:Number(p.totalPrice||p.cenaCalkowita||p.cena||0),
+    unitPrice:Number(p.unitPrice||p.cenaJednostkowa||0),
+    category:p.category||p.kategoria||"",
+    addToPantry:p.addToPantry!==false,
+    isDietProduct:!!p.isDietProduct,
+    isExtraProduct:!!p.isExtraProduct
+  };
 }
 
 // ── Fingerprint paragonu ───────────────────────────────────────────────────
@@ -3153,32 +2855,116 @@ function deleteReceipt(userId,receiptId){
 }
 
 // ── Receipt Learning ─────────────────────────────────────────────────────
-function loadReceiptLearning(){
-  return fbGet(FB+"/receiptLearning/"+profileKey(userName)).then(function(data){return data||{};}).catch(function(){return{};});
+function normalizeRawName(name){
+  return String(name||"").toLowerCase().trim().replace(/[.$#\[\]\/]/g,"_").replace(/\s+/g,"_");
 }
+function loadReceiptLearning(){
+  if(!userName)return Promise.resolve({});
+  return fbGet(FB+"/receiptLearning/"+profileKey(userName))
+    .then(function(data){receiptLearningCache=data||{};return receiptLearningCache;})
+    .catch(function(){return{};});
+}
+function saveReceiptLearning(rawName,data){
+  if(!userName||!rawName)return Promise.resolve();
+  var key=normalizeRawName(rawName);
+  if(!key)return Promise.resolve();
+  var path=FB+"/receiptLearning/"+profileKey(userName)+"/"+key;
+  return fbGet(path).then(function(old){
+    old=old||{};
+    var payload=Object.assign({},old,data,{
+      rawName:rawName,
+      normalizedName:key,
+      lastUsedAt:Date.now(),
+      timesConfirmed:Number(old.timesConfirmed||0)+1
+    });
+    receiptLearningCache[key]=payload;
+    return fbPut(path,payload);
+  });
+}
+
+function applyReceiptLearning(){
+  // Modyfikuje receiptData / receiptAdjustments / receiptUncertain na podstawie cache
+  var learn=receiptLearningCache||{};
+  var keepProducts=[];
+  (receiptData||[]).forEach(function(p){
+    var raw=p.rawName||p.nazwa||p.n||"";
+    var key=normalizeRawName(raw);
+    var l=key?learn[key]:null;
+    if(l&&l.type==="discount"){
+      receiptAdjustments.push({rawName:raw,type:"discount",value:Number(p.totalPrice||p.cenaCalkowita||p.cena||0),description:"Upust / rabat"});
+      return;
+    }
+    if(l&&l.type==="ignore")return;
+    if(l&&l.type==="product"&&l.matchedName){p.matchedName=l.matchedName;}
+    keepProducts.push(p);
+  });
+  receiptData=keepProducts;
+  var keepUncertain=[];
+  (receiptUncertain||[]).forEach(function(u){
+    var raw=u.rawName||u.nazwa||u.name||"";
+    var key=normalizeRawName(raw);
+    var l=key?learn[key]:null;
+    if(l&&l.type==="discount"){
+      receiptAdjustments.push({rawName:raw,type:"discount",value:Number(u.totalPrice||u.cena||0),description:"Upust / rabat"});
+      return;
+    }
+    if(l&&l.type==="ignore")return;
+    if(l&&l.type==="product"){
+      receiptData.push({rawName:raw,matchedName:l.matchedName||raw,quantity:Number(u.quantity||u.ilosc||1),unit:u.unit||u.jednostka||"szt.",totalPrice:Number(u.totalPrice||u.cena||0),type:"product",needsReview:false});
+      return;
+    }
+    keepUncertain.push(u);
+  });
+  receiptUncertain=keepUncertain;
+}
+
 function confirmUncertain(idx,decision){
   var item=receiptUncertain[idx];if(!item)return;
-  if(decision==="product"){receiptData.push({n:item.rawName,ilosc:1,matchedProductId:""});}
-  if(FB&&userName&&item.rawName){
-    var lKey=item.rawName.toLowerCase().replace(/[^a-z0-9]/g,"_");
-    fbPut(FB+"/receiptLearning/"+profileKey(userName)+"/"+lKey,{rawName:item.rawName,type:decision,userDecision:decision,lastUsedAt:Date.now(),timesConfirmed:1});
+  var raw=item.rawName||item.nazwa||item.name||"";
+  if(decision==="discount"){
+    receiptAdjustments.push({
+      rawName:raw,type:"discount",
+      value:Number(item.totalPrice||item.cena||0),
+      description:"Upust / rabat"
+    });
+    saveReceiptLearning(raw,{type:"discount",userDecision:"discount"});
+  }
+  if(decision==="ignore"){
+    saveReceiptLearning(raw,{type:"ignore",userDecision:"ignore"});
+  }
+  if(decision==="product"){
+    var name=raw;
+    receiptData.push({
+      rawName:raw,matchedName:name,
+      quantity:Number(item.quantity||item.ilosc||1),
+      unit:item.unit||item.jednostka||"szt.",
+      totalPrice:Number(item.totalPrice||item.cena||0),
+      type:"product",needsReview:false
+    });
+    saveReceiptLearning(raw,{type:"product",userDecision:"product",matchedName:name});
   }
   receiptUncertain.splice(idx,1);
   showReceiptResults();
 }
-function confirmUncertainCustom(idx){
+function confirmUncertainManual(idx){
   var item=receiptUncertain[idx];if(!item)return;
-  var name=window.prompt("Wpisz nazwę produktu lub opis:",item.rawName||"");
+  var raw=item.rawName||item.nazwa||item.name||"";
+  var name=window.prompt("Wpisz nazwę produktu lub opis:",raw);
   if(!name||!name.trim())return;
   name=name.trim();
-  receiptData.push({n:name,ilosc:1,matchedProductId:""});
-  if(FB&&userName&&item.rawName){
-    var lKey=item.rawName.toLowerCase().replace(/[^a-z0-9]/g,"_");
-    fbPut(FB+"/receiptLearning/"+profileKey(userName)+"/"+lKey,{rawName:item.rawName,matchedName:name,type:"product",userDecision:"product",lastUsedAt:Date.now(),timesConfirmed:1});
-  }
+  receiptData.push({
+    rawName:raw,matchedName:name,
+    quantity:Number(item.quantity||item.ilosc||1),
+    unit:item.unit||item.jednostka||"szt.",
+    totalPrice:Number(item.totalPrice||item.cena||0),
+    type:"product",needsReview:false
+  });
+  saveReceiptLearning(raw,{type:"product",userDecision:"product",matchedName:name});
   receiptUncertain.splice(idx,1);
   showReceiptResults();
 }
+// Stary alias dla kompatybilności
+function confirmUncertainCustom(idx){confirmUncertainManual(idx);}
 
 // ── Discount keywords ─────────────────────────────────────────────────────
 var RECEIPT_DISCOUNT_KEYWORDS=["OPUST","UPUST","RABAT","KUPON","PROMOCJA","OBNIZKA","OBNIŻKA","ZWROT","KAUCJA","PLATNOSC","PŁATNOŚĆ","SUMA","RAZEM","RESZTA","GOTOWKA","GOTÓWKA","VISA","MASTERCARD","BLIK","KARTA","REKOMPENSATA","KOREKTA"];
@@ -3203,31 +2989,81 @@ function closePantryAudit(){
   var el=document.getElementById("pantry-audit-overlay");if(el)el.style.display="none";
 }
 function buildDietProductAuditList(){
-  var prods=[];var seen={};
-  CATS.forEach(function(cat){
-    cat.items.forEach(function(it){
-      if(seen[it.n])return;seen[it.n]=true;
-      prods.push({n:it.n,unit:it.unit,target:it.target,cat:cat.id,cur:state[fbk(cat.id,it.n)]||0});
+  var prods={};
+  function findCATSItem(name){
+    var ln=String(name||"").toLowerCase().trim();
+    var foundCat=null,foundIt=null;
+    CATS.forEach(function(cat){cat.items.forEach(function(it){
+      if(!foundIt&&(it.n.toLowerCase()===ln||it.n.toLowerCase().indexOf(ln)!==-1||ln.indexOf(it.n.toLowerCase())!==-1)){
+        foundCat=cat;foundIt=it;
+      }
+    });});
+    return foundIt?{cat:foundCat,it:foundIt}:null;
+  }
+  function addIngredient(sk,mealName){
+    var name=sk.n||sk.name||"";
+    if(!name)return;
+    var amount=sk.il||sk.amount||"";
+    var found=findCATSItem(name);
+    var key=found?fbk(found.cat.id,found.it.n):"ext__"+normalizeRawName(name);
+    if(!prods[key]){
+      prods[key]={
+        n:found?found.it.n:name,
+        unit:found?found.it.unit:"szt.",
+        target:found?found.it.target:1,
+        cat:found?found.cat.id:"ext",
+        cur:found?(state[key]||0):0,
+        requiredText:[],
+        meals:[]
+      };
+    }
+    if(amount)prods[key].requiredText.push(String(amount));
+    if(mealName)prods[key].meals.push(mealName);
+  }
+  var d=(typeof getDietData==="function")?getDietData():null;
+  var menus=[];
+  if(d&&d.menu1)menus.push(d.menu1);
+  if(d&&d.menu2)menus.push(d.menu2);
+  menus.forEach(function(menu){
+    ["sniadania","obiady","kolacje"].forEach(function(sec){
+      (menu[sec]||[]).forEach(function(meal){
+        (meal.skladniki||[]).forEach(function(sk){addIngredient(sk,meal.nazwa||"");});
+      });
     });
   });
-  return sortByNamePL(prods,function(p){return p.n;});
+  // Jeśli dieta nie ma produktów (lub brak diety), zfalluj do CATS
+  if(!Object.keys(prods).length){
+    var seen={};
+    CATS.forEach(function(cat){cat.items.forEach(function(it){
+      if(seen[it.n])return;seen[it.n]=true;
+      var key=fbk(cat.id,it.n);
+      prods[key]={n:it.n,unit:it.unit,target:it.target,cat:cat.id,cur:state[key]||0,requiredText:[],meals:[]};
+    });});
+  }
+  var list=Object.keys(prods).map(function(k){var p=prods[k];p._key=k;return p;});
+  return sortByNamePL(list,function(p){return p.n;});
 }
 var pantryAuditData={};
 function renderPantryAudit(prods){
   var body=document.getElementById("pantry-audit-body");if(!body)return;
   pantryAuditData={};
-  var html='<div style="font-size:12px;color:var(--text3);margin-bottom:14px;padding:10px;background:rgba(30,215,96,.06);border-radius:10px;border:1px solid rgba(30,215,96,.15)">Zaznacz stan produktów w lodówce. Użyj przycisków lub wpisz ilość ręcznie.</div>';
+  var html='<div style="font-size:12px;color:var(--text3);margin-bottom:14px;padding:10px;background:rgba(30,215,96,.06);border-radius:10px;border:1px solid rgba(30,215,96,.15)">Produkty z Twojej diety. Zaznacz aktualny stan w lodówce — wpisz ilość lub użyj przycisków.</div>';
   prods.forEach(function(p){
-    pantryAuditData[fbk(p.cat,p.n)]=p.cur||0;
+    var key=p._key||fbk(p.cat,p.n);
+    pantryAuditData[key]=p.cur||0;
+    var requiredHint=(p.requiredText&&p.requiredText.length)?("Wymagane: "+p.requiredText.slice(0,3).join(", ")):("Cel: "+p.target+" "+p.unit);
+    var mealHint=(p.meals&&p.meals.length)?(" &bull; W posiłkach: "+p.meals.slice(0,3).join(", ")+(p.meals.length>3?" ...":"")):"";
+    var sk=key.replace(/'/g,"\\'");
     html+='<div style="background:var(--bg3);border-radius:14px;padding:12px;margin-bottom:8px;border:1px solid var(--border)">';
-    html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
-    html+='<div style="font-size:13px;font-weight:700;color:var(--text)">'+p.n+'</div>';
-    html+='<div style="font-size:11px;color:var(--text3)">Cel: '+p.target+' '+p.unit+'</div></div>';
+    html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px">';
+    html+='<div style="font-size:13px;font-weight:700;color:var(--text);flex:1">'+p.n+'</div>';
+    html+='<div style="font-size:11px;color:var(--text3);text-align:right">'+requiredHint+'</div></div>';
+    if(mealHint)html+='<div style="font-size:10px;color:var(--text3);margin-bottom:8px">'+mealHint.replace("&bull; ","")+'</div>';
     html+='<div style="display:flex;gap:6px;flex-wrap:wrap">';
-    html+='<button onclick="setAudit(\''+fbk(p.cat,p.n)+'\',0,this)" style="flex:1;padding:7px;border-radius:8px;border:1px solid var(--border);background:var(--bg4);color:var(--red);font-size:11px;font-weight:700;cursor:pointer;min-width:60px">Nie mam</button>';
-    html+='<button onclick="setAudit(\''+fbk(p.cat,p.n)+'\','+Math.round(p.target*0.5)+',this)" style="flex:1;padding:7px;border-radius:8px;border:1px solid var(--border);background:var(--bg4);color:var(--amber);font-size:11px;font-weight:700;cursor:pointer;min-width:60px">Połowa</button>';
-    html+='<button onclick="setAudit(\''+fbk(p.cat,p.n)+'\','+p.target+',this)" style="flex:1;padding:7px;border-radius:8px;border:1px solid var(--green);background:rgba(30,215,96,.1);color:var(--green);font-size:11px;font-weight:700;cursor:pointer;min-width:60px">Mam pełno</button>';
-    html+='<input type="number" onchange="setAuditVal(\''+fbk(p.cat,p.n)+'\',this.value)" placeholder="wpisz" style="width:70px;background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:7px;font-size:11px;color:var(--text);outline:none;color-scheme:dark" value="'+p.cur+'">';
+    html+='<button onclick="setAudit(\''+sk+'\',0,this)" style="flex:1;padding:7px;border-radius:8px;border:1px solid var(--border);background:var(--bg4);color:var(--red);font-size:11px;font-weight:700;cursor:pointer;min-width:60px">Nie mam</button>';
+    html+='<button onclick="setAudit(\''+sk+'\','+Math.round((p.target||1)*0.5)+',this)" style="flex:1;padding:7px;border-radius:8px;border:1px solid var(--border);background:var(--bg4);color:var(--amber);font-size:11px;font-weight:700;cursor:pointer;min-width:60px">Połowa</button>';
+    html+='<button onclick="setAudit(\''+sk+'\','+(p.target||1)+',this)" style="flex:1;padding:7px;border-radius:8px;border:1px solid var(--green);background:rgba(30,215,96,.1);color:var(--green);font-size:11px;font-weight:700;cursor:pointer;min-width:60px">Mam pełno</button>';
+    html+='<input type="number" onchange="setAuditVal(\''+sk+'\',this.value)" placeholder="wpisz" style="width:70px;background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:7px;font-size:11px;color:var(--text);outline:none;color-scheme:dark" value="'+p.cur+'">';
     html+='</div></div>';
   });
   body.innerHTML=html;
@@ -3240,78 +3076,113 @@ function setAudit(key,val,btn){
 }
 function setAuditVal(key,val){pantryAuditData[key]=Math.max(0,Number(val)||0);}
 function savePantryAudit(){
-  var now=new Date();
-  var dateStr=now.toISOString().slice(0,10);
-  var timeStr=now.toTimeString().slice(0,5);
-  // Zapisz do pantry
-  var updates={};
+  var rpUpdates={},pantryUpdates={};
   Object.entries(pantryAuditData).forEach(function(e){
-    var id=e[0],amt=e[1];
-    updates[id]=amt;
-    state[id]=amt;
+    var id=e[0],amt=Number(e[1])||0;
+    if(id in state){
+      // Klucz pochodzący z CATS — zapisz do /rooms (state)
+      state[id]=amt;
+      rpUpdates[id]=amt;
+    }
+    // Niezależnie od źródła zapisz też do /pantry dla audytu
+    pantryUpdates[id]=amt;
   });
-  fbPatch(PANTRY_PATH,updates).then(function(){
-    savePantryUpdateDate("manual_audit","");
+  var promises=[];
+  if(RP&&Object.keys(rpUpdates).length)promises.push(fbPatch(RP,rpUpdates));
+  if(PANTRY_PATH)promises.push(fbPatch(PANTRY_PATH,pantryUpdates));
+  Promise.all(promises).then(function(){
+    savePantryUpdateDate("manual_audit","","");
     dlgAlert("✅","Zapisano","Stan lodówki został zaktualizowany.");
     closePantryAudit();
     render();
-  }).catch(function(err){dlgAlert("❌","Błąd","Nie udało się zapisać: "+err.message);});
+  }).catch(function(err){dlgAlert("X","Błąd","Nie udało się zapisać: "+(err&&err.message?err.message:""));});
 }
 
 // ── showUpdatePantryModal — 3 opcje ───────────────────────────────────────
 function showUpdatePantryModal(){
-  dlgConfirm("🏠","Aktualizuj stan lodówki","Wybierz sposób aktualizacji lodówki:",
-    function(){openPantryAudit();},"Produkty z diety","ok");
-  // Nadpisz przyciski
-  setTimeout(function(){
-    var btns=document.getElementById("dlg-btns");
-    if(!btns)return;
-    btns.innerHTML='<button class="dlg-btn ok" onclick="document.getElementById(\'dlg\').classList.remove(\'show\');openPantryAudit()">Produkty z diety</button>'
-      +'<button class="dlg-btn ok" onclick="document.getElementById(\'dlg\').classList.remove(\'show\');openReceipt()">Skanuj paragon</button>'
-      +'<button class="dlg-btn cancel" onclick="document.getElementById(\'dlg\').classList.remove(\'show\')">Zamknij</button>';
-  },50);
+  showDlg("🏠","Aktualizuj stan lodówki","Wybierz sposób aktualizacji:",[
+    {label:"Produkty z diety",cls:"ok",cb:function(){openPantryAudit();}},
+    {label:"Skanuj paragon",cls:"ok",cb:function(){openReceipt();}},
+    {label:"Ręcznie wybrany produkt",cls:"ok",cb:function(){openSingleProductPicker();}},
+    {label:"Zamknij",cls:"cancel"}
+  ]);
+}
+// Wybór jednego produktu do aktualizacji ręcznej
+function openSingleProductPicker(){
+  var list=buildDietProductAuditList();
+  var names=list.map(function(p){return p.n;});
+  var input=window.prompt("Wpisz nazwę produktu, który chcesz zaktualizować:\n\nDostępne (z diety lub lodówki): "+names.slice(0,30).join(", ")+(names.length>30?" ...":""));
+  if(!input||!input.trim())return;
+  var q=input.trim().toLowerCase();
+  var found=list.filter(function(p){return p.n.toLowerCase().indexOf(q)!==-1;})[0];
+  if(!found){dlgAlert("X","Nie znaleziono","Nie znaleziono produktu pasującego do: "+input);return;}
+  var val=window.prompt('Wpisz aktualną ilość dla "'+found.n+'" ('+found.unit+"):",String(found.cur||0));
+  if(val===null)return;
+  var amt=Math.max(0,Number(val)||0);
+  var key=found._key||fbk(found.cat,found.n);
+  pantryAuditData={};pantryAuditData[key]=amt;
+  if(key in state){state[key]=amt;}
+  var rpU={},pU={};
+  if(key in state)rpU[key]=amt;
+  pU[key]=amt;
+  var ps=[];
+  if(RP&&Object.keys(rpU).length)ps.push(fbPatch(RP,rpU));
+  if(PANTRY_PATH)ps.push(fbPatch(PANTRY_PATH,pU));
+  Promise.all(ps).then(function(){
+    savePantryUpdateDate("manual_single","","");
+    dlgAlert("✅","Zapisano",'"'+found.n+'" zaktualizowano na '+amt+" "+found.unit);
+    render();
+  }).catch(function(err){dlgAlert("X","Błąd","Nie udało się zapisać.");});
 }
 
 // ── Admin panel wiring ─────────────────────────────────────────────────────
-var ADMIN_PASS_LOCAL="spizarnia2025";
-var adminCurrentTab=0;
-var adminUsersData={};
 function openAdminLogin(){
   var el=document.getElementById("admin-login-overlay");if(!el)return;
   var inp=document.getElementById("admin-pass-inp");if(inp)inp.value="";
   var err=document.getElementById("admin-pass-error");if(err)err.style.display="none";
-  el.style.display="flex";
+  el.classList.add("show");
   setTimeout(function(){if(inp)inp.focus();},100);
 }
-function closeAdminLogin(){var el=document.getElementById("admin-login-overlay");if(el)el.style.display="none";}
+function closeAdminLogin(){
+  var el=document.getElementById("admin-login-overlay");if(el)el.classList.remove("show");
+}
 function checkAdminPassword(){
   var inp=document.getElementById("admin-pass-inp");
   var pass=inp?inp.value:"";
-  if(pass===ADMIN_PASS_LOCAL){closeAdminLogin();openAdminPanel();}
-  else{var err=document.getElementById("admin-pass-error");if(err)err.style.display="block";}
+  if(pass===ADMIN_PASS){closeAdminLogin();openAdminPanel();}
+  else{
+    var err=document.getElementById("admin-pass-error");
+    if(err)err.style.display="block";
+    dlgAlert("X","Nieprawidłowe hasło administratora","Spróbuj ponownie.");
+  }
 }
 function openAdminPanel(){
   var el=document.getElementById("admin-panel-overlay");if(!el)return;
-  el.style.display="flex";
+  el.classList.add("show");
+  document.body.classList.add("admin-open");
   switchAdminTab(0);
+  if(typeof loadAdminUsers==="function")loadAdminUsers();
+  if(typeof loadAdminStats==="function")loadAdminStats();
 }
-function closeAdminPanel(){var el=document.getElementById("admin-panel-overlay");if(el)el.style.display="none";}
-function openSettingsModal(){openAdminLogin();}
+function closeAdminPanel(){
+  var el=document.getElementById("admin-panel-overlay");if(el)el.classList.remove("show");
+  document.body.classList.remove("admin-open");
+}
 </script>
 
 
 
 <!-- ══ ADMIN PANEL OVERLAY ═══════════════════════════════════════════════ -->
-<div id="admin-panel-overlay" style="display:none;position:fixed;inset:0;z-index:500;background:#0A0A0F;overflow-y:auto;flex-direction:column">
-  <div style="background:rgba(13,13,18,.98);border-bottom:1px solid rgba(255,255,255,.08);padding:14px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10">
-    <button onclick="closeAdminPanel()" style="background:#1A1A24;border:none;color:#6B6B85;border-radius:50%;width:38px;height:38px;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">&#8592;</button>
+<div id="admin-panel-overlay">
+  <div style="background:rgba(13,13,18,.98);border-bottom:1px solid var(--border);padding:14px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10">
+    <button onclick="closeAdminPanel()" style="background:var(--bg3);border:none;color:var(--text3);border-radius:50%;width:38px;height:38px;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">&#8592;</button>
     <div style="flex:1">
-      <div style="font-size:17px;font-weight:900;color:#fff">Panel administratora</div>
-      <div style="font-size:11px;color:#6B6B85">Pełna Lodówka CMS &bull; <span id="admin-firebase-status">Firebase</span></div>
+      <div style="font-size:17px;font-weight:900;color:var(--text)">Panel administratora</div>
+      <div style="font-size:11px;color:var(--text3)">Pełna Lodówka &bull; <span id="admin-firebase-status">Firebase</span></div>
     </div>
-    <div id="admin-api-dot" style="width:8px;height:8px;border-radius:50%;background:#1ED760"></div>
+    <div id="admin-api-dot" style="width:8px;height:8px;border-radius:50%;background:var(--green)"></div>
   </div>
-  <div style="display:flex;background:#111118;border-bottom:1px solid rgba(255,255,255,.06);overflow-x:auto;flex-shrink:0">
+  <div style="display:flex;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0">
     <button id="admtab-0" onclick="switchAdminTab(0)" class="admtab act">Użytkownicy</button>
     <button id="admtab-1" onclick="switchAdminTab(1)" class="admtab">Diety</button>
     <button id="admtab-2" onclick="switchAdminTab(2)" class="admtab">Paragony</button>
@@ -3322,18 +3193,18 @@ function openSettingsModal(){openAdminLogin();}
 </div>
 
 <!-- Admin Login Modal -->
-<div id="admin-login-overlay" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.85);align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(6px)">
-  <div style="background:#111118;border-radius:20px;padding:24px;width:100%;max-width:340px;border:1px solid rgba(255,255,255,.08);text-align:center">
+<div id="admin-login-overlay">
+  <div style="background:var(--bg2);border-radius:20px;padding:24px;width:100%;max-width:340px;border:1px solid var(--border2);text-align:center">
     <div style="font-size:36px;margin-bottom:12px">🔐</div>
-    <div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:6px">Panel administratora</div>
-    <div style="font-size:13px;color:#6B6B85;margin-bottom:18px">Wpisz hasło administratora</div>
+    <div style="font-size:18px;font-weight:900;color:var(--text);margin-bottom:6px">Panel administratora</div>
+    <div style="font-size:13px;color:var(--text3);margin-bottom:18px">Wpisz hasło administratora</div>
     <input id="admin-pass-inp" type="password" placeholder="Hasło administratora"
-      style="width:100%;background:#1A1A24;border:1.5px solid rgba(255,255,255,.1);border-radius:12px;padding:13px 16px;font-size:14px;color:#fff;outline:none;margin-bottom:6px;color-scheme:dark"
+      style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:12px;padding:13px 16px;font-size:14px;color:var(--text);outline:none;margin-bottom:6px;color-scheme:dark"
       onkeydown="if(event.key==='Enter')checkAdminPassword()">
-    <div id="admin-pass-error" style="font-size:12px;color:#FF4D4D;margin-bottom:12px;display:none">Nieprawidłowe hasło administratora.</div>
+    <div id="admin-pass-error" style="font-size:12px;color:var(--red);margin-bottom:12px;display:none">Nieprawidłowe hasło administratora.</div>
     <div style="display:flex;gap:8px;margin-top:8px">
-      <button onclick="closeAdminLogin()" style="flex:1;padding:13px;border-radius:50px;border:1px solid rgba(255,255,255,.1);background:transparent;color:#6B6B85;font-size:13px;font-weight:700;cursor:pointer">Anuluj</button>
-      <button onclick="checkAdminPassword()" style="flex:1;padding:13px;border-radius:50px;border:none;background:#1ED760;color:#000;font-size:13px;font-weight:800;cursor:pointer">Wejdź</button>
+      <button onclick="closeAdminLogin()" style="flex:1;padding:13px;border-radius:50px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:13px;font-weight:700;cursor:pointer">Anuluj</button>
+      <button onclick="checkAdminPassword()" style="flex:1;padding:13px;border-radius:50px;border:none;background:var(--green);color:#000;font-size:13px;font-weight:800;cursor:pointer">Wejdź</button>
     </div>
   </div>
 </div>
