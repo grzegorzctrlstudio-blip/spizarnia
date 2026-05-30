@@ -309,6 +309,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .photo-modal-img{width:100%;border-radius:var(--radius-sm);max-height:260px;object-fit:cover;margin-bottom:12px;display:none;border:1px solid var(--border)}
 .photo-modal-empty{width:100%;height:160px;background:var(--bg3);border-radius:var(--radius-sm);border:2px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;color:var(--text3)}
 
+/* PHOTO SLOTS — front / side / top + optional expiry */
+.photo-slots{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.photo-slots.with-exp{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
+.photo-slot{position:relative;aspect-ratio:1;background:var(--bg3);border:2px dashed var(--border2);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;overflow:hidden;transition:border .15s}
+.photo-slot:active{border-color:var(--green)}
+.photo-slot.filled{border-style:solid;border-color:var(--green)}
+.photo-slot-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
+.photo-slot.filled .photo-slot-img{display:block}
+.photo-slot-ico{font-size:26px;line-height:1}
+.photo-slot.filled .photo-slot-ico,.photo-slot.filled .photo-slot-lbl{display:none}
+.photo-slot-lbl{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;text-align:center;padding:0 4px}
+.photo-slot-badge{position:absolute;top:6px;left:6px;background:rgba(0,0,0,.7);color:#fff;font-size:9px;font-weight:800;padding:3px 7px;border-radius:50px;text-transform:uppercase;letter-spacing:.3px;z-index:2}
+.photo-slot-del{position:absolute;top:6px;right:6px;background:rgba(255,77,77,.9);color:#fff;border:none;border-radius:50%;width:24px;height:24px;font-size:13px;font-weight:900;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:2}
+.photo-slot.filled .photo-slot-del{display:flex}
+.photo-slot.exp{border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.05)}
+.photo-slot.exp.filled{border-color:var(--amber)}
+.photo-slot.exp .photo-slot-lbl{color:var(--amber)}
+
 /* ── ADMIN PANEL ── */
 #admin-login-overlay,#admin-panel-overlay{display:none}
 #admin-login-overlay.show{display:flex;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.85);align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(12px)}
@@ -589,18 +607,33 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <!-- EXPIRY MODAL -->
 <div class="overlay" id="exp-overlay" onclick="if(event.target===this)closeExpiry()">
-  <div class="modal">
+  <div class="modal" style="max-width:440px">
     <h3>📅 Data przydatności</h3>
-    <p id="exp-name" style="color:var(--text2);margin-bottom:12px"></p>
-    <input type="date" class="modal-inp" id="exp-date-inp">
+    <p id="exp-name" style="color:var(--text2);margin-bottom:14px;font-weight:700"></p>
+
+    <div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Szybki wybór</div>
+    <div id="exp-presets" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:14px">
+      <button class="exp-preset" data-days="1" onclick="setExpiryPreset(1)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:11px;font-weight:700;cursor:pointer">Jutro</button>
+      <button class="exp-preset" data-days="3" onclick="setExpiryPreset(3)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:11px;font-weight:700;cursor:pointer">Za 3 dni</button>
+      <button class="exp-preset" data-days="7" onclick="setExpiryPreset(7)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:11px;font-weight:700;cursor:pointer">Za tydzień</button>
+      <button class="exp-preset" data-days="14" onclick="setExpiryPreset(14)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:11px;font-weight:700;cursor:pointer">Za 2 tyg.</button>
+      <button class="exp-preset" data-days="30" onclick="setExpiryPreset(30)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:11px;font-weight:700;cursor:pointer">Za miesiąc</button>
+      <button class="exp-preset" data-days="180" onclick="setExpiryPreset(180)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:11px;font-weight:700;cursor:pointer">Za 6 mies.</button>
+      <button class="exp-preset" data-days="365" onclick="setExpiryPreset(365)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:11px;font-weight:700;cursor:pointer">Za rok</button>
+      <button class="exp-preset" data-days="default" onclick="setExpiryPreset('default')" style="background:rgba(30,215,96,.08);border:1.5px solid rgba(30,215,96,.3);color:var(--green);border-radius:10px;padding:10px 6px;font-size:11px;font-weight:700;cursor:pointer;grid-column:span 2">Wg kategorii</button>
+    </div>
+
+    <div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Lub wybierz datę ręcznie</div>
+    <input type="date" class="modal-inp" id="exp-date-inp" style="margin-bottom:14px">
+
     <div class="modal-btns" style="margin-bottom:8px">
-      <button class="mbtn blue" onclick="openScannerFromExpiry()">📷 Skanuj</button>
-      <button class="mbtn ok" onclick="saveExpiry()">✅ Zapisz</button>
+      <button class="mbtn blue" onclick="openScannerFromExpiry()">📷 Skanuj datę z opakowania</button>
     </div>
-    <div class="modal-btns">
-      <button class="mbtn del" onclick="clearExpiry()">🗑️ Usuń datę</button>
-      <button class="mbtn cancel" onclick="closeExpiry()">Zamknij</button>
+    <div class="modal-btns" style="margin-bottom:8px">
+      <button class="mbtn ok" style="flex:2" onclick="saveExpiry()">✅ Zapisz</button>
+      <button class="mbtn del" onclick="clearExpiry()">🗑️ Usuń</button>
     </div>
+    <button class="mbtn cancel" style="width:100%" onclick="closeExpiry()">Zamknij</button>
   </div>
 </div>
 
@@ -642,19 +675,46 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <!-- PHOTO MODAL -->
 <div class="overlay" id="photo-overlay" onclick="if(event.target===this)closePhoto()">
-  <div class="modal">
-    <h3>📷 Zdjęcie produktu</h3>
-    <p id="photo-modal-name" style="color:var(--text2);margin-bottom:12px"></p>
-    <img class="photo-modal-img" id="photo-modal-img" alt="">
-    <div class="photo-modal-empty" id="photo-modal-placeholder">
-      <span style="font-size:40px">📷</span>
-      <span style="font-size:12px;font-weight:600">Brak zdjęcia</span>
+  <div class="modal" style="max-width:460px">
+    <h3 id="photo-modal-hdr">📷 Zdjęcia produktu</h3>
+    <p id="photo-modal-name" style="color:var(--text2);margin-bottom:14px;font-weight:700"></p>
+    <div id="photo-modal-info" style="font-size:11px;color:var(--text3);margin-bottom:10px"></div>
+
+    <!-- 3 sloty + opcjonalny 4 dla scan:true -->
+    <div id="photo-slots" class="photo-slots">
+      <div class="photo-slot" data-slot="front" onclick="triggerSlotPhoto('front')">
+        <div class="photo-slot-badge">1</div>
+        <button class="photo-slot-del" onclick="event.stopPropagation();deleteSlotPhoto('front')">✕</button>
+        <img class="photo-slot-img" id="slot-front-img" alt="">
+        <div class="photo-slot-ico">📷</div>
+        <div class="photo-slot-lbl">Przód</div>
+      </div>
+      <div class="photo-slot" data-slot="side" onclick="triggerSlotPhoto('side')">
+        <div class="photo-slot-badge">2</div>
+        <button class="photo-slot-del" onclick="event.stopPropagation();deleteSlotPhoto('side')">✕</button>
+        <img class="photo-slot-img" id="slot-side-img" alt="">
+        <div class="photo-slot-ico">📷</div>
+        <div class="photo-slot-lbl">Bok</div>
+      </div>
+      <div class="photo-slot" data-slot="top" onclick="triggerSlotPhoto('top')">
+        <div class="photo-slot-badge">3</div>
+        <button class="photo-slot-del" onclick="event.stopPropagation();deleteSlotPhoto('top')">✕</button>
+        <img class="photo-slot-img" id="slot-top-img" alt="">
+        <div class="photo-slot-ico">📷</div>
+        <div class="photo-slot-lbl">Góra</div>
+      </div>
+      <div class="photo-slot exp" data-slot="expiry" id="slot-expiry-card" onclick="triggerSlotPhotoAndScan('expiry')" style="display:none">
+        <div class="photo-slot-badge" style="background:var(--amber);color:#000">📅 AI</div>
+        <button class="photo-slot-del" onclick="event.stopPropagation();deleteSlotPhoto('expiry')">✕</button>
+        <img class="photo-slot-img" id="slot-expiry-img" alt="">
+        <div class="photo-slot-ico">🔍</div>
+        <div class="photo-slot-lbl">Data ważności</div>
+      </div>
     </div>
-    <div class="modal-btns" style="margin-bottom:8px">
-      <button class="mbtn blue" onclick="triggerProductPhoto()">📷 Zrób zdjęcie</button>
-      <button class="mbtn del" id="photo-delete-btn" style="display:none" onclick="deleteProductPhoto()">🗑️ Usuń</button>
+
+    <div class="modal-btns">
+      <button class="mbtn cancel" style="width:100%" onclick="closePhoto()">Zamknij</button>
     </div>
-    <button class="mbtn cancel" style="width:100%" onclick="closePhoto()">Zamknij</button>
     <input type="file" id="product-photo-file" accept="image/*" capture="environment" style="display:none" onchange="handleProductPhoto(this)">
     <input type="file" id="photo-slot-file" accept="image/*" capture="environment" style="display:none" onchange="handleSlotPhoto(this)">
   </div>
@@ -877,10 +937,59 @@ function fHtml(it){var d=getExplicitExpiryDaysLeft(it);if(d===null)return"";if(d
 function expiringSoon(it){var d=getDaysLeft(it);return d!==null&&d<=3;}
 
 // ── EXPIRY MODAL ──────────────────────────────────────────────────────────────
-function openExpiry(name){expiryItem=name;document.getElementById("exp-name").textContent=name;var ek=fbk("e",name);document.getElementById("exp-date-inp").value=expiry[ek]?new Date(expiry[ek]).toISOString().slice(0,10):"";document.getElementById("exp-overlay").classList.add("show");}
+function openExpiry(name){
+  expiryItem=name;
+  document.getElementById("exp-name").textContent=name;
+  var ek=fbk("e",name);
+  document.getElementById("exp-date-inp").value=expiry[ek]?new Date(expiry[ek]).toISOString().slice(0,10):"";
+  document.getElementById("exp-overlay").classList.add("show");
+}
 function closeExpiry(){document.getElementById("exp-overlay").classList.remove("show");}
-function saveExpiry(){var v=document.getElementById("exp-date-inp").value;if(!v){dlgAlert("?","Brak daty","Wpisz date waznosci");return;}var ts=new Date(v).getTime(),ek=fbk("e",expiryItem),p={};expiry[ek]=ts;p[ek]=ts;fbPatch(EP,p);closeExpiry();render();}
-function clearExpiry(){var ek=fbk("e",expiryItem),p={};delete expiry[ek];p[ek]=null;fbPatch(EP,p);closeExpiry();render();}
+function saveExpiry(){
+  var v=document.getElementById("exp-date-inp").value;
+  if(!v){dlgAlert("ℹ️","Brak daty","Wybierz datę z presetów lub wpisz ręcznie.");return;}
+  var ts=new Date(v).getTime(),ek=fbk("e",expiryItem),p={};
+  expiry[ek]=ts;p[ek]=ts;
+  fbPatch(EP,p).catch(function(){});
+  closeExpiry();render();
+}
+function clearExpiry(){
+  var ek=fbk("e",expiryItem),p={};
+  delete expiry[ek];p[ek]=null;
+  fbPatch(EP,p).catch(function(){});
+  closeExpiry();render();
+}
+// Ustawia datę z presetu (+X dni) i wpisuje do inputa
+function setExpiryPreset(days){
+  if(days==="default"){
+    // Bierz domyślną liczbę dni z CATS dla tego produktu
+    var item=null;
+    for(var i=0;i<CATS.length&&!item;i++){
+      for(var j=0;j<CATS[i].items.length&&!item;j++){
+        if(CATS[i].items[j].n===expiryItem)item=CATS[i].items[j];
+      }
+    }
+    days=(item&&item.days)?item.days:7;
+  }
+  var d=new Date();d.setHours(0,0,0,0);
+  d.setDate(d.getDate()+Number(days||0));
+  var iso=d.toISOString().slice(0,10);
+  var inp=document.getElementById("exp-date-inp");
+  if(inp)inp.value=iso;
+  // Wizualne potwierdzenie wybranego presetu
+  document.querySelectorAll('.exp-preset').forEach(function(b){
+    b.style.background="var(--bg3)";
+    b.style.borderColor="var(--border)";
+    b.style.color="var(--text2)";
+  });
+  // Highlight clicked
+  var clicked=document.querySelector('.exp-preset[data-days="'+(days==="default"?"default":Number(days))+'"]');
+  if(clicked){
+    clicked.style.background="rgba(30,215,96,.18)";
+    clicked.style.borderColor="var(--green)";
+    clicked.style.color="var(--green)";
+  }
+}
 
 // ── SCANNER ───────────────────────────────────────────────────────────────────
 function openScannerFromExpiry(){scanFromExpiry=true;closeExpiry();openScanner();}
@@ -900,8 +1009,19 @@ function handleScanPhoto(input){
   reader.onload=function(e){
     var img=document.getElementById("scan-img");img.src=e.target.result;img.style.display="block";
     document.getElementById("scan-result").style.display="none";document.getElementById("scan-apply").style.display="none";document.getElementById("scan-loading").style.display="block";
-    var b64=e.target.result.split(",")[1],mime=input.files[0].type||"image/jpeg";
-    callAPI([{role:"user",content:[{type:"image",source:{type:"base64",media_type:mime,data:b64}},{type:"text",text:"Przeanalizuj zdjecie produktu. ZNAJDZ DATE PRZYDATNOSCI: Format polskich produktow DD.MM.YYYY lub DD.MM.RR. PRZYKLAD: 14.06.28 = dzien 14, miesiac 06, rok 2028 (NIE 2014!). Rok dwucyfrowy 25-35 = 2025-2035. TYLKO JSON: {\"produkt\":\"pelna nazwa\",\"data\":\"DD.MM.YYYY lub null\",\"uwaga\":\"\"}"}]}],null,function(txt){
+    var dataUrl=e.target.result;
+    var b64=dataUrl.split(",")[1],mime=input.files[0].type||"image/jpeg";
+    // Jeśli scanSavesPhoto i mamy photoItem, zapisz zdjęcie jako slot "front" (kompresja)
+    if(scanSavesPhoto&&photoItem){
+      compressPhoto(dataUrl,function(compressed){
+        var slot=(activeSlot==="expiry")?"expiry":"front";
+        var key=slotKey(photoItem,slot),p={};
+        photos[key]=compressed;p[key]=compressed;
+        if(slot==="front"){var mk=photoKey(photoItem);photos[mk]=compressed;p[mk]=compressed;}
+        if(PP)fbPatch(PP,p).catch(function(){});
+      });
+    }
+    callAPI([{role:"user",content:[{type:"image",source:{type:"base64",media_type:mime,data:b64}},{type:"text",text:"Przeanalizuj zdjęcie produktu. ZNAJDŹ DATĘ PRZYDATNOŚCI: Format polskich produktów DD.MM.YYYY lub DD.MM.RR. PRZYKŁAD: 14.06.28 = dzień 14, miesiąc 06, rok 2028 (NIE 2014!). Rok dwucyfrowy 25-35 = 2025-2035. TYLKO JSON: {\"produkt\":\"pełna nazwa\",\"data\":\"DD.MM.YYYY lub null\",\"uwaga\":\"\"}"}]}],null,function(txt){
       document.getElementById("scan-loading").style.display="none";
       try{var p=JSON.parse(txt.replace(/```json|```/g,"").trim());scanData=p;document.getElementById("scan-product").textContent=p.produkt||"Nieznany";document.getElementById("scan-date-txt").textContent=p.data&&p.data!=="null"?"Data: "+p.data:"Brak daty";document.getElementById("scan-note").textContent=p.uwaga||"";document.getElementById("scan-result").style.display="block";if(p.data&&p.data!=="null")document.getElementById("scan-apply").style.display="block";}
       catch(e){document.getElementById("scan-product").textContent="Błąd: "+txt.slice(0,80);document.getElementById("scan-result").style.display="block";}
@@ -915,8 +1035,23 @@ function applyScan(){
   var yr=parts[2].length===2?"20"+parts[2]:parts[2];
   var iso=yr+"-"+parts[1]+"-"+parts[0];
   closeScanner();
-  if(scanFromExpiry&&expiryItem){document.getElementById("exp-overlay").classList.add("show");setTimeout(function(){document.getElementById("exp-date-inp").value=iso;},50);scanFromExpiry=false;}
-  else{var name=scanData.produkt||"",found=null;CATS.forEach(function(cat){cat.items.forEach(function(it){if(!found&&it.n.toLowerCase().indexOf(name.toLowerCase().slice(0,5))!==-1)found=it.n;});});if(found){openExpiry(found);setTimeout(function(){document.getElementById("exp-date-inp").value=iso;},50);}else dlgAlert("?","Wybierz produkt recznie","Wykryto: "+name+" | Data: "+scanData.data);}
+  if(scanFromExpiry&&expiryItem){
+    document.getElementById("exp-overlay").classList.add("show");
+    setTimeout(function(){document.getElementById("exp-date-inp").value=iso;},50);
+    scanFromExpiry=false;
+    scanSavesPhoto=false;
+    render();
+  }else{
+    var name=scanData.produkt||"",found=null;
+    CATS.forEach(function(cat){cat.items.forEach(function(it){if(!found&&it.n.toLowerCase().indexOf(name.toLowerCase().slice(0,5))!==-1)found=it.n;});});
+    if(found){
+      openExpiry(found);
+      setTimeout(function(){document.getElementById("exp-date-inp").value=iso;},50);
+    }else{
+      dlgAlert("ℹ️","Wybierz produkt ręcznie","Wykryto: "+name+"\nData: "+scanData.data+"\n\nWejdź w kartę produktu i kliknij 'Dodaj datę'.");
+    }
+    scanSavesPhoto=false;
+  }
 }
 
 // ── RECEIPT ───────────────────────────────────────────────────────────────────
@@ -1168,73 +1303,123 @@ function applyReceipt(){applyReceiptSelected();}
 
 
 function compressPhoto(dataUrl,cb){var img=new Image();img.onload=function(){var canvas=document.createElement("canvas"),size=120;canvas.width=size;canvas.height=size;var ctx=canvas.getContext("2d");var s=Math.min(img.width,img.height),ox=(img.width-s)/2,oy=(img.height-s)/2;ctx.drawImage(img,ox,oy,s,s,0,0,size,size);cb(canvas.toDataURL("image/jpeg",.7));};img.onerror=function(){cb(dataUrl);};img.src=dataUrl;}
-// ── PHOTO MODULE — uproszczone (1 zdjęcie per produkt, klucz: fbk("p",name)) ──
+// ── PHOTO MODULE — 3 sloty (front/side/top) + opcjonalny 4. (expiry z AI OCR) ──
+// Klucze: fbk("p_front", name), fbk("p_side", name), fbk("p_top", name), fbk("p_expiry", name)
+// + osobny "front-mirror" jako fbk("p", name) używany jako thumbnail na karcie produktu
 function photoKey(name){return fbk("p",name);}
+function slotKey(name,slot){return fbk("p_"+slot,name);}
+
+// Znajdź obiekt CATS dla danego produktu po nazwie
+function findCatForProduct(name){
+  for(var i=0;i<CATS.length;i++){
+    for(var j=0;j<CATS[i].items.length;j++){
+      if(CATS[i].items[j].n===name)return CATS[i];
+    }
+  }
+  return null;
+}
 
 function openPhoto(name){
   if(!name)return;
   photoItem=name;
-  var pnameEl=document.getElementById("photo-modal-name");
-  if(pnameEl)pnameEl.textContent=name;
-  var img=document.getElementById("photo-modal-img");
-  var placeholder=document.getElementById("photo-modal-placeholder");
-  var delBtn=document.getElementById("photo-delete-btn");
-  var src=photos[photoKey(name)];
-  if(src){
-    if(img){img.src=src;img.style.display="block";}
-    if(placeholder)placeholder.style.display="none";
-    if(delBtn)delBtn.style.display="";
-  }else{
-    if(img)img.style.display="none";
-    if(placeholder)placeholder.style.display="flex";
-    if(delBtn)delBtn.style.display="none";
+  var nameEl=document.getElementById("photo-modal-name");
+  if(nameEl)nameEl.textContent=name;
+  // Czy produkt ma kategorię z scan:true? Wtedy pokaż slot expiry
+  var cat=findCatForProduct(name);
+  var hasScan=!!(cat&&cat.scan);
+  var infoEl=document.getElementById("photo-modal-info");
+  var hdrEl=document.getElementById("photo-modal-hdr");
+  if(hdrEl)hdrEl.textContent=hasScan?"📷 Zdjęcia + 📅 Skaner daty":"📷 Zdjęcia produktu";
+  if(infoEl)infoEl.textContent=hasScan
+    ? "Zrób 3 zdjęcia produktu (przód, bok, góra) + opcjonalnie skanuj datę ważności."
+    : "Produkty świeże — zrób 3 zdjęcia (przód, bok, góra). Daty na opakowaniu zwykle brak.";
+  var slotsWrap=document.getElementById("photo-slots");
+  if(slotsWrap){
+    slotsWrap.classList.toggle("with-exp",hasScan);
   }
+  var expSlot=document.getElementById("slot-expiry-card");
+  if(expSlot)expSlot.style.display=hasScan?"flex":"none";
+  // Wypełnij sloty
+  ["front","side","top","expiry"].forEach(function(slot){
+    var card=document.querySelector('[data-slot="'+slot+'"]');
+    var img=document.getElementById("slot-"+slot+"-img");
+    var src=photos[slotKey(name,slot)];
+    if(src){
+      if(img){img.src=src;}
+      if(card)card.classList.add("filled");
+    }else{
+      if(card)card.classList.remove("filled");
+    }
+  });
   document.getElementById("photo-overlay").classList.add("show");
 }
-// Alias dla kompatybilności (render może wołać openPhotoModal)
+// Alias dla kompatybilności
 function openPhotoModal(id,name){openPhoto(name);}
 
 function closePhoto(){document.getElementById("photo-overlay").classList.remove("show");render();}
-function triggerProductPhoto(){var fi=document.getElementById("product-photo-file");if(fi){fi.value="";fi.click();}}
-// Stare aliasy slotów - zostają dla kompatybilności
-function triggerSlotPhoto(slot){activeSlot=slot||"front";triggerProductPhoto();}
-function triggerSlotPhotoAndScan(slot){activeSlot=slot||"front";expiryItem=photoItem;scanFromExpiry=true;openScanner();}
 
-function handleProductPhoto(input){
+// Generic: kliknięcie głównego przycisku - traktujemy jako slot "front"
+function triggerProductPhoto(){activeSlot="front";triggerSlotPhoto("front");}
+
+// Kliknięcie konkretnego slotu — robi zdjęcie
+function triggerSlotPhoto(slot){
+  activeSlot=slot||"front";
+  var fi=document.getElementById("photo-slot-file");
+  if(fi){fi.value="";fi.click();}
+}
+
+// Slot daty: zdjęcie + AI OCR daty
+function triggerSlotPhotoAndScan(slot){
+  activeSlot=slot||"expiry";
+  if(!photoItem)return;
+  expiryItem=photoItem;
+  scanFromExpiry=true;
+  // Robi zdjęcie i wysyła do skanera OCR daty
+  scanSavesPhoto=true;
+  openScanner();
+}
+
+function handleSlotPhoto(input){
   if(!input.files||!input.files[0]||!photoItem)return;
+  var slot=activeSlot||"front";
   var reader=new FileReader();
   reader.onload=function(e){
     compressPhoto(e.target.result,function(compressed){
-      var key=photoKey(photoItem),p={};
+      var key=slotKey(photoItem,slot),p={};
       photos[key]=compressed;p[key]=compressed;
+      // Front jest też thumbnailem na karcie produktu — zapisz mirror pod fbk("p", name)
+      if(slot==="front"){
+        var mk=photoKey(photoItem);
+        photos[mk]=compressed;p[mk]=compressed;
+      }
       if(PP)fbPatch(PP,p).catch(function(){});
-      // Update modal
-      var img=document.getElementById("photo-modal-img");
-      var placeholder=document.getElementById("photo-modal-placeholder");
-      var delBtn=document.getElementById("photo-delete-btn");
-      if(img){img.src=compressed;img.style.display="block";}
-      if(placeholder)placeholder.style.display="none";
-      if(delBtn)delBtn.style.display="";
+      // Update UI in modal
+      var card=document.querySelector('[data-slot="'+slot+'"]');
+      var img=document.getElementById("slot-"+slot+"-img");
+      if(img)img.src=compressed;
+      if(card)card.classList.add("filled");
       render();
     });
   };
   reader.readAsDataURL(input.files[0]);
 }
-function handleSlotPhoto(input){handleProductPhoto(input);}
+function handleProductPhoto(input){handleSlotPhoto(input);}
 
-function deleteProductPhoto(){
-  if(!photoItem)return;
-  var key=photoKey(photoItem),p={};
+function deleteSlotPhoto(slot){
+  if(!photoItem||!slot)return;
+  var key=slotKey(photoItem,slot),p={};
   delete photos[key];p[key]=null;
+  if(slot==="front"){
+    var mk=photoKey(photoItem);delete photos[mk];p[mk]=null;
+  }
   if(PP)fbPatch(PP,p).catch(function(){});
-  var img=document.getElementById("photo-modal-img");
-  var placeholder=document.getElementById("photo-modal-placeholder");
-  var delBtn=document.getElementById("photo-delete-btn");
-  if(img)img.style.display="none";
-  if(placeholder)placeholder.style.display="flex";
-  if(delBtn)delBtn.style.display="none";
+  var card=document.querySelector('[data-slot="'+slot+'"]');
+  if(card)card.classList.remove("filled");
+  var img=document.getElementById("slot-"+slot+"-img");
+  if(img)img.src="";
   render();
 }
+function deleteProductPhoto(){deleteSlotPhoto("front");}
 
 // ── ADMIN ─────────────────────────────────────────────────────────────────────
 // Nowy system admina znajduje się w sekcji "Admin panel wiring" poniżej.
@@ -1359,10 +1544,17 @@ function render(){
       html+='<div style="flex:1;height:5px;background:var(--bg4);border-radius:4px"><div style="height:100%;width:'+pct+'%;background:'+borderColor+';border-radius:4px"></div></div>';
       html+=ql;
       html+='</div>';
-      // Chipsy: data ważności + skanuj produkt
+      // Chipsy: zdjęcia + data (zawsze) + skanuj produkt (tylko gdy cat.scan)
       html+='<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">';
-      html+='<button onclick="openExpiry(\''+ne+'\')" style="background:'+(hasDate?"rgba(245,158,11,.15)":"var(--bg4)")+';border:1px solid '+(hasDate?"var(--amber)":"var(--border)")+';color:'+(hasDate?"var(--amber)":"var(--text3)")+';border-radius:50px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px">📅 '+(hasDate?"Data":"Dodaj datę")+'</button>';
-      html+='<button onclick="openScannerAndPhoto(\''+ne+'\')" style="background:rgba(61,139,255,.12);border:1px solid rgba(61,139,255,.35);color:#60A5FA;border-radius:50px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px">📸 Skanuj produkt</button>';
+      // Zdjęcia (zawsze, 3 sloty)
+      html+='<button onclick="openPhoto(\''+ne+'\')" style="background:var(--bg4);border:1px solid var(--border);color:var(--text3);border-radius:50px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px">📷 Zdjęcia</button>';
+      // Data ważności (zawsze, ale w warzywach z innym podpisem)
+      var dateLabel=cat.scan?(hasDate?"Data":"Dodaj datę"):(hasDate?"Data":"Świeżość");
+      html+='<button onclick="openExpiry(\''+ne+'\')" style="background:'+(hasDate?"rgba(245,158,11,.15)":"var(--bg4)")+';border:1px solid '+(hasDate?"var(--amber)":"var(--border)")+';color:'+(hasDate?"var(--amber)":"var(--text3)")+';border-radius:50px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px">📅 '+dateLabel+'</button>';
+      // Skaner AI (tylko dla cat.scan = produkty z opakowaniem)
+      if(cat.scan){
+        html+='<button onclick="openScannerAndPhoto(\''+ne+'\')" style="background:rgba(61,139,255,.12);border:1px solid rgba(61,139,255,.35);color:#60A5FA;border-radius:50px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px">🔍 Skanuj AI</button>';
+      }
       html+='</div>';
       html+='</div>';
       html+='<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">';
