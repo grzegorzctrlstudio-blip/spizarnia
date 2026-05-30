@@ -875,7 +875,7 @@ var state={},expiry={},photos={},filter="all",catFilter="all",searchQ="";
 var userName="",shopTs=0,saveTimer=null,apiKey="";
 var expiryItem=null,scanData=null,scanFromExpiry=false,scanSavesPhoto=false;
 var photoItem=null,activeSlot="front",chatHistory=[],chatBusy=false;
-var receiptData=null,receiptAllProducts=[],receiptMeta={},shopChecked={},shopStore="biedronka";
+var receiptData=null,receiptAllProducts=[],receiptMeta={},receiptAdjustments=[],receiptUncertain=[],shopChecked={},shopStore="biedronka";
 var userProfile=null,obStep=0,obSels={},obMethod="manual";
 var dietTab=0,dietMenu=1,expandedMeal=null,weekPlan={};
 var editMealCtx={section:null,idx:null};
@@ -1032,8 +1032,11 @@ function updateShopBar(){
 
 // ── FRESHNESS ─────────────────────────────────────────────────────────────────
 function getDaysLeft(it){var ek=fbk("e",it.n);if(expiry[ek])return Math.round((expiry[ek]-Date.now())/86400000);if(it.days&&shopTs)return Math.round(it.days-(Date.now()-shopTs)/86400000);return null;}
-function isExpired(it){var d=getDaysLeft(it);return d!==null&&d<=0;}
-function isExpiringSoon(it){var d=getDaysLeft(it);return d!==null&&d>0&&d<=3;}
+function isExpiredProduct(it){var d=getDaysLeft(it);return d!==null&&d!==undefined&&!isNaN(d)&&d<0;}
+function isExpiringSoonProduct(it){var d=getDaysLeft(it);return d!==null&&d!==undefined&&!isNaN(d)&&d>=0&&d<=3;}
+function isExpired(it){return isExpiredProduct(it);}
+function isExpiringSoon(it){return isExpiringSoonProduct(it);}
+
 function fHtml(it){var d=getDaysLeft(it);if(d===null)return"";if(d<=0)return'<div class="fresh-bad">Przeterminowane!</div>';if(d===1)return'<div class="fresh-bad">Zostaje 1 dzień</div>';if(d<=2)return'<div class="fresh-warn">Zostają '+d+' dni</div>';return'<div class="fresh-ok">Świeże — '+d+' dni</div>';}
 function expiringSoon(it){var d=getDaysLeft(it);return d!==null&&d<=3;}
 
@@ -1127,13 +1130,7 @@ function handleReceiptPhoto(input){
     var b64=e.target.result.split(",")[1],mime=input.files[0].type||"image/jpeg";
     // Lista produktow z lodowki do dopasowania
     var allP=[];CATS.forEach(function(cat){cat.items.forEach(function(it){allP.push(it.n);});});
-    var prompt="Przeanalizuj paragon i zwroc 2 listy w JSON:\n"
-      +"1. 'dopasowane' - produkty ktore pasuja do listy lodowki: "+allP.join(", ")+"\n"
-      +"2. 'wszystkie' - WSZYSTKIE produkty z paragonu (nazwy, ilosci, ceny)\n"
-      +"TYLKO JSON bez markdown:\n"
-      +'{"dopasowane":[{"n":"nazwa z listy lodowki","ilosc":1}],'
-      +'"wszystkie":[{"nazwa":"pelna nazwa z paragonu","ilosc":1,"cena":0.0,"jednostka":"szt"}],'
-      +'"suma":0.0,"sklep":"nazwa sklepu","data":"DD.MM.YYYY lub null"}';
+    var prompt="Przeanalizuj paragon. Odczytaj wszystkie pozycje. Pozycje takie jak OPUST, UPUST, RABAT, KUPON, RESZTA, GOTOWKA, VISA, BLIK, KARTA, MASTERCARD to NIE sa produkty spozywcze. Produkty z ujemna cena to rabaty. Dopasuj do listy lodowki: "+allP.join(",")+". Zwroc TYLKO JSON: {\"sklep\":\"\",\"data\":\"DD.MM.YYYY\",\"suma\":0,\"produkty\":[{\"rawName\":\"\",\"matchedProductId\":\"\",\"matchedName\":\"\",\"quantity\":1,\"unit\":\"szt.\",\"totalPrice\":0,\"unitPrice\":0,\"confidence\":0.8,\"needsReview\":false,\"type\":\"product\"}],\"adjustments\":[{\"rawName\":\"OPUST\",\"type\":\"discount\",\"value\":-2.5,\"description\":\"Upust/rabat\"}],\"uncertainItems\":[]}. Produkty spozywcze do produkty, rabaty/upusty do adjustments"
     callAPI([
       {role:"user",content:[
         {type:"image",source:{type:"base64",media_type:mime,data:b64}},
@@ -1152,9 +1149,28 @@ function handleReceiptPhoto(input){
       try{
         var jsonStr=clean.slice(s,e+1).replace(/,\s*([}\]])/g,"$1");
         var parsed=JSON.parse(jsonStr);
-        receiptData=parsed.dopasowane||[];
-        receiptAllProducts=parsed.wszystkie||[];
+        // Filter out discounts from products
+        var rawProds=(parsed.produkty||[]).filter(function(p){
+          return p.type!=="discount"&&!isReceiptDiscount(p.rawName||p.matchedName||"");
+        });
+        // Map to receiptData format using matched names
+        receiptData=rawProds.filter(function(p){return p.matchedName||p.matchedProductId;}).map(function(p){
+          return {n:p.matchedName||p.rawName,ilosc:p.quantity||1,matchedProductId:p.matchedProductId};
+        });
+        receiptAllProducts=rawProds;
+        receiptAdjustments=parsed.adjustments||[];
+        receiptUncertain=parsed.uncertainItems||[];
         receiptMeta={suma:parsed.suma||0,sklep:parsed.sklep||"",data:parsed.data||""};
+        // Save to purchase history with proper format
+        if(PH_PATH){
+          var rcptId="rcpt_"+Date.now();
+          var receiptDoc={
+            userId:profileKey(userName),sklep:receiptMeta.sklep,data:receiptMeta.data,
+            suma:receiptMeta.suma,ts:Date.now(),source:"scanner",status:"confirmed",
+            produkty:receiptAllProducts,adjustments:receiptAdjustments
+          };
+          fbPost(PH_PATH,receiptDoc);
+        }
         // Zapisz paragon osobno w /purchaseHistory/ — nie w logach zmian
         if(PH_PATH){
           var receipt={
@@ -1227,7 +1243,8 @@ function showReceiptResults(){
   // Dopasowane do lodówki z checkboxami
   if(receiptData&&receiptData.length){
     html+='<div style="font-size:11px;font-weight:800;color:var(--green);margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">Dopasowane do lodówki ('+receiptData.length+') — zaznacz co dodać:</div>';
-    receiptData.forEach(function(p,i){
+    receiptData=sortByNamePL(receiptData,function(p){return p.n||p.matchedName||p.rawName||"";});
+  receiptData.forEach(function(p,i){
       var np=normalizeReceiptProduct(p);
       var name=getReceiptProductName(np);
       var qty=getReceiptProductQty(np);
@@ -1236,6 +1253,29 @@ function showReceiptResults(){
       html+='<label for="rp-cb-'+i+'" style="flex:1;cursor:pointer"><div style="font-size:13px;font-weight:700;color:var(--text)">'+name+'</div></label>';
       html+='<div style="font-size:12px;font-weight:800;color:var(--amber)">x'+qty+'</div>';
       html+='</div>';
+    });
+  }
+    // Rabaty / upusty z paragonu
+  if(receiptAdjustments&&receiptAdjustments.length){
+    html+='<div style="margin-top:10px;padding:8px 12px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:10px;font-size:12px;color:var(--amber)">';
+    html+='<b>Rabaty/upusty z paragonu:</b><br>';
+    receiptAdjustments.forEach(function(adj){
+      html+=adj.rawName+': '+(adj.value<0?adj.value.toFixed(2)+" zł":adj.description||"rabat")+'<br>';
+    });
+    html+='</div>';
+  }
+  // Pozycje wymagające potwierdzenia
+  if(receiptUncertain&&receiptUncertain.length){
+    html+='<div style="margin-top:10px;font-size:11px;font-weight:800;color:var(--amber);margin-bottom:6px;text-transform:uppercase">Pozycje wymagające potwierdzenia</div>';
+    receiptUncertain.forEach(function(u,ui){
+      html+='<div style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:8px 10px;margin-bottom:6px;">';
+      html+='<div style="font-size:12px;font-weight:700;color:var(--text)">'+(u.rawName||"?")+'</div>';
+      if(u.totalPrice)html+='<div style="font-size:11px;color:var(--text3)">'+u.totalPrice.toFixed(2)+' zł</div>';
+      html+='<div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap">';
+      html+='<button onclick="confirmUncertain('+ui+',\"discount\")" style="background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:var(--amber);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer">Rabat/upust</button>';
+      html+='<button onclick="confirmUncertain('+ui+',\"product\")" style="background:rgba(30,215,96,.1);border:1px solid rgba(30,215,96,.2);color:var(--green);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer">To produkt</button>';
+      html+='<button onclick="confirmUncertain('+ui+',\"skip\")" style="background:var(--bg3);border:1px solid var(--border);color:var(--text3);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer">Pomiń</button>';
+      html+='</div></div>';
     });
   }
   // Pozostałe z paragonu
@@ -1341,7 +1381,7 @@ function closeLog(){document.getElementById("log-overlay").classList.remove("sho
 function renderLog(){var b=document.getElementById("log-body");b.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3)">Ładowanie...</div>';fbGet(LP).then(function(data){if(!data){b.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3)">Brak zapisanych zmian</div>';return;}var en=Object.values(data).sort(function(a,b){return b.ts-a.ts;}).slice(0,200);b.innerHTML=en.map(function(e){var d=new Date(e.ts),g=d.toLocaleDateString("pl-PL",{day:"2-digit",month:"2-digit"})+" "+d.toLocaleTimeString("pl-PL",{hour:"2-digit",minute:"2-digit"});var delta=e.delta||0,badge=delta>0?'<span class="lbadge up">+'+delta+'</span>':'<span class="lbadge dn">'+delta+'</span>';return'<div class="log-entry"><div class="log-av" style="background:'+nc(e.who||"?")+'">'+ni(e.who||"?")+'</div><div class="log-info"><div class="log-who">'+(e.who||"?")+'</div><div class="log-what">'+(delta>0?"dodał":"zabrał")+" "+Math.abs(delta)+" x "+(e.what||"?")+'</div><div class="log-when">'+g+'</div></div>'+badge+'</div>';}).join("");}).catch(function(){b.innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">Blad</div>';});}
 
 // ── CAT CHIPS ─────────────────────────────────────────────────────────────────
-function buildCatChips(){var wrap=document.getElementById("cat-chips");if(!wrap)return;wrap.innerHTML='<button class="cat-chip act" id="chip-all" onclick="setCatFilter(\'all\')">Wszystko</button>';CATS.forEach(function(cat){var btn=document.createElement("button");btn.className="cat-chip";btn.id="chip-"+cat.id;btn.innerHTML=cat.label;if(cat.color)btn.style.borderColor=cat.color;btn.onclick=(function(id){return function(){setCatFilter(id);};})(cat.id);wrap.appendChild(btn);});}
+function buildCatChips(){var wrap=document.getElementById("cat-chips");if(!wrap)return;var sortedCats=sortByNamePL(CATS,function(c){return c.label;});wrap.innerHTML='<button class="cat-chip act" id="chip-all" onclick="setCatFilter(\'all\')">Wszystko</button>';sortedCats.forEach(function(cat){var btn=document.createElement("button");btn.className="cat-chip";btn.id="chip-"+cat.id;btn.innerHTML=cat.label;if(cat.color)btn.style.borderColor=cat.color;btn.onclick=(function(id){return function(){setCatFilter(id);};})(cat.id);wrap.appendChild(btn);});}
 function setCatFilter(id){catFilter=id;document.querySelectorAll(".cat-chip").forEach(function(el){el.classList.remove("act");});var el=document.getElementById("chip-"+(id==="all"?"all":id));if(el){el.classList.add("act");if(CATS.find(function(c){return c.id===id;})){var cat=CATS.find(function(c){return c.id===id;});el.style.background=cat.color||"var(--green)";el.style.borderColor=cat.color||"var(--green)";el.style.color="#000";}}render();}
 function setFilter(f){filter=f;catFilter='all';render();document.querySelectorAll('.cat-chip').forEach(function(el){el.classList.remove('act');});var allChip=document.getElementById('chip-all');if(allChip)allChip.classList.add('act');}
 function onSearch(q){searchQ=q.toLowerCase().trim();document.getElementById("xbtn").classList[q?"add":"remove"]("show");render();}
@@ -1408,7 +1448,7 @@ function render(){
   var body=document.getElementById("body"),nR=0,nG=0,tot=0;
   CATS.forEach(function(c){c.items.forEach(function(it){cls(state[fbk(c.id,it.n)]||0,it.target)==="grn"?nG++:nR++;tot++;});});
   document.getElementById("n-red").textContent=nR;document.getElementById("n-grn").textContent=nG;document.getElementById("n-all").textContent=tot;
-  var nExp=0;CATS.forEach(function(cat){cat.items.forEach(function(it){if(isExpired(it))nExp++;});});
+  var nExp=0;CATS.forEach(function(cat){cat.items.forEach(function(it){if(isExpiredProduct(it))nExp++;});});
   var expEl=document.getElementById("n-exp");if(expEl)expEl.textContent=nExp;
   var expCount=0;CATS.forEach(function(c){c.items.forEach(function(it){if(expiringSoon(it))expCount++;});});
   var expEl=document.getElementById("n-exp");if(expEl)expEl.textContent=expCount;var et=document.getElementById("exp-alert-txt");if(et)et.textContent=expCount>0?"Wygasa\n"+expCount+" prod.":"Data\nwaznosci";
@@ -1416,7 +1456,8 @@ function render(){
   CATS.forEach(function(cat){
     if(catFilter!=="all"&&cat.id!==catFilter)return;
     var catColor=cat.color||"var(--text3)";
-    var vis=cat.items.filter(function(it){var c=cls(state[fbk(cat.id,it.n)]||0,it.target);if(filter==="red"&&c==="grn")return false;if(filter==="grn"&&c!=="grn")return false;if(filter==="exp"&&!isExpired(it))return false;if(searchQ&&it.n.toLowerCase().indexOf(searchQ)===-1)return false;return true;});
+    var vis=cat.items.filter(function(it){var c=cls(state[fbk(cat.id,it.n)]||0,it.target);if(filter==="red"&&c==="grn")return false;
+    vis=sortByNamePL(vis,function(it){return it.n;});if(filter==="grn"&&c!=="grn")return false;if(filter==="exp"&&!isExpiredProduct(it))return false;if(searchQ&&it.n.toLowerCase().indexOf(searchQ)===-1)return false;return true;});
     if(!vis.length)return;
     any=true;
     html+='<div class="cat-section"><div class="cat-hdr" style="color:'+catColor+'">'+cat.label+'</div>';
@@ -1445,7 +1486,7 @@ function render(){
     });
     html+='</div>';
   });
-  if(!any){html='<div class="empty"><div style="font-size:48px;margin-bottom:12px;opacity:.5">'+(filter==="exp"?"??":searchQ?"??":"??")+'</div>'+(filter==="exp"?"Brak przeterminowanych produktów":searchQ?"Brak wynikow: "+searchQ:filter==="red"?"Wszystko jest!":"Brak produktów")+'</div>';}
+  if(!any){html='<div class="empty"><div style="font-size:48px;margin-bottom:12px;opacity:.5">'+(filter==="exp"?"\u26a0\ufe0f":searchQ?"\U0001f50d":"\U0001f4e6")+'</div>'+(filter==="exp"?"Brak przeterminowanych produktów":searchQ?"Brak wynikow: "+searchQ:filter==="red"?"Wszystko jest!":"Brak produktów")+'</div>';}
   body.innerHTML=html;
 }
 
@@ -1974,7 +2015,8 @@ function openPurchaseHistory(){
     // Price analysis
     var priceMap={};
     purchaseHistory.forEach(function(p){
-      (p.produkty||[]).forEach(function(prod){
+      var sortedProds=sortByNamePL((p.produkty||[]),function(pr){return pr.matchedName||pr.rawName||pr.nazwa||"";});
+        sortedProds.forEach(function(prod){
         var np=normalizeReceiptProduct(prod);
         var nm=getReceiptProductName(np);
         var price=getReceiptProductPrice(np)||0;
@@ -2073,6 +2115,20 @@ function toggleReceiptDetails(el){
 // ══════════════════════════════════════════════════════════════════════════════
 // PRODUCT DATABASE — z wartościami odżywczymi i jednostkami zakupowymi
 // ══════════════════════════════════════════════════════════════════════════════
+var RECEIPT_DISCOUNT_KEYWORDS=["OPUST","UPUST","RABAT","KUPON","PROMOCJA","OBNIZKA","OBNIŻKA","ZWROT","KAUCJA","PLATNOSC","PŁATNOŚĆ","SUMA","RAZEM","RESZTA","GOTOWKA","GOTÓWKA","VISA","MASTERCARD","BLIK","KARTA","REKOMPENSATA","KOREKTA"];
+function isReceiptDiscount(name){
+  if(!name)return false;
+  var n=name.toUpperCase().trim();
+  return RECEIPT_DISCOUNT_KEYWORDS.some(function(k){return n===k||n.startsWith(k);});
+}
+function isReceiptUncertain(name,confidence){
+  if(isReceiptDiscount(name))return false;
+  if(confidence!==undefined&&confidence<0.5)return true;
+  if(!name||name.length<2)return true;
+  if(/^[A-Z]{2,4}\s*\d*$/.test(name.trim()))return true;// skróty jak "NN","ART"
+  return false;
+}
+
 var PRODUCT_DB = [
   // MIĘSO
   {id:"piers_kurczaka",name:"Pierś z Kurczaka",aliases:["piers z kurczaka","pierś kurczaka","kurczak"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:110,prot:23,carb:0,fat:2},unit:"g",pkgUnit:"g",pkgSize:500,soldByWeight:true,days:3},
@@ -2285,8 +2341,8 @@ function calculateShoppingListFromDiet(days){
 // Renderuj inteligentną listę zakupów
 function renderSmartShoppingList(list){
   var html="";
-  var tooBuy=list.filter(function(i){return i.status==="MISSING";});
-  var have=list.filter(function(i){return i.status==="OK";});
+  var tooBuy=sortByNamePL(list.filter(function(i){return i.status==="MISSING";}),function(i){return i.name;});
+  var have=sortByNamePL(list.filter(function(i){return i.status==="OK";}),function(i){return i.name;});
   
   if(!tooBuy.length&&!have.length){
     return'<div style="text-align:center;padding:30px;color:var(--text3)">Brak składników do obliczenia.<br>Wygeneruj najpierw dietę.</div>';
@@ -2887,7 +2943,7 @@ function adminUserCard(uid, p, receiptsCount) {
 function loadAdminUsers() {
   fbGet(FB + "/profiles").then(function(data) {
     adminUsersData = data || {};
-    var uids = Object.keys(adminUsersData);
+    var uids = Object.keys(adminUsersData).sort(function(a,b){return a.localeCompare(b,"pl",{sensitivity:"base"});});
     if (!uids.length) {
       document.getElementById("admin-body").innerHTML = '<div style="text-align:center;padding:40px;color:#6B6B85">Brak użytkowników w bazie.</div>';
       return;
@@ -3049,7 +3105,7 @@ function renderAdminReceipts(receipts) {
       + '</div>';
     if (products.length) {
       html += '<div style="border-top:1px solid rgba(255,255,255,.06);padding-top:6px">';
-      products.slice(0, 5).forEach(function(p) {
+      sortByNamePL(products,function(p){return p.matchedName||p.rawName||p.nazwa||"";}).slice(0, 5).forEach(function(p) {
         var np = typeof normalizeReceiptProduct === "function" ? normalizeReceiptProduct(p) : p;
         var pname = (np.matchedName || np.rawName || np.nazwa || np.n || "Nieznany produkt").trim() || "Nieznany produkt";
         var price = np.totalPrice || np.cena || 0;
@@ -3177,6 +3233,29 @@ var closeCMS = closeAdminPanel;
 var switchCMSTab = switchAdminTab;
 var checkCMSPass = checkAdminPassword;
 
+
+function sortByNamePL(items,getName){return items.slice().sort(function(a,b){var na=(getName?getName(a):(a.name||a.nazwa||a.matchedName||a.rawName||a.n||"")).toString().trim();var nb=(getName?getName(b):(b.name||b.nazwa||b.matchedName||b.rawName||b.n||"")).toString().trim();if(na==="Nieznany produkt"||na==="")return 1;if(nb==="Nieznany produkt"||nb==="")return -1;return na.localeCompare(nb,"pl",{sensitivity:"base",numeric:true});});}
+function parseProductDate(value){if(!value)return null;var str=String(value).trim();if(!str)return null;var d,p;if(/^\d{4}-\d{2}-\d{2}$/.test(str)){d=new Date(str+"T00:00:00");return isNaN(d.getTime())?null:d;}if(/^\d{1,2}\.\d{1,2}\.\d{4}$/.test(str)){p=str.split(".");d=new Date(p[2]+"-"+p[1].padStart(2,"0")+"-"+p[0].padStart(2,"0")+"T00:00:00");return isNaN(d.getTime())?null:d;}if(/^\d{1,2}\.\d{1,2}\.\d{2}$/.test(str)){p=str.split(".");d=new Date("20"+p[2]+"-"+p[1].padStart(2,"0")+"-"+p[0].padStart(2,"0")+"T00:00:00");return isNaN(d.getTime())?null:d;}return null;}
+
+function confirmUncertain(idx,decision){
+  var item=receiptUncertain[idx];
+  if(!item)return;
+  item._decision=decision;
+  if(decision==="product"){
+    receiptData.push({n:item.rawName,ilosc:1,matchedProductId:""});
+  }
+  // Save learning to Firebase
+  if(FB&&userName&&item.rawName){
+    var lKey=item.rawName.toLowerCase().replace(/[^a-z0-9]/g,"_");
+    fbPut(FB+"/receiptLearning/"+profileKey(userName)+"/"+lKey,{
+      rawName:item.rawName,type:decision,
+      userDecision:decision,lastUsedAt:Date.now(),timesConfirmed:1
+    });
+  }
+  // Remove from uncertain
+  receiptUncertain.splice(idx,1);
+  showReceiptResults();
+}
 </script>
 
 <!-- ══ ADMIN PANEL OVERLAY (hidden by default) ══════════════════════════ -->
