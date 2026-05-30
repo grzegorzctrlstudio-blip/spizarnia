@@ -542,6 +542,9 @@ var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
 var ADMIN_PASS="spizarnia2025";
 var ROOM="room1",RP,LP,EP,PP;
 var CP=FB+"/config/apikey";
+var PH_PATH=""; // /purchaseHistory/{userId}
+var PANTRY_PATH=""; // /pantry/{userId}
+var pantryData={}; // {productId: {amount, unit, pkgSize, ...}}
 var state={},expiry={},photos={},filter="all",catFilter="all",searchQ="";
 var userName="",shopTs=0,saveTimer=null,apiKey="";
 var expiryItem=null,scanData=null,scanFromExpiry=false,scanSavesPhoto=false;
@@ -629,7 +632,15 @@ function nc(n){var h=0;for(var i=0;i<n.length;i++)h=(h*31+n.charCodeAt(i))%CLR.l
 function ni(n){return n.trim().charAt(0).toUpperCase();}
 function cls(c,t){return c>=t?"grn":c>0?"low":"red";}
 function profileKey(name){return name.toLowerCase().replace(/[^a-z0-9]/g,"_").replace(/__+/g,"_");}
-function setUserRoom(name){ROOM="user_"+profileKey(name);RP=FB+"/rooms/"+ROOM;LP=FB+"/logs/"+ROOM;EP=FB+"/expiry/"+ROOM;PP=FB+"/photos/"+ROOM;}
+function setUserRoom(name){
+  ROOM="user_"+profileKey(name);
+  RP=FB+"/rooms/"+ROOM;
+  LP=FB+"/logs/"+ROOM;
+  EP=FB+"/expiry/"+ROOM;
+  PP=FB+"/photos/"+ROOM;
+  PH_PATH=FB+"/purchaseHistory/"+profileKey(name);
+  PANTRY_PATH=FB+"/pantry/"+profileKey(name);
+}
 
 // ── DIALOG ────────────────────────────────────────────────────────────────────
 function showDlg(ico,title,msg,btns){
@@ -708,7 +719,7 @@ function openExpiryScanner(name){
   expiryItem=name;
   openExpiry(name);
 }
-function openScannerAndPhoto(name){expiryItem=name;scanFromExpiry=true;photoItem=name;openScanner();}
+
 function openScannerAndPhoto(name){expiryItem=name;scanFromExpiry=true;photoItem=name;scanSavesPhoto=true;openScanner();}
 function openScanner(){if(!apiKey){dlgAlert("X","Niedostepne","Skonfiguruj klucz API");return;}document.getElementById("scan-img").style.display="none";document.getElementById("scan-loading").style.display="none";document.getElementById("scan-result").style.display="none";document.getElementById("scan-apply").style.display="none";scanData=null;document.getElementById("scan-overlay").classList.add("show");}
 function closeScanner(){document.getElementById("scan-overlay").classList.remove("show");scanSavesPhoto=false;}
@@ -778,15 +789,37 @@ function handleReceiptPhoto(input){
       try{
         var jsonStr=clean.slice(s,e+1).replace(/,\s*([}\]])/g,"$1");
         var parsed=JSON.parse(jsonStr);
-        // Zapisz wszystkie produkty jako historia zakupow
         receiptData=parsed.dopasowane||[];
         receiptAllProducts=parsed.wszystkie||[];
         receiptMeta={suma:parsed.suma||0,sklep:parsed.sklep||"",data:parsed.data||""};
-        // Zapisz history do Firebase
-        if(receiptAllProducts.length&&LP){
-          fbPost(LP,{who:userName,what:"PARAGON",sklep:receiptMeta.sklep,
-            suma:receiptMeta.suma,data:receiptMeta.data,
-            produkty:receiptAllProducts,ts:Date.now()});
+        // Zapisz paragon osobno w /purchaseHistory/ — nie w logach zmian
+        if(PH_PATH){
+          var receipt={
+            userId:profileKey(userName),
+            sklep:receiptMeta.sklep,
+            data:receiptMeta.data,
+            suma:receiptMeta.suma,
+            ts:Date.now(),
+            source:"scanner",
+            status:"confirmed",
+            produkty:(parsed.wszystkie||[]).map(function(p){
+              var prod=findProduct(p.nazwa||"");
+              return{
+                rawName:p.nazwa||"",
+                matchedProductId:prod?prod.id:"",
+                matchedName:prod?prod.name:(p.nazwa||""),
+                ilosc:p.ilosc||1,
+                jednostka:p.jednostka||"szt",
+                cenaCalkowita:p.cena||0,
+                cenaJednostkowa:p.cena&&p.ilosc?parseFloat((p.cena/p.ilosc).toFixed(2)):0,
+                kategoria:prod?prod.cat:"",
+                addToPantry:!!prod,
+                isDietProduct:!!prod,
+                isExtraProduct:!prod
+              };
+            })
+          };
+          fbPost(PH_PATH,receipt);
         }
         closeReceiptModal();
         showReceiptResults();
@@ -859,30 +892,46 @@ function showReceiptResults(){
 
 function applyReceiptSelected(){
   if(!receiptData||!receiptData.length){dlgAlert("?","Brak produktow","Brak dopasowanych produktow.");return;}
-  var patch={},updated=[];
+  var updated=[], patch={};
   receiptData.forEach(function(p,i){
     var cb=document.getElementById("rp-cb-"+i);
-    if(!cb||!cb.checked)return;// Skip unchecked
+    if(!cb||!cb.checked)return;
     var matchName=p.n||p.dopasowanie;
     if(!matchName||matchName==="null")return;
+    var prod=findProduct(matchName);
+    var ilosc=parseInt(p.ilosc)||1;
+    
+    // Oblicz realną ilość w gramach/ml/szt
+    if(prod){
+      var realAmount=ilosc*(prod.pkgSize||100);// np. 3 × 350g = 1050g
+      addToPantry(prod, realAmount, "receipt");
+      updated.push(prod.name+" ("+realAmount+prod.unit+")");
+    }
+    
+    // Aktualizuj też stary state dla UI lodówki
     CATS.forEach(function(cat){cat.items.forEach(function(it){
-      if(it.n.toLowerCase()===matchName.toLowerCase()||it.n===matchName){
-        var id=fbk(cat.id,it.n),cur=state[id]||0,nv=Math.min(it.target*2,cur+(parseInt(p.ilosc)||1));
-        state[id]=nv;patch[id]=nv;updated.push(it.n);
+      if(it.n.toLowerCase()===matchName.toLowerCase()||
+         (prod&&(prod.aliases||[]).some(function(a){return a===it.n.toLowerCase();}))){
+        var id=fbk(cat.id,it.n),cur=state[id]||0,nv=Math.min(it.target*2,cur+ilosc);
+        state[id]=nv;patch[id]=nv;
       }
     });});
   });
-  if(Object.keys(patch).length){
-    shopTs=Date.now();patch.__shopTs=shopTs;
-    fbPatch(RP,patch).then(function(){addLog("PARAGON",0,Object.keys(patch).length);});
-    updateShopBar();render();
+  if(updated.length){
+    if(Object.keys(patch).length){
+      shopTs=Date.now();patch.__shopTs=shopTs;
+      fbPatch(RP,patch).then(function(){addLog("PARAGON",0,updated.length);});
+      updateShopBar();render();
+    }
     document.getElementById("receipt-results").style.display="none";
-    var extra=(receiptAllProducts&&receiptAllProducts.length>receiptData.length)?" Pozostale "+( receiptAllProducts.length-receiptData.length)+" prod. zapisane w historii.":"";
-    dlgAlert("OK","Zaktualizowano lodowke","Dodano "+updated.length+" produktow."+extra);
+    var extra=receiptAllProducts.length>receiptData.length?
+      " Pozostałe "+(receiptAllProducts.length-receiptData.length)+" prod. w historii.":"";
+    dlgAlert("OK","Lodówka zaktualizowana","Dodano: "+updated.join(", ")+"."+extra);
   }else{
-    dlgAlert("?","Nic nie zaznaczono","Zaznacz produkty ktore chcesz dodac do lodowki.");
+    dlgAlert("?","Nic nie zaznaczono","Zaznacz produkty do dodania.");
   }
 }
+
 
 function applyReceipt(){applyReceiptSelected();}
 
@@ -990,8 +1039,8 @@ function applyPresetProfile(name){
   return{age:30,weight:85,height:180,gender:"m",activity:"active",goal:"gain",
     stores:"biedronka",exclude:"ryby (tylko losos wedzony)",kcal:3060,prot:244,fat:107,carb:281};
 }
-function loadUserProfile(name,cb){fbGet(FB+"/profiles/"+profileKey(name)).then(function(p){if(p&&p.kcal){userProfile=p;cb(true);}else{userProfile=null;cb(false);}}).catch(function(){userProfile=null;cb(false);});}
-function saveUserProfile(p){userProfile=p;if(RP)fbPut(FB+"/profiles/"+profileKey(userName),p);}
+
+
 function updateAISys(){if(!userProfile)return;var st={biedronka:"Biedronke",lidl:"Lidl",both:"Biedronke i Lidl"}[userProfile.stores]||"Biedronke";SYS="Jestes agentem kulinarnym "+userName.split(" ")[0]+". Cel: "+({lose:"redukcja",maintain:"utrzymanie wagi",gain:"masa miesniowa"}[userProfile.goal]||"")+". "+userProfile.kcal+" kcal/dzien. B:"+userProfile.prot+"g W:"+userProfile.carb+"g T:"+userProfile.fat+"g. Sklep: "+st+". Wykluczenia: "+(userProfile.exclude||"brak")+". Odpowiadaj po polsku.";}
 function openProfileModal(){
   document.getElementById("profile-modal-name").textContent="Profil: "+userName;
@@ -1113,7 +1162,7 @@ function renderRecipes(){
   h+='<button onclick="generateShopFromDiet()" style="width:100%;background:linear-gradient(135deg,var(--purple),#4F46E5);color:#fff;border:none;border-radius:50px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;margin-top:4px">Generuj liste zakupow z diety</button>';
   return h;
 }
-function renderWeekPlan(){return'<div style="text-align:center;padding:30px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px">?</div>Plan tygodnia - wkrotce</div>';}
+
 function renderUploadDiet(){return'<button onclick="generateAIDiet(userProfile)" style="width:100%;background:linear-gradient(135deg,var(--green2),var(--green));color:#000;border:none;border-radius:50px;padding:14px;font-size:14px;font-weight:900;cursor:pointer;margin-bottom:16px">Generuj diete AI na nowo</button><div style="font-size:13px;font-weight:700;color:var(--text3);margin-bottom:8px">lub wklej tekst planu:</div><textarea id="diet-upload-text" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px;font-size:13px;color:var(--text);outline:none;min-height:100px;font-family:inherit;resize:vertical;margin-bottom:10px" placeholder="Wklej tekst planu zywieniowego..."></textarea><button onclick="parseDietText()" style="width:100%;background:linear-gradient(135deg,var(--purple),#4F46E5);color:#fff;border:none;border-radius:50px;padding:13px;font-size:14px;font-weight:800;cursor:pointer">Analizuj z AI</button>';}
 function parseDietText(){var txt=document.getElementById("diet-upload-text");if(!txt||!txt.value.trim())return;if(!apiKey)return;var body=document.getElementById("diet-body");body.innerHTML='<div style="text-align:center;padding:40px"><div class="spin" style="margin:0 auto"></div></div>';callAPI([{role:"user",content:'Przeanalizuj plan diety. TYLKO JSON: {"menu1":{"sniadania":[{"nazwa":"","czas":"","kcal":0,"prot":0,"carb":0,"fat":0,"skladniki":[{"n":"","il":""}],"przepis":""}],"obiady":[...],"kolacje":[...]},"menu2":{...}}. Plan: '+txt.value}],"Jestes dietetykiem. TYLKO JSON bez markdown.",function(res){try{var clean=res.replace(/```json/gi,"").replace(/```/g,"").trim();var p=JSON.parse(clean.slice(clean.indexOf("{"),clean.lastIndexOf("}")+1));if(!userProfile)userProfile={};userProfile.dietData=p;saveUserProfile(userProfile);switchDietTab(0);}catch(e){renderDietBody();}},function(){renderDietBody();},3500);}
 function generateShopFromDiet(){var d=getDietData(),menu=dietMenu===1?d.menu1:d.menu2;var allIngr=[];["sniadania","obiady","kolacje"].forEach(function(t){(menu[t]||[]).forEach(function(m){(m.skladniki||[]).forEach(function(s){allIngr.push(s.n+" "+s.il);});});});var inStock=[];CATS.forEach(function(cat){cat.items.forEach(function(it){if((state[fbk(cat.id,it.n)]||0)>=it.target)inStock.push(it.n);});});closeDiet();showPage("shop");callAPI([{role:"user",content:"Skladniki z diety: "+allIngr.join(", ")+". Mam juz: "+inStock.join(", ")+". Lista zakupow. TYLKO JSON: {\"komentarz\":\"\",\"produkty\":[{\"nazwa\":\"\",\"ilosc\":\"\",\"priorytet\":\"wysoki\",\"powod\":\"\"}]}"}],SYS,function(res){var clean=res.replace(/```json/gi,"").replace(/```/g,"").trim();try{renderShopList(JSON.parse(clean.slice(clean.indexOf("{"),clean.lastIndexOf("}")+1)));}catch(e){document.getElementById("shop-list-content").innerHTML='<div class="ai-note">'+res+'</div>';}},function(err){dlgAlert("X","Blad",err);});}
@@ -1294,8 +1343,8 @@ function doLogin(){
 
 // ── START ─────────────────────────────────────────────────────────────────────
 function startApp(){
-  Promise.all([fbGet(RP),fbGet(EP),fbGet(CP),fbGet(PP)]).then(function(res){
-    var remote=res[0],exp=res[1],key=res[2],ph=res[3];
+  Promise.all([fbGet(RP),fbGet(EP),fbGet(CP),fbGet(PP),fbGet(PANTRY_PATH)]).then(function(res){
+    var remote=res[0],exp=res[1],key=res[2],ph=res[3],pnt=res[4];
     if(key)apiKey=key;
     state=mkState();
     if(remote){Object.keys(remote).forEach(function(k){if(k in state)state[k]=remote[k]||0;if(k==="__shopTs")shopTs=remote[k];});}
@@ -1376,12 +1425,13 @@ function obNextStep(){
 var purchaseHistory=[];
 
 function loadPurchaseHistory(cb){
-  fbGet(LP).then(function(data){
+  if(!PH_PATH){purchaseHistory=[];if(cb)cb();return;}
+  fbGet(PH_PATH).then(function(data){
     if(!data){purchaseHistory=[];if(cb)cb();return;}
     purchaseHistory=Object.values(data)
-      .filter(function(e){return e.what==="PARAGON"&&e.produkty;})
+      .filter(function(e){return e.ts;})
       .sort(function(a,b){return b.ts-a.ts;})
-      .slice(0,20);
+      .slice(0,30);
     if(cb)cb();
   }).catch(function(){purchaseHistory=[];if(cb)cb();});
 }
@@ -1610,55 +1660,63 @@ function getDietIngredients(diet, menuKey, days){
 }
 
 // Pobierz stan lodówki dla produktu (ilość w gramach/ml/szt)
-function getPantryAmountForProduct(prod,productName){
-  if(!prod){
-    // Szukaj po nazwie w CATS
+function getPantryAmountForProduct(prod, productName){
+  // 1. Sprawdź nową strukturę /pantry/{userId}
+  if(prod&&pantryData){
+    var entry=pantryData[prod.id];
+    if(entry&&entry.amount>0)return entry.amount;
+  }
+  // 2. Fallback — szacuj ze starego stanu CATS
+  if(prod){
     var found=0;
     CATS.forEach(function(cat){cat.items.forEach(function(it){
-      if(it.n.toLowerCase()===productName.toLowerCase()||productName.toLowerCase().indexOf(it.n.toLowerCase())!==-1){
+      var itLow=it.n.toLowerCase();
+      var match=(prod.aliases||[]).some(function(a){return a===itLow||itLow.indexOf(a)!==-1;});
+      if(match){
         var cur=state[fbk(cat.id,it.n)]||0;
-        // Przybliżone przeliczenie: 1 opak = pkgSize g
-        found=cur*(it.pkgSize||1);
+        found+=cur*(prod.pkgSize||100);
       }
     });});
     return found;
   }
-  // Szukaj po CATS używając aliasów
-  var found=0;
-  CATS.forEach(function(cat){cat.items.forEach(function(it){
-    var aliases=prod.aliases||[];
-    var itLow=it.n.toLowerCase();
-    var match=aliases.some(function(a){return a===itLow||itLow.indexOf(a)!==-1;});
-    if(match){
-      var cur=state[fbk(cat.id,it.n)]||0;
-      found+=cur*(prod.pkgSize||100);
-    }
-  });});
-  return found;
+  // 3. Szukaj po nazwie w CATS
+  var found2=0;
+  if(productName){
+    CATS.forEach(function(cat){cat.items.forEach(function(it){
+      if(it.n.toLowerCase()===productName.toLowerCase()){
+        var cur=state[fbk(cat.id,it.n)]||0;
+        found2=cur*(it.pkgSize||100);
+      }
+    });});
+  }
+  return found2;
 }
 
-// Oblicz ile opakowań kupić
-function convertToPurchaseUnits(product, missingAmount){
-  if(!product)return{pcs:1,label:Math.ceil(missingAmount)+"g",surplus:0,total:missingAmount};
-  if(product.soldByWeight){
-    // Na wagę — podaj gramaturę
-    return{pcs:1,label:Math.ceil(missingAmount)+"g",surplus:0,total:missingAmount,byWeight:true};
-  }
-  if(product.unit==="szt"){
-    var itemsNeeded=Math.ceil(missingAmount);
-    var pkgsNeeded=Math.ceil(itemsNeeded/product.pkgSize);
-    var totalBought=pkgsNeeded*product.pkgSize;
-    var surplus=totalBought-itemsNeeded;
-    return{pcs:pkgsNeeded,label:pkgsNeeded+" "+product.pkgUnit+" ("+product.pkgSize+" szt.)",surplus:surplus,total:totalBought};
-  }
-  // Paczkowane (g/ml)
-  var pkgsNeeded2=Math.ceil(missingAmount/product.pkgSize);
-  var totalBought2=pkgsNeeded2*product.pkgSize;
-  var surplus2=totalBought2-missingAmount;
-  return{pcs:pkgsNeeded2,label:pkgsNeeded2+" "+product.pkgUnit+" ("+product.pkgSize+product.unit+")",surplus:Math.round(surplus2),total:totalBought2};
+// Zapisz produkt do pantry
+function savePantryProduct(productId, data){
+  if(!PANTRY_PATH)return;
+  pantryData[productId]=Object.assign(pantryData[productId]||{},data,{updatedAt:Date.now()});
+  fbPut(PANTRY_PATH+"/"+productId, pantryData[productId]);
 }
 
-// GŁÓWNA FUNKCJA: oblicz listę zakupów z diety
+// Dodaj ilość do pantry
+function addToPantry(prod, amountG, source, receiptId){
+  if(!prod)return;
+  var entry=pantryData[prod.id]||{productId:prod.id,name:prod.name,amount:0,unit:prod.unit||"g",packageSize:prod.pkgSize||100,packageUnit:prod.pkgUnit||"g"};
+  entry.amount=(entry.amount||0)+amountG;
+  entry.source=source||"manual";
+  if(receiptId)entry.receiptId=receiptId;
+  savePantryProduct(prod.id, entry);
+}
+
+// Odejmij ze stanu po przygotowaniu posiłku
+function deductFromPantry(productId, amountG){
+  var entry=pantryData[productId];
+  if(!entry)return;
+  entry.amount=Math.max(0,(entry.amount||0)-amountG);
+  savePantryProduct(productId, entry);
+}
+
 function calculateShoppingListFromDiet(days){
   days=days||1;
   var d=getDietData();
@@ -1825,39 +1883,56 @@ function generateDietShoppingList(days){
     +'<b style="color:var(--purple)">📊 Lista z diety na '+days+(days===1?" dzień":" dni")+'</b><br>'
     +'Obliczona lokalnie: dieta → składniki → stan lodówki → brakujące → opakowania'
     +'</div>'+html;
-  document.getElementById("shop-list-content").innerHTML=html;
+  // Przycisk "Kupione" — dodaje pełne opakowania do pantry
+  var kupBtn='<button onclick="_currentShopList&&applyPurchasedItemsToPantry(_currentShopList)" '
+    +'style="width:100%;background:var(--green);color:#000;border:none;border-radius:50px;'
+    +'padding:13px;font-size:14px;font-weight:800;cursor:pointer;margin-top:10px">'
+    +'✅ Zakupy zrealizowane — dodaj do lodówki</button>';
+  document.getElementById("shop-list-content").innerHTML=html+kupBtn;
+  window._currentShopList=list;
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
 // WALIDACJA MAKRO
 // ══════════════════════════════════════════════════════════════════════════════
 function validateMeal(meal, profile){
-  if(!profile||!meal)return{ok:false,msg:"Brak danych"};
+  if(!profile||!meal)return{ok:false,issues:["Brak danych profilu"]};
   var mK=Math.round(profile.kcal/3),mP=Math.round(profile.prot/3),mC=Math.round(profile.carb/3),mF=Math.round(profile.fat/3);
-  var tolerance=0.1;
   var issues=[];
-  if(Math.abs(meal.kcal-mK)>mK*tolerance)issues.push("kcal: "+meal.kcal+" (cel: "+mK+")");
-  if(Math.abs(meal.prot-mP)>mP*tolerance)issues.push("B: "+meal.prot+"g (cel: "+mP+"g)");
-  if(Math.abs(meal.carb-mC)>mC*(tolerance*1.5))issues.push("W: "+meal.carb+"g (cel: "+mC+"g)");
-  if(Math.abs(meal.fat-mF)>mF*(tolerance*1.5))issues.push("T: "+meal.fat+"g (cel: "+mF+"g)");
-  return{ok:issues.length===0,issues:issues};
+  var tK=0.03,tP=0.05,tC=0.05,tF=0.05;// ±3% kcal, ±5% makro
+  if(meal.kcal&&Math.abs(meal.kcal-mK)>mK*tK)
+    issues.push("Kcal: "+meal.kcal+" (cel: "+mK+", odchylenie: "+Math.round((meal.kcal-mK)/mK*100)+"%)");
+  if(meal.prot&&Math.abs(meal.prot-mP)>mP*tP)
+    issues.push("Białko: "+meal.prot+"g (cel: "+mP+"g)");
+  if(meal.carb&&Math.abs(meal.carb-mC)>mC*tC)
+    issues.push("Węgle: "+meal.carb+"g (cel: "+mC+"g)");
+  if(meal.fat&&Math.abs(meal.fat-mF)>mF*tF)
+    issues.push("Tłuszcze: "+meal.fat+"g (cel: "+mF+"g)");
+  return{ok:issues.length===0,issues:issues,
+    diffKcal:meal.kcal-mK,pctKcal:meal.kcal?Math.round(meal.kcal/mK*100):0};
 }
 
 function validateMenu(menu, profile){
-  if(!menu||!profile)return{ok:false};
+  if(!menu||!profile)return{ok:false,issues:["Brak danych"]};
   var totalK=0,totalP=0,totalC=0,totalF=0;
   ["sniadania","obiady","kolacje"].forEach(function(t){
     (menu[t]||[]).forEach(function(m){totalK+=m.kcal||0;totalP+=m.prot||0;totalC+=m.carb||0;totalF+=m.fat||0;});
   });
-  var tol=0.07;
-  var ok=Math.abs(totalK-profile.kcal)<=profile.kcal*tol;
-  return{ok:ok,kcal:totalK,prot:totalP,carb:totalC,fat:totalF,
+  var issues=[];
+  var tK=0.03,tP=0.05,tC=0.05,tF=0.05;
+  if(Math.abs(totalK-profile.kcal)>profile.kcal*tK)
+    issues.push("Kcal menu: "+totalK+" (cel: "+profile.kcal+", odch: "+Math.round((totalK-profile.kcal)/profile.kcal*100)+"%)");
+  if(Math.abs(totalP-profile.prot)>profile.prot*tP)
+    issues.push("Białko: "+totalP+"g (cel: "+profile.prot+"g)");
+  if(Math.abs(totalC-profile.carb)>profile.carb*tC)
+    issues.push("Węgle: "+totalC+"g (cel: "+profile.carb+"g)");
+  if(Math.abs(totalF-profile.fat)>profile.fat*tF)
+    issues.push("Tłuszcze: "+totalF+"g (cel: "+profile.fat+"g)");
+  return{ok:issues.length===0,issues:issues,
+    kcal:totalK,prot:totalP,carb:totalC,fat:totalF,
     diffKcal:totalK-profile.kcal,pct:Math.round(totalK/profile.kcal*100)};
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// ANALIZA CEN
-// ══════════════════════════════════════════════════════════════════════════════
 function renderPriceAnalysis(){
   var body=document.getElementById("diet-body");
   if(!body)return;
@@ -1963,6 +2038,56 @@ function renderPriceAnalysis(){
   });
 }
 
+
+// ── Po oznaczeniu listy zakupów jako kupionej ─────────────────────────────
+function applyPurchasedItemsToPantry(shopList){
+  if(!shopList||!shopList.length)return;
+  var added=[];
+  shopList.forEach(function(item){
+    if(!item.buy||item.status!=="MISSING")return;
+    var prod=item.product;
+    if(!prod)return;
+    // Dodaj PEŁNE kupione opakowanie (nie tylko brakującą ilość)
+    var totalBought=item.buy.total||item.missing;
+    addToPantry(prod, totalBought, "shopping_list");
+    // Aktualizuj też stary CATS state
+    CATS.forEach(function(cat){cat.items.forEach(function(it){
+      if((prod.aliases||[]).some(function(a){return a===it.n.toLowerCase();})){
+        var id=fbk(cat.id,it.n),cur=state[id]||0;
+        var newPkgs=Math.ceil(totalBought/(prod.pkgSize||100));
+        state[id]=Math.min(it.target*2, cur+newPkgs);
+      }
+    });});
+    added.push(prod.name+" ("+totalBought+prod.unit+")");
+  });
+  if(added.length){
+    shopTs=Date.now();
+    var patch={__shopTs:shopTs};
+    Object.keys(state).forEach(function(k){patch[k]=state[k];});
+    fbPatch(RP,patch);updateShopBar();render();
+    dlgAlert("OK","Zakupy zrealizowane!","Dodano do lodówki: "+added.join(", ")+"\n\nSystem obliczył nadwyżki z zakupionych opakowań.");
+  }
+}
+
+// ── Przelicz brakującą ilość na realne opakowania ────────────────────────────
+function convertToPurchaseUnits(product, missingAmount){
+  if(!product)return{pcs:1,label:Math.ceil(missingAmount)+"g",surplus:0,total:missingAmount,byWeight:true};
+  if(product.soldByWeight){
+    return{pcs:1,label:Math.ceil(missingAmount)+product.unit,surplus:0,total:missingAmount,byWeight:true};
+  }
+  var pkgSize=product.pkgSize||100;
+  if(product.unit==="szt"){
+    var need=Math.ceil(missingAmount);
+    var pkgs=Math.ceil(need/pkgSize);
+    var total=pkgs*pkgSize;
+    return{pcs:pkgs,label:pkgs+" "+product.pkgUnit+" ("+pkgSize+" szt.)",surplus:total-need,total:total};
+  }
+  // Paczkowane g/ml
+  var pkgs2=Math.ceil(missingAmount/pkgSize);
+  var total2=pkgs2*pkgSize;
+  var surplus=Math.round(total2-missingAmount);
+  return{pcs:pkgs2,label:pkgs2+" "+product.pkgUnit+" ("+pkgSize+product.unit+")",surplus:surplus,total:total2};
+}
 </script>
 </body>
 </html>
