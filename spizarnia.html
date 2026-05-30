@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Pełna Lodówka — APP_VERSION: 2026-05-30-final-recovery-design-modules-v1 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -26,7 +27,7 @@
   --radius:16px;
   --radius-sm:10px;
 }
-body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:76px;overscroll-behavior:none}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overscroll-behavior:none}
 
 /* ── SPLASH ── */
 #splash{min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:32px;background:radial-gradient(ellipse at 50% 0%,#1a1a2e 0%,var(--bg) 70%)}
@@ -47,8 +48,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .login-btn{width:100%;max-width:340px;background:var(--green);color:#000;border:none;border-radius:50px;padding:16px;font-size:16px;font-weight:900;cursor:pointer;letter-spacing:.3px;transition:transform .15s,filter .15s}
 .login-btn:active{transform:scale(.97);filter:brightness(.9)}
 
-/* ── BOTTOM NAV ── */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(17,17,24,.95);border-top:1px solid var(--border);backdrop-filter:blur(20px);display:flex;z-index:50;padding:8px 0 max(8px,env(safe-area-inset-bottom))}
+/* ── TOP NAV (segmented control) ── */
+.top-nav{display:flex;background:var(--bg3);border:1px solid var(--border);border-radius:50px;padding:4px;gap:4px;margin:0 0 14px;position:sticky;top:0;z-index:25}
+.tnav-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:transparent;border:none;color:var(--text3);font-size:13px;font-weight:700;padding:10px 8px;border-radius:50px;cursor:pointer;transition:background .2s,color .2s;white-space:nowrap}
+.tnav-btn.act{background:var(--green);color:#000;font-weight:800}
+.tnav-ico{font-size:16px;line-height:1}
+.tnav-lbl{font-size:12px;font-weight:800;letter-spacing:.2px}
+@media (max-width:380px){.tnav-lbl{font-size:11px}}
+
+/* ── BOTTOM NAV (auxiliary, hidden by default — top nav is primary) ── */
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(17,17,24,.95);border-top:1px solid var(--border);backdrop-filter:blur(20px);z-index:50;padding:8px 0 max(8px,env(safe-area-inset-bottom))}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:none;background:none;cursor:pointer;padding:4px}
 .nav-ico{font-size:22px;line-height:1;transition:transform .2s}
 .nav-lbl{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text3);transition:color .2s}
@@ -135,13 +144,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .item.grn .prog-fill{background:linear-gradient(90deg,var(--green2),var(--green))}
 .prog-label{font-size:10px;color:var(--text3);font-weight:600}
 .qty-ctrl{display:flex;align-items:center;gap:6px}
-.qty-btn{width:38px;height:38px;border:none;border-radius:50%;font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .1s}
-.qty-btn:active{transform:scale(.85)}
+.qty-btn{width:44px;height:44px;min-width:44px;min-height:44px;border:none;border-radius:12px;font-size:22px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .1s,filter .15s;line-height:1}
+.qty-btn:active{transform:scale(.92);filter:brightness(.85)}
 .item.red .qty-btn{background:#FF4D4D22;color:var(--red)}
 .item.low .qty-btn{background:#F59E0B22;color:var(--amber)}
 .item.grn .qty-btn{background:#1ED76022;color:var(--green)}
-.qty-num{min-width:36px;text-align:center}
-.qty-val{font-size:22px;font-weight:900;line-height:1;color:var(--text)}
+.qty-num{min-width:44px;text-align:center;padding:0 2px}
+.qty-val{font-size:18px;font-weight:800;line-height:1.1;color:var(--text)}
 .qty-unit{font-size:9px;color:var(--text3);font-weight:600}
 
 .exp-chip{margin-top:8px;display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border);color:var(--text3);transition:all .2s}
@@ -378,6 +387,13 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
         </div>
       </div>
 
+      <!-- TOP NAV (segmented control) -->
+      <div class="top-nav" id="top-nav-pantry">
+        <button class="tnav-btn act" id="tnav-pantry" onclick="showPage('pantry')"><span class="tnav-ico">🥬</span><span class="tnav-lbl">Lodówka</span></button>
+        <button class="tnav-btn" id="tnav-chat" onclick="showPage('chat')"><span class="tnav-ico">🤖</span><span class="tnav-lbl">Agent AI</span></button>
+        <button class="tnav-btn" id="tnav-shop" onclick="showPage('shop')"><span class="tnav-ico">🛒</span><span class="tnav-lbl">Zakupy</span></button>
+      </div>
+
       <!-- STATS 2x2 -->
       <div class="stats-grid">
         <button class="stat-tile red" onclick="setFilter('red')">
@@ -439,6 +455,11 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
   <!-- CHAT -->
   <div class="page-flex" id="page-chat">
     <div class="chat-hdr">
+      <div class="top-nav" style="position:sticky;top:0;z-index:25;margin-bottom:10px">
+        <button class="tnav-btn" id="tnav-pantry-2" onclick="showPage('pantry')"><span class="tnav-ico">🥬</span><span class="tnav-lbl">Lodówka</span></button>
+        <button class="tnav-btn act" id="tnav-chat-2" onclick="showPage('chat')"><span class="tnav-ico">🤖</span><span class="tnav-lbl">Agent AI</span></button>
+        <button class="tnav-btn" id="tnav-shop-2" onclick="showPage('shop')"><span class="tnav-ico">🛒</span><span class="tnav-lbl">Zakupy</span></button>
+      </div>
       <div class="chat-hdr-title">
         <h2>Agent AI</h2>
         <span class="ai-badge">AKTYWNY</span>
@@ -464,6 +485,11 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
   <!-- SHOPPING -->
   <div class="page-flex" id="page-shop">
     <div class="shop-hdr">
+      <div class="top-nav" style="position:sticky;top:0;z-index:25;margin-bottom:10px">
+        <button class="tnav-btn" id="tnav-pantry-3" onclick="showPage('pantry')"><span class="tnav-ico">🥬</span><span class="tnav-lbl">Lodówka</span></button>
+        <button class="tnav-btn" id="tnav-chat-3" onclick="showPage('chat')"><span class="tnav-ico">🤖</span><span class="tnav-lbl">Agent AI</span></button>
+        <button class="tnav-btn act" id="tnav-shop-3" onclick="showPage('shop')"><span class="tnav-ico">🛒</span><span class="tnav-lbl">Zakupy</span></button>
+      </div>
       <h2>🛒 Zakupy</h2>
       <p>Lista AI + szybkie zamówienie online</p>
     </div>
@@ -616,7 +642,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-30-repair-user-admin-receipts-v1";
+var APP_VERSION="2026-05-30-final-recovery-design-modules-v1";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -755,7 +781,12 @@ function showPage(p){
     var pg=document.getElementById("page-"+x);if(!pg)return;
     var isF=x!=="pantry";
     pg.className=x===p?(isF?"page-flex show":"page show"):(isF?"page-flex":"page");
+    // Bottom nav (auxiliary)
     var nb=document.getElementById("nav-"+x);if(nb)nb.classList[x===p?"add":"remove"]("act");
+    // Top nav segmented control (primary) — present in each page header
+    ["tnav-"+x,"tnav-"+x+"-2","tnav-"+x+"-3"].forEach(function(tid){
+      var tb=document.getElementById(tid);if(tb)tb.classList[x===p?"add":"remove"]("act");
+    });
   });
   if(p==="chat"&&chatHistory.length===0)addWelcome();
 }
@@ -1199,7 +1230,7 @@ function render(){
       html+='</div></div>';
       html+='<div style="display:flex;align-items:center;gap:4px;flex-shrink:0">';
       html+='<button class="qty-btn" style="background:var(--bg3);color:var(--text)" onclick="adj(\''+id+'\',\''+cat.id+'\',\''+ne+'\',-1)">−</button>';
-      html+='<div style="min-width:32px;text-align:center;font-size:13px;font-weight:800;color:var(--text)">'+cur+'<span style="font-size:9px;color:var(--text3);display:block">'+it.unit+'</span></div>';
+      html+='<div style="min-width:44px;text-align:center;font-weight:800;color:var(--text)"><span style="font-size:18px;line-height:1.1">'+cur+'</span><span style="font-size:10px;color:var(--text3);display:block;margin-top:2px">'+it.unit+'</span></div>';
       html+='<button class="qty-btn" style="background:var(--green);color:#000" onclick="adj(\''+id+'\',\''+cat.id+'\',\''+ne+'\',1)">+</button>';
       html+='</div></div></div>';
     });
