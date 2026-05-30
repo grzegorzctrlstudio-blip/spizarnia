@@ -1062,55 +1062,170 @@ function closeProfileModal(){document.getElementById("profile-overlay").classLis
 function logoutUser(){dlgConfirm("X","Wylogowanie","Chcesz sie wylogowac?",function(){localStorage.removeItem("spiz_name");userName="";userProfile=null;state={};expiry={};photos={};chatHistory=[];apiKey="";weekPlan={};document.getElementById("app").style.display="none";document.getElementById("login").style.display="flex";document.getElementById("name-inp").value="";document.getElementById("surname-inp").value="";closeProfileModal();},"Wyloguj","danger");}
 
 // ── ONBOARDING ────────────────────────────────────────────────────────────────
-function calcProfile(){var age=parseInt(document.getElementById("ob-age").value)||30,weight=parseInt(document.getElementById("ob-weight").value)||75,height=parseInt(document.getElementById("ob-height").value)||175,gender=document.getElementById("ob-gender").value||"m",activity=obSels.activity||"mod",goal=obSels.goal||"maintain",stores=obSels.stores||"biedronka";var exclude=(document.getElementById("ob-exclude")||{}).value||"";var bmr=gender==="m"?10*weight+6.25*height-5*age+5:10*weight+6.25*height-5*age-161;var kcal=Math.round(bmr*({sed:1.2,light:1.375,mod:1.55,active:1.725}[activity]||1.55))+({lose:-400,maintain:0,gain:400}[goal]||0);var prot=Math.round(weight*2),fat=Math.round(kcal*.27/9),carb=Math.round((kcal-prot*4-fat*9)/4);return{age:age,weight:weight,height:height,gender:gender,activity:activity,goal:goal,stores:stores,exclude:exclude,kcal:kcal,prot:prot,fat:fat,carb:carb,liked:obSels.liked||[],disliked:obSels.disliked||[]};}
-function showOb(){obStep=0;obSels={};obMethod="manual";renderObStep();document.getElementById("ob-overlay").classList.add("show");}
-function hideOb(){document.getElementById("ob-overlay").classList.remove("show");}
-function renderObStep(){for(var i=0;i<6;i++){var el=document.getElementById("ob-step-"+i);if(el)el.style.display=i===obStep?"block":"none";}var dots="";for(var j=0;j<6;j++)dots+='<div style="width:8px;height:8px;border-radius:50%;background:'+(j===obStep?"var(--green)":"var(--border2)")+'" ></div>';document.getElementById("ob-progress").innerHTML=dots;document.getElementById("ob-back-btn").style.display=obStep>0?"block":"none";document.getElementById("ob-next-btn").textContent=obStep===5?"Zaczynamy!":"Dalej";if(obStep===5){var p=calcProfile();document.getElementById("ob-res-kcal").textContent=p.kcal+" kcal";document.getElementById("ob-res-prot").textContent=p.prot+"g";document.getElementById("ob-res-carb").textContent=p.carb+"g";document.getElementById("ob-res-fat").textContent=p.fat+"g";}}
-function selectObMethod(m,el){obMethod=m;document.getElementById("ob-method-manual").classList[m==="manual"?"add":"remove"]("sel");document.getElementById("ob-method-ai").classList[m==="ai"?"add":"remove"]("sel");document.getElementById("ob-ai-input").style.display=m==="ai"?"block":"none";}
-function selectOb(type,val,el){obSels[type]=val;el.parentElement.querySelectorAll(".ob-opt").forEach(function(o){o.classList.remove("sel");});el.classList.add("sel");}
+function calcProfile(){
+  var age=parseInt((document.getElementById("ob-age")||{}).value)||30;
+  var weight=parseInt((document.getElementById("ob-weight")||{}).value)||75;
+  var height=parseInt((document.getElementById("ob-height")||{}).value)||175;
+  var gender=(document.getElementById("ob-gender")||{value:"m"}).value||"m";
+  var activity=obSels.activity||"mod";
+  var goal=obSels.goal||"maintain";
+  var stores=obSels.stores||"biedronka";
+  var exclude=((document.getElementById("ob-exclude")||{}).value||"").trim();
+  var bmr=gender==="m"?10*weight+6.25*height-5*age+5:10*weight+6.25*height-5*age-161;
+  var multMap={sed:1.2,light:1.375,mod:1.55,active:1.725};
+  var kcal=Math.round(bmr*(multMap[activity]||1.55))+({lose:-400,maintain:0,gain:400}[goal]||0);
+  var prot=Math.round(weight*2);
+  var fat=Math.round(kcal*0.27/9);
+  var carb=Math.round((kcal-prot*4-fat*9)/4);
+  return{
+    age:age,weight:weight,height:height,gender:gender,
+    activity:activity,goal:goal,stores:stores,exclude:exclude,
+    kcal:kcal,prot:prot,fat:fat,carb:carb,
+    liked:obPrefs.liked||[],
+    disliked:obPrefs.disliked||[]
+  };
+}
+
+// ── ONBOARDING — spójna logika oparta na OB_STEPS + obStepIndex ──────────────
+var OB_STEPS=["0","1","2","3","4","4b","5"];
+var obStepIndex=0;
+var obPrefs={liked:[],disliked:[]};
+var obSels={};
+var obMethod="manual";
+
+function showOb(){
+  obStepIndex=0;
+  obSels={};
+  obPrefs={liked:[],disliked:[]};
+  obMethod="manual";
+  renderObStep();
+  document.getElementById("ob-overlay").classList.add("show");
+}
+
+function hideOb(){
+  document.getElementById("ob-overlay").classList.remove("show");
+}
+
+function renderObStep(){
+  // Ukryj wszystkie kroki
+  document.querySelectorAll(".ob-step").forEach(function(el){el.style.display="none";});
+  var step=OB_STEPS[obStepIndex];
+  var el=document.getElementById("ob-step-"+step);
+  if(el)el.style.display="block";
+  // Kropki postępu
+  var dots="";
+  for(var i=0;i<OB_STEPS.length;i++){
+    dots+='<div style="width:8px;height:8px;border-radius:50%;background:'+(i===obStepIndex?"var(--green)":"var(--border2)")+'"></div>';
+  }
+  var prog=document.getElementById("ob-progress");
+  if(prog)prog.innerHTML=dots;
+  // Przyciski
+  var backBtn=document.getElementById("ob-back-btn");
+  var nextBtn=document.getElementById("ob-next-btn");
+  if(backBtn)backBtn.style.display=obStepIndex>0?"block":"none";
+  if(nextBtn)nextBtn.textContent=obStepIndex===OB_STEPS.length-1?"Zaczynamy!":"Dalej";
+  // Krok 5 — oblicz i pokaż makro
+  if(step==="5"){
+    var p=calcProfile();
+    var rk=document.getElementById("ob-res-kcal");var rp=document.getElementById("ob-res-prot");
+    var rc=document.getElementById("ob-res-carb");var rf=document.getElementById("ob-res-fat");
+    if(rk)rk.textContent=p.kcal+" kcal";
+    if(rp)rp.textContent=p.prot+"g";
+    if(rc)rc.textContent=p.carb+"g";
+    if(rf)rf.textContent=p.fat+"g";
+  }
+}
+
+function selectObMethod(m,el){
+  obMethod=m;
+  var mEl=document.getElementById("ob-method-manual");
+  var aEl=document.getElementById("ob-method-ai");
+  if(mEl)mEl.classList[m==="manual"?"add":"remove"]("sel");
+  if(aEl)aEl.classList[m==="ai"?"add":"remove"]("sel");
+  var aiInput=document.getElementById("ob-ai-input");
+  if(aiInput)aiInput.style.display=m==="ai"?"block":"none";
+}
+
+function selectOb(type,val,el){
+  obSels[type]=val;
+  el.parentElement.querySelectorAll(".ob-opt").forEach(function(o){o.classList.remove("sel");});
+  el.classList.add("sel");
+}
+
+function togglePref(el,type){
+  var val=el.dataset.val;
+  var other=type==="liked"?"disliked":"liked";
+  // Usuń z przeciwnej listy jeśli jest
+  var otherIdx=obPrefs[other].indexOf(val);
+  if(otherIdx!==-1)obPrefs[other].splice(otherIdx,1);
+  var otherEl=el.parentElement.parentElement
+    .querySelectorAll("[data-val='"+val+"']");
+  otherEl.forEach(function(o){if(o!==el)o.classList.remove("active");});
+  // Toggle w bieżącej liście
+  var arr=obPrefs[type];
+  var idx=arr.indexOf(val);
+  if(idx===-1){arr.push(val);el.classList.add("active");}
+  else{arr.splice(idx,1);el.classList.remove("active");}
+}
+
 function obNext(){
-  if(obStep===0){
+  var step=OB_STEPS[obStepIndex];
+  if(step==="0"){
     if(!obMethod)return;
     if(obMethod==="ai"){
-      var txt2=document.getElementById("ob-diet-text").value.trim();if(!txt2)return;
-      document.getElementById("ob-next-btn").disabled=true;
-      var st=document.getElementById("ob-ai-status");st.textContent="Analizuje...";st.style.color="var(--amber)";
+      var txt2=(document.getElementById("ob-diet-text")||{value:""}).value.trim();
+      if(!txt2)return;
+      var nextBtn=document.getElementById("ob-next-btn");
+      if(nextBtn)nextBtn.disabled=true;
+      var st=document.getElementById("ob-ai-status");
+      if(st){st.textContent="Analizuje...";st.style.color="var(--amber)";}
       callAPI([{role:"user",content:'Przeanalizuj plan diety. TYLKO JSON: {"kcal":3060,"prot":244,"carb":281,"fat":107,"sklep":"biedronka","wykluczenia":"","cel":"gain"}. Plan: '+txt2}],
         "Jestes dietetykiem. TYLKO JSON.",
-        function(res){try{var p=JSON.parse(res.replace(/```json|```/g,"").trim());saveUserProfile({kcal:p.kcal||2000,prot:p.prot||150,carb:p.carb||200,fat:p.fat||70,stores:p.sklep||"biedronka",exclude:p.wykluczenia||"",goal:p.cel||"maintain",activity:"mod",age:30,weight:75,height:175,gender:"m"});hideOb();updateAISys();}catch(e){st.textContent="Blad";document.getElementById("ob-next-btn").disabled=false;}},
-        function(){st.textContent="Blad API";document.getElementById("ob-next-btn").disabled=false;});
+        function(res){
+          try{
+            var p=JSON.parse(res.replace(/```json|```/g,"").trim());
+            saveUserProfile({kcal:p.kcal||2000,prot:p.prot||150,carb:p.carb||200,fat:p.fat||70,
+              stores:p.sklep||"biedronka",exclude:p.wykluczenia||"",goal:p.cel||"maintain",
+              activity:"mod",age:30,weight:75,height:175,gender:"m",liked:[],disliked:[]});
+            hideOb();updateAISys();
+          }catch(e){
+            if(st)st.textContent="Blad analizy";
+            if(nextBtn)nextBtn.disabled=false;
+          }
+        },
+        function(){
+          if(st)st.textContent="Blad API";
+          if(nextBtn)nextBtn.disabled=false;
+        }
+      );
       return;
     }
-    obStep++;renderObStep();return;
+    obStepIndex++;renderObStep();return;
   }
-  if(obStep===1&&(!document.getElementById("ob-age").value||!document.getElementById("ob-weight").value)){dlgAlert("?","Uzupelnij dane","Wpisz wiek i wage");return;}
-  if(obStep===2&&!obSels.activity){dlgAlert("?","Wybierz aktywnosc","");return;}
-  if(obStep===3&&!obSels.goal){dlgAlert("?","Wybierz cel","");return;}
-  if(obStep===4&&!obSels.stores){dlgAlert("?","Wybierz sklep","");return;}
-  if(obStep===4){
-    // Go to 4b (preferences)
-    obStep=40;// use 40 as "4b"
-    var el=document.getElementById("ob-step-4b");
-    if(el){
-      for(var i=0;i<6;i++){var s2=document.getElementById("ob-step-"+i);if(s2)s2.style.display="none";}
-      document.getElementById("ob-step-5")&&(document.getElementById("ob-step-5").style.display="none");
-      el.style.display="block";
+  if(step==="1"){
+    if(!(document.getElementById("ob-age")||{}).value||!(document.getElementById("ob-weight")||{}).value){
+      dlgAlert("?","Uzupelnij dane","Wpisz wiek i wage.");return;
     }
-    var dots="";for(var j=0;j<6;j++)dots+='<div style="width:8px;height:8px;border-radius:50%;background:'+(j===4?"var(--green)":"var(--border2)")+'"></div>';
-    document.getElementById("ob-progress").innerHTML=dots;
-    document.getElementById("ob-back-btn").style.display="block";
-    document.getElementById("ob-next-btn").textContent="Dalej";
+  }
+  if(step==="2"&&!obSels.activity){dlgAlert("?","Wybierz aktywnosc","");return;}
+  if(step==="3"&&!obSels.goal){dlgAlert("?","Wybierz cel","");return;}
+  if(step==="4"&&!obSels.stores){dlgAlert("?","Wybierz sklep","");return;}
+  // Krok 4b — preferencje są opcjonalne, zawsze przechodzimy dalej
+  if(step==="5"){
+    var profile=calcProfile();
+    saveUserProfile(profile);
+    updateAISys();
+    hideOb();
+    if(typeof startDietGeneration==="function")startDietGeneration();
     return;
   }
-  if(obStep===40){
-    // Preferences done, go to step 5
-    obHandlePrefsStep();
-    obStep=5;renderObStep();return;
-  }
-  if(obStep===5){var fp=calcProfile();saveUserProfile(fp);updateAISys();hideOb();startDietGeneration();return;}
-  obStep++;renderObStep();
+  obStepIndex++;renderObStep();
 }
-function obBack(){if(obStep>0){obStep--;renderObStep();}}
+
+function obBack(){
+  if(obStepIndex>0){obStepIndex--;renderObStep();}
+}
+
 
 // ── DIET ──────────────────────────────────────────────────────────────────────
 function openDiet(){document.getElementById("diet-user-name").textContent=userName;document.getElementById("diet-overlay").classList.add("show");switchDietTab(0);}
@@ -1403,23 +1518,10 @@ if(sn){var snp=sn.trim().split(" ");document.getElementById("name-inp").value=sn
 
 // ── PREFERENCES ───────────────────────────────────────────────────────────────
 var obPrefs={liked:[],disliked:[]};
-function togglePref(el,type){
-  var val=el.dataset.val;
-  var arr=obPrefs[type];
-  var idx=arr.indexOf(val);
-  if(idx===-1){arr.push(val);el.classList.add("active");}
-  else{arr.splice(idx,1);el.classList.remove("active");}
-}
+
 
 // ── OVERRIDE obNext to handle 6 steps (added 4b) ─────────────────────────────
 var OB_STEP_ORDER=["0","1","2","3","4","4b","5"];
-function obNextStep(){
-  var cur=obStep,next=cur+1;
-  // Step 4 -> 4b: skip to prefs
-  if(cur===4)return "4b";
-  if(cur==="4b"||cur===40)return 5;
-  return next;
-}
 
 // ── HISTORIA ZAKUPOW ──────────────────────────────────────────────────────────
 var purchaseHistory=[];
