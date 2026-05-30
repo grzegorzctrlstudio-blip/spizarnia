@@ -111,9 +111,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 
 /* ── PRODUCT ITEMS ── */
 .body{padding:0 16px}
-.cat-section{margin-bottom:8px}
+.cat-section{margin-bottom:14px}
 .cat-section-hdr{font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);padding:16px 0 8px;display:flex;align-items:center;gap:8px;border-top:1px solid var(--border)}
 .cat-section:first-child .cat-section-hdr{border-top:none;padding-top:8px}
+
+/* Kolorowy banner nagłówka kategorii w lodówce */
+.cat-banner{display:flex;align-items:center;gap:12px;border-radius:14px;padding:12px 16px;margin:18px 0 10px;border-left:5px solid;position:relative;overflow:hidden}
+.cat-banner::after{content:"";position:absolute;inset:0;opacity:.12;pointer-events:none}
+.cat-banner-ico{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#fff;flex-shrink:0;z-index:1}
+.cat-banner-info{flex:1;min-width:0;z-index:1}
+.cat-banner-name{font-size:16px;font-weight:900;color:#fff;letter-spacing:-.2px}
+.cat-banner-sub{font-size:11px;color:rgba(255,255,255,.7);margin-top:1px;font-weight:600}
+.cat-banner-badge{background:rgba(255,255,255,.15);border-radius:50px;padding:5px 12px;font-size:11px;font-weight:800;color:#fff;z-index:1;flex-shrink:0}
 
 .item{background:var(--bg2);border-radius:var(--radius);margin-bottom:8px;padding:14px;border:1px solid var(--border);transition:border .2s}
 .item.red{border-color:#FF4D4D22;background:rgba(255,77,77,.05)}
@@ -1026,7 +1035,31 @@ function isExpiredProduct(it){var d=getExplicitExpiryDaysLeft(it);return d!==nul
 function isExpiringSoonProduct(it){var d=getExplicitExpiryDaysLeft(it);return d!==null&&d>=0&&d<=3;}
 function isExpired(it){return isExpiredProduct(it);}
 function isExpiringSoon(it){return isExpiringSoonProduct(it);}
-function fHtml(it){var d=getExplicitExpiryDaysLeft(it);if(d===null)return"";if(d<0)return'<div class="fresh-bad">Przeterminowane</div>';if(d===0)return'<div class="fresh-warn">Ważne do dzisiaj</div>';if(d===1)return'<div class="fresh-warn">Wygasa jutro</div>';if(d<=3)return'<div class="fresh-warn">Wygasa za '+d+' dni</div>';return'<div class="fresh-ok">Świeże — '+d+' dni</div>';}
+function fHtml(it){
+  // Najpierw sprawdź explicit datę (ustawioną przez użytkownika lub AI)
+  var d=getExplicitExpiryDaysLeft(it);
+  var isExplicit=d!==null;
+  // Fallback: orientacyjnie z CATS.days od daty aktualizacji lodówki
+  if(!isExplicit){
+    if(it.days&&shopTs){
+      d=Math.floor(it.days-(Date.now()-shopTs)/86400000);
+    }else if(it.days){
+      d=it.days;
+    }else{
+      return "";
+    }
+  }
+  if(d===null)return "";
+  var suffix=isExplicit?"":" <span style=\"opacity:.6;font-size:9px\">orient.</span>";
+  if(d<0)return isExplicit
+    ? '<div class="fresh-bad">Przeterminowane</div>'
+    : '<div class="fresh-warn">Czas mija — sprawdź'+suffix+'</div>';
+  if(d===0)return '<div class="fresh-warn">Ważne do dzisiaj'+suffix+'</div>';
+  if(d===1)return '<div class="fresh-warn">Wygasa jutro'+suffix+'</div>';
+  if(d<=3)return '<div class="fresh-warn">Wygasa za '+d+' dni'+suffix+'</div>';
+  if(d<=14)return '<div class="fresh-ok">Świeże — '+d+' dni'+suffix+'</div>';
+  return '<div class="fresh-ok">Świeże — ponad '+Math.min(30,d)+' dni'+suffix+'</div>';
+}
 function expiringSoon(it){var d=getDaysLeft(it);return d!==null&&d<=3;}
 
 // ── EXPIRY MODAL ──────────────────────────────────────────────────────────────
@@ -1634,7 +1667,22 @@ function render(){
     vis=sortByNamePL(vis,function(it){return it.n;});
     if(!vis.length)return;
     any=true;
-    html+='<div class="cat-section"><div class="cat-hdr" style="color:'+catColor+'">'+cat.label+'</div>';
+    // Policz statystyki dla bannera kategorii
+    var totalInCat=cat.items.length;
+    var inFridge=0,missingInCat=0;
+    cat.items.forEach(function(x){
+      var s=state[fbk(cat.id,x.n)]||0;
+      if(s>=x.target)inFridge++;
+      else missingInCat++;
+    });
+    var catIcon=cat.ic||cat.label.charAt(0);
+    var catSubtitle=inFridge+" / "+totalInCat+" mam &bull; "+missingInCat+" do kupienia";
+    html+='<div class="cat-section">';
+    html+='<div class="cat-banner" style="background:linear-gradient(135deg,'+catColor+' 0%,'+catColor+'CC 100%);border-left-color:'+catColor+'">';
+    html+='<div class="cat-banner-ico" style="background:rgba(255,255,255,.18)">'+catIcon+'</div>';
+    html+='<div class="cat-banner-info"><div class="cat-banner-name">'+cat.label+'</div><div class="cat-banner-sub">'+catSubtitle+'</div></div>';
+    html+='<div class="cat-banner-badge">'+vis.length+'</div>';
+    html+='</div>';
     vis.forEach(function(it){
       var id=fbk(cat.id,it.n),ne=it.n.replace(/'/g,"\\'");
       var cur=state[id]||0,cc=cls(cur,it.target),pct=Math.min(100,Math.round(cur/Math.max(1,it.target)*100)),brak=Math.max(0,it.target-cur);
@@ -1661,14 +1709,11 @@ function render(){
       html+='<div style="flex:1;height:5px;background:var(--bg4);border-radius:4px"><div style="height:100%;width:'+pct+'%;background:'+borderColor+';border-radius:4px"></div></div>';
       html+=ql;
       html+='</div>';
-      // Chipsy: zdjęcia + data (zawsze) + skanuj produkt (tylko gdy cat.scan)
+      // Chipsy: data ważności (zawsze) + skanuj produkt (tylko gdy cat.scan)
+      // Zdjęcia → kliknięcie ikonki aparatu po lewej stronie karty
       html+='<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">';
-      // Zdjęcia (zawsze, 3 sloty)
-      html+='<button onclick="openPhoto(\''+ne+'\')" style="background:var(--bg4);border:1px solid var(--border);color:var(--text3);border-radius:50px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px">📷 Zdjęcia</button>';
-      // Data ważności (zawsze, ale w warzywach z innym podpisem)
       var dateLabel=cat.scan?(hasDate?"Data":"Dodaj datę"):(hasDate?"Data":"Świeżość");
       html+='<button onclick="openExpiry(\''+ne+'\')" style="background:'+(hasDate?"rgba(245,158,11,.15)":"var(--bg4)")+';border:1px solid '+(hasDate?"var(--amber)":"var(--border)")+';color:'+(hasDate?"var(--amber)":"var(--text3)")+';border-radius:50px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px">📅 '+dateLabel+'</button>';
-      // Skaner AI (tylko dla cat.scan = produkty z opakowaniem)
       if(cat.scan){
         html+='<button onclick="openScannerAndPhoto(\''+ne+'\')" style="background:rgba(61,139,255,.12);border:1px solid rgba(61,139,255,.35);color:#60A5FA;border-radius:50px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px">🔍 Skanuj AI</button>';
       }
