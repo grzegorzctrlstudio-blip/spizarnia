@@ -137,7 +137,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .prio{font-size:10px;font-weight:800;border-radius:50px;padding:3px 10px}
 .prio-high{background:#FF4D4D22;color:var(--red)}.prio-med{background:#F59E0B22;color:var(--amber)}.prio-low{background:#3D8BFF22;color:var(--blue)}
 .ai-note{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:13px;margin-bottom:12px;font-size:13px;color:var(--text2);line-height:1.7}
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
 .overlay.show{display:flex}
 .overlay.bottom{align-items:flex-end}
 .modal{background:var(--bg2);border-radius:20px;padding:22px;width:100%;max-width:420px;border:1px solid var(--border2)}
@@ -215,18 +215,42 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
           <div class="icon-btn" onclick="resetAll()">&#128465;</div>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:7px;margin-bottom:12px">
-        <div class="stat-card red" onclick="setFilter('red')"><div style="font-size:16px">&#128722;</div><div class="stat-n" id="n-red">0</div><div class="stat-label">Brakuje</div></div>
-        <div class="stat-card green" onclick="setFilter('grn')"><div style="font-size:16px">&#9989;</div><div class="stat-n" id="n-grn">0</div><div class="stat-label">W lodowce</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <div class="stat-card red" onclick="setFilter('red')" style="padding:14px 12px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div><div class="stat-n" id="n-red" style="font-size:30px">0</div><div class="stat-label">Brakuje</div></div>
+            <div style="font-size:26px;opacity:.4">&#128722;</div>
+          </div>
+        </div>
+        <div class="stat-card green" onclick="setFilter('grn')" style="padding:14px 12px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div><div class="stat-n" id="n-grn" style="font-size:30px">0</div><div class="stat-label">W lodowce</div></div>
+            <div style="font-size:26px;opacity:.4">&#9989;</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <div class="stat-card" onclick="setFilter('all')" style="padding:10px 12px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div><div class="stat-n" id="n-all" style="font-size:22px">0</div><div class="stat-label">Pozycji</div></div>
+            <div style="font-size:20px;opacity:.4">&#128230;</div>
+          </div>
+        </div>
+        <div class="stat-card" onclick="setFilter('exp')" style="padding:10px 12px;border-color:var(--amber)">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div><div class="stat-n" id="n-exp" style="font-size:22px;color:var(--amber)">0</div><div class="stat-label" style="color:var(--amber)">Przeterminowane</div></div>
+            <div style="font-size:20px;opacity:.5">&#9888;&#65039;</div>
+          </div>
+        </div>
+      </div>
+      <div id="shop-lbl" style="display:none"></div><div id="shop-ago" style="display:none"></div><div id="pantry-status-bar" style="background:var(--bg3);border-radius:12px;padding:10px 14px;margin-bottom:10px;border:1px solid var(--border)">
+        <div style="font-size:12px;color:var(--text3)">Ladowanie stanu lodowki...</div>
+      </div><div class="stat-n" id="n-grn">0</div><div class="stat-label">W lodowce</div></div>
         <div class="stat-card neutral"><div style="font-size:16px">&#128230;</div><div class="stat-n" id="n-all">0</div><div class="stat-label">Pozycji</div></div>
         <button class="action-card primary" onclick="markShopping()"><span style="font-size:18px">&#128717;&#65039;</span><span style="font-size:8px;font-weight:800;text-transform:uppercase">Bylem w<br>sklepie</span></button>
         <button class="action-card expiry" onclick="setFilter('exp')"><span style="font-size:18px">&#9200;</span><span style="font-size:8px;font-weight:800;text-transform:uppercase;color:var(--amber)" id="exp-alert-txt">Data<br>waznosci</span></button>
       </div>
-      <div class="date-mini">
-        <span style="font-size:16px">&#128197;</span>
-        <div style="flex:1"><strong style="font-size:12px;font-weight:700;display:block" id="shop-lbl">Nie ustawiono daty</strong><span style="font-size:11px;color:var(--text3)" id="shop-ago"></span></div>
-        <button onclick="openShopDateModal()" style="background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;color:var(--text2);cursor:pointer">Edytuj</button>
-      </div>
+      
       <div class="search-wrap">
         <span class="search-ico">&#128269;</span>
         <input class="search-inp" id="sinp" placeholder="Szukaj w lodowce..." oninput="onSearch(this.value)">
@@ -310,8 +334,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <p style="font-size:12px;color:var(--text3);margin-bottom:12px">Zrob zdjecie daty na opakowaniu — AI rozpozna date</p>
     <img class="scan-preview" id="scan-img" alt="">
     <div class="scan-loading" id="scan-loading"><div class="scan-spin"></div>Claude analizuje...</div>
-    <div class="scan-result" id="scan-result"><b id="scan-product"></b><br><span id="scan-date-txt" style="color:var(--green);font-weight:700"></span><div id="scan-note" style="font-size:11px;color:var(--text3);margin-top:4px"></div></div>
-    <div class="modal-btns" style="margin-bottom:8px"><button class="mbtn blue" onclick="triggerScanPhoto()">Nowe zdjecie</button><button class="mbtn ok" id="scan-apply" style="display:none" onclick="applyScan()">Zastosuj date</button></div>
+    <div class="scan-result" id="scan-result">
+      <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:8px" id="scan-product"></div>
+      <div style="margin-bottom:10px">
+        <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:5px">Data ważności (możesz poprawić):</div>
+        <input type="date" id="scan-date-edit" class="modal-inp" style="margin-bottom:4px;color-scheme:dark">
+        <div id="scan-date-warning" style="font-size:11px;color:var(--amber);display:none">⚠️ Data jest w przeszłości</div>
+      </div>
+      <div id="scan-note" style="font-size:11px;color:var(--text3)"></div>
+    </div>
+    <div class="modal-btns" style="margin-bottom:8px"><button class="mbtn blue" onclick="triggerScanPhoto()">Nowe zdjecie</button><button class="mbtn ok" id="scan-apply" style="display:none" onclick="applyScanEdited()">Zastosuj date</button></div>
     <button class="mbtn cancel" style="width:100%" onclick="closeScanner()">Zamknij</button>
     <input type="file" id="scan-file" accept="image/*" style="display:none" onchange="handleScanPhoto(this)">
   </div>
@@ -387,7 +419,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </div>
 <!-- SETTINGS -->
 <div class="overlay" id="admin-pass-overlay"><div class="modal" style="text-align:center"><div style="font-size:38px;margin-bottom:10px">&#128272;</div><h3>Panel admina</h3><p style="color:var(--text3);margin-bottom:14px">Wpisz haslo zeby zarzadzac kluczem API</p><input class="modal-inp" id="admin-pass-inp" type="password" placeholder="Haslo administratora" onkeydown="if(event.key==='Enter')checkAdminPass()"><div class="modal-btns"><button class="mbtn cancel" onclick="closeAdminPass()">Anuluj</button><button class="mbtn ok" onclick="checkAdminPass()">Wejdz</button></div></div></div>
-<div class="overlay" id="settings-overlay" onclick="if(event.target===this)closeSettings()"><div class="modal"><h3>Panel administratora</h3><div style="background:#3D8BFF15;border:1px solid #3D8BFF44;border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#93C5FD" id="admin-api-status">Sprawdzam klucz...</div><input class="modal-inp" id="api-key-inp" type="password" placeholder="sk-ant-api03-..." style="font-size:12px;font-family:monospace"><div class="modal-btns" style="margin-bottom:8px"><button class="mbtn ok" onclick="saveApiKey()">Zapisz dla wszystkich</button></div><div class="modal-btns"><button class="mbtn del" onclick="clearApiKey()">Usun klucz</button><button class="mbtn cancel" onclick="closeSettings()">Zamknij</button></div></div></div>
+<div class="overlay" id="settings-overlay" onclick="if(event.target===this)closeSettings()"><div class="modal"><h3>Panel administratora</h3>
+    <button onclick="closeSettings();openCMS()" style="width:100%;background:linear-gradient(135deg,#8B5CF6,#4F46E5);color:#fff;border:none;border-radius:10px;padding:10px;font-size:12px;font-weight:800;cursor:pointer;margin-bottom:12px">&#128102; Otwórz CMS — zarządzanie użytkownikami</button><div style="background:#3D8BFF15;border:1px solid #3D8BFF44;border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#93C5FD" id="admin-api-status">Sprawdzam klucz...</div><input class="modal-inp" id="api-key-inp" type="password" placeholder="sk-ant-api03-..." style="font-size:12px;font-family:monospace"><div class="modal-btns" style="margin-bottom:8px"><button class="mbtn ok" onclick="saveApiKey()">Zapisz dla wszystkich</button></div><div class="modal-btns"><button class="mbtn del" onclick="clearApiKey()">Usun klucz</button><button class="mbtn cancel" onclick="closeSettings()">Zamknij</button></div></div></div>
 <!-- LOG MODAL -->
 <div class="overlay bottom" id="log-overlay" onclick="if(event.target===this)closeLog()"><div class="log-modal"><div class="log-hdr"><h3 style="font-size:16px;font-weight:800">Historia zmian</h3><button onclick="closeLog()" style="background:var(--bg3);border:none;color:var(--text2);border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer">Zamknij</button></div><div class="log-body" id="log-body"></div></div></div>
 <!-- DIALOG -->
@@ -407,7 +440,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 </div>
 <!-- DIET OVERLAY -->
-<div class="overlay" id="diet-overlay" style="align-items:stretch;justify-content:flex-start;padding:0;flex-direction:column;overflow:hidden">
+<div class="overlay" id="diet-overlay" style="align-items:stretch;justify-content:flex-start;padding:0;flex-direction:column;overflow:hidden;backdrop-filter:none;background:#0A0A0F">
   <div style="background:var(--bg2);padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0">
     <button onclick="closeDiet()" style="background:var(--bg3);border:none;color:var(--text2);border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer">&#8592;</button>
     <div style="font-size:18px;font-weight:900;color:var(--text);flex:1">Moja Dieta</div>
@@ -420,7 +453,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <button id="dtab-3" onclick="switchDietTab(3)" style="flex:1;padding:12px;border:none;background:none;color:var(--text3);font-size:12px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent">Historia</button>
     <button id="dtab-4" onclick="switchDietTab(4)" style="flex:1;padding:12px;border:none;background:none;color:var(--text3);font-size:11px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent">Ceny</button>
   </div>
-  <div id="diet-body" style="flex:1;overflow-y:auto;padding:16px"></div>
+  <div id="diet-body" style="flex:1;overflow-y:auto;padding:16px;padding-bottom:80px"></div>
 </div>
 <!-- ONBOARDING -->
 <div class="overlay" id="ob-overlay" style="align-items:flex-start;overflow-y:auto;padding:20px">
@@ -690,7 +723,7 @@ function callAPI(messages,system,onOk,onErr,maxTok){
 // ── SHOP DATE ─────────────────────────────────────────────────────────────────
 function openShopDateModal(){document.getElementById("shop-date-overlay").classList.add("show");}
 function closeShopDateModal(){document.getElementById("shop-date-overlay").classList.remove("show");}
-function markShopping(){dlgConfirm("?","Bylem w sklepie","Zaznaczyc dzisiejsza date?",function(){shopTs=Date.now();fbPatch(RP,{__shopTs:shopTs});updateShopBar();render();},"Tak");}
+function markShopping(){dlgConfirm("?","Aktualizacja stanu lodówki","Ustawić dzisiejszą datę zakupów?",function(){shopTs=Date.now();fbPatch(RP,{__shopTs:shopTs});updateShopBar();render();},"Tak");}
 function markShoppingNow(){shopTs=Date.now();fbPatch(RP,{__shopTs:shopTs});updateShopBar();render();closeShopDateModal();}
 function saveShopDate(){var v=document.getElementById("shop-date-inp").value;if(!v)return;shopTs=new Date(v).getTime();fbPatch(RP,{__shopTs:shopTs});updateShopBar();render();closeShopDateModal();}
 function updateShopBar(){
@@ -733,23 +766,55 @@ function handleScanPhoto(input){
     var b64=e.target.result.split(",")[1],mime=input.files[0].type||"image/jpeg";
     callAPI([{role:"user",content:[{type:"image",source:{type:"base64",media_type:mime,data:b64}},{type:"text",text:"Przeanalizuj zdjecie produktu. ZNAJDZ DATE PRZYDATNOSCI: Format polskich produktow DD.MM.YYYY lub DD.MM.RR. PRZYKLAD: 14.06.28 = dzien 14, miesiac 06, rok 2028 (NIE 2014!). Rok dwucyfrowy 25-35 = 2025-2035. TYLKO JSON: {\"produkt\":\"pelna nazwa\",\"data\":\"DD.MM.YYYY lub null\",\"uwaga\":\"\"}"}]}],null,function(txt){
       document.getElementById("scan-loading").style.display="none";
-      try{var p=JSON.parse(txt.replace(/```json|```/g,"").trim());scanData=p;document.getElementById("scan-product").textContent=p.produkt||"Nieznany";document.getElementById("scan-date-txt").textContent=p.data&&p.data!=="null"?"Data: "+p.data:"Brak daty";document.getElementById("scan-note").textContent=p.uwaga||"";document.getElementById("scan-result").style.display="block";if(p.data&&p.data!=="null")document.getElementById("scan-apply").style.display="block";}
+      try{var p=JSON.parse(txt.replace(/```json|```/g,"").trim());scanData=p;document.getElementById("scan-product").textContent=p.produkt||"Nieznany";
+          // Ustaw edytowalne pole daty
+          var dateVal="";
+          if(p.data&&p.data!=="null"){
+            var parts=p.data.split(".");
+            if(parts.length===3){
+              var yr=parts[2].length===2?"20"+parts[2]:parts[2];
+              dateVal=yr+"-"+parts[1]+"-"+parts[0];
+            }
+          }
+          document.getElementById("scan-date-edit").value=dateVal;
+          var warn=document.getElementById("scan-date-warning");
+          if(warn){warn.style.display=dateVal&&new Date(dateVal)<new Date()?"block":"none";}
+          document.getElementById("scan-note").textContent=p.uwaga||"";
+          document.getElementById("scan-result").style.display="block";
+          if(dateVal)document.getElementById("scan-apply").style.display="block";}
       catch(e){document.getElementById("scan-product").textContent="Blad: "+txt.slice(0,80);document.getElementById("scan-result").style.display="block";}
     },function(err){document.getElementById("scan-loading").style.display="none";document.getElementById("scan-product").textContent="Blad: "+err;document.getElementById("scan-result").style.display="block";});
   };
   reader.readAsDataURL(input.files[0]);
 }
-function applyScan(){
-  if(!scanData||!scanData.data||scanData.data==="null")return;
-  var parts=scanData.data.split(".");if(parts.length!==3)return;
-  var yr=parts[2].length===2?"20"+parts[2]:parts[2];
-  var iso=yr+"-"+parts[1]+"-"+parts[0];
-  closeScanner();
-  if(scanFromExpiry&&expiryItem){document.getElementById("exp-overlay").classList.add("show");setTimeout(function(){document.getElementById("exp-date-inp").value=iso;},50);scanFromExpiry=false;}
-  else{var name=scanData.produkt||"",found=null;CATS.forEach(function(cat){cat.items.forEach(function(it){if(!found&&it.n.toLowerCase().indexOf(name.toLowerCase().slice(0,5))!==-1)found=it.n;});});if(found){openExpiry(found);setTimeout(function(){document.getElementById("exp-date-inp").value=iso;},50);}else dlgAlert("?","Wybierz produkt recznie","Wykryto: "+name+" | Data: "+scanData.data);}
+function applyScanEdited(){
+  var dateInput=document.getElementById("scan-date-edit");
+  if(!dateInput||!dateInput.value){dlgAlert("?","Brak daty","Wpisz datę ważności");return;}
+  var iso=dateInput.value; // format YYYY-MM-DD
+  var d=new Date(iso);
+  if(isNaN(d.getTime())){dlgAlert("?","Błędna data","Niepoprawny format daty");return;}
+  if(d<new Date()){
+    dlgConfirm("⚠️","Data w przeszłości","Data jest przeszła. Zapisać mimo to?",function(){saveScanDate(iso);},"Zapisz","danger");
+    return;
+  }
+  saveScanDate(iso);
 }
+function saveScanDate(iso){
+  closeScanner();
+  if(scanFromExpiry&&expiryItem){
+    var ek=fbk("e",expiryItem),ep={};
+    expiry[ek]=new Date(iso).getTime();ep[ek]=expiry[ek];
+    fbPatch(EP,ep);render();
+    dlgAlert("✅","Zapisano","Data ważności zapisana dla: "+expiryItem);
+    scanFromExpiry=false;
+  }else{
+    // Otwórz modal wyboru produktu
+    document.getElementById("exp-overlay").classList.add("show");
+    setTimeout(function(){document.getElementById("exp-date-inp").value=iso;},50);
+  }
+}
+function applyScan(){applyScanEdited();}
 
-// ── RECEIPT ───────────────────────────────────────────────────────────────────
 function openReceipt(){if(!apiKey){dlgAlert("X","Niedostepne","Skonfiguruj klucz API");return;}document.getElementById("receipt-img").style.display="none";document.getElementById("receipt-loading").style.display="none";document.getElementById("receipt-scan-result").style.display="none";receiptData=null;document.getElementById("receipt-overlay").classList.add("show");}
 function closeReceiptModal(){document.getElementById("receipt-overlay").classList.remove("show");}
 function triggerReceiptPhoto(){document.getElementById("receipt-file").click();}
@@ -858,33 +923,48 @@ function showReceiptResults(){
     html+='<div style="background:var(--bg4);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:var(--text3)">';
     if(receiptMeta.sklep)html+='<b style="color:var(--text)">'+receiptMeta.sklep+'</b> ';
     if(receiptMeta.data)html+=receiptMeta.data+' ';
-    if(receiptMeta.suma)html+='Suma: <b style="color:var(--amber)">'+receiptMeta.suma+' zl</b>';
+    if(receiptMeta.suma)html+='Suma: <b style="color:var(--amber)">'+receiptMeta.suma.toFixed(2)+' zł</b>';
     html+='</div>';
   }
-  // Dopasowane — z checkboxami
+  // Dopasowane do lodówki z checkboxami
   if(receiptData&&receiptData.length){
-    html+='<div style="font-size:11px;font-weight:800;color:var(--green);margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">Dopasowane do lodowki ('+receiptData.length+') — zaznacz co dodac:</div>';
+    html+='<div style="font-size:11px;font-weight:800;color:var(--green);margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">Dopasowane do lodówki ('+receiptData.length+') — zaznacz co dodać:</div>';
     receiptData.forEach(function(p,i){
+      var np=normalizeReceiptProduct(p);
+      var name=getReceiptProductName(np);
+      var qty=getReceiptProductQty(np);
       html+='<div style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--bg3);border-radius:10px;margin-bottom:6px;border:1px solid var(--border)">';
       html+='<input type="checkbox" id="rp-cb-'+i+'" checked style="width:18px;height:18px;accent-color:var(--green);cursor:pointer;flex-shrink:0">';
-      html+='<label for="rp-cb-'+i+'" style="flex:1;cursor:pointer"><div style="font-size:13px;font-weight:700;color:var(--text)">'+p.n+'</div></label>';
-      html+='<div style="font-size:12px;font-weight:800;color:var(--amber)">x'+(p.ilosc||1)+'</div>';
+      html+='<label for="rp-cb-'+i+'" style="flex:1;cursor:pointer"><div style="font-size:13px;font-weight:700;color:var(--text)">'+name+'</div></label>';
+      html+='<div style="font-size:12px;font-weight:800;color:var(--amber)">x'+qty+'</div>';
       html+='</div>';
     });
   }
-  // Pozostale
+  // Pozostałe z paragonu
   if(receiptAllProducts&&receiptAllProducts.length){
-    var notMatched=receiptAllProducts.filter(function(p){return!receiptData.some(function(r){return r.n===p.nazwa;});});
+    var notMatched=receiptAllProducts.filter(function(p){
+      var np=normalizeReceiptProduct(p);
+      var pname=getReceiptProductName(np);
+      return!receiptData.some(function(r){var rn=normalizeReceiptProduct(r);return getReceiptProductName(rn)===pname;});
+    });
     if(notMatched.length){
-      html+='<div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:6px;margin-top:14px;text-transform:uppercase;letter-spacing:.8px">Pozostale z paragonu — zapisane w historii ('+notMatched.length+')</div>';
-      notMatched.slice(0,12).forEach(function(p){
+      html+='<div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:6px;margin-top:14px;text-transform:uppercase;letter-spacing:.8px">Pozostałe z paragonu ('+notMatched.length+') — zapisane w historii</div>';
+      notMatched.slice(0,15).forEach(function(p){
+        var np=normalizeReceiptProduct(p);
+        var name=getReceiptProductName(np);
+        var qty=getReceiptProductQty(np);
+        var unit=getReceiptProductUnit(np);
+        var price=getReceiptProductPrice(np);
         html+='<div style="display:flex;justify-content:space-between;padding:6px 10px;font-size:12px;color:var(--text3);border-bottom:1px solid var(--border)">';
-        html+='<span>'+p.nazwa+'</span>';
-        html+='<span>'+(p.cena?p.cena+' zl ':'')+' x'+(p.ilosc||1)+' '+p.jednostka+'</span>';
+        html+='<span>'+name+'</span>';
+        html+='<span>'+qty+' '+unit+(price?' · <b style="color:var(--amber)">'+price.toFixed(2)+' zł</b>':'')+'</span>';
         html+='</div>';
       });
-      if(notMatched.length>12)html+='<div style="font-size:11px;color:var(--text3);text-align:center;padding:6px">... i '+(notMatched.length-12)+' wiecej</div>';
+      if(notMatched.length>15)html+='<div style="font-size:11px;color:var(--text3);text-align:center;padding:6px">... i '+(notMatched.length-15)+' więcej</div>';
     }
+  }
+  if(!receiptData||!receiptData.length){
+    html+='<div style="text-align:center;padding:20px;color:var(--text3)">Brak dopasowanych produktów do lodówki.<br><span style="font-size:11px">Powyższe produkty zapisano w historii zakupów.</span></div>';
   }
   document.getElementById("receipt-items").innerHTML=html;
 }
@@ -924,6 +1004,8 @@ function applyReceiptSelected(){
       updateShopBar();render();
     }
     document.getElementById("receipt-results").style.display="none";
+    // Zapisz datę aktualizacji stanu lodówki
+    savePantryUpdateDate("receipt", receiptMeta&&receiptMeta.sklep||"", "");
     var extra=receiptAllProducts.length>receiptData.length?
       " Pozostałe "+(receiptAllProducts.length-receiptData.length)+" prod. w historii.":"";
     dlgAlert("OK","Lodówka zaktualizowana","Dodano: "+updated.join(", ")+"."+extra);
@@ -962,7 +1044,7 @@ function renderLog(){var b=document.getElementById("log-body");b.innerHTML='<div
 // ── CAT CHIPS ─────────────────────────────────────────────────────────────────
 function buildCatChips(){var wrap=document.getElementById("cat-chips");if(!wrap)return;wrap.innerHTML='<button class="cat-chip act" id="chip-all" onclick="setCatFilter(\'all\')">Wszystko</button>';CATS.forEach(function(cat){var btn=document.createElement("button");btn.className="cat-chip";btn.id="chip-"+cat.id;btn.innerHTML=cat.label;if(cat.color)btn.style.borderColor=cat.color;btn.onclick=(function(id){return function(){setCatFilter(id);};})(cat.id);wrap.appendChild(btn);});}
 function setCatFilter(id){catFilter=id;document.querySelectorAll(".cat-chip").forEach(function(el){el.classList.remove("act");});var el=document.getElementById("chip-"+(id==="all"?"all":id));if(el){el.classList.add("act");if(CATS.find(function(c){return c.id===id;})){var cat=CATS.find(function(c){return c.id===id;});el.style.background=cat.color||"var(--green)";el.style.borderColor=cat.color||"var(--green)";el.style.color="#000";}}render();}
-function setFilter(f){filter=f;render();}
+function setFilter(f){filter=f;catFilter='all';render();document.querySelectorAll('.cat-chip').forEach(function(el){el.classList.remove('act');});var allChip=document.getElementById('chip-all');if(allChip)allChip.classList.add('act');}
 function onSearch(q){searchQ=q.toLowerCase().trim();document.getElementById("xbtn").classList[q?"add":"remove"]("show");render();}
 function clearSearch(){document.getElementById("sinp").value="";onSearch("");}
 
@@ -971,7 +1053,46 @@ function selectShopStore(store){shopStore=store;["biedronka","lidl","both"].forE
 function generateShopList(){if(!apiKey){dlgAlert("X","Niedostepne","Skonfiguruj klucz API");return;}var btn=document.getElementById("gen-btn"),spin=document.getElementById("gen-spin"),txt=document.getElementById("gen-btn-txt");btn.disabled=true;spin.style.display="block";txt.textContent="Generuje...";var missing=[],expiring=[];CATS.forEach(function(cat){cat.items.forEach(function(it){var cur=state[fbk(cat.id,it.n)]||0;if(cur<it.target)missing.push(it.n+"(mam:"+cur+",potrzeba:"+it.target+" "+it.unit+")");var d=getDaysLeft(it);if(d!==null&&d<=3&&cur>0)expiring.push(it.n+"("+d+"dni)");});});var storeName={biedronka:"Biedronka",lidl:"Lidl",both:"Biedronka i Lidl"}[shopStore]||"Biedronka";var prompt="Lista zakupow do "+storeName+". Braki w lodowce: "+missing.join("; ")+". Wygasaja wkrotce: "+(expiring.join("; ")||"nic")+". Jezeli uzytkownik ostatnio kupowal cos w Biedronce uwzgledniej te produkty przy priorytetach. TYLKO JSON: {\"komentarz\":\"\",\"produkty\":[{\"nazwa\":\"\",\"ilosc\":\"\",\"priorytet\":\"wysoki/sredni/niski\",\"powod\":\"\"}]}";callAPI([{role:"user",content:prompt}],SYS,function(res){btn.disabled=false;spin.style.display="none";txt.textContent="Odswiez liste";var clean=res.replace(/```json/gi,"").replace(/```/g,"").trim();var s=clean.indexOf("{"),e=clean.lastIndexOf("}");try{renderShopList(JSON.parse(s!==-1&&e!==-1?clean.slice(s,e+1):clean));}catch(ex){document.getElementById("shop-list-content").innerHTML='<div class="ai-note">'+res+'</div>';}},function(err){btn.disabled=false;spin.style.display="none";txt.textContent="Generuj liste AI";document.getElementById("shop-list-content").innerHTML='<div class="ai-note" style="color:var(--red)">Blad: '+err+'</div>';});}
 function renderShopList(data){shopChecked={};document.getElementById("copy-btn").classList.add("show");var high=[],med=[],low=[];(data.produkty||[]).forEach(function(p){if(p.priorytet==="wysoki"||p.priorytet==="high")high.push(p);else if(p.priorytet==="niski"||p.priorytet==="low")low.push(p);else med.push(p);});var html='<div class="ai-note">'+(data.komentarz||"")+'</div>';function sec(items,title,cls){if(!items.length)return"";var s='<div style="margin-bottom:14px"><div class="shop-sec-title">'+title+'</div>';items.forEach(function(p,i){var id="si-"+cls+i;s+='<div class="shop-item" id="'+id+'" onclick="toggleShopItem(this.id)"><div class="shop-item-check"></div><div class="shop-item-info"><div class="shop-item-name">'+p.nazwa+'</div><div class="shop-item-detail">'+p.ilosc+' - '+p.powod+'</div></div><span class="prio prio-'+cls+'">'+p.priorytet+'</span></div>';});return s+"</div>";}html+=sec(high,"Pilne","high")+sec(med,"Wazne","med")+sec(low,"Warto miec","low");document.getElementById("shop-list-content").innerHTML=html;}
 function toggleShopItem(id){var el=document.getElementById(id);if(!el)return;shopChecked[id]=!shopChecked[id];el.classList[shopChecked[id]?"add":"remove"]("checked");el.querySelector(".shop-item-check").textContent=shopChecked[id]?"v":"";}
-function copyShopList(silent){var items=[];document.querySelectorAll(".shop-item:not(.checked) .shop-item-name").forEach(function(el){items.push("- "+el.textContent);});if(!items.length){CATS.forEach(function(cat){cat.items.forEach(function(it){var cur=state[fbk(cat.id,it.n)]||0;if(cur<it.target)items.push("- "+it.n+" ("+Math.max(0,it.target-cur)+" "+it.unit+")");});});}if(!items.length){if(!silent)dlgAlert("?","Brak produktow","Wygeneruj najpierw liste AI");return false;}var text="PELNA LODOWKA - Lista zakupow\n"+new Date().toLocaleDateString("pl-PL")+"\n\n"+items.join("\n");navigator.clipboard.writeText(text).then(function(){if(!silent)dlgAlert("OK","Skopiowano!",items.length+" produktow.");}).catch(function(){var ta=document.createElement("textarea");ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand("copy");document.body.removeChild(ta);if(!silent)dlgAlert("OK","Skopiowano!","Lista skopiowana.");});return true;}
+function copyShopList(silent){
+  // Try to get detailed shop list data
+  var detailedLines=[];
+  var i=1;
+  document.querySelectorAll(".shop-item:not(.checked)").forEach(function(el){
+    var name=(el.querySelector(".shop-item-name")||{}).textContent||"";
+    var detail=(el.querySelector(".shop-item-detail")||{}).textContent||"";
+    if(!name)return;
+    detailedLines.push(i+". "+name.trim());
+    if(detail)detailedLines.push("   "+detail.trim());
+    i++;
+  });
+  // Fallback: build from window._currentShopList
+  if(!detailedLines.length&&window._currentShopList){
+    window._currentShopList.filter(function(x){return x.status==="MISSING";}).forEach(function(item,idx){
+      var unit=item.product?item.product.unit:"g";
+      detailedLines.push((idx+1)+". "+item.name);
+      detailedLines.push("   Kup: "+formatPurchaseAmount(item));
+      detailedLines.push("   Potrzebne: "+item.required+unit+" | Masz: "+item.available+unit+(item.buy&&item.buy.surplus>0?" | Nadwyżka: +"+item.buy.surplus+unit:""));
+      if(item.product&&item.product.shops)detailedLines.push("   Sklep: "+item.product.shops.join(" / "));
+    });
+  }
+  // Last fallback
+  if(!detailedLines.length){
+    CATS.forEach(function(cat){cat.items.forEach(function(it){
+      var cur=state[fbk(cat.id,it.n)]||0;
+      if(cur<it.target)detailedLines.push("- "+it.n+" ("+Math.max(0,it.target-cur)+" "+it.unit+")");
+    });});
+  }
+  if(!detailedLines.length){if(!silent)dlgAlert("?","Brak listy","Wygeneruj najpierw listę zakupów.");return false;}
+  var text="Pełna Lodówka — lista zakupów\n"+new Date().toLocaleDateString("pl-PL")+"\n\n"+detailedLines.join("\n");
+  navigator.clipboard.writeText(text).then(function(){
+    if(!silent)dlgAlert("OK","Skopiowano!","Lista skopiowana do schowka.");
+  }).catch(function(){
+    var ta=document.createElement("textarea");ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand("copy");document.body.removeChild(ta);
+    if(!silent)dlgAlert("OK","Skopiowano!","Lista skopiowana.");
+  });
+  return true;
+}
+
 function openStore(store){var urls={biedronka:"https://biedronkago.pl",frisco:"https://www.frisco.pl",glovo:"https://glovoapp.com/pl/pl/warszawa/",lisek:"https://lisek.app"};copyShopList(true);dlgConfirm("?","Lista skopiowana","Otworzyc "+store+"?",function(){window.open(urls[store],"_blank");},"Otworz");}
 
 // ── CHAT ──────────────────────────────────────────────────────────────────────
@@ -988,8 +1109,10 @@ function render(){
   var body=document.getElementById("body"),nR=0,nG=0,tot=0;
   CATS.forEach(function(c){c.items.forEach(function(it){cls(state[fbk(c.id,it.n)]||0,it.target)==="grn"?nG++:nR++;tot++;});});
   document.getElementById("n-red").textContent=nR;document.getElementById("n-grn").textContent=nG;document.getElementById("n-all").textContent=tot;
+  var nExp=0;CATS.forEach(function(c){c.items.forEach(function(it){var d=getDaysLeft(it);if(d!==null&&d<=0)nExp++;});});
+  var expEl=document.getElementById("n-exp");if(expEl)expEl.textContent=nExp;
   var expCount=0;CATS.forEach(function(c){c.items.forEach(function(it){if(expiringSoon(it))expCount++;});});
-  var et=document.getElementById("exp-alert-txt");if(et)et.textContent=expCount>0?"Wygasa\n"+expCount+" prod.":"Data\nwaznosci";
+  var expEl=document.getElementById("n-exp");if(expEl)expEl.textContent=expCount;var et=document.getElementById("exp-alert-txt");if(et)et.textContent=expCount>0?"Wygasa\n"+expCount+" prod.":"Data\nwaznosci";
   var html="",any=false;
   CATS.forEach(function(cat){
     if(catFilter!=="all"&&cat.id!==catFilter)return;
@@ -1551,10 +1674,13 @@ function openPurchaseHistory(){
     var priceMap={};
     purchaseHistory.forEach(function(p){
       (p.produkty||[]).forEach(function(prod){
-        if(!prod.nazwa||!prod.cena)return;
-        var key=prod.nazwa.toLowerCase();
-        if(!priceMap[key])priceMap[key]={name:prod.nazwa,prices:[],sklepy:{}};
-        priceMap[key].prices.push(prod.cena);
+        var np=normalizeReceiptProduct(prod);
+        var nm=getReceiptProductName(np);
+        var price=getReceiptProductPrice(np)||0;
+        if(!nm||!price)return;
+        var key=nm.toLowerCase().slice(0,30);
+        if(!priceMap[key])priceMap[key]={name:nm,prices:[],sklepy:{}};
+        priceMap[key].prices.push(price);
         if(p.sklep){
           if(!priceMap[key].sklepy[p.sklep])priceMap[key].sklepy[p.sklep]=[];
           priceMap[key].sklepy[p.sklep].push(prod.cena);
@@ -1591,8 +1717,8 @@ function openPurchaseHistory(){
       html+='<div style="display:none;padding:0 14px 12px">';
       (p.produkty||[]).forEach(function(prod){
         html+='<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bg3);font-size:12px">';
-        html+='<span style="color:var(--text2)">'+prod.nazwa+'</span>';
-        html+='<span style="color:var(--text3)">'+prod.ilosc+' '+prod.jednostka+(prod.cena?' &bull; <b style="color:var(--amber)">'+prod.cena+' zl</b>':'')+'</span>';
+        html+='<span style="color:var(--text2)">'+getReceiptProductName(normalizeReceiptProduct(prod))+'</span>';
+        html+='<span style="color:var(--text3)">'+getReceiptProductQty(normalizeReceiptProduct(prod))+' '+getReceiptProductUnit(normalizeReceiptProduct(prod))+(prod.cena?' &bull; <b style="color:var(--amber)">'+prod.cena+' zl</b>':'')+'</span>';
         html+='</div>';
       });
       html+='</div></div>';
@@ -1877,21 +2003,27 @@ function renderSmartShoppingList(list){
     html+='<div style="font-size:10px;font-weight:800;color:var(--red);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Do kupienia ('+tooBuy.length+')</div>';
     tooBuy.forEach(function(item){
       var cat=item.product?item.product.cat:"";
+      var unit=item.product?item.product.unit:"g";
+      var buyLabel=item.buy?formatPurchaseAmount(item):"?";
       html+='<div style="background:var(--bg2);border-radius:12px;padding:12px 14px;margin-bottom:8px;border:1px solid var(--border);border-left:4px solid var(--red)">';
       html+='<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">';
-      html+='<div style="flex:1"><div style="font-size:13px;font-weight:800;color:var(--text)">'+item.name+'</div>';
+      html+='<div style="flex:1">';
+      html+='<div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:4px">'+item.name+'</div>';
       if(item.buy){
-        html+='<div style="font-size:14px;font-weight:900;color:var(--green);margin:4px 0">Kup: '+item.buy.label+'</div>';
-        html+='<div style="font-size:11px;color:var(--text3)">Potrzebne: '+item.required+(item.product?item.product.unit:"g")
-          +' &bull; Masz: '+item.available+(item.product?item.product.unit:"g")
-          +' &bull; Brakuje: '+item.missing+(item.product?item.product.unit:"g")+'</div>';
-        if(item.buy.surplus>0)html+='<div style="font-size:11px;color:var(--amber);margin-top:2px">Nadwyżka po zakupie: +'+item.buy.surplus+(item.product?item.product.unit:"g")+'</div>';
+        html+='<div style="font-size:15px;font-weight:900;color:var(--green);margin:4px 0">Kup: '+buyLabel+'</div>';
+        html+='<div style="font-size:11px;color:var(--text3);line-height:1.7">';
+        html+='Potrzebne: '+item.required+unit+'<br>';
+        html+='Masz: '+item.available+unit+'<br>';
+        html+='Brakuje: '+item.missing+unit;
+        if(item.buy.surplus>0)html+='<br><span style="color:var(--amber)">Nadwyżka po zakupie: +'+item.buy.surplus+unit+'</span>';
+        html+='</div>';
+        if(item.buy.byWeight)html+='<div style="font-size:10px;color:var(--text3);margin-top:2px;font-style:italic">Produkt na wagę</div>';
       }
-      if(item.meals&&item.meals.length)html+='<div style="font-size:10px;color:var(--text3);margin-top:4px">Do: '+item.meals.join(", ")+'</div>';
+      if(item.meals&&item.meals.length)html+='<div style="font-size:10px;color:var(--text3);margin-top:5px">Do: '+item.meals.join(", ")+'</div>';
       html+='</div>';
       if(item.product&&item.product.shops){
         var shop=item.product.shops[0];
-        html+='<div style="background:var(--bg3);border-radius:8px;padding:4px 8px;font-size:10px;font-weight:700;color:var(--blue);flex-shrink:0">'+shop+'</div>';
+        html+='<div style="background:var(--bg3);border-radius:8px;padding:4px 8px;font-size:10px;font-weight:700;color:var(--blue);flex-shrink:0;margin-top:2px">'+shop+'</div>';
       }
       html+='</div></div>';
     });
@@ -2036,112 +2168,119 @@ function validateMenu(menu, profile){
 }
 
 function renderPriceAnalysis(){
-  var body=document.getElementById("diet-body");
-  if(!body)return;
-  
-  loadPurchaseHistory(function(){
-    if(!purchaseHistory.length){
+  var body=document.getElementById("diet-body");if(!body)return;
+  body.innerHTML='<div style="text-align:center;padding:30px;color:var(--text3)"><div class="spin" style="margin:0 auto 16px"></div>Ładowanie analizy cen...</div>';
+  if(!PH_PATH){
+    body.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px">📊</div>Zaloguj się, aby zobaczyć analizę cen.</div>';
+    return;
+  }
+  fbGet(PH_PATH).then(function(data){
+    var receipts=data?Object.values(data).sort(function(a,b){return(b.ts||0)-(a.ts||0);}):[];
+    if(!receipts.length){
       body.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px">📊</div>'
-        +'Za mało danych do analizy.<br><br><span style="font-size:12px">Zeskanuj paragony w zakładce Zakupy aby zobaczyć analizę cen.</span></div>';
+        +'<b style="color:var(--text);display:block;margin-bottom:8px">Brak paragonów</b>'
+        +'Za mało danych do analizy. Zeskanuj paragony z Lidla i Biedronki.</div>';
       return;
     }
-    
-    // Zbierz dane cenowe
-    var priceMap={};// productName → {biedronka:[], lidl:[], other:[]}
-    var shopTotals={};// shop → [suma]
-    var monthlyTotals={};// YYYY-MM → suma
-    
-    purchaseHistory.forEach(function(p){
-      var shop=(p.sklep||"").toLowerCase();
-      var shopKey=shop.indexOf("biedronka")!==-1?"Biedronka":shop.indexOf("lidl")!==-1?"Lidl":"Inny";
+    // Zbierz dane
+    var priceMap={};var shopTotals={};var monthlyTotals={};var totalSum=0;
+    receipts.forEach(function(p){
+      var sklep=(p.sklep||"").toLowerCase();
+      var shopKey=sklep.indexOf("biedronka")!==-1?"Biedronka":sklep.indexOf("lidl")!==-1?"Lidl":"Inny";
       if(p.suma){
-        if(!shopTotals[shopKey])shopTotals[shopKey]=[];
-        shopTotals[shopKey].push(p.suma);
-        if(p.ts){
-          var d2=new Date(p.ts),mkey=d2.getFullYear()+"-"+(d2.getMonth()+1<10?"0":"")+(d2.getMonth()+1);
-          if(!monthlyTotals[mkey])monthlyTotals[mkey]=0;
-          monthlyTotals[mkey]+=p.suma;
-        }
+        totalSum+=Number(p.suma)||0;
+        if(!shopTotals[shopKey])shopTotals[shopKey]={count:0,sum:0};
+        shopTotals[shopKey].count++;shopTotals[shopKey].sum+=Number(p.suma)||0;
+        if(p.ts){var d=new Date(p.ts),mk=d.getFullYear()+"-"+(d.getMonth()+1<10?"0":"")+(d.getMonth()+1);if(!monthlyTotals[mk])monthlyTotals[mk]=0;monthlyTotals[mk]+=Number(p.suma)||0;}
       }
       (p.produkty||[]).forEach(function(prod){
-        if(!prod.nazwa||!prod.cenaJednostkowa&&!prod.cena)return;
-        var key=prod.nazwa.toLowerCase().slice(0,25);
-        if(!priceMap[key])priceMap[key]={name:prod.nazwa,Biedronka:[],Lidl:[],Inny:[]};
-        var price=prod.cenaJednostkowa||prod.cena||0;
-        if(price>0)(priceMap[key][shopKey]||priceMap[key].Inny).push(price);
+        var np=normalizeReceiptProduct(prod);
+        var name=getReceiptProductName(np);
+        var price=np.unitPrice||np.totalPrice||0;
+        if(!name||name==="Nieznany produkt"||!price)return;
+        var key=name.toLowerCase().slice(0,30);
+        if(!priceMap[key])priceMap[key]={name:name,Biedronka:[],Lidl:[],Inny:[],allDates:[]};
+        (priceMap[key][shopKey]=priceMap[key][shopKey]||[]).push(price);
+        if(p.ts)priceMap[key].allDates.push({price:price,shop:shopKey,ts:p.ts});
       });
     });
-    
-    var html='<div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px">Analiza cen — '+purchaseHistory.length+' paragonów</div>';
-    
-    // Porównanie sklepów
-    var compareItems=Object.values(priceMap).filter(function(p){
-      return (p.Biedronka.length>0&&p.Lidl.length>0);
-    });
-    
+    var html="";
+    // Podsumowanie
+    var uniqueProds=Object.keys(priceMap).length;
+    var topShop=Object.entries(shopTotals).sort(function(a,b){return b[1].count-a[1].count;})[0];
+    html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">';
+    html+=statCard2(receipts.length+"","Paragonów","#1ED760");
+    html+=statCard2(totalSum.toFixed(0)+" zł","Suma wydatków","#F59E0B");
+    html+=statCard2(uniqueProds+"","Produktów","#60A5FA");
+    html+=statCard2(topShop?topShop[0]:"?","Główny sklep","#8B5CF6");
+    html+='</div>';
+    // Porównanie Lidl vs Biedronka
+    var compareItems=Object.values(priceMap).filter(function(p){return p.Biedronka.length>0&&p.Lidl.length>0;});
     if(compareItems.length){
-      html+='<div style="background:rgba(61,139,255,.08);border:1px solid rgba(61,139,255,.2);border-radius:var(--radius);padding:14px;margin-bottom:14px">';
-      html+='<div style="font-size:11px;font-weight:800;color:var(--blue);margin-bottom:10px;text-transform:uppercase">Biedronka vs Lidl</div>';
-      compareItems.slice(0,8).forEach(function(p){
-        var avgB=(p.Biedronka.reduce(function(a,b){return a+b;},0)/p.Biedronka.length).toFixed(2);
-        var avgL=(p.Lidl.reduce(function(a,b){return a+b;},0)/p.Lidl.length).toFixed(2);
-        var cheaper=parseFloat(avgB)<parseFloat(avgL)?"Biedronka":"Lidl";
-        var diff=Math.abs(parseFloat(avgB)-parseFloat(avgL)).toFixed(2);
+      html+='<div style="background:var(--bg2);border-radius:var(--radius);padding:14px;margin-bottom:12px;border:1px solid var(--border)">';
+      html+='<div style="font-size:11px;font-weight:800;color:var(--blue);margin-bottom:12px;text-transform:uppercase;letter-spacing:.8px">Biedronka vs Lidl ('+compareItems.length+' produktów)</div>';
+      compareItems.sort(function(a,b){
+        var dA=Math.abs((a.Biedronka.reduce(function(x,y){return x+y;},0)/a.Biedronka.length)-(a.Lidl.reduce(function(x,y){return x+y;},0)/a.Lidl.length));
+        var dB=Math.abs((b.Biedronka.reduce(function(x,y){return x+y;},0)/b.Biedronka.length)-(b.Lidl.reduce(function(x,y){return x+y;},0)/b.Lidl.length));
+        return dB-dA;
+      }).slice(0,8).forEach(function(p){
+        var avgB=(p.Biedronka.reduce(function(a,b){return a+b;},0)/p.Biedronka.length);
+        var avgL=(p.Lidl.reduce(function(a,b){return a+b;},0)/p.Lidl.length);
+        var cheaper=avgB<avgL?"Biedronka":"Lidl";
+        var diff=Math.abs(avgB-avgL).toFixed(2);
         html+='<div style="padding:8px 0;border-bottom:1px solid var(--border)">';
-        html+='<div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">'+p.name+'</div>';
-        html+='<div style="display:flex;gap:10px;align-items:center">';
-        html+='<span style="font-size:11px">🐝 Biedronka: <b style="color:'+(cheaper==="Biedronka"?"var(--green)":"var(--text2)")+'">'+avgB+' zł</b></span>';
-        html+='<span style="font-size:11px">🏪 Lidl: <b style="color:'+(cheaper==="Lidl"?"var(--green)":"var(--text2)")+'">'+avgL+' zł</b></span>';
-        html+='<span style="font-size:10px;color:var(--amber)">diff: '+diff+' zł</span>';
+        html+='<div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:5px">'+p.name+'</div>';
+        html+='<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">';
+        html+='<span style="font-size:12px">🐝 <b style="color:'+(cheaper==="Biedronka"?"var(--green)":"var(--text2)")+'">'+avgB.toFixed(2)+' zł</b></span>';
+        html+='<span style="font-size:12px">🏪 <b style="color:'+(cheaper==="Lidl"?"var(--green)":"var(--text2)")+'">'+avgL.toFixed(2)+' zł</b></span>';
+        html+='<span style="font-size:11px;color:var(--amber)">Taniej: <b>'+cheaper+'</b> o '+diff+' zł</span>';
         html+='</div></div>';
       });
       html+='</div>';
+    } else {
+      html+='<div style="background:var(--bg3);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:12px;color:var(--text3)">Brak danych do porównania Lidl vs Biedronka. Zeskanuj paragony z obu sklepów.</div>';
     }
-    
-    // Wykres wydatków (prosty SVG bar chart)
+    // Wykres wydatków
     var months=Object.keys(monthlyTotals).sort().slice(-6);
-    if(months.length>1){
+    if(months.length>0){
       var maxVal=Math.max.apply(null,months.map(function(m){return monthlyTotals[m];}));
-      html+='<div style="background:var(--bg2);border-radius:var(--radius);padding:14px;margin-bottom:14px;border:1px solid var(--border)">';
-      html+='<div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:12px;text-transform:uppercase">Wydatki miesięcznie (zł)</div>';
-      html+='<svg width="100%" height="100" viewBox="0 0 300 100" preserveAspectRatio="none">';
-      var barW=300/months.length-4;
+      html+='<div style="background:var(--bg2);border-radius:var(--radius);padding:14px;margin-bottom:12px;border:1px solid var(--border)">';
+      html+='<div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:12px;text-transform:uppercase">Wydatki miesięcznie</div>';
+      html+='<svg width="100%" height="100" viewBox="0 0 '+(months.length*48)+' 100" preserveAspectRatio="none" style="display:block">';
       months.forEach(function(m,i){
-        var h2=Math.round((monthlyTotals[m]/maxVal)*80);
-        var x=i*(300/months.length)+2;
-        html+='<rect x="'+x+'" y="'+(100-h2)+'" width="'+barW+'" height="'+h2+'" fill="var(--purple)" rx="2"/>';
-        html+='<text x="'+(x+barW/2)+'" y="98" text-anchor="middle" fill="#6B6B85" font-size="8">'+m.slice(5)+'</text>';
-        html+='<text x="'+(x+barW/2)+'" y="'+(100-h2-3)+'" text-anchor="middle" fill="#B0B0C8" font-size="7">'+Math.round(monthlyTotals[m])+'</text>';
+        var h2=Math.max(8,Math.round((monthlyTotals[m]/maxVal)*80));
+        var x=i*48+4;var bw=40;
+        html+='<rect x="'+x+'" y="'+(96-h2)+'" width="'+bw+'" height="'+h2+'" fill="rgba(139,92,246,.6)" rx="4"/>';
+        html+='<text x="'+(x+bw/2)+'" y="98" text-anchor="middle" fill="#6B6B85" font-size="9">'+m.slice(5)+'</text>';
+        html+='<text x="'+(x+bw/2)+'" y="'+(93-h2)+'" text-anchor="middle" fill="#B0B0C8" font-size="8">'+Math.round(monthlyTotals[m])+'</text>';
       });
       html+='</svg></div>';
     }
-    
     // Najczęściej kupowane
-    var sortedProducts=Object.values(priceMap).sort(function(a,b){
-      return(b.Biedronka.length+b.Lidl.length)-(a.Biedronka.length+a.Lidl.length);
-    }).slice(0,8);
-    
-    if(sortedProducts.length){
-      html+='<div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">Najczęściej kupowane</div>';
-      sortedProducts.forEach(function(p,i){
+    var topProds=Object.values(priceMap).sort(function(a,b){return(b.Biedronka.length+b.Lidl.length+b.Inny.length)-(a.Biedronka.length+a.Lidl.length+a.Inny.length);}).slice(0,8);
+    if(topProds.length){
+      html+='<div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Najczęściej kupowane</div>';
+      topProds.forEach(function(p,i){
         var count=p.Biedronka.length+p.Lidl.length+p.Inny.length;
-        var allPrices=p.Biedronka.concat(p.Lidl).concat(p.Inny);
-        var avg=allPrices.length?(allPrices.reduce(function(a,b){return a+b;},0)/allPrices.length).toFixed(2):"?";
+        var all=p.Biedronka.concat(p.Lidl).concat(p.Inny);
+        var avg=all.length?(all.reduce(function(a,b){return a+b;},0)/all.length).toFixed(2):"?";
         html+='<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg3);border-radius:8px;margin-bottom:4px">';
-        html+='<span style="font-size:14px;font-weight:900;color:var(--text3);min-width:20px">'+(i+1)+'.</span>';
+        html+='<span style="font-size:13px;font-weight:900;color:var(--text3);min-width:20px">'+(i+1)+'.</span>';
         html+='<span style="flex:1;font-size:12px;font-weight:700;color:var(--text)">'+p.name+'</span>';
         html+='<span style="font-size:11px;color:var(--text3)">'+count+'x</span>';
         html+='<span style="font-size:12px;font-weight:800;color:var(--amber)">~'+avg+' zł</span>';
         html+='</div>';
       });
     }
-    
     body.innerHTML=html;
+  }).catch(function(e){
+    body.innerHTML='<div style="text-align:center;padding:40px;color:var(--red)">Błąd ładowania: '+e.message+'</div>';
   });
 }
+function statCard2(val,label,color){
+  return'<div style="background:var(--bg2);border-radius:12px;padding:12px;border:1px solid var(--border);text-align:center"><div style="font-size:22px;font-weight:900;color:'+(color||"var(--text)")+'">'+val+'</div><div style="font-size:11px;color:var(--text3);margin-top:3px">'+label+'</div></div>';
+}
 
-
-// ── Po oznaczeniu listy zakupów jako kupionej ─────────────────────────────
 function applyPurchasedItemsToPantry(shopList){
   if(!shopList||!shopList.length)return;
   var added=[];
@@ -2190,6 +2329,531 @@ function convertToPurchaseUnits(product, missingAmount){
   var surplus=Math.round(total2-missingAmount);
   return{pcs:pkgs2,label:pkgs2+" "+product.pkgUnit+" ("+pkgSize+product.unit+")",surplus:surplus,total:total2};
 }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// CMS — Panel Administratora
+// ══════════════════════════════════════════════════════════════════════════════
+var CMS_PASS = "spizarnia2025";
+var cmsTab = 0;
+var cmsUsers = {}; // {userId: profileData}
+var cmsSelectedUser = null;
+
+// ── Wejście do CMS ────────────────────────────────────────────────────────────
+function openCMS() {
+  document.getElementById("cms-pass-inp").value = "";
+  document.getElementById("cms-pass-overlay").classList.add("show");
+  setTimeout(function() { document.getElementById("cms-pass-inp").focus(); }, 100);
+}
+
+function checkCMSPass() {
+  var p = document.getElementById("cms-pass-inp").value;
+  if (p !== CMS_PASS) { dlgAlert("X", "Błędne hasło", ""); return; }
+  document.getElementById("cms-pass-overlay").classList.remove("show");
+  document.getElementById("cms-overlay").classList.add("show");
+  loadCMSData();
+}
+
+function closeCMS() {
+  document.getElementById("cms-overlay").classList.remove("show");
+}
+
+function closeCMSUser() {
+  document.getElementById("cms-user-overlay").classList.remove("show");
+}
+
+// ── Załaduj dane z Firebase ───────────────────────────────────────────────────
+function loadCMSData() {
+  var body = document.getElementById("cms-body");
+  body.innerHTML = '<div style="text-align:center;padding:40px;color:#6B6B85"><div class="spin" style="margin:0 auto 16px"></div>Ładowanie danych...</div>';
+  fbGet(FB + "/profiles").then(function(data) {
+    if (!data) { cmsUsers = {}; renderCMSTab(); return; }
+    cmsUsers = data;
+    renderCMSTab();
+  }).catch(function(e) {
+    body.innerHTML = '<div style="text-align:center;padding:40px;color:#FF4D4D">Błąd: ' + e.message + '</div>';
+  });
+}
+
+// ── Przełącz zakładkę ─────────────────────────────────────────────────────────
+function switchCMSTab(n) {
+  cmsTab = n;
+  for (var i = 0; i < 4; i++) {
+    var t = document.getElementById("cmstab-" + i);
+    if (t) {
+      t.style.borderBottom = i === n ? "2px solid #1ED760" : "2px solid transparent";
+      t.style.color = i === n ? "#1ED760" : "#6B6B85";
+    }
+  }
+  renderCMSTab();
+}
+
+function renderCMSTab() {
+  if (cmsTab === 0) renderCMSUsers();
+  else if (cmsTab === 1) renderCMSDiets();
+  else if (cmsTab === 2) renderCMSReceipts();
+  else renderCMSStats();
+}
+
+// ── Karta użytkownika (mini) ──────────────────────────────────────────────────
+function userCard(uid, p) {
+  var name = uid.replace(/_/g, " ").replace(/\b\w/g, function(l) { return l.toUpperCase(); });
+  var goal = { lose: "Redukcja", maintain: "Utrzymanie", gain: "Masa" }[p.goal] || p.goal || "?";
+  var store = { biedronka: "🐝 Biedronka", lidl: "🏪 Lidl", both: "Oba" }[p.stores] || p.stores || "?";
+  var hasDiet = !!(p.dietData && (p.dietData.menu1 || p.dietData.menu2));
+  return '<div onclick="openCMSUser(\'' + uid + '\')" style="background:#111118;border-radius:14px;padding:14px;margin-bottom:10px;border:1px solid #2A2A3A;cursor:pointer;transition:border .2s" onmouseover="this.style.borderColor=\'#1ED760\'" onmouseout="this.style.borderColor=\'#2A2A3A\'">'
+    + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
+    + '<div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#1ED760,#17A84A);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#000;flex-shrink:0">' + name.charAt(0) + '</div>'
+    + '<div style="flex:1"><div style="font-size:14px;font-weight:800;color:#fff">' + name + '</div>'
+    + '<div style="font-size:11px;color:#6B6B85">' + (p.age || "?") + ' lat &bull; ' + (p.weight || "?") + ' kg &bull; ' + (p.height || "?") + ' cm</div></div>'
+    + '<div style="text-align:right"><div style="font-size:13px;font-weight:900;color:#F59E0B">' + (p.kcal || "?") + ' kcal</div>'
+    + '<div style="font-size:10px;color:#6B6B85">' + goal + '</div></div></div>'
+    + '<div style="display:flex;gap:6px;flex-wrap:wrap">'
+    + '<span style="background:#1ED76015;border:1px solid #1ED76033;border-radius:50px;padding:3px 10px;font-size:10px;font-weight:700;color:#1ED760">B:' + (p.prot || "?") + 'g</span>'
+    + '<span style="background:#60A5FA15;border:1px solid #60A5FA33;border-radius:50px;padding:3px 10px;font-size:10px;font-weight:700;color:#60A5FA">W:' + (p.carb || "?") + 'g</span>'
+    + '<span style="background:#F9A8D415;border:1px solid #F9A8D433;border-radius:50px;padding:3px 10px;font-size:10px;font-weight:700;color:#F9A8D4">T:' + (p.fat || "?") + 'g</span>'
+    + '<span style="background:#7C3AED15;border:1px solid #7C3AED33;border-radius:50px;padding:3px 10px;font-size:10px;font-weight:700;color:#8B5CF6">' + store + '</span>'
+    + (hasDiet ? '<span style="background:#1ED76015;border:1px solid #1ED76044;border-radius:50px;padding:3px 10px;font-size:10px;font-weight:700;color:#1ED760">✓ Dieta</span>' : '<span style="background:#FF4D4D15;border:1px solid #FF4D4D33;border-radius:50px;padding:3px 10px;font-size:10px;font-weight:700;color:#FF4D4D">Brak diety</span>')
+    + '</div></div>';
+}
+
+// ══ ZAKŁADKA 1: Użytkownicy ════════════════════════════════════════════════════
+function renderCMSUsers() {
+  var body = document.getElementById("cms-body");
+  var users = Object.entries(cmsUsers);
+  if (!users.length) {
+    body.innerHTML = '<div style="text-align:center;padding:40px;color:#6B6B85">Brak użytkowników w bazie.</div>';
+    return;
+  }
+  var html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
+    + '<div style="font-size:13px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px">Wszyscy użytkownicy (' + users.length + ')</div>'
+    + '<button onclick="loadCMSData()" style="background:#1A1A24;border:1px solid #2A2A3A;color:#6B6B85;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer">Odśwież</button>'
+    + '</div>';
+  users.forEach(function(entry) {
+    html += userCard(entry[0], entry[1]);
+  });
+  body.innerHTML = html;
+}
+
+// ══ ZAKŁADKA 2: Diety ═════════════════════════════════════════════════════════
+function renderCMSDiets() {
+  var body = document.getElementById("cms-body");
+  var users = Object.entries(cmsUsers);
+  var withDiet = users.filter(function(e) { return e[1].dietData; });
+  var withoutDiet = users.filter(function(e) { return !e[1].dietData; });
+  var html = '<div style="margin-bottom:16px">';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">';
+  html += '<div style="background:#111118;border-radius:12px;padding:14px;border:1px solid #2A2A3A;text-align:center"><div style="font-size:28px;font-weight:900;color:#1ED760">' + withDiet.length + '</div><div style="font-size:11px;color:#6B6B85;margin-top:4px">Z dietą</div></div>';
+  html += '<div style="background:#111118;border-radius:12px;padding:14px;border:1px solid #2A2A3A;text-align:center"><div style="font-size:28px;font-weight:900;color:#FF4D4D">' + withoutDiet.length + '</div><div style="font-size:11px;color:#6B6B85;margin-top:4px">Bez diety</div></div>';
+  html += '</div>';
+  if (withDiet.length) {
+    html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Użytkownicy z dietą</div>';
+    withDiet.forEach(function(e) {
+      var p = e[1]; var d = p.dietData;
+      var m1meals = (d.menu1 ? ((d.menu1.sniadania||[]).length + (d.menu1.obiady||[]).length + (d.menu1.kolacje||[]).length) : 0);
+      var m2meals = (d.menu2 ? ((d.menu2.sniadania||[]).length + (d.menu2.obiady||[]).length + (d.menu2.kolacje||[]).length) : 0);
+      var name = e[0].replace(/_/g, " ").replace(/\b\w/g, function(l) { return l.toUpperCase(); });
+      html += '<div onclick="openCMSUser(\'' + e[0] + '\')" style="background:#111118;border-radius:12px;padding:12px 14px;margin-bottom:8px;border:1px solid #2A2A3A;cursor:pointer;display:flex;align-items:center;gap:10px">';
+      html += '<div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#1ED760,#17A84A);display:flex;align-items:center;justify-content:center;font-weight:900;color:#000;flex-shrink:0">' + name.charAt(0) + '</div>';
+      html += '<div style="flex:1"><div style="font-size:13px;font-weight:700;color:#fff">' + name + '</div>';
+      html += '<div style="font-size:11px;color:#6B6B85">Menu 1: ' + m1meals + ' posiłków &bull; Menu 2: ' + m2meals + ' posiłków</div></div>';
+      html += '<div style="font-size:12px;font-weight:800;color:#F59E0B">' + (p.kcal || "?") + ' kcal</div>';
+      html += '</div>';
+    });
+  }
+  if (withoutDiet.length) {
+    html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;margin-top:14px">Bez diety</div>';
+    withoutDiet.forEach(function(e) {
+      var name = e[0].replace(/_/g, " ").replace(/\b\w/g, function(l) { return l.toUpperCase(); });
+      html += '<div style="background:#111118;border-radius:12px;padding:10px 14px;margin-bottom:6px;border:1px solid #FF4D4D22;display:flex;align-items:center;gap:8px">';
+      html += '<div style="width:28px;height:28px;border-radius:50%;background:#FF4D4D22;display:flex;align-items:center;justify-content:center;font-weight:900;color:#FF4D4D;font-size:12px">' + name.charAt(0) + '</div>';
+      html += '<span style="font-size:13px;color:#B0B0C8">' + name + '</span>';
+      html += '<span style="margin-left:auto;font-size:10px;color:#FF4D4D">Brak diety</span>';
+      html += '</div>';
+    });
+  }
+  html += '</div>';
+  body.innerHTML = html;
+}
+
+// ══ ZAKŁADKA 3: Paragony ══════════════════════════════════════════════════════
+function renderCMSReceipts() {
+  var body = document.getElementById("cms-body");
+  body.innerHTML = '<div style="text-align:center;padding:30px;color:#6B6B85"><div class="spin" style="margin:0 auto 16px"></div>Ładowanie paragonów...</div>';
+  var userIds = Object.keys(cmsUsers);
+  var allReceipts = [];
+  var loaded = 0;
+  if (!userIds.length) { body.innerHTML = '<div style="text-align:center;padding:40px;color:#6B6B85">Brak użytkowników.</div>'; return; }
+  userIds.forEach(function(uid) {
+    fbGet(FB + "/purchaseHistory/" + uid).then(function(data) {
+      if (data) {
+        Object.values(data).forEach(function(r) { allReceipts.push(Object.assign({}, r, { _userId: uid })); });
+      }
+      loaded++;
+      if (loaded === userIds.length) showCMSReceipts(allReceipts);
+    }).catch(function() {
+      loaded++;
+      if (loaded === userIds.length) showCMSReceipts(allReceipts);
+    });
+  });
+}
+
+function showCMSReceipts(receipts) {
+  var body = document.getElementById("cms-body");
+  receipts.sort(function(a, b) { return (b.ts || 0) - (a.ts || 0); });
+  if (!receipts.length) {
+    body.innerHTML = '<div style="text-align:center;padding:40px;color:#6B6B85"><div style="font-size:40px;margin-bottom:12px">🧾</div>Brak zeskanowanych paragonów.</div>';
+    return;
+  }
+  var totalSum = receipts.reduce(function(s, r) { return s + (r.suma || 0); }, 0);
+  var html = '<div style="background:#111118;border-radius:12px;padding:14px;margin-bottom:14px;border:1px solid #2A2A3A">';
+  html += '<div style="display:flex;justify-content:space-between;align-items:center">';
+  html += '<div><div style="font-size:24px;font-weight:900;color:#fff">' + receipts.length + '</div><div style="font-size:11px;color:#6B6B85">Paragonów łącznie</div></div>';
+  html += '<div style="text-align:right"><div style="font-size:20px;font-weight:900;color:#F59E0B">' + totalSum.toFixed(2) + ' zł</div><div style="font-size:11px;color:#6B6B85">Suma wydatków</div></div>';
+  html += '</div></div>';
+  receipts.forEach(function(r) {
+    var name = (r._userId || "").replace(/_/g, " ").replace(/\b\w/g, function(l) { return l.toUpperCase(); });
+    var d = r.ts ? new Date(r.ts).toLocaleDateString("pl-PL") : (r.data || "?");
+    var pCount = (r.produkty || []).length;
+    html += '<div style="background:#111118;border-radius:12px;padding:12px 14px;margin-bottom:8px;border:1px solid #2A2A3A">';
+    html += '<div style="display:flex;align-items:center;gap:10px">';
+    html += '<div style="font-size:26px">🧾</div>';
+    html += '<div style="flex:1">';
+    html += '<div style="font-size:13px;font-weight:800;color:#fff">' + (r.sklep || "Sklep") + '</div>';
+    html += '<div style="font-size:11px;color:#6B6B85">' + name + ' &bull; ' + d + ' &bull; ' + pCount + ' produktów</div>';
+    html += '</div>';
+    if (r.suma) html += '<div style="font-size:14px;font-weight:900;color:#F59E0B">' + r.suma + ' zł</div>';
+    html += '</div>';
+    if (pCount > 0) {
+      html += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid #1A1A24">';
+      (r.produkty || []).slice(0, 5).forEach(function(p) {
+        html += '<div style="display:flex;justify-content:space-between;font-size:11px;color:#6B6B85;padding:2px 0">';
+        html += '<span>' + (p.rawName || p.nazwa || p.matchedName || "?") + '</span>';
+        html += '<span>' + (p.cenaCalkowita || p.cena || "") + (p.cenaCalkowita ? " zł" : "") + '</span>';
+        html += '</div>';
+      });
+      if (pCount > 5) html += '<div style="font-size:10px;color:#6B6B85;text-align:center;margin-top:4px">... i ' + (pCount - 5) + ' więcej</div>';
+      html += '</div>';
+    }
+    html += '</div>';
+  });
+  body.innerHTML = html;
+}
+
+// ══ ZAKŁADKA 4: Statystyki ════════════════════════════════════════════════════
+function renderCMSStats() {
+  var body = document.getElementById("cms-body");
+  var users = Object.values(cmsUsers);
+  if (!users.length) { body.innerHTML = '<div style="text-align:center;padding:40px;color:#6B6B85">Brak danych.</div>'; return; }
+  var totalUsers = users.length;
+  var withDiet = users.filter(function(u) { return u.dietData; }).length;
+  var goals = { lose: 0, maintain: 0, gain: 0 };
+  var stores = { biedronka: 0, lidl: 0, both: 0 };
+  var avgKcal = 0, avgWeight = 0, avgAge = 0, counted = 0;
+  users.forEach(function(u) {
+    if (u.goal) goals[u.goal] = (goals[u.goal] || 0) + 1;
+    if (u.stores) stores[u.stores] = (stores[u.stores] || 0) + 1;
+    if (u.kcal) { avgKcal += u.kcal; counted++; }
+    if (u.weight) avgWeight += u.weight;
+    if (u.age) avgAge += u.age;
+  });
+  if (counted) { avgKcal = Math.round(avgKcal / counted); avgWeight = Math.round(avgWeight / counted); avgAge = Math.round(avgAge / counted); }
+
+  function statCard(label, value, color) {
+    return '<div style="background:#111118;border-radius:12px;padding:14px;border:1px solid #2A2A3A;text-align:center">'
+      + '<div style="font-size:26px;font-weight:900;color:' + (color || "#fff") + '">' + value + '</div>'
+      + '<div style="font-size:11px;color:#6B6B85;margin-top:4px">' + label + '</div></div>';
+  }
+  function bar(label, val, total, color) {
+    var pct = total > 0 ? Math.round(val / total * 100) : 0;
+    return '<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;color:#B0B0C8;margin-bottom:4px"><span>' + label + '</span><span style="font-weight:700;color:' + color + '">' + val + ' (' + pct + '%)</span></div>'
+      + '<div style="height:6px;background:#1A1A24;border-radius:4px"><div style="height:100%;width:' + pct + '%;background:' + color + ';border-radius:4px"></div></div></div>';
+  }
+
+  var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">';
+  html += statCard("Użytkownicy", totalUsers, "#1ED760");
+  html += statCard("Z dietą", withDiet, "#8B5CF6");
+  html += statCard("Śr. kcal/dzień", avgKcal || "?", "#F59E0B");
+  html += statCard("Śr. wiek", avgAge ? avgAge + " lat" : "?", "#60A5FA");
+  html += '</div>';
+  html += '<div style="background:#111118;border-radius:12px;padding:14px;border:1px solid #2A2A3A;margin-bottom:12px">';
+  html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Cele użytkowników</div>';
+  html += bar("Redukcja tłuszczu", goals.lose || 0, totalUsers, "#FF4D4D");
+  html += bar("Utrzymanie wagi", goals.maintain || 0, totalUsers, "#F59E0B");
+  html += bar("Masa mięśniowa", goals.gain || 0, totalUsers, "#1ED760");
+  html += '</div>';
+  html += '<div style="background:#111118;border-radius:12px;padding:14px;border:1px solid #2A2A3A;margin-bottom:12px">';
+  html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Sklepy</div>';
+  html += bar("Biedronka", stores.biedronka || 0, totalUsers, "#DC2626");
+  html += bar("Lidl", stores.lidl || 0, totalUsers, "#1D4ED8");
+  html += bar("Oba sklepy", stores.both || 0, totalUsers, "#7C3AED");
+  html += '</div>';
+  // Wykres kcal (SVG)
+  var kcalData = users.filter(function(u) { return u.kcal; }).map(function(u) { return u.kcal; }).sort(function(a,b){return a-b;});
+  if (kcalData.length > 1) {
+    var minK = kcalData[0], maxK = kcalData[kcalData.length-1], rangeK = maxK - minK || 1;
+    html += '<div style="background:#111118;border-radius:12px;padding:14px;border:1px solid #2A2A3A">';
+    html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Rozkład kalorii</div>';
+    html += '<svg width="100%" height="60" viewBox="0 0 300 60">';
+    kcalData.forEach(function(k, i) {
+      var x = Math.round(i / (kcalData.length - 1) * 280 + 10);
+      var h = Math.round((k - minK) / rangeK * 45 + 5);
+      html += '<rect x="' + (x-3) + '" y="' + (60-h) + '" width="6" height="' + h + '" fill="#1ED760" rx="2" opacity="0.8"/>';
+    });
+    html += '<text x="10" y="58" fill="#6B6B85" font-size="9">' + minK + ' kcal</text>';
+    html += '<text x="240" y="58" fill="#6B6B85" font-size="9">' + maxK + ' kcal</text>';
+    html += '</svg></div>';
+  }
+  body.innerHTML = html;
+}
+
+// ══ WIDOK SZCZEGÓŁOWY UŻYTKOWNIKA ═════════════════════════════════════════════
+function openCMSUser(uid) {
+  cmsSelectedUser = uid;
+  var p = cmsUsers[uid] || {};
+  var name = uid.replace(/_/g, " ").replace(/\b\w/g, function(l) { return l.toUpperCase(); });
+  document.getElementById("cms-user-name-hdr").textContent = name;
+  document.getElementById("cms-user-overlay").classList.add("show");
+  renderCMSUserDetail(uid, p);
+}
+
+function renderCMSUserDetail(uid, p) {
+  var body = document.getElementById("cms-user-body");
+  var name = uid.replace(/_/g, " ").replace(/\b\w/g, function(l) { return l.toUpperCase(); });
+  var html = "";
+
+  // Profil
+  html += '<div style="background:#111118;border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid #2A2A3A">';
+  html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Profil</div>';
+  var fields = [
+    ["Imię / ID", name], ["Wiek", p.age ? p.age + " lat" : "?"],
+    ["Waga", p.weight ? p.weight + " kg" : "?"], ["Wzrost", p.height ? p.height + " cm" : "?"],
+    ["Płeć", p.gender === "m" ? "Mężczyzna" : p.gender === "f" ? "Kobieta" : "?"],
+    ["Aktywność", {sed:"Siedzący",light:"Lekki",mod:"Umiarkowany",active:"Aktywny"}[p.activity] || p.activity || "?"],
+    ["Cel", {lose:"Redukcja",maintain:"Utrzymanie",gain:"Masa"}[p.goal] || p.goal || "?"],
+    ["Sklep", {biedronka:"Biedronka",lidl:"Lidl",both:"Oba sklepy"}[p.stores] || p.stores || "?"],
+    ["Wykluczenia", p.exclude || "Brak"],
+  ];
+  fields.forEach(function(f) {
+    html += '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1A1A24">';
+    html += '<span style="font-size:12px;color:#6B6B85">' + f[0] + '</span>';
+    html += '<span style="font-size:12px;font-weight:700;color:#fff">' + f[1] + '</span>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  // Makro
+  if (p.kcal) {
+    html += '<div style="background:#111118;border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid #2A2A3A">';
+    html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Cel kaloryczny i makro</div>';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
+    [["Kalorie", p.kcal + " kcal", "#F59E0B"], ["Białko", (p.prot||"?") + "g", "#60A5FA"], ["Węglowodany", (p.carb||"?") + "g", "#1ED760"], ["Tłuszcze", (p.fat||"?") + "g", "#F9A8D4"]].forEach(function(m) {
+      html += '<div style="background:#0D0D15;border-radius:10px;padding:10px;text-align:center;border:1px solid #2A2A3A">';
+      html += '<div style="font-size:18px;font-weight:900;color:' + m[2] + '">' + m[1] + '</div>';
+      html += '<div style="font-size:10px;color:#6B6B85;margin-top:2px">' + m[0] + '</div></div>';
+    });
+    html += '</div></div>';
+  }
+
+  // Preferencje
+  if ((p.liked && p.liked.length) || (p.disliked && p.disliked.length)) {
+    html += '<div style="background:#111118;border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid #2A2A3A">';
+    html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Preferencje</div>';
+    if (p.liked && p.liked.length) {
+      html += '<div style="margin-bottom:8px"><span style="font-size:11px;color:#1ED760;font-weight:700">Lubi: </span>';
+      html += p.liked.map(function(x) { return '<span style="background:#1ED76015;border:1px solid #1ED76033;border-radius:50px;padding:2px 10px;font-size:11px;color:#1ED760;margin-right:4px">' + x + '</span>'; }).join("");
+      html += '</div>';
+    }
+    if (p.disliked && p.disliked.length) {
+      html += '<div><span style="font-size:11px;color:#FF4D4D;font-weight:700">Nie lubi: </span>';
+      html += p.disliked.map(function(x) { return '<span style="background:#FF4D4D15;border:1px solid #FF4D4D33;border-radius:50px;padding:2px 10px;font-size:11px;color:#FF4D4D;margin-right:4px">' + x + '</span>'; }).join("");
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+
+  // Dieta — podsumowanie
+  if (p.dietData) {
+    html += '<div style="background:#111118;border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid #2A2A3A">';
+    html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Dieta</div>';
+    ["menu1", "menu2"].forEach(function(mk, mi) {
+      var menu = p.dietData[mk];
+      if (!menu) return;
+      html += '<div style="margin-bottom:10px"><div style="font-size:12px;font-weight:800;color:#8B5CF6;margin-bottom:6px">Menu ' + (mi + 1) + '</div>';
+      ["sniadania", "obiady", "kolacje"].forEach(function(t) {
+        (menu[t] || []).forEach(function(meal) {
+          html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:#0D0D15;border-radius:8px;margin-bottom:4px">';
+          html += '<span style="font-size:11px;color:#6B6B85;width:60px;flex-shrink:0">' + {sniadania:"Śniadanie",obiady:"Obiad",kolacje:"Kolacja"}[t] + '</span>';
+          html += '<span style="font-size:12px;font-weight:700;color:#fff;flex:1">' + (meal.nazwa || "?") + '</span>';
+          html += '<span style="font-size:11px;color:#F59E0B">' + (meal.kcal || "?") + ' kcal</span>';
+          html += '</div>';
+        });
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  // Historia zakupów
+  fbGet(FB + "/purchaseHistory/" + uid).then(function(data) {
+    var receipts = data ? Object.values(data).sort(function(a, b) { return (b.ts||0)-(a.ts||0); }) : [];
+    var extraHtml = '<div style="background:#111118;border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid #2A2A3A">';
+    extraHtml += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Historia zakupów (' + receipts.length + ' paragonów)</div>';
+    if (!receipts.length) {
+      extraHtml += '<div style="font-size:12px;color:#6B6B85;text-align:center;padding:10px">Brak paragonów</div>';
+    } else {
+      var totalSum = receipts.reduce(function(s, r) { return s + (r.suma || 0); }, 0);
+      extraHtml += '<div style="font-size:13px;font-weight:800;color:#F59E0B;margin-bottom:10px">Suma: ' + totalSum.toFixed(2) + ' zł</div>';
+      receipts.slice(0, 5).forEach(function(r) {
+        var d = r.ts ? new Date(r.ts).toLocaleDateString("pl-PL") : (r.data || "?");
+        extraHtml += '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:#0D0D15;border-radius:8px;margin-bottom:4px">';
+        extraHtml += '<div><div style="font-size:12px;font-weight:700;color:#fff">' + (r.sklep || "Sklep") + '</div><div style="font-size:10px;color:#6B6B85">' + d + ' &bull; ' + (r.produkty||[]).length + ' prod.</div></div>';
+        if (r.suma) extraHtml += '<span style="font-size:13px;font-weight:800;color:#F59E0B">' + r.suma + ' zł</span>';
+        extraHtml += '</div>';
+      });
+      if (receipts.length > 5) extraHtml += '<div style="font-size:11px;color:#6B6B85;text-align:center;padding:6px">... i ' + (receipts.length - 5) + ' więcej paragonów</div>';
+    }
+    extraHtml += '</div>';
+    document.getElementById("cms-user-body").innerHTML += extraHtml;
+  }).catch(function() {});
+
+  body.innerHTML = html;
+}
+
+// ── Otwórz CMS z URL hash lub przycisku ──────────────────────────────────────
+function checkCMSRoute() {
+  if (window.location.hash === "#admin" || window.location.hash === "#cms") {
+    openCMS();
+    window.history.replaceState(null, "", window.location.pathname);
+  }
+}
+window.addEventListener("load", checkCMSRoute);
+window.addEventListener("hashchange", function() {
+  if (window.location.hash === "#admin" || window.location.hash === "#cms") { checkCMSRoute(); }
+});
+
+
+// ── Normalizacja produktu z paragonu ─────────────────────────────────────────
+function normalizeReceiptProduct(p){
+  return{
+    rawName:p.rawName||p.nazwa||p.n||p.name||"",
+    matchedProductId:p.matchedProductId||"",
+    matchedName:p.matchedName||p.nazwa||p.n||p.name||"",
+    quantity:Number(p.quantity||p.ilosc||p.qty||p.amount||1),
+    unit:p.unit||p.jednostka||"szt",
+    totalPrice:Number(p.totalPrice||p.cenaCalkowita||p.cena||0),
+    unitPrice:Number(p.unitPrice||p.cenaJednostkowa||0),
+    category:p.category||p.kategoria||"",
+    addToPantry:p.addToPantry!==false,
+    isDietProduct:!!p.isDietProduct,
+    isExtraProduct:!!p.isExtraProduct
+  };
+}
+function getReceiptProductName(p){return p.matchedName||p.rawName||p.nazwa||p.n||p.name||"Nieznany produkt";}
+function getReceiptProductQty(p){return Number(p.quantity||p.ilosc||p.qty||p.amount||1);}
+function getReceiptProductUnit(p){return p.unit||p.jednostka||"szt";}
+function getReceiptProductPrice(p){return Number(p.totalPrice||p.cenaCalkowita||p.cena||0);}
+
+// ── Formatuj ilość zakupu (paczki/sztuki/waga) ────────────────────────────────
+function formatPurchaseAmount(item){
+  if(!item.buy)return item.missing?(Math.ceil(item.missing)+"g"):"?";
+  var b=item.buy,p=item.product;
+  if(!p||p.soldByWeight)return Math.ceil(item.missing||0)+(p?p.unit:"g")+" (na wagę)";
+  if(p.unit==="szt"){
+    var pcs=b.pcs||1;
+    return pcs+" "+(pcs===1?"opakowanie":"opakowania")+" "+p.pkgSize+" szt.";
+  }
+  var pcs2=b.pcs||1;
+  var pkgLabel=p.pkgUnit||"opakowanie";
+  return pcs2+" "+pkgLabel+" "+p.pkgSize+(p.unit||"g");
+}
+
+// ── Stan lodówki — data ostatniej aktualizacji ────────────────────────────────
+var lastPantryUpdate=null;
+function loadLastPantryUpdate(){
+  if(!FB||!userName)return;
+  fbGet(FB+"/pantryState/"+profileKey(userName)).then(function(d){
+    if(d&&d.date)lastPantryUpdate=d;
+    renderPantryStatus();
+  }).catch(function(){});
+}
+function savePantryUpdateDate(source,shop,receiptId){
+  var data={date:new Date().toISOString().slice(0,10),source:source||"manual",shop:shop||"",receiptId:receiptId||"",ts:Date.now()};
+  lastPantryUpdate=data;
+  if(FB&&userName)fbPut(FB+"/pantryState/"+profileKey(userName),data);
+  renderPantryStatus();
+}
+function renderPantryStatus(){
+  var el=document.getElementById("pantry-status-bar");
+  if(!el)return;
+  if(!lastPantryUpdate){
+    el.innerHTML='<div style="font-size:12px;color:var(--text3)">Stan lodówki nieznany &bull; <span onclick="showUpdatePantryModal()" style="color:var(--blue);cursor:pointer;text-decoration:underline">Zaktualizuj</span></div>';
+    return;
+  }
+  var d=new Date(lastPantryUpdate.date);
+  var daysAgo=Math.floor((Date.now()-d.getTime())/86400000);
+  var dateStr=d.toLocaleDateString("pl-PL",{day:"2-digit",month:"2-digit",year:"numeric"});
+  var sourceStr={receipt:"po skanowaniu paragonu",manual:"ręcznie",shopping_list:"po zakupach"}[lastPantryUpdate.source]||lastPantryUpdate.source||"";
+  var shopStr=lastPantryUpdate.shop?" z "+lastPantryUpdate.shop:"";
+  var warning=daysAgo>3?'<div style="font-size:11px;color:var(--amber);margin-top:3px">⚠️ Stan może być nieaktualny — '+(daysAgo+' dni temu')+'</div>':"";
+  el.innerHTML='<div style="font-size:12px;color:var(--text2)">Stan lodówki na dzień <b style="color:var(--text)">'+dateStr+'</b>'+(sourceStr?' &bull; '+sourceStr+shopStr:"")+'</div>'
+    +warning
+    +'<div style="margin-top:6px"><button onclick="showUpdatePantryModal()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer">Zaktualizuj stan</button></div>';
+}
+function showUpdatePantryModal(){
+  dlgConfirm("🏠","Aktualizuj stan lodówki","Jak chcesz zaktualizować?",null,"");
+  var box=document.getElementById("dlg");
+  document.getElementById("dlg-btns").innerHTML=
+    '<button class="dlg-btn cancel" onclick="document.getElementById(\'dlg\').classList.remove(\'show\')">Zamknij</button>'
+    +'<button class="dlg-btn ok" onclick="document.getElementById(\'dlg\').classList.remove(\'show\');openReceipt()">Skanuj paragon</button>';
+}
 </script>
+
+<!-- CMS ADMIN PANEL -->
+<div class="overlay" id="cms-overlay" style="align-items:stretch;justify-content:flex-start;padding:0;flex-direction:column;overflow:hidden;z-index:200">
+  <div style="background:#0D0D15;border-bottom:1px solid #2A2A3A;padding:14px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0">
+    <button onclick="closeCMS()" style="background:#1A1A24;border:none;color:#6B6B85;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer">&#8592;</button>
+    <div>
+      <div style="font-size:17px;font-weight:900;color:#fff">Panel Administratora</div>
+      <div style="font-size:11px;color:#6B6B85">Pełna Lodówka CMS</div>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+      <div id="cms-sync-dot" style="width:8px;height:8px;border-radius:50%;background:#1ED760"></div>
+      <span style="font-size:11px;color:#6B6B85">Firebase</span>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div style="display:flex;background:#111118;border-bottom:1px solid #2A2A3A;flex-shrink:0">
+    <button id="cmstab-0" onclick="switchCMSTab(0)" style="flex:1;padding:11px;border:none;background:none;color:#1ED760;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid #1ED760">Użytkownicy</button>
+    <button id="cmstab-1" onclick="switchCMSTab(1)" style="flex:1;padding:11px;border:none;background:none;color:#6B6B85;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent">Diety</button>
+    <button id="cmstab-2" onclick="switchCMSTab(2)" style="flex:1;padding:11px;border:none;background:none;color:#6B6B85;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent">Paragony</button>
+    <button id="cmstab-3" onclick="switchCMSTab(3)" style="flex:1;padding:11px;border:none;background:none;color:#6B6B85;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent">Statystyki</button>
+  </div>
+
+  <div id="cms-body" style="flex:1;overflow-y:auto;padding:16px;background:#0A0A0F"></div>
+</div>
+
+<!-- CMS USER DETAIL PANEL -->
+<div class="overlay" id="cms-user-overlay" style="align-items:stretch;justify-content:flex-start;padding:0;flex-direction:column;overflow:hidden;z-index:210">
+  <div style="background:#0D0D15;border-bottom:1px solid #2A2A3A;padding:14px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0">
+    <button onclick="closeCMSUser()" style="background:#1A1A24;border:none;color:#6B6B85;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer">&#8592;</button>
+    <div id="cms-user-name-hdr" style="font-size:16px;font-weight:900;color:#fff">Użytkownik</div>
+  </div>
+  <div id="cms-user-body" style="flex:1;overflow-y:auto;padding:16px;background:#0A0A0F"></div>
+</div>
+
+<!-- CMS PASSWORD -->
+<div class="dlg-overlay" id="cms-pass-overlay">
+  <div class="dlg-box" style="max-width:340px">
+    <div class="dlg-ico">&#128272;</div>
+    <div class="dlg-title">Panel Administratora</div>
+    <div class="dlg-msg" style="margin-bottom:12px">Wpisz hasło administratora</div>
+    <input id="cms-pass-inp" type="password" class="modal-inp" placeholder="Hasło..." onkeydown="if(event.key==='Enter')checkCMSPass()" style="margin-bottom:14px">
+    <div class="dlg-btns">
+      <button class="dlg-btn cancel" onclick="document.getElementById('cms-pass-overlay').classList.remove('show')">Anuluj</button>
+      <button class="dlg-btn ok" onclick="checkCMSPass()">Wejdź</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
