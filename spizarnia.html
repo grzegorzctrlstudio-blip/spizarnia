@@ -245,11 +245,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       </div>
       <div id="shop-lbl" style="display:none"></div><div id="shop-ago" style="display:none"></div><div id="pantry-status-bar" style="background:var(--bg3);border-radius:12px;padding:10px 14px;margin-bottom:10px;border:1px solid var(--border)">
         <div style="font-size:12px;color:var(--text3)">Ładowanie stanu lodówki...</div>
-      </div><div class="stat-n" id="n-grn">0</div><div class="stat-label">W lodówce</div></div>
-        <div class="stat-card neutral"><div style="font-size:16px">&#128230;</div><div class="stat-n" id="n-all">0</div><div class="stat-label">Pozycji</div></div>
-        <button class="action-card primary" onclick="markShopping()"><span style="font-size:18px">&#128717;&#65039;</span><span style="font-size:8px;font-weight:800;text-transform:uppercase">Bylem w<br>sklepie</span></button>
-        <button class="action-card expiry" onclick="setFilter('exp')"><span style="font-size:18px">&#9200;</span><span style="font-size:8px;font-weight:800;text-transform:uppercase;color:var(--amber)" id="exp-alert-txt">Data<br>waznosci</span></button>
-      </div>
+      
       
       <div class="search-wrap">
         <span class="search-ico">&#128269;</span>
@@ -262,12 +258,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 
   <div class="page-flex" id="page-chat">
-    <div class="chat-hdr"><h2 style="font-size:19px;font-weight:900">Agent AI</h2><p style="font-size:12px;color:var(--text3);margin-top:3px">Sposób przygotowaniay i porady na podstawie Twojej lodówki i diety</p></div>
+    <div class="chat-hdr"><h2 style="font-size:19px;font-weight:900">Agent AI</h2><p style="font-size:12px;color:var(--text3);margin-top:3px">Przepisy i porady na podstawie Twojej lodówki i diety</p></div>
     <div class="chat-sugs">
       <button class="sug-btn" onclick="sendSug('Co moge ugotowac z tego co mam?')">Co ugotować?</button>
       <button class="sug-btn" onclick="sendSug('Zaproponuj mi obiad na dzis')">Obiad na dziś</button>
       <button class="sug-btn" onclick="sendSug('Co wkrotce wygasnie?')">Co wkrótce wygasa?</button>
-      <button class="sug-btn" onclick="sendSug('Nowe śniadanie')">Sniadanie</button>
+      <button class="sug-btn" onclick="sendSug('Nowe śniadanie')">Śniadanie</button>
     </div>
     <div class="chat-msgs" id="chat-msgs"></div>
     <div class="chat-inp-row">
@@ -325,7 +321,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="modal"><h3>Data ważności</h3><p id="exp-name" style="color:var(--text2);margin-bottom:12px"></p>
     <input type="date" class="modal-inp" id="exp-date-inp" style="color-scheme:dark">
     <div class="modal-btns"><button class="mbtn blue" onclick="openScannerFromExpiry()">Skanuj</button><button class="mbtn ok" onclick="saveExpiry()">Zapisz</button></div>
-    <div class="modal-btns"><button class="mbtn del" onclick="clearExpiry()">Usun date</button><button class="mbtn cancel" onclick="closeExpiry()">Zamknij</button></div>
+    <div class="modal-btns"><button class="mbtn del" onclick="clearExpiry()">Usuń datę</button><button class="mbtn cancel" onclick="closeExpiry()">Zamknij</button></div>
   </div>
 </div>
 <!-- SCAN MODAL -->
@@ -364,16 +360,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
       <div>
         <h3 style="font-size:16px;margin-bottom:2px">Zdjęcia produktu</h3>
-        <p style="font-size:11px;color:var(--text3)">Zdjęcia będą widoczne jako miniaturki na liscie</p>
+        <p style="font-size:11px;color:var(--text3)">Zdjęcia będą widoczne jako miniaturki na liście</p>
       </div>
       <button onclick="closePhoto()" style="background:var(--bg3);border:none;color:var(--text2);border-radius:50%;width:30px;height:30px;font-size:15px;cursor:pointer">&#215;</button>
     </div>
     <p id="photo-modal-name" style="color:var(--green);margin-bottom:14px;font-weight:800;font-size:14px;padding:8px 12px;background:rgba(30,215,96,.08);border-radius:10px;border:1px solid rgba(30,215,96,.2)"></p>
 
-    <!-- 3 sloty: Przód (ikona), Bok, Gora -->
+    <!-- 3 sloty: Przód (ikona), Bok, Góra -->
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
       <div>
-        <div style="font-size:9px;font-weight:800;color:var(--green);margin-bottom:5px;text-align:center;text-transform:uppercase;letter-spacing:.6px">Przod &#11088;<br><span style="color:var(--text3);font-weight:600">(ikona listy)</span></div>
+        <div style="font-size:9px;font-weight:800;color:var(--green);margin-bottom:5px;text-align:center;text-transform:uppercase;letter-spacing:.6px">Przód &#11088;<br><span style="color:var(--text3);font-weight:600">(ikona listy)</span></div>
         <div onclick="triggerSlotPhoto('front')" style="width:100%;height:100px;background:var(--bg3);border:2px dashed var(--green);border-radius:10px;cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative">
           <img id="slot-front-img" style="display:none;width:100%;height:100%;object-fit:cover" alt="">
           <div id="slot-front-empty" style="text-align:center;color:var(--green)"><div style="font-size:24px">&#128247;</div><div style="font-size:9px;margin-top:3px;font-weight:700">Dodaj</div></div>
@@ -387,7 +383,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         </div>
       </div>
       <div>
-        <div style="font-size:9px;font-weight:800;color:var(--text3);margin-bottom:5px;text-align:center;text-transform:uppercase;letter-spacing:.6px">Gora<br><span style="font-weight:400">&nbsp;</span></div>
+        <div style="font-size:9px;font-weight:800;color:var(--text3);margin-bottom:5px;text-align:center;text-transform:uppercase;letter-spacing:.6px">Góra<br><span style="font-weight:400">&nbsp;</span></div>
         <div onclick="triggerSlotPhoto('top')" style="width:100%;height:100px;background:var(--bg3);border:2px dashed var(--border2);border-radius:10px;cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center">
           <img id="slot-top-img" style="display:none;width:100%;height:100%;object-fit:cover" alt="">
           <div id="slot-top-empty" style="text-align:center;color:var(--text3)"><div style="font-size:24px">&#128247;</div><div style="font-size:9px;margin-top:3px;font-weight:700">Dodaj</div></div>
@@ -404,21 +400,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
           <div id="slot-expiry-empty" style="text-align:center;color:var(--amber)"><div style="font-size:22px">&#128197;</div><div style="font-size:8px;margin-top:2px;font-weight:700">Skanuj</div></div>
         </div>
         <div style="flex:1;font-size:11px;color:var(--text3);line-height:1.6">
-          Zrób zdjęcie kodu daty na opakowaniu — AI automatycznie rozpozna date i ja zapisze.<br>
+          Zrób zdjęcie kodu daty na opakowaniu — AI automatycznie rozpozna datę i ją zapisze.<br>
           <span style="color:var(--amber);font-weight:700">Format: DD.MM.RRRR</span>
         </div>
       </div>
     </div>
 
     <div style="font-size:10px;color:var(--text3);text-align:center;margin-bottom:12px;padding:8px;background:var(--bg3);border-radius:8px;line-height:1.5">
-      Zdjecie <b style="color:var(--green)">Przodu</b> bedzie widoczne jako ikona produktu na liście lodówki
+      Zdjecie <b style="color:var(--green)">Przódu</b> będzie widoczne jako ikona produktu na liście lodówki
     </div>
     <button class="mbtn cancel" style="width:100%" onclick="closePhoto()">Gotowe</button>
     <input type="file" id="photo-slot-file" accept="image/*" capture="environment" style="display:none" onchange="handleSlotPhoto(this)">
   </div>
 </div>
 <!-- SETTINGS -->
-<div class="overlay" id="admin-pass-overlay"><div class="modal" style="text-align:center"><div style="font-size:38px;margin-bottom:10px">&#128272;</div><h3>Panel admina</h3><p style="color:var(--text3);margin-bottom:14px">Wpisz haslo zeby zarzadzac kluczem API</p><input class="modal-inp" id="admin-pass-inp" type="password" placeholder="Hasło administratora" onkeydown="if(event.key==='Enter')checkAdminPass()"><div class="modal-btns"><button class="mbtn cancel" onclick="closeAdminPass()">Anuluj</button><button class="mbtn ok" onclick="checkAdminPass()">Wejdz</button></div></div></div>
+<div class="overlay" id="admin-pass-overlay"><div class="modal" style="text-align:center"><div style="font-size:38px;margin-bottom:10px">&#128272;</div><h3>Panel admina</h3><p style="color:var(--text3);margin-bottom:14px">Wpisz hasło, aby zarządzać kluczem API</p><input class="modal-inp" id="admin-pass-inp" type="password" placeholder="Hasło administratora" onkeydown="if(event.key==='Enter')checkAdminPass()"><div class="modal-btns"><button class="mbtn cancel" onclick="closeAdminPass()">Anuluj</button><button class="mbtn ok" onclick="checkAdminPass()">Wejdź</button></div></div></div>
 <div class="overlay" id="settings-overlay" onclick="if(event.target===this)closeSettings()"><div class="modal"><h3>Panel administratora</h3>
     <button onclick="closeSettings();openCMS()" style="width:100%;background:linear-gradient(135deg,#8B5CF6,#4F46E5);color:#fff;border:none;border-radius:10px;padding:10px;font-size:12px;font-weight:800;cursor:pointer;margin-bottom:12px">&#128102; Otwórz CMS — zarządzanie użytkownikami</button><div style="background:#3D8BFF15;border:1px solid #3D8BFF44;border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#93C5FD" id="admin-api-status">Sprawdzam klucz...</div><input class="modal-inp" id="api-key-inp" type="password" placeholder="sk-ant-... (klucz API)" style="font-size:12px;font-family:monospace"><div class="modal-btns" style="margin-bottom:8px"><button class="mbtn ok" onclick="saveApiKey()">Zapisz dla wszystkich użytkowników</button></div><div class="modal-btns"><button class="mbtn del" onclick="clearApiKey()">Usuń klucz</button><button class="mbtn cancel" onclick="closeSettings()">Zamknij</button></div></div></div>
 <!-- LOG MODAL -->
@@ -447,7 +443,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div style="font-size:12px;color:var(--text3)" id="diet-user-name"></div>
   </div>
   <div style="display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0">
-    <button id="dtab-0" onclick="switchDietTab(0)" style="flex:1;padding:12px;border:none;background:none;font-size:13px;font-weight:700;cursor:pointer;border-bottom:3px solid var(--green);color:var(--green)">Sposób przygotowaniay</button>
+    <button id="dtab-0" onclick="switchDietTab(0)" style="flex:1;padding:12px;border:none;background:none;font-size:13px;font-weight:700;cursor:pointer;border-bottom:3px solid var(--green);color:var(--green)">Przepisy</button>
     <button id="dtab-1" onclick="switchDietTab(1)" style="flex:1;padding:12px;border:none;background:none;color:var(--text3);font-size:13px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent">Plan tygodnia</button>
     <button id="dtab-2" onclick="switchDietTab(2)" style="flex:1;padding:12px;border:none;background:none;color:var(--text3);font-size:13px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent">Wgraj dietę</button>
     <button id="dtab-3" onclick="switchDietTab(3)" style="flex:1;padding:12px;border:none;background:none;color:var(--text3);font-size:12px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent">Historia</button>
@@ -520,7 +516,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <button class="pref-chip" data-val="jogurt" onclick="togglePref(this,'liked')">🥛 Jogurt/Skyr</button>
         <button class="pref-chip" data-val="orzechy" onclick="togglePref(this,'liked')">🌰 Orzechy</button>
       </div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Czego <b style="color:var(--red)">nie lubisz lub nie mozesz jesc</b>:</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Czego <b style="color:var(--red)">nie lubisz lub nie możesz jeść</b>:</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px" id="disliked-chips">
         <button class="pref-chip dislike" data-val="ryby" onclick="togglePref(this,'disliked')">🐟 Ryby</button>
         <button class="pref-chip dislike" data-val="laktoza" onclick="togglePref(this,'disliked')">🥛 Laktoza</button>
@@ -1448,7 +1444,7 @@ function startDietGeneration(){
   // Pokaż natychmiastowy feedback w diet-overlay
   document.getElementById("diet-overlay").classList.add("show");
   document.getElementById("diet-user-name").textContent=userName;
-  // Aktywuj zakładkę Sposób przygotowaniay
+  // Aktywuj zakładkę Przepisy
   for(var i=0;i<3;i++){var t=document.getElementById("dtab-"+i);if(t){t.style.borderBottom=i===0?"3px solid var(--green)":"3px solid transparent";t.style.color=i===0?"var(--green)":"var(--text3)";}}
   var body=document.getElementById("diet-body");
   var storeName={biedronka:"Biedronka",lidl:"Lidl",both:"Biedronka i Lidl"}[userProfile.stores]||"Biedronka";
