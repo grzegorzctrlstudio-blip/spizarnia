@@ -38,15 +38,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .splash-sub{font-size:13px;color:var(--text3);text-align:center;line-height:1.6;max-width:260px}
 
 /* ── LOGIN ── */
-#login{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;gap:20px;background:radial-gradient(ellipse at 50% 0%,#1a1a2e 0%,var(--bg) 70%)}
-.login-logo{font-size:64px;filter:drop-shadow(0 0 24px rgba(30,215,96,.4))}
-.login-title{font-size:28px;font-weight:900;letter-spacing:-1px;background:linear-gradient(135deg,#fff 0%,var(--text2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.login-sub{font-size:13px;color:var(--text3);text-align:center}
-.name-inp{width:100%;max-width:340px;background:var(--bg3);border:1.5px solid var(--border2);border-radius:14px;padding:16px 20px;font-size:18px;color:var(--text);outline:none;text-align:center;font-weight:700;transition:border .2s}
+#login{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 24px 40px;gap:14px;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(30,215,96,.18) 0%,transparent 60%),radial-gradient(ellipse 70% 50% at 50% 100%,rgba(139,92,246,.15) 0%,transparent 60%),var(--bg)}
+.login-hero{width:100%;max-width:340px;margin-bottom:6px}
+.login-svg{width:100%;height:auto;display:block;filter:drop-shadow(0 8px 32px rgba(30,215,96,.25))}
+.login-title{font-size:32px;font-weight:900;letter-spacing:-1.2px;background:linear-gradient(135deg,#fff 0%,var(--text2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;margin-top:4px}
+.login-sub{font-size:13px;color:var(--text3);text-align:center;max-width:300px;line-height:1.55;margin-bottom:12px}
+.login-mode-tabs{display:flex;width:100%;max-width:340px;background:var(--bg3);border-radius:50px;padding:4px;border:1px solid var(--border);margin-bottom:6px}
+.login-mode-btn{flex:1;background:transparent;border:none;color:var(--text3);font-size:13px;font-weight:800;padding:10px 14px;border-radius:50px;cursor:pointer;transition:all .2s}
+.login-mode-btn.act{background:var(--green);color:#000}
+.name-inp{width:100%;max-width:340px;background:var(--bg3);border:1.5px solid var(--border2);border-radius:14px;padding:15px 18px;font-size:16px;color:var(--text);outline:none;text-align:center;font-weight:700;transition:border .2s}
 .name-inp:focus{border-color:var(--green)}
 .name-inp::placeholder{color:var(--text3);font-weight:400}
-.login-btn{width:100%;max-width:340px;background:var(--green);color:#000;border:none;border-radius:50px;padding:16px;font-size:16px;font-weight:900;cursor:pointer;letter-spacing:.3px;transition:transform .15s,filter .15s}
+.login-btn{width:100%;max-width:340px;background:var(--green);color:#000;border:none;border-radius:50px;padding:15px;font-size:15px;font-weight:900;cursor:pointer;letter-spacing:.3px;transition:transform .15s,filter .15s;margin-top:4px}
 .login-btn:active{transform:scale(.97);filter:brightness(.9)}
+.login-tip{font-size:11px;color:var(--text3);text-align:center;margin-top:8px;line-height:1.55;max-width:300px}
 
 /* ── TOP NAV (segmented control) — single instance inside #app-hdr ── */
 .top-nav{display:flex;background:var(--bg3);border:1px solid var(--border);border-radius:50px;padding:4px;gap:4px;margin:0 0 12px}
@@ -94,7 +99,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .search-clear.show{display:flex}
 
 /* ── CATEGORY CHIPS ── */
-.cat-chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:12px;scrollbar-width:none}
+.cat-chips-wrap{position:sticky;top:0;z-index:20;background:linear-gradient(to bottom,var(--bg) 70%,rgba(10,10,15,.85) 100%);padding:8px 0 10px;margin:0 -16px;padding-left:16px;padding-right:16px;backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+.cat-chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
 .cat-chips::-webkit-scrollbar{display:none}
 .cat-chip{display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:50px;border:1.5px solid var(--border);background:transparent;color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0}
 .cat-chip.act{background:var(--green);border-color:var(--green);color:#000}
@@ -450,12 +456,70 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 </div>
 
 <div id="login" style="display:flex">
-  <div class="login-logo">🥦</div>
+  <!-- Hero illustration: stylowa lodówka SVG -->
+  <div class="login-hero">
+    <svg class="login-svg" viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg" fill="none">
+      <defs>
+        <linearGradient id="fridgeGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#1ED760" stop-opacity=".24"/>
+          <stop offset="100%" stop-color="#17A84A" stop-opacity=".08"/>
+        </linearGradient>
+        <linearGradient id="doorGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#22222F"/>
+          <stop offset="100%" stop-color="#1A1A24"/>
+        </linearGradient>
+      </defs>
+      <!-- Glow -->
+      <ellipse cx="160" cy="195" rx="120" ry="14" fill="#1ED760" fill-opacity=".14"/>
+      <!-- Body -->
+      <rect x="92" y="22" width="136" height="172" rx="20" fill="url(#fridgeGrad)" stroke="#1ED760" stroke-opacity=".55" stroke-width="2"/>
+      <!-- Top compartment -->
+      <rect x="100" y="30" width="120" height="62" rx="13" fill="url(#doorGrad)" stroke="#1ED760" stroke-opacity=".35"/>
+      <!-- Bottom compartment -->
+      <rect x="100" y="98" width="120" height="88" rx="13" fill="url(#doorGrad)" stroke="#1ED760" stroke-opacity=".35"/>
+      <!-- Handles -->
+      <rect x="108" y="48" width="4" height="22" rx="2" fill="#1ED760" opacity=".7"/>
+      <rect x="108" y="118" width="4" height="34" rx="2" fill="#1ED760" opacity=".7"/>
+      <!-- Sparkle / aktywność -->
+      <circle cx="210" cy="40" r="4" fill="#1ED760"/>
+      <circle cx="210" cy="40" r="8" fill="#1ED760" fill-opacity=".25"/>
+      <!-- Shelf items - top -->
+      <rect x="110" y="44" width="36" height="6" rx="2" fill="#F59E0B" opacity=".85"/>
+      <rect x="152" y="44" width="22" height="6" rx="2" fill="#60A5FA" opacity=".85"/>
+      <rect x="180" y="44" width="28" height="6" rx="2" fill="#F9A8D4" opacity=".85"/>
+      <rect x="110" y="58" width="50" height="6" rx="2" fill="#1ED760" opacity=".7"/>
+      <rect x="166" y="58" width="42" height="6" rx="2" fill="#FF4D4D" opacity=".75"/>
+      <rect x="110" y="72" width="32" height="6" rx="2" fill="#8B5CF6" opacity=".7"/>
+      <rect x="148" y="72" width="60" height="6" rx="2" fill="#1ED760" opacity=".6"/>
+      <!-- Shelf items - bottom -->
+      <rect x="110" y="112" width="44" height="8" rx="2" fill="#16A34A" opacity=".7"/>
+      <rect x="160" y="112" width="48" height="8" rx="2" fill="#D97706" opacity=".7"/>
+      <rect x="110" y="128" width="60" height="8" rx="2" fill="#0891B2" opacity=".7"/>
+      <rect x="176" y="128" width="32" height="8" rx="2" fill="#CA8A04" opacity=".7"/>
+      <rect x="110" y="144" width="98" height="8" rx="2" fill="#1ED760" opacity=".6"/>
+      <rect x="110" y="160" width="54" height="8" rx="2" fill="#E11D48" opacity=".65"/>
+      <rect x="170" y="160" width="38" height="8" rx="2" fill="#2563EB" opacity=".7"/>
+      <!-- Shopping cart badge -->
+      <circle cx="248" cy="60" r="22" fill="#1ED760" stroke="#0A0A0F" stroke-width="3"/>
+      <path d="M239 56 L243 56 L246 67 L257 67 L260 58 L244 58" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <circle cx="248" cy="71" r="1.6" fill="#000"/>
+      <circle cx="255" cy="71" r="1.6" fill="#000"/>
+    </svg>
+  </div>
+
   <div class="login-title">Pełna Lodówka</div>
-  <p class="login-sub">Twój domowy asystent zakupów</p>
+  <p class="login-sub">Inteligentna lodówka: śledzi zapasy, doradza posiłki, automatycznie tworzy listę zakupów na Biedronkę i&nbsp;Lidl.</p>
+
+  <!-- Wybór trybu: mam konto / załóż nowe -->
+  <div class="login-mode-tabs">
+    <button class="login-mode-btn act" id="login-mode-existing" onclick="setLoginMode('existing')">Mam konto</button>
+    <button class="login-mode-btn" id="login-mode-new" onclick="setLoginMode('new')">Załóż nowe</button>
+  </div>
+
   <input class="name-inp" id="name-inp" placeholder="Imię" maxlength="30" onkeydown="if(event.key==='Enter')document.getElementById('surname-inp').focus()">
-  <input class="name-inp" id="surname-inp" placeholder="Nazwisko" maxlength="40" style="margin-top:10px" onkeydown="if(event.key==='Enter')doLogin()">
-  <button class="login-btn" onclick="doLogin()">Wchodzę →</button>
+  <input class="name-inp" id="surname-inp" placeholder="Nazwisko" maxlength="40" onkeydown="if(event.key==='Enter')doLogin()">
+  <button class="login-btn" id="login-btn" onclick="doLogin()">Wchodzę →</button>
+  <div class="login-tip" id="login-tip">Wpisz imię i&nbsp;nazwisko, aby wrócić do swojej lodówki.</div>
 </div>
 
 <div id="app" style="display:none">
@@ -535,11 +599,13 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
         <button class="search-clear" id="xbtn" onclick="clearSearch()">✕</button>
       </div>
 
-      <!-- CATEGORY CHIPS -->
-      <div class="cat-chips" id="cat-chips">
-        <button class="cat-chip act" id="chip-all" onclick="setCatFilter('all')">
-          <span class="cat-chip-ico">📋</span>Wszystko
-        </button>
+      <!-- CATEGORY CHIPS (sticky podczas scrollu) -->
+      <div class="cat-chips-wrap">
+        <div class="cat-chips" id="cat-chips">
+          <button class="cat-chip act" id="chip-all" onclick="setCatFilter('all')">
+            <span class="cat-chip-ico">📋</span>Wszystko
+          </button>
+        </div>
       </div>
 
       <!-- Filtry statusu są obsługiwane przez kafle dashboardu -->
@@ -844,7 +910,7 @@ var CP=FB+"/config/apikey";
 var PH_PATH=""; // /purchaseHistory/{userId}
 var PANTRY_PATH=""; // /pantry/{userId}
 var pantryData={}; // {productId: {amount, unit, pkgSize, ...}}
-var state={},expiry={},photos={},filter="all",catFilter="all",searchQ="";
+var state={},expiry={},photos={},productTs={},filter="all",catFilter="all",searchQ="";
 var userName="",userFirstName="",userLastName="",userDisplayName="",shopTs=0,saveTimer=null,apiKey="";
 var expiryItem=null,scanData=null,scanFromExpiry=false,scanSavesPhoto=false;
 var photoItem=null,activeSlot="front",chatHistory=[],chatBusy=false;
@@ -1035,16 +1101,30 @@ function isExpiredProduct(it){var d=getExplicitExpiryDaysLeft(it);return d!==nul
 function isExpiringSoonProduct(it){var d=getExplicitExpiryDaysLeft(it);return d!==null&&d>=0&&d<=3;}
 function isExpired(it){return isExpiredProduct(it);}
 function isExpiringSoon(it){return isExpiringSoonProduct(it);}
+// Znajdź klucz produktu w state (per-produkt timestamp lookup)
+function productTsKey(it){
+  for(var i=0;i<CATS.length;i++){
+    for(var j=0;j<CATS[i].items.length;j++){
+      if(CATS[i].items[j].n===it.n)return fbk(CATS[i].id,it.n);
+    }
+  }
+  return null;
+}
 function fHtml(it){
-  // Najpierw sprawdź explicit datę (ustawioną przez użytkownika lub AI)
+  // Najpierw sprawdź explicit datę (ustawioną przez użytkownika lub AI scanner)
   var d=getExplicitExpiryDaysLeft(it);
   var isExplicit=d!==null;
-  // Fallback: orientacyjnie z CATS.days od daty aktualizacji lodówki
+  // Fallback: orientacyjnie z CATS.days
+  // Priorytet referencyjnej daty: productTs (kiedy ostatnio dodano produkt) → shopTs (data aktualizacji lodówki)
   if(!isExplicit){
-    if(it.days&&shopTs){
-      d=Math.floor(it.days-(Date.now()-shopTs)/86400000);
-    }else if(it.days){
-      d=it.days;
+    if(it.days){
+      var tsKey=productTsKey(it);
+      var refTs=(tsKey&&productTs[tsKey])||shopTs||0;
+      if(refTs){
+        d=Math.floor(it.days-(Date.now()-refTs)/86400000);
+      }else{
+        d=it.days;
+      }
     }else{
       return "";
     }
@@ -1568,6 +1648,12 @@ function adj(id,catId,name,delta){
   var nv=Math.min(max*2,Math.max(0,o+Number(delta||0)));
   if(nv===o)return;
   state[id]=nv;
+  // Zapisz timestamp aktualizacji produktu (per-produkt świeżość)
+  if(nv>o){
+    // Dodanie produktu → reset timera świeżości
+    productTs[id]=Date.now();
+    if(EP){var tk="t_"+id,tp={};tp[tk]=productTs[id];fbPatch(EP,tp).catch(function(){});}
+  }
   render();
   clearTimeout(saveTimer);
   setSyncUI("saving");
@@ -1697,7 +1783,10 @@ function render(){
       var borderColor=isExpiredProduct(it)?"var(--red)":isExpiringSoonProduct(it)?"var(--amber)":cc==="grn"?"var(--green)":cc==="low"?"var(--amber)":"var(--red)";
       var dKey=fbk("e",it.n);
       var hasDate=!!expiry[dKey];
-      html+='<div class="item" style="border-left-color:'+borderColor+'">';
+      // Tło karty w kolorze kategorii (subtelny gradient)
+      var catTint=catColor+'14';
+      var catTintStrong=catColor+'22';
+      html+='<div class="item" style="background:linear-gradient(135deg,'+catTint+' 0%,'+catTintStrong+' 100%);border-left:5px solid '+borderColor+';border-color:'+catColor+'33">';
       html+='<div style="display:flex;align-items:center;gap:10px">';
       html+=photoHtml;
       html+='<div style="flex:1;min-width:0">';
@@ -2242,6 +2331,25 @@ var GRZES_DIET={menu1:{
 }};
 
 // ── LOGIN ─────────────────────────────────────────────────────────────────────
+var loginMode="existing"; // "existing" | "new"
+function setLoginMode(mode){
+  loginMode=mode||"existing";
+  var ex=document.getElementById("login-mode-existing");
+  var nw=document.getElementById("login-mode-new");
+  if(ex)ex.classList.toggle("act",loginMode==="existing");
+  if(nw)nw.classList.toggle("act",loginMode==="new");
+  var btn=document.getElementById("login-btn");
+  var tip=document.getElementById("login-tip");
+  if(loginMode==="new"){
+    if(btn)btn.textContent="Załóż konto →";
+    if(tip)tip.innerHTML="Po kliknięciu przeprowadzimy Cię przez krótki onboarding: imię, parametry, cel i&nbsp;preferencje.";
+    var ni=document.getElementById("name-inp");if(ni)ni.value="";
+    var si=document.getElementById("surname-inp");if(si)si.value="";
+  }else{
+    if(btn)btn.textContent="Wchodzę →";
+    if(tip)tip.innerHTML="Wpisz imię i&nbsp;nazwisko, aby wrócić do swojej lodówki.";
+  }
+}
 function doLogin(){
   var first=document.getElementById("name-inp").value.trim();
   var last=(document.getElementById("surname-inp")||{}).value||"";last=last.trim();
@@ -2270,7 +2378,12 @@ function startApp(){
     state=mkState();
     if(remote){Object.keys(remote).forEach(function(k){if(k in state)state[k]=remote[k]||0;if(k==="__shopTs")shopTs=remote[k];});}
     else fbPatch(RP,state);
-    expiry={};if(exp)Object.keys(exp).forEach(function(k){if(exp[k])expiry[k]=exp[k];});
+    expiry={};productTs={};
+    if(exp)Object.keys(exp).forEach(function(k){
+      if(!exp[k])return;
+      if(k.indexOf("t_")===0){productTs[k.substring(2)]=Number(exp[k])||0;}
+      else{expiry[k]=exp[k];}
+    });
     photos={};if(ph)Object.keys(ph).forEach(function(k){if(ph[k])photos[k]=ph[k];});
     document.getElementById("splash").style.display="none";
     document.getElementById("app").style.display="block";
@@ -2285,7 +2398,12 @@ function startApp(){
         var r=res[0],e=res[1],k=res[2],p=res[3],ch=false;
         if(k)apiKey=k;
         if(r){Object.keys(r).forEach(function(key2){if(key2 in state&&r[key2]!==state[key2]){state[key2]=r[key2]||0;ch=true;}if(key2==="__shopTs"&&r[key2]!==shopTs){shopTs=r[key2];updateShopBar();ch=true;}});}
-        expiry={};if(e)Object.keys(e).forEach(function(key2){if(e[key2])expiry[key2]=e[key2];});
+        expiry={};productTs={};
+        if(e)Object.keys(e).forEach(function(key2){
+          if(!e[key2])return;
+          if(key2.indexOf("t_")===0){productTs[key2.substring(2)]=Number(e[key2])||0;}
+          else{expiry[key2]=e[key2];}
+        });
         photos={};if(p)Object.keys(p).forEach(function(key2){if(p[key2])photos[key2]=p[key2];});
         if(ch)render();setSyncUI("ok");
       }).catch(function(){setSyncUI("err");});
@@ -2671,6 +2789,27 @@ function calculateShoppingListFromDiet(days){
 }
 
 // Renderuj inteligentną listę zakupów
+// Klasyfikuje pozycję zakupową wg typu opakowania w sklepie
+function shopItemPackType(item){
+  var prod=item.product;
+  if(!prod){
+    // brak danych produktu w PRODUCT_DB - oszacuj po nazwie / jednostce
+    var unit=(item.unit||"").toLowerCase();
+    if(unit==="szt"||unit==="szt.")return {key:"sztuki",label:"Sztuki",ico:"🥬",order:3};
+    return {key:"wagowe",label:"Na wagę",ico:"⚖️",order:1};
+  }
+  if(prod.soldByWeight)return {key:"wagowe",label:"Na wagę",ico:"⚖️",order:1};
+  var pu=String(prod.pkgUnit||"").toLowerCase();
+  if(pu.indexOf("bochenek")!==-1)return {key:"bochenki",label:"Pieczywo (bochenki)",ico:"🍞",order:5};
+  if(pu.indexOf("butelka")!==-1)return {key:"butelki",label:"Butelki",ico:"🫙",order:6};
+  if(pu.indexOf("puszka")!==-1)return {key:"puszki",label:"Puszki / słoiki",ico:"🥫",order:7};
+  if(pu.indexOf("słoik")!==-1||pu.indexOf("sloik")!==-1)return {key:"puszki",label:"Puszki / słoiki",ico:"🫙",order:7};
+  if(pu.indexOf("litr")!==-1)return {key:"butelki",label:"Płyny / litry",ico:"🥛",order:6};
+  if(pu.indexOf("kg")!==-1)return {key:"wagowe",label:"Na wagę",ico:"⚖️",order:1};
+  if(prod.unit==="szt")return {key:"sztuki",label:"Sztuki",ico:"🥬",order:3};
+  return {key:"opakowania",label:"Opakowania",ico:"📦",order:4};
+}
+
 function renderSmartShoppingList(list){
   // Filtruj wg wybranego sklepu (jeśli "both" → zostaw wszystkie)
   function shopMatch(prod){
@@ -2679,15 +2818,22 @@ function renderSmartShoppingList(list){
     var sLabel=shopStore==="biedronka"?"Biedronka":shopStore==="lidl"?"Lidl":"";
     return prod.shops.some(function(s){return String(s).toLowerCase().indexOf(sLabel.toLowerCase())!==-1;});
   }
-  // Sortuj listy alfabetycznie
   list=sortByNamePL(list,function(i){return i.name||"";});
   var tooBuy=list.filter(function(i){return i.status==="MISSING"&&shopMatch(i.product);});
   var have=list.filter(function(i){return i.status==="OK";});
   if(!tooBuy.length&&!have.length){
     return'<div style="text-align:center;padding:30px;color:var(--text3)"><div style="font-size:40px;margin-bottom:10px">🍽️</div>Brak składników do obliczenia.<br><br>Wygeneruj najpierw dietę w sekcji <b>Moja dieta</b>.</div>';
   }
+  // Grupuj DO KUPIENIA wg typu opakowania
+  var groups={};
+  tooBuy.forEach(function(it){
+    var g=shopItemPackType(it);
+    if(!groups[g.key])groups[g.key]={meta:g,items:[]};
+    groups[g.key].items.push(it);
+  });
+  var groupKeys=Object.keys(groups).sort(function(a,b){return groups[a].meta.order-groups[b].meta.order;});
+
   var html="";
-  // Nagłówek z podsumowaniem
   var storeLabel={biedronka:"🐝 Biedronka",lidl:"🏪 Lidl",both:"🐝🏪 Biedronka + Lidl"}[shopStore]||"Biedronka";
   html+='<div style="background:linear-gradient(135deg,rgba(139,92,246,.12),rgba(61,139,255,.08));border:1px solid rgba(139,92,246,.3);border-radius:14px;padding:14px 16px;margin-bottom:14px">';
   html+='<div style="font-size:13px;font-weight:800;color:var(--purple);margin-bottom:6px">📊 Lista z diety</div>';
@@ -2695,63 +2841,66 @@ function renderSmartShoppingList(list){
   html+='<b style="color:var(--text)">'+tooBuy.length+'</b> produktów do kupienia &bull; <b style="color:var(--text)">'+have.length+'</b> już masz';
   html+='<br>Sklep: <b style="color:var(--text)">'+storeLabel+'</b> &bull; Na <b style="color:var(--text)">'+(shopDays||7)+' dni</b>';
   html+='</div></div>';
-  // Produkty DO KUPIENIA - karty z dużą informacją o opakowaniach
+
   if(tooBuy.length){
     html+='<div style="font-size:11px;font-weight:800;color:var(--red);margin-bottom:10px;text-transform:uppercase;letter-spacing:.6px">🛒 Do kupienia ('+tooBuy.length+')</div>';
-    tooBuy.forEach(function(item,idx){
-      var prod=item.product;
-      var unit=prod?prod.unit:"g";
-      var pkgUnit=prod?(prod.pkgUnit||"opak."):"";
-      var pkgSize=prod?(prod.pkgSize||0):0;
-      var buy=item.buy||{};
-      var pcs=buy.pcs||1;
-      var totalAmount=buy.total||item.missing;
-      var byWeight=buy.byWeight||!!prod&&prod.soldByWeight;
-      // Główna informacja: ile sztuk / opakowań kupić
-      var packLine="";
-      if(byWeight){
-        packLine='<span style="font-size:20px;font-weight:900;color:var(--green)">'+Math.ceil(totalAmount)+' '+unit+'</span><span style="font-size:13px;color:var(--text3);font-weight:600"> na wagę</span>';
-      }else if(prod&&prod.unit==="szt"){
-        // sprzedawane na sztuki w opakowaniach (np. jajka 10 szt)
-        packLine='<span style="font-size:20px;font-weight:900;color:var(--green)">'+pcs+' '+pkgUnit+'</span>'
-          +(pkgSize?'<span style="font-size:13px;color:var(--text3);font-weight:600"> × '+pkgSize+' szt = '+totalAmount+' szt</span>':'');
-      }else{
-        // paczkowane g/ml
-        packLine='<span style="font-size:20px;font-weight:900;color:var(--green)">'+pcs+' '+pkgUnit+'</span>'
-          +(pkgSize?'<span style="font-size:13px;color:var(--text3);font-weight:600"> × '+pkgSize+unit+' = '+totalAmount+unit+'</span>':'');
-      }
-      // Sklep badge
-      var shopBadge="";
-      if(prod&&prod.shops&&prod.shops.length){
-        var sh=prod.shops[0];
-        var color=sh.toLowerCase().indexOf("biedronka")!==-1?"#DC2626":sh.toLowerCase().indexOf("lidl")!==-1?"#1D4ED8":"#7C3AED";
-        shopBadge='<span style="background:'+color+'22;border:1px solid '+color+'66;color:'+color+';border-radius:50px;padding:3px 10px;font-size:10px;font-weight:800;margin-left:auto">'+sh+'</span>';
-      }
-      html+='<div style="background:var(--bg2);border-radius:16px;padding:14px 16px;margin-bottom:10px;border:1px solid var(--border);border-left:5px solid var(--red)">';
-      // Nagłówek produktu
-      html+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">';
-      html+='<input type="checkbox" id="shop-cb-'+idx+'" data-shop-cb style="width:20px;height:20px;accent-color:var(--green);cursor:pointer;flex-shrink:0" onchange="toggleShopItemChecked(this,'+idx+')">';
-      html+='<div style="font-size:16px;font-weight:800;color:var(--text);flex:1;line-height:1.2">'+item.name+'</div>';
-      html+=shopBadge;
+    // Renderuj grupę po grupie
+    var globalIdx=0;
+    groupKeys.forEach(function(gk){
+      var grp=groups[gk];
+      html+='<div style="display:flex;align-items:center;gap:8px;margin:14px 0 8px;padding:8px 12px;background:var(--bg3);border-radius:10px;border:1px solid var(--border)">';
+      html+='<span style="font-size:18px">'+grp.meta.ico+'</span>';
+      html+='<span style="font-size:13px;font-weight:800;color:var(--text);flex:1">'+grp.meta.label+'</span>';
+      html+='<span style="font-size:11px;color:var(--text3);font-weight:700">'+grp.items.length+' poz.</span>';
       html+='</div>';
-      // Główna linia "Kup:"
-      html+='<div style="background:rgba(30,215,96,.08);border-radius:10px;padding:10px 12px;margin-bottom:8px"><div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Kup</div>'+packLine+'</div>';
-      // Bilans (potrzebne / masz / brakuje)
-      html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;font-size:11px;margin-bottom:6px">';
-      html+='<div style="background:var(--bg3);border-radius:8px;padding:6px 8px;text-align:center"><div style="color:var(--text3);font-weight:600">Potrzebne</div><div style="color:var(--text);font-weight:800;margin-top:2px">'+item.required+' '+unit+'</div></div>';
-      html+='<div style="background:var(--bg3);border-radius:8px;padding:6px 8px;text-align:center"><div style="color:var(--text3);font-weight:600">Masz</div><div style="color:var(--text);font-weight:800;margin-top:2px">'+item.available+' '+unit+'</div></div>';
-      html+='<div style="background:rgba(255,77,77,.08);border-radius:8px;padding:6px 8px;text-align:center"><div style="color:var(--red);font-weight:600">Brakuje</div><div style="color:var(--red);font-weight:800;margin-top:2px">'+item.missing+' '+unit+'</div></div>';
-      html+='</div>';
-      if(buy.surplus>0){
-        html+='<div style="font-size:11px;color:var(--amber);font-weight:600;margin-top:4px">+ Nadwyżka po zakupie: '+buy.surplus+' '+unit+' (na zapas)</div>';
-      }
-      if(item.meals&&item.meals.length){
-        html+='<div style="font-size:10px;color:var(--text3);margin-top:6px;border-top:1px solid var(--border);padding-top:6px">Do posiłków: <i>'+item.meals.join(", ")+'</i></div>';
-      }
-      html+='</div>';
+      grp.items.forEach(function(item){
+        var idx=globalIdx++;
+        var prod=item.product;
+        var unit=prod?prod.unit:"g";
+        var pkgUnit=prod?(prod.pkgUnit||"opak."):"";
+        var pkgSize=prod?(prod.pkgSize||0):0;
+        var buy=item.buy||{};
+        var pcs=buy.pcs||1;
+        var totalAmount=buy.total||item.missing;
+        var byWeight=buy.byWeight||!!prod&&prod.soldByWeight;
+        var packLine="";
+        if(byWeight){
+          packLine='<span style="font-size:22px;font-weight:900;color:var(--green)">'+Math.ceil(totalAmount)+' '+unit+'</span><span style="font-size:13px;color:var(--text3);font-weight:600"> na wagę</span>';
+        }else if(prod&&prod.unit==="szt"){
+          packLine='<span style="font-size:22px;font-weight:900;color:var(--green)">'+pcs+' '+pkgUnit+'</span>'
+            +(pkgSize?'<span style="font-size:13px;color:var(--text3);font-weight:600"> × '+pkgSize+' szt = '+totalAmount+' szt</span>':'');
+        }else{
+          packLine='<span style="font-size:22px;font-weight:900;color:var(--green)">'+pcs+' '+pkgUnit+'</span>'
+            +(pkgSize?'<span style="font-size:13px;color:var(--text3);font-weight:600"> × '+pkgSize+unit+' = '+totalAmount+unit+'</span>':'');
+        }
+        var shopBadge="";
+        if(prod&&prod.shops&&prod.shops.length){
+          var sh=prod.shops[0];
+          var color=sh.toLowerCase().indexOf("biedronka")!==-1?"#DC2626":sh.toLowerCase().indexOf("lidl")!==-1?"#1D4ED8":"#7C3AED";
+          shopBadge='<span style="background:'+color+'22;border:1px solid '+color+'66;color:'+color+';border-radius:50px;padding:3px 10px;font-size:10px;font-weight:800;margin-left:auto">'+sh+'</span>';
+        }
+        html+='<div style="background:var(--bg2);border-radius:16px;padding:14px 16px;margin-bottom:10px;border:1px solid var(--border);border-left:5px solid var(--red)">';
+        html+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">';
+        html+='<input type="checkbox" id="shop-cb-'+idx+'" data-shop-cb style="width:20px;height:20px;accent-color:var(--green);cursor:pointer;flex-shrink:0" onchange="toggleShopItemChecked(this,'+idx+')">';
+        html+='<div style="font-size:16px;font-weight:800;color:var(--text);flex:1;line-height:1.2">'+item.name+'</div>';
+        html+=shopBadge;
+        html+='</div>';
+        html+='<div style="background:rgba(30,215,96,.08);border-radius:10px;padding:10px 12px;margin-bottom:8px"><div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Kup</div>'+packLine+'</div>';
+        html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;font-size:11px;margin-bottom:6px">';
+        html+='<div style="background:var(--bg3);border-radius:8px;padding:6px 8px;text-align:center"><div style="color:var(--text3);font-weight:600">Potrzebne</div><div style="color:var(--text);font-weight:800;margin-top:2px">'+item.required+' '+unit+'</div></div>';
+        html+='<div style="background:var(--bg3);border-radius:8px;padding:6px 8px;text-align:center"><div style="color:var(--text3);font-weight:600">Masz</div><div style="color:var(--text);font-weight:800;margin-top:2px">'+item.available+' '+unit+'</div></div>';
+        html+='<div style="background:rgba(255,77,77,.08);border-radius:8px;padding:6px 8px;text-align:center"><div style="color:var(--red);font-weight:600">Brakuje</div><div style="color:var(--red);font-weight:800;margin-top:2px">'+item.missing+' '+unit+'</div></div>';
+        html+='</div>';
+        if(buy.surplus>0){
+          html+='<div style="font-size:11px;color:var(--amber);font-weight:600;margin-top:4px">+ Nadwyżka po zakupie: '+buy.surplus+' '+unit+' (na zapas)</div>';
+        }
+        if(item.meals&&item.meals.length){
+          html+='<div style="font-size:10px;color:var(--text3);margin-top:6px;border-top:1px solid var(--border);padding-top:6px">Do posiłków: <i>'+item.meals.join(", ")+'</i></div>';
+        }
+        html+='</div>';
+      });
     });
   }
-  // Już masz
   if(have.length){
     html+='<div style="margin-top:18px;font-size:11px;font-weight:800;color:var(--green);margin-bottom:8px;text-transform:uppercase;letter-spacing:.6px">✓ Masz wystarczająco ('+have.length+')</div>';
     have.forEach(function(item){
