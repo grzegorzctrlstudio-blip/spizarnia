@@ -48,8 +48,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .login-btn{width:100%;max-width:340px;background:var(--green);color:#000;border:none;border-radius:50px;padding:16px;font-size:16px;font-weight:900;cursor:pointer;letter-spacing:.3px;transition:transform .15s,filter .15s}
 .login-btn:active{transform:scale(.97);filter:brightness(.9)}
 
-/* ── TOP NAV (segmented control) ── */
-.top-nav{display:flex;background:var(--bg3);border:1px solid var(--border);border-radius:50px;padding:4px;gap:4px;margin:0 0 14px;position:sticky;top:0;z-index:25}
+/* ── TOP NAV (segmented control) — single instance inside #app-hdr ── */
+.top-nav{display:flex;background:var(--bg3);border:1px solid var(--border);border-radius:50px;padding:4px;gap:4px;margin:0 0 12px}
 .tnav-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:transparent;border:none;color:var(--text3);font-size:13px;font-weight:700;padding:10px 8px;border-radius:50px;cursor:pointer;transition:background .2s,color .2s;white-space:nowrap}
 .tnav-btn.act{background:var(--green);color:#000;font-weight:800}
 .tnav-ico{font-size:16px;line-height:1}
@@ -66,10 +66,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 
 /* ── PAGES ── */
 .page{display:none}.page.show{display:block}
-.page-flex{display:none;flex-direction:column}.page-flex.show{display:flex;height:calc(100vh - 76px)}
+.page-flex{display:none;flex-direction:column}.page-flex.show{display:flex;min-height:calc(100vh - 110px)}
 
 /* ── PANTRY HEADER ── */
-.hdr{padding:16px 16px 0;background:var(--bg);position:sticky;top:0;z-index:10}
+.app-hdr{position:sticky;top:0;z-index:30;background:var(--bg);padding:12px 16px 0;border-bottom:1px solid var(--border)}
+.hdr{padding:14px 16px 0;background:var(--bg)}
 .hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .hdr-brand{display:flex;align-items:center;gap:10px}
 .hdr-logo{font-size:26px}
@@ -370,30 +371,33 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <div id="app" style="display:none">
 
+  <!-- ══ GLOBAL APP HEADER — shared across all pages ══════════════════════════ -->
+  <div id="app-hdr" class="app-hdr">
+    <div class="hdr-top">
+      <div class="hdr-brand">
+        <span class="hdr-logo">🥦</span>
+        <span class="hdr-title">Pełna Lodówka</span>
+        <div class="sync-dot" id="sdot"></div>
+      </div>
+      <div class="hdr-right">
+        <div class="user-chip" id="user-pill" onclick="openUserPanel()" title="Panel użytkownika"></div>
+        <div class="icon-btn" onclick="openAdminLogin()" title="Panel administratora">⚙️</div>
+        <div class="icon-btn" onclick="openLog()" title="Historia zmian">📋</div>
+        <div class="icon-btn" onclick="resetAll()" title="Reset lodówki">🗑️</div>
+      </div>
+    </div>
+
+    <!-- TOP NAV (segmented control) - single shared instance -->
+    <div class="top-nav" id="top-nav-main">
+      <button class="tnav-btn act" id="tnav-pantry" onclick="showPage('pantry')"><span class="tnav-ico">🥬</span><span class="tnav-lbl">Lodówka</span></button>
+      <button class="tnav-btn" id="tnav-chat" onclick="showPage('chat')"><span class="tnav-ico">🤖</span><span class="tnav-lbl">Agent AI</span></button>
+      <button class="tnav-btn" id="tnav-shop" onclick="showPage('shop')"><span class="tnav-ico">🛒</span><span class="tnav-lbl">Zakupy</span></button>
+    </div>
+  </div>
+
   <!-- PANTRY -->
   <div class="page show" id="page-pantry">
     <div class="hdr">
-      <div class="hdr-top">
-        <div class="hdr-brand">
-          <span class="hdr-logo">🥦</span>
-          <span class="hdr-title">Pełna Lodówka</span>
-          <div class="sync-dot" id="sdot"></div>
-        </div>
-        <div class="hdr-right">
-          <div class="user-chip" id="user-pill" onclick="openUserPanel()" title="Panel użytkownika"></div>
-          <div class="icon-btn" onclick="openAdminLogin()" title="Panel administratora">⚙️</div>
-          <div class="icon-btn" onclick="openLog()" title="Historia zmian">📋</div>
-          <div class="icon-btn" onclick="resetAll()" title="Reset lodówki">🗑️</div>
-        </div>
-      </div>
-
-      <!-- TOP NAV (segmented control) -->
-      <div class="top-nav" id="top-nav-pantry">
-        <button class="tnav-btn act" id="tnav-pantry" onclick="showPage('pantry')"><span class="tnav-ico">🥬</span><span class="tnav-lbl">Lodówka</span></button>
-        <button class="tnav-btn" id="tnav-chat" onclick="showPage('chat')"><span class="tnav-ico">🤖</span><span class="tnav-lbl">Agent AI</span></button>
-        <button class="tnav-btn" id="tnav-shop" onclick="showPage('shop')"><span class="tnav-ico">🛒</span><span class="tnav-lbl">Zakupy</span></button>
-      </div>
-
       <!-- STATS 2x2 -->
       <div class="stats-grid">
         <button class="stat-tile red" onclick="setFilter('red')">
@@ -455,11 +459,6 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
   <!-- CHAT -->
   <div class="page-flex" id="page-chat">
     <div class="chat-hdr">
-      <div class="top-nav" style="position:sticky;top:0;z-index:25;margin-bottom:10px">
-        <button class="tnav-btn" id="tnav-pantry-2" onclick="showPage('pantry')"><span class="tnav-ico">🥬</span><span class="tnav-lbl">Lodówka</span></button>
-        <button class="tnav-btn act" id="tnav-chat-2" onclick="showPage('chat')"><span class="tnav-ico">🤖</span><span class="tnav-lbl">Agent AI</span></button>
-        <button class="tnav-btn" id="tnav-shop-2" onclick="showPage('shop')"><span class="tnav-ico">🛒</span><span class="tnav-lbl">Zakupy</span></button>
-      </div>
       <div class="chat-hdr-title">
         <h2>Agent AI</h2>
         <span class="ai-badge">AKTYWNY</span>
@@ -485,11 +484,6 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
   <!-- SHOPPING -->
   <div class="page-flex" id="page-shop">
     <div class="shop-hdr">
-      <div class="top-nav" style="position:sticky;top:0;z-index:25;margin-bottom:10px">
-        <button class="tnav-btn" id="tnav-pantry-3" onclick="showPage('pantry')"><span class="tnav-ico">🥬</span><span class="tnav-lbl">Lodówka</span></button>
-        <button class="tnav-btn" id="tnav-chat-3" onclick="showPage('chat')"><span class="tnav-ico">🤖</span><span class="tnav-lbl">Agent AI</span></button>
-        <button class="tnav-btn act" id="tnav-shop-3" onclick="showPage('shop')"><span class="tnav-ico">🛒</span><span class="tnav-lbl">Zakupy</span></button>
-      </div>
       <h2>🛒 Zakupy</h2>
       <p>Lista AI + szybkie zamówienie online</p>
     </div>
@@ -781,12 +775,10 @@ function showPage(p){
     var pg=document.getElementById("page-"+x);if(!pg)return;
     var isF=x!=="pantry";
     pg.className=x===p?(isF?"page-flex show":"page show"):(isF?"page-flex":"page");
-    // Bottom nav (auxiliary)
+    // Bottom nav (auxiliary, currently hidden via CSS)
     var nb=document.getElementById("nav-"+x);if(nb)nb.classList[x===p?"add":"remove"]("act");
-    // Top nav segmented control (primary) — present in each page header
-    ["tnav-"+x,"tnav-"+x+"-2","tnav-"+x+"-3"].forEach(function(tid){
-      var tb=document.getElementById(tid);if(tb)tb.classList[x===p?"add":"remove"]("act");
-    });
+    // Top nav segmented control (primary) — single shared instance
+    var tb=document.getElementById("tnav-"+x);if(tb)tb.classList[x===p?"add":"remove"]("act");
   });
   if(p==="chat"&&chatHistory.length===0)addWelcome();
 }
