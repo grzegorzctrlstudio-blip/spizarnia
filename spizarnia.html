@@ -4138,12 +4138,14 @@ function renderPantryAudit(prods){
       'style="flex:1;padding:18px 12px;border-radius:14px;border:2px solid '+(isHas?"var(--green)":"var(--border)")+';background:'+(isHas?"rgba(30,215,96,.18)":"var(--bg3)")+';color:'+(isHas?"#fff":"var(--green)")+';font-size:16px;font-weight:800;cursor:pointer;transition:all .15s;line-height:1.1">'+
       '<div style="font-size:22px;margin-bottom:4px">✓</div>Mam</button>';
     html+='</div>';
-    // Quantity input - BIG
-    html+='<div style="display:flex;align-items:center;gap:10px;background:var(--bg3);border-radius:12px;padding:10px 14px;border:1px solid var(--border)">';
+    // Quantity input - BIG z przyciskami +/-
+    html+='<div style="display:flex;align-items:center;gap:8px;background:var(--bg3);border-radius:12px;padding:8px 10px;border:1px solid var(--border)">';
     html+='<div style="font-size:13px;font-weight:700;color:var(--text3);flex-shrink:0">Ile mam:</div>';
+    html+='<button type="button" onclick="auditChangeQty(\''+sk+'\',-1)" aria-label="mniej" style="width:42px;height:42px;border:none;border-radius:12px;background:var(--bg4);color:var(--red);font-size:24px;font-weight:900;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;line-height:1">−</button>';
     html+='<input type="number" min="0" step="1" inputmode="numeric" data-aud-inp="'+sk+'" onchange="setAuditVal(\''+sk+'\',this.value)" oninput="setAuditVal(\''+sk+'\',this.value)" value="'+cur+'" '+
       'style="flex:1;background:transparent;border:none;font-size:22px;color:var(--text);outline:none;text-align:center;font-weight:800;font-family:inherit;padding:6px 4px;-webkit-appearance:none;appearance:textfield;min-width:0">';
-    html+='<div style="font-size:14px;color:var(--text3);font-weight:700;min-width:50px;text-align:right">'+unit+'</div>';
+    html+='<button type="button" onclick="auditChangeQty(\''+sk+'\',1)" aria-label="więcej" style="width:42px;height:42px;border:none;border-radius:12px;background:var(--green);color:#000;font-size:24px;font-weight:900;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;line-height:1">+</button>';
+    html+='<div style="font-size:14px;color:var(--text3);font-weight:700;min-width:42px;text-align:right">'+unit+'</div>';
     html+='</div>';
     html+='</div>';
   });
@@ -4199,6 +4201,14 @@ function setAuditVal(key,val){
       }
     });
   }
+}
+// Zmiana ilości w audycie przez przyciski +/-
+function auditChangeQty(key,delta){
+  var cur=Number(pantryAuditData[key])||0;
+  var nv=Math.max(0,cur+Number(delta||0));
+  var inp=document.querySelector('input[data-aud-inp="'+key+'"]');
+  if(inp)inp.value=nv;
+  setAuditVal(key,nv);
 }
 function savePantryAudit(){
   var rpUpdates={},pantryUpdates={};
