@@ -275,7 +275,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <button class="receipt-apply" onclick="applyReceiptSelected()" style="flex:2">Dodaj zaznaczone do lodowki</button>
   <button onclick="document.getElementById('receipt-results').style.display='none'" style="flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:50px;padding:13px;font-size:13px;font-weight:700;cursor:pointer">Anuluj</button>
 </div></div>
-      <button class="gen-btn" id="gen-btn" onclick="generateSmartShopList()"><div class="gen-spin" id="gen-spin"></div><span id="gen-btn-txt">Generuj liste zakupow AI</span></button>
+      <button class="gen-btn" id="gen-btn" onclick="generateDietShoppingList(1)"><div class="gen-spin" id="gen-spin"></div><span id="gen-btn-txt">Generuj liste zakupow AI</span></button>
       <button class="copy-btn" id="copy-btn" onclick="copyShopList()">Kopiuj liste</button>
       <div id="shop-list-content"></div>
     </div>
@@ -399,6 +399,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <p id="profile-modal-name" style="color:var(--green);font-weight:800;font-size:14px;margin-bottom:12px"></p>
     <div id="profile-modal-content" style="background:var(--bg3);border-radius:12px;padding:14px;margin-bottom:14px;border:1px solid var(--border);font-size:13px;color:var(--text2);line-height:2.2"></div>
     <button class="mbtn ok" style="width:100%;margin-bottom:8px;padding:13px" onclick="closeProfileModal();openDiet()">Moja dieta i przepisy</button>
+    <button class="mbtn" style="width:100%;margin-bottom:8px;padding:13px;background:rgba(139,92,246,.15);color:var(--purple);border:1px solid rgba(139,92,246,.3)" onclick="closeProfileModal();openDiet();setTimeout(function(){switchDietTab(4);},100)">📊 Analiza cen</button>
     <button class="mbtn ok" style="width:100%;margin-bottom:8px;padding:13px;background:var(--purple)" onclick="startDietGeneration()">Generuj nowa diete AI</button>
     <button class="mbtn blue" style="width:100%;margin-bottom:8px;padding:13px" onclick="closeProfileModal();showOb()">Edytuj profil</button>
     <button class="mbtn cancel" style="width:100%;margin-bottom:4px" onclick="closeProfileModal()">Zamknij</button>
@@ -417,6 +418,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <button id="dtab-1" onclick="switchDietTab(1)" style="flex:1;padding:12px;border:none;background:none;color:var(--text3);font-size:13px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent">Plan tygodnia</button>
     <button id="dtab-2" onclick="switchDietTab(2)" style="flex:1;padding:12px;border:none;background:none;color:var(--text3);font-size:13px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent">Wgraj diete</button>
     <button id="dtab-3" onclick="switchDietTab(3)" style="flex:1;padding:12px;border:none;background:none;color:var(--text3);font-size:12px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent">Historia</button>
+    <button id="dtab-4" onclick="switchDietTab(4)" style="flex:1;padding:12px;border:none;background:none;color:var(--text3);font-size:11px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent">Ceny</button>
   </div>
   <div id="diet-body" style="flex:1;overflow-y:auto;padding:16px"></div>
 </div>
@@ -1064,9 +1066,9 @@ function obBack(){if(obStep>0){obStep--;renderObStep();}}
 // ── DIET ──────────────────────────────────────────────────────────────────────
 function openDiet(){document.getElementById("diet-user-name").textContent=userName;document.getElementById("diet-overlay").classList.add("show");switchDietTab(0);}
 function closeDiet(){document.getElementById("diet-overlay").classList.remove("show");}
-function switchDietTab(n){dietTab=n;for(var i=0;i<4;i++){var t=document.getElementById("dtab-"+i);if(t){t.style.borderBottom=i===n?"3px solid var(--green)":"3px solid transparent";t.style.color=i===n?"var(--green)":"var(--text3)";}}renderDietBody();}
+function switchDietTab(n){dietTab=n;for(var i=0;i<5;i++){var t=document.getElementById("dtab-"+i);if(t){t.style.borderBottom=i===n?"3px solid var(--green)":"3px solid transparent";t.style.color=i===n?"var(--green)":"var(--text3)";}}renderDietBody();}
 function getDietData(){return(userProfile&&userProfile.dietData)?userProfile.dietData:GRZES_DIET;}
-function renderDietBody(){var body=document.getElementById("diet-body");if(!body)return;if(dietTab===0)body.innerHTML=renderRecipes();else if(dietTab===1)body.innerHTML=renderWeekPlan();else if(dietTab===2)body.innerHTML=renderUploadDiet();else openPurchaseHistory();}
+function renderDietBody(){var body=document.getElementById("diet-body");if(!body)return;if(dietTab===0)body.innerHTML=renderRecipes();else if(dietTab===1)body.innerHTML=renderWeekPlan();else if(dietTab===2)body.innerHTML=renderUploadDiet();else if(dietTab===3)openPurchaseHistory();else renderPriceAnalysis();}
 
 function renderRecipes(){
   var d=getDietData(),menu=dietMenu===1?d.menu1:d.menu2;
@@ -1488,6 +1490,479 @@ function toggleReceiptDetails(el){
   var next=el.nextElementSibling;
   if(next)next.style.display=next.style.display==="none"?"block":"none";
 }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PRODUCT DATABASE — z wartościami odżywczymi i jednostkami zakupowymi
+// ══════════════════════════════════════════════════════════════════════════════
+var PRODUCT_DB = [
+  // MIĘSO
+  {id:"piers_kurczaka",name:"Pierś z Kurczaka",aliases:["piers z kurczaka","pierś kurczaka","kurczak"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:110,prot:23,carb:0,fat:2},unit:"g",pkgUnit:"g",pkgSize:500,soldByWeight:true,days:3},
+  {id:"udka_kurczaka",name:"Udka z Kurczaka",aliases:["udka kurczaka","udka z kurczaka"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:170,prot:18,carb:0,fat:11},unit:"g",pkgUnit:"g",pkgSize:1000,soldByWeight:true,days:3},
+  {id:"wolowina_mielona",name:"Wołowina Mielona",aliases:["mielona wolowina","wołowina","wolowina"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:220,prot:18,carb:0,fat:16},unit:"g",pkgUnit:"g",pkgSize:400,soldByWeight:false,days:2},
+  {id:"losos_swiezy",name:"Łosoś Świeży",aliases:["losos swiezy","losos","łosoś"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:208,prot:20,carb:0,fat:13},unit:"g",pkgUnit:"g",pkgSize:300,soldByWeight:true,days:2},
+  {id:"dorsz",name:"Dorsz",aliases:["dorsz","filet z dorsza"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:82,prot:18,carb:0,fat:1},unit:"g",pkgUnit:"g",pkgSize:400,soldByWeight:true,days:2},
+  {id:"indyk_mielony",name:"Indyk Mielony",aliases:["indyk mielony","indyk"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:130,prot:20,carb:0,fat:5},unit:"g",pkgUnit:"g",pkgSize:400,soldByWeight:false,days:2},
+  // WĘDLINY
+  {id:"szynka_indyka",name:"Szynka z Indyka",aliases:["szynka z indyka","szynka indyka","polędwica indyka"],cat:"wedliny",shops:["Biedronka"],n100:{kcal:95,prot:20,carb:1,fat:2},unit:"g",pkgUnit:"opakowanie",pkgSize:150,soldByWeight:false,days:7},
+  {id:"losos_wedzony",name:"Łosoś Wędzony",aliases:["losos wedzony","łosoś wędzony"],cat:"wedliny",shops:["Biedronka","Lidl"],n100:{kcal:172,prot:25,carb:0,fat:8},unit:"g",pkgUnit:"opakowanie",pkgSize:150,soldByWeight:false,days:14},
+  // NABIAŁ
+  {id:"skyr",name:"Skyr Naturalny",aliases:["skyr naturalny","skyr","skyr 0%"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:58,prot:10,carb:4,fat:0},unit:"g",pkgUnit:"opakowanie",pkgSize:350,soldByWeight:false,days:14},
+  {id:"jogurt_naturalny",name:"Jogurt Naturalny 2%",aliases:["jogurt naturalny","jogurt 2%","jogurt"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:50,prot:4,carb:5,fat:2},unit:"g",pkgUnit:"opakowanie",pkgSize:400,soldByWeight:false,days:14},
+  {id:"ser_twarogowy",name:"Ser Twarogowy Chudy",aliases:["ser twarogowy","twaróg","twarog chudy","twarog"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:86,prot:18,carb:3,fat:1},unit:"g",pkgUnit:"opakowanie",pkgSize:400,soldByWeight:false,days:7},
+  {id:"serek_wiejski",name:"Serek Wiejski Light",aliases:["serek wiejski","serek wiejski light","cottage"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:72,prot:11,carb:4,fat:2},unit:"g",pkgUnit:"opakowanie",pkgSize:200,soldByWeight:false,days:7},
+  {id:"mozzarella_light",name:"Mozzarella Light",aliases:["mozzarella light","mozzarella"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:167,prot:20,carb:2,fat:9},unit:"g",pkgUnit:"opakowanie",pkgSize:125,soldByWeight:false,days:14},
+  {id:"mleko",name:"Mleko 0,5%",aliases:["mleko 0.5%","mleko 0,5%","mleko"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:35,prot:3,carb:5,fat:0},unit:"ml",pkgUnit:"litr",pkgSize:1000,soldByWeight:false,days:7},
+  // JAJA
+  {id:"jaja",name:"Jaja L",aliases:["jaja","jajka","jaja l","jaja kurze"],cat:"jaja",shops:["Biedronka","Lidl"],n100:{kcal:155,prot:13,carb:1,fat:11},unit:"szt",pkgUnit:"opakowanie",pkgSize:10,soldByWeight:false,days:28,singleWeight:60},
+  // ZBOŻA
+  {id:"ryz_basmati",name:"Ryż Basmati",aliases:["ryz basmati","ryż basmati","ryz"],cat:"suche",shops:["Biedronka","Lidl"],n100:{kcal:356,prot:7,carb:79,fat:1},unit:"g",pkgUnit:"opakowanie",pkgSize:1000,soldByWeight:false,days:365},
+  {id:"kasza_gryczana",name:"Kasza Gryczana",aliases:["kasza gryczana","kasza"],cat:"suche",shops:["Biedronka","Lidl"],n100:{kcal:343,prot:13,carb:65,fat:3},unit:"g",pkgUnit:"opakowanie",pkgSize:500,soldByWeight:false,days:365},
+  {id:"kasza_jaglana",name:"Kasza Jaglana",aliases:["kasza jaglana"],cat:"suche",shops:["Biedronka","Lidl"],n100:{kcal:378,prot:11,carb:73,fat:4},unit:"g",pkgUnit:"opakowanie",pkgSize:500,soldByWeight:false,days:365},
+  {id:"platki_owsiane",name:"Płatki Owsiane",aliases:["platki owsiane","płatki owsiane","platki"],cat:"suche",shops:["Biedronka","Lidl"],n100:{kcal:372,prot:13,carb:63,fat:7},unit:"g",pkgUnit:"opakowanie",pkgSize:500,soldByWeight:false,days:180},
+  {id:"makaron_pelnoziarnisty",name:"Makaron Pełnoziarnisty",aliases:["makaron pelnoziarnisty","makaron"],cat:"suche",shops:["Biedronka","Lidl"],n100:{kcal:350,prot:13,carb:68,fat:2},unit:"g",pkgUnit:"opakowanie",pkgSize:500,soldByWeight:false,days:365},
+  {id:"chleb_pelnoziarnisty",name:"Chleb Pełnoziarnisty",aliases:["chleb pelnoziarnisty","chleb","pieczywo"],cat:"piekarnia",shops:["Biedronka","Lidl"],n100:{kcal:240,prot:9,carb:43,fat:3},unit:"g",pkgUnit:"bochenek",pkgSize:500,soldByWeight:false,days:5},
+  {id:"wafle_ryzowe",name:"Wafle Ryżowe",aliases:["wafle ryzowe","wafle ryżowe"],cat:"suche",shops:["Biedronka","Lidl"],n100:{kcal:392,prot:7,carb:83,fat:2},unit:"g",pkgUnit:"opakowanie",pkgSize:130,soldByWeight:false,days:365},
+  // STRĄCZKI
+  {id:"ciecierzyca",name:"Ciecierzyca (Puszka)",aliases:["ciecierzyca","ciecierzyca z puszki","cieciorka"],cat:"puszki",shops:["Biedronka","Lidl"],n100:{kcal:164,prot:9,carb:27,fat:3},unit:"g",pkgUnit:"puszka",pkgSize:400,soldByWeight:false,days:730},
+  {id:"soczewica_czerwona",name:"Soczewica Czerwona",aliases:["soczewica czerwona","soczewica"],cat:"suche",shops:["Biedronka","Lidl"],n100:{kcal:353,prot:25,carb:60,fat:1},unit:"g",pkgUnit:"opakowanie",pkgSize:400,soldByWeight:false,days:365},
+  // WARZYWA
+  {id:"pomidory",name:"Pomidory",aliases:["pomidory","pomidor"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:18,prot:1,carb:4,fat:0},unit:"g",pkgUnit:"szt",pkgSize:150,soldByWeight:true,days:5},
+  {id:"ogurek",name:"Ogórek",aliases:["ogurek","ogórek"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:15,prot:1,carb:3,fat:0},unit:"g",pkgUnit:"szt",pkgSize:200,soldByWeight:true,days:7},
+  {id:"papryka",name:"Papryka Czerwona",aliases:["papryka czerwona","papryka","papryka żółta"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:31,prot:1,carb:6,fat:0},unit:"g",pkgUnit:"szt",pkgSize:180,soldByWeight:true,days:7},
+  {id:"szpinak",name:"Szpinak",aliases:["szpinak","szpinak baby"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:23,prot:3,carb:2,fat:0},unit:"g",pkgUnit:"opakowanie",pkgSize:200,soldByWeight:false,days:3},
+  {id:"brokuł",name:"Brokuł",aliases:["brokul","brokuł"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:34,prot:3,carb:5,fat:0},unit:"g",pkgUnit:"szt",pkgSize:400,soldByWeight:true,days:5},
+  {id:"cukinia",name:"Cukinia",aliases:["cukinia"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:17,prot:1,carb:3,fat:0},unit:"g",pkgUnit:"szt",pkgSize:300,soldByWeight:true,days:7},
+  {id:"marchew",name:"Marchew",aliases:["marchew","marchewka"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:41,prot:1,carb:10,fat:0},unit:"g",pkgUnit:"kg",pkgSize:1000,soldByWeight:true,days:21},
+  {id:"bataty",name:"Bataty",aliases:["bataty","batata","słodki ziemniak"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:86,prot:2,carb:20,fat:0},unit:"g",pkgUnit:"szt",pkgSize:300,soldByWeight:true,days:14},
+  {id:"ziemniaki",name:"Ziemniaki",aliases:["ziemniaki","ziemniak"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:77,prot:2,carb:17,fat:0},unit:"g",pkgUnit:"kg",pkgSize:2000,soldByWeight:true,days:21},
+  // OWOCE
+  {id:"banany",name:"Banany",aliases:["banany","banan"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:89,prot:1,carb:23,fat:0},unit:"g",pkgUnit:"szt",pkgSize:120,soldByWeight:true,days:5},
+  {id:"jablka",name:"Jabłka",aliases:["jablka","jabłka","jabłko"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:52,prot:0,carb:14,fat:0},unit:"g",pkgUnit:"szt",pkgSize:180,soldByWeight:true,days:14},
+  {id:"truskawki_mrozone",name:"Truskawki Mrożone",aliases:["truskawki mrozone","truskawki mrożone","truskawki"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:32,prot:1,carb:8,fat:0},unit:"g",pkgUnit:"opakowanie",pkgSize:1000,soldByWeight:false,days:365},
+  {id:"awokado",name:"Awokado",aliases:["awokado"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:160,prot:2,carb:9,fat:15},unit:"g",pkgUnit:"szt",pkgSize:180,soldByWeight:true,days:5},
+  // TŁUSZCZE
+  {id:"oliwa",name:"Oliwa z Oliwek",aliases:["oliwa z oliwek","oliwa"],cat:"tluszcze",shops:["Biedronka","Lidl"],n100:{kcal:899,prot:0,carb:0,fat:100},unit:"ml",pkgUnit:"butelka",pkgSize:500,soldByWeight:false,days:365},
+  {id:"maslo_orzechowe",name:"Masło Orzechowe",aliases:["maslo orzechowe","masło orzechowe","maslo orzechowe vitanella"],cat:"tluszcze",shops:["Biedronka","Lidl"],n100:{kcal:598,prot:26,carb:14,fat:51},unit:"g",pkgUnit:"opakowanie",pkgSize:350,soldByWeight:false,days:180},
+  {id:"platki_migdalow",name:"Płatki Migdałów",aliases:["platki migdalow","płatki migdałów","migdaly","migdały"],cat:"tluszcze",shops:["Biedronka","Lidl"],n100:{kcal:580,prot:20,carb:20,fat:50},unit:"g",pkgUnit:"opakowanie",pkgSize:100,soldByWeight:false,days:180},
+  {id:"orzechy_wloskie",name:"Orzechy Włoskie",aliases:["orzechy wloskie","orzechy włoskie"],cat:"tluszcze",shops:["Biedronka","Lidl"],n100:{kcal:654,prot:15,carb:14,fat:65},unit:"g",pkgUnit:"opakowanie",pkgSize:200,soldByWeight:false,days:180},
+  // SOSY I INNE
+  {id:"passata",name:"Passata Pomidorowa",aliases:["passata pomidorowa","passata"],cat:"puszki",shops:["Biedronka","Lidl"],n100:{kcal:35,prot:2,carb:7,fat:0},unit:"g",pkgUnit:"opakowanie",pkgSize:700,soldByWeight:false,days:365},
+  {id:"musztarda",name:"Musztarda",aliases:["musztarda","musztarda dijon"],cat:"puszki",shops:["Biedronka","Lidl"],n100:{kcal:66,prot:4,carb:6,fat:4},unit:"g",pkgUnit:"słoik",pkgSize:190,soldByWeight:false,days:365},
+  {id:"ketchup",name:"Ketchup bez Cukru",aliases:["ketchup bez cukru","ketchup"],cat:"puszki",shops:["Biedronka","Lidl"],n100:{kcal:60,prot:2,carb:14,fat:0},unit:"g",pkgUnit:"butelka",pkgSize:450,soldByWeight:false,days:365},
+];
+
+// ── Helper: znajdź produkt po nazwie ─────────────────────────────────────────
+function findProduct(name){
+  if(!name)return null;
+  var n=name.toLowerCase().trim();
+  for(var i=0;i<PRODUCT_DB.length;i++){
+    var p=PRODUCT_DB[i];
+    if(p.name.toLowerCase()===n)return p;
+    if(p.aliases){for(var j=0;j<p.aliases.length;j++){if(p.aliases[j]===n||n.indexOf(p.aliases[j])!==-1||p.aliases[j].indexOf(n)!==-1)return p;}}
+  }
+  return null;
+}
+
+// ── Parse amount from strings like "150g", "2 szt.", "1 szklanka" ─────────────
+function parseAmount(str,unit){
+  if(!str)return 0;
+  var m=String(str).match(/([\d.]+)/);
+  if(!m)return 0;
+  var n=parseFloat(m[1]);
+  // Konwersja: szklanka ≈ 240ml, łyżka ≈ 15g, łyżeczka ≈ 5g
+  var s=String(str).toLowerCase();
+  if(s.indexOf("szklan")!==-1)return n*240;
+  if(s.indexOf("łyżka")!==-1||s.indexOf("lyzka")!==-1)return n*15;
+  if(s.indexOf("łyżeczk")!==-1||s.indexOf("lyzeczk")!==-1)return n*5;
+  return n;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// SHOPPING LIST MATH — prawdziwe obliczenia z diety - lodówka → opakowania
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Zbierz wszystkie składniki z diety na N dni
+function getDietIngredients(diet, menuKey, days){
+  days=days||1;
+  var ingredients={};// {productId: {name, totalAmount, unit, product, meals[]}}
+  var menu=diet[menuKey||"menu1"]||{};
+  ["sniadania","obiady","kolacje"].forEach(function(typ){
+    (menu[typ]||[]).forEach(function(meal){
+      (meal.skladniki||[]).forEach(function(sk){
+        var amt=parseAmount(sk.il||sk.amount||"0", sk.unit||"g");
+        var prod=findProduct(sk.n||sk.name||"");
+        var pid=prod?prod.id:(sk.n||"unknown_"+Math.random()).replace(/\s+/g,"_").toLowerCase();
+        if(!ingredients[pid]){
+          ingredients[pid]={
+            name:prod?prod.name:(sk.n||""),
+            totalAmount:0,
+            unit:prod?prod.unit:(sk.unit||"g"),
+            product:prod,
+            meals:[]
+          };
+        }
+        ingredients[pid].totalAmount+=amt*days;
+        ingredients[pid].meals.push(meal.nazwa+" ("+typ+")");
+      });
+    });
+  });
+  return ingredients;
+}
+
+// Pobierz stan lodówki dla produktu (ilość w gramach/ml/szt)
+function getPantryAmountForProduct(prod,productName){
+  if(!prod){
+    // Szukaj po nazwie w CATS
+    var found=0;
+    CATS.forEach(function(cat){cat.items.forEach(function(it){
+      if(it.n.toLowerCase()===productName.toLowerCase()||productName.toLowerCase().indexOf(it.n.toLowerCase())!==-1){
+        var cur=state[fbk(cat.id,it.n)]||0;
+        // Przybliżone przeliczenie: 1 opak = pkgSize g
+        found=cur*(it.pkgSize||1);
+      }
+    });});
+    return found;
+  }
+  // Szukaj po CATS używając aliasów
+  var found=0;
+  CATS.forEach(function(cat){cat.items.forEach(function(it){
+    var aliases=prod.aliases||[];
+    var itLow=it.n.toLowerCase();
+    var match=aliases.some(function(a){return a===itLow||itLow.indexOf(a)!==-1;});
+    if(match){
+      var cur=state[fbk(cat.id,it.n)]||0;
+      found+=cur*(prod.pkgSize||100);
+    }
+  });});
+  return found;
+}
+
+// Oblicz ile opakowań kupić
+function convertToPurchaseUnits(product, missingAmount){
+  if(!product)return{pcs:1,label:Math.ceil(missingAmount)+"g",surplus:0,total:missingAmount};
+  if(product.soldByWeight){
+    // Na wagę — podaj gramaturę
+    return{pcs:1,label:Math.ceil(missingAmount)+"g",surplus:0,total:missingAmount,byWeight:true};
+  }
+  if(product.unit==="szt"){
+    var itemsNeeded=Math.ceil(missingAmount);
+    var pkgsNeeded=Math.ceil(itemsNeeded/product.pkgSize);
+    var totalBought=pkgsNeeded*product.pkgSize;
+    var surplus=totalBought-itemsNeeded;
+    return{pcs:pkgsNeeded,label:pkgsNeeded+" "+product.pkgUnit+" ("+product.pkgSize+" szt.)",surplus:surplus,total:totalBought};
+  }
+  // Paczkowane (g/ml)
+  var pkgsNeeded2=Math.ceil(missingAmount/product.pkgSize);
+  var totalBought2=pkgsNeeded2*product.pkgSize;
+  var surplus2=totalBought2-missingAmount;
+  return{pcs:pkgsNeeded2,label:pkgsNeeded2+" "+product.pkgUnit+" ("+product.pkgSize+product.unit+")",surplus:Math.round(surplus2),total:totalBought2};
+}
+
+// GŁÓWNA FUNKCJA: oblicz listę zakupów z diety
+function calculateShoppingListFromDiet(days){
+  days=days||1;
+  var d=getDietData();
+  // Użyj Menu 1 lub combine obu
+  var ingr1=getDietIngredients(d,"menu1",days);
+  var allIngredients={};
+  Object.keys(ingr1).forEach(function(k){allIngredients[k]=ingr1[k];});
+  
+  var shopList=[];
+  Object.keys(allIngredients).forEach(function(pid){
+    var ing=allIngredients[pid];
+    if(!ing.totalAmount||ing.totalAmount<=0)return;
+    var available=getPantryAmountForProduct(ing.product,ing.name);
+    var missing=Math.max(0,ing.totalAmount-available);
+    if(missing<=0){
+      // Mam wystarczająco
+      shopList.push({
+        pid:pid,name:ing.name,product:ing.product,
+        required:Math.round(ing.totalAmount),available:Math.round(available),
+        missing:0,buy:null,status:"OK",meals:ing.meals.slice(0,2)
+      });
+      return;
+    }
+    var buyInfo=convertToPurchaseUnits(ing.product,missing);
+    shopList.push({
+      pid:pid,name:ing.name,product:ing.product,
+      required:Math.round(ing.totalAmount),available:Math.round(available),
+      missing:Math.round(missing),buy:buyInfo,status:"MISSING",
+      meals:ing.meals.slice(0,2)
+    });
+  });
+  // Posortuj: najpierw brakujące
+  shopList.sort(function(a,b){return b.missing-a.missing;});
+  return shopList;
+}
+
+// Renderuj inteligentną listę zakupów
+function renderSmartShoppingList(list){
+  var html="";
+  var tooBuy=list.filter(function(i){return i.status==="MISSING";});
+  var have=list.filter(function(i){return i.status==="OK";});
+  
+  if(!tooBuy.length&&!have.length){
+    return'<div style="text-align:center;padding:30px;color:var(--text3)">Brak składników do obliczenia.<br>Wygeneruj najpierw dietę.</div>';
+  }
+  
+  // Nagłówek
+  if(userProfile&&userProfile.kcal){
+    html+='<div style="background:rgba(30,215,96,.08);border:1px solid rgba(30,215,96,.2);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:12px;color:var(--text2)">'
+      +'<div style="font-weight:800;color:var(--green);margin-bottom:4px">Lista zakupów z diety ('+list.filter(function(x){return x.status==="MISSING";}).length+' produktów do kupienia)</div>'
+      +'Baza: dieta użytkownika vs stan lodówki. Opakowania zaokrąglone w górę.</div>';
+  }
+  
+  // Produkty do kupienia
+  if(tooBuy.length){
+    html+='<div style="font-size:10px;font-weight:800;color:var(--red);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Do kupienia ('+tooBuy.length+')</div>';
+    tooBuy.forEach(function(item){
+      var cat=item.product?item.product.cat:"";
+      html+='<div style="background:var(--bg2);border-radius:12px;padding:12px 14px;margin-bottom:8px;border:1px solid var(--border);border-left:4px solid var(--red)">';
+      html+='<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">';
+      html+='<div style="flex:1"><div style="font-size:13px;font-weight:800;color:var(--text)">'+item.name+'</div>';
+      if(item.buy){
+        html+='<div style="font-size:14px;font-weight:900;color:var(--green);margin:4px 0">Kup: '+item.buy.label+'</div>';
+        html+='<div style="font-size:11px;color:var(--text3)">Potrzebne: '+item.required+(item.product?item.product.unit:"g")
+          +' &bull; Masz: '+item.available+(item.product?item.product.unit:"g")
+          +' &bull; Brakuje: '+item.missing+(item.product?item.product.unit:"g")+'</div>';
+        if(item.buy.surplus>0)html+='<div style="font-size:11px;color:var(--amber);margin-top:2px">Nadwyżka po zakupie: +'+item.buy.surplus+(item.product?item.product.unit:"g")+'</div>';
+      }
+      if(item.meals&&item.meals.length)html+='<div style="font-size:10px;color:var(--text3);margin-top:4px">Do: '+item.meals.join(", ")+'</div>';
+      html+='</div>';
+      if(item.product&&item.product.shops){
+        var shop=item.product.shops[0];
+        html+='<div style="background:var(--bg3);border-radius:8px;padding:4px 8px;font-size:10px;font-weight:700;color:var(--blue);flex-shrink:0">'+shop+'</div>';
+      }
+      html+='</div></div>';
+    });
+  }
+  
+  // Masz już
+  if(have.length){
+    html+='<div style="margin-top:12px;font-size:10px;font-weight:800;color:var(--green);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Masz wystarczająco ('+have.length+')</div>';
+    have.forEach(function(item){
+      html+='<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(30,215,96,.05);border-radius:8px;margin-bottom:4px;border:1px solid rgba(30,215,96,.1)">';
+      html+='<span style="color:var(--green);font-size:14px">✓</span>';
+      html+='<span style="font-size:12px;font-weight:700;color:var(--text2)">'+item.name+'</span>';
+      html+='<span style="font-size:11px;color:var(--text3);margin-left:auto">'+item.available+(item.product?item.product.unit:"g")+' / '+item.required+(item.product?item.product.unit:"g")+'</span>';
+      html+='</div>';
+    });
+  }
+  return html;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PLAN TYGODNIA — działa naprawdę
+// ══════════════════════════════════════════════════════════════════════════════
+var DAYS=["Poniedziałek","Wtorek","Środa","Czwartek","Piątek","Sobota","Niedziela"];
+var planDays=7,planStart=0;
+
+function renderWeekPlan(){
+  var d=getDietData();
+  var hasMenu1=d.menu1&&(d.menu1.sniadania||[]).length>0;
+  var hasMenu2=d.menu2&&(d.menu2.sniadania||[]).length>0;
+  if(!hasMenu1&&!hasMenu2){
+    return'<div style="text-align:center;padding:30px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px">📅</div>Brak diety. Wygeneruj dietę najpierw.<br><br><button onclick="startDietGeneration()" style="background:var(--green);color:#000;border:none;border-radius:50px;padding:12px 24px;font-size:13px;font-weight:800;cursor:pointer">Generuj dietę AI</button></div>';
+  }
+  
+  var h='';
+  // Wybór liczby dni
+  h+='<div style="display:flex;gap:6px;margin-bottom:14px">';
+  [1,3,5,7].forEach(function(n){
+    h+='<button onclick="planDays='+n+';renderDietBody()" style="flex:1;padding:9px 4px;border-radius:10px;border:1.5px solid '+(planDays===n?"var(--green)":"var(--border)")+';background:'+(planDays===n?"rgba(30,215,96,.15)":"transparent")+';color:'+(planDays===n?"var(--green)":"var(--text3)")+';font-size:12px;font-weight:800;cursor:pointer">'+n+(n===1?" dzień":" dni")+'</button>';
+  });
+  h+='</div>';
+  
+  // Plan dni
+  for(var day=0;day<planDays;day++){
+    var useMenu=(day%2===0)?d.menu1:d.menu2;
+    var menuLabel=(day%2===0)?"Menu 1":"Menu 2";
+    var dayName=DAYS[day%7];
+    
+    h+='<div style="background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:10px;overflow:hidden">';
+    h+='<div style="padding:10px 14px;background:var(--bg3);display:flex;align-items:center;justify-content:space-between">';
+    h+='<div style="font-size:13px;font-weight:800;color:var(--text)">'+dayName+'</div>';
+    h+='<div style="font-size:10px;font-weight:700;color:var(--text3)">'+menuLabel+'</div>';
+    h+='</div>';
+    
+    var dayKcal=0,dayProt=0,dayCarb=0,dayFat=0;
+    [{key:"sniadania",icon:"🌅"},{key:"obiady",icon:"☀️"},{key:"kolacje",icon:"🌙"}].forEach(function(meal){
+      var meals=useMenu[meal.key]||[];
+      if(!meals.length)return;
+      var m=meals[0];// Zawsze bierz pierwsze danie
+      dayKcal+=(m.kcal||0);dayProt+=(m.prot||0);dayCarb+=(m.carb||0);dayFat+=(m.fat||0);
+      h+='<div style="padding:8px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px">';
+      h+='<span style="font-size:16px">'+meal.icon+'</span>';
+      h+='<div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--text)">'+m.nazwa+'</div>';
+      h+='<div style="font-size:10px;color:var(--text3)">'+m.kcal+' kcal &bull; B:'+m.prot+'g W:'+m.carb+'g T:'+m.fat+'g</div></div>';
+      h+='</div>';
+    });
+    
+    // Podsumowanie dnia
+    var ok=userProfile&&Math.abs(dayKcal-userProfile.kcal)<userProfile.kcal*0.1;
+    h+='<div style="padding:8px 14px;display:flex;gap:8px;align-items:center">';
+    h+='<span style="font-size:10px;color:'+(ok?"var(--green)":"var(--amber)")+'">'+dayKcal+' kcal</span>';
+    h+='<span style="font-size:10px;color:var(--text3)">B:'+dayProt+'g W:'+dayCarb+'g T:'+dayFat+'g</span>';
+    h+='</div></div>';
+  }
+  
+  // Przycisk listy zakupów na N dni
+  h+='<div style="margin-top:14px;display:flex;gap:8px">';
+  h+='<button onclick="generateDietShoppingList('+planDays+')" style="flex:2;background:linear-gradient(135deg,var(--purple),#4F46E5);color:#fff;border:none;border-radius:50px;padding:13px;font-size:13px;font-weight:800;cursor:pointer">📊 Lista zakupów na '+planDays+(planDays===1?" dzień":" dni")+'</button>';
+  h+='<button onclick="generateShopFromDiet()" style="flex:1;background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:50px;padding:13px;font-size:12px;font-weight:700;cursor:pointer">AI lista</button>';
+  h+='</div>';
+  return h;
+}
+
+// Wygeneruj listę zakupów na N dni z matematyki
+function generateDietShoppingList(days){
+  closeDiet();
+  showPage("shop");
+  document.getElementById("copy-btn").classList.add("show");
+  var list=calculateShoppingListFromDiet(days);
+  var html=renderSmartShoppingList(list);
+  html='<div style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--text2)">'
+    +'<b style="color:var(--purple)">📊 Lista z diety na '+days+(days===1?" dzień":" dni")+'</b><br>'
+    +'Obliczona lokalnie: dieta → składniki → stan lodówki → brakujące → opakowania'
+    +'</div>'+html;
+  document.getElementById("shop-list-content").innerHTML=html;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// WALIDACJA MAKRO
+// ══════════════════════════════════════════════════════════════════════════════
+function validateMeal(meal, profile){
+  if(!profile||!meal)return{ok:false,msg:"Brak danych"};
+  var mK=Math.round(profile.kcal/3),mP=Math.round(profile.prot/3),mC=Math.round(profile.carb/3),mF=Math.round(profile.fat/3);
+  var tolerance=0.1;
+  var issues=[];
+  if(Math.abs(meal.kcal-mK)>mK*tolerance)issues.push("kcal: "+meal.kcal+" (cel: "+mK+")");
+  if(Math.abs(meal.prot-mP)>mP*tolerance)issues.push("B: "+meal.prot+"g (cel: "+mP+"g)");
+  if(Math.abs(meal.carb-mC)>mC*(tolerance*1.5))issues.push("W: "+meal.carb+"g (cel: "+mC+"g)");
+  if(Math.abs(meal.fat-mF)>mF*(tolerance*1.5))issues.push("T: "+meal.fat+"g (cel: "+mF+"g)");
+  return{ok:issues.length===0,issues:issues};
+}
+
+function validateMenu(menu, profile){
+  if(!menu||!profile)return{ok:false};
+  var totalK=0,totalP=0,totalC=0,totalF=0;
+  ["sniadania","obiady","kolacje"].forEach(function(t){
+    (menu[t]||[]).forEach(function(m){totalK+=m.kcal||0;totalP+=m.prot||0;totalC+=m.carb||0;totalF+=m.fat||0;});
+  });
+  var tol=0.07;
+  var ok=Math.abs(totalK-profile.kcal)<=profile.kcal*tol;
+  return{ok:ok,kcal:totalK,prot:totalP,carb:totalC,fat:totalF,
+    diffKcal:totalK-profile.kcal,pct:Math.round(totalK/profile.kcal*100)};
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ANALIZA CEN
+// ══════════════════════════════════════════════════════════════════════════════
+function renderPriceAnalysis(){
+  var body=document.getElementById("diet-body");
+  if(!body)return;
+  
+  loadPurchaseHistory(function(){
+    if(!purchaseHistory.length){
+      body.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px">📊</div>'
+        +'Za mało danych do analizy.<br><br><span style="font-size:12px">Zeskanuj paragony w zakładce Zakupy aby zobaczyć analizę cen.</span></div>';
+      return;
+    }
+    
+    // Zbierz dane cenowe
+    var priceMap={};// productName → {biedronka:[], lidl:[], other:[]}
+    var shopTotals={};// shop → [suma]
+    var monthlyTotals={};// YYYY-MM → suma
+    
+    purchaseHistory.forEach(function(p){
+      var shop=(p.sklep||"").toLowerCase();
+      var shopKey=shop.indexOf("biedronka")!==-1?"Biedronka":shop.indexOf("lidl")!==-1?"Lidl":"Inny";
+      if(p.suma){
+        if(!shopTotals[shopKey])shopTotals[shopKey]=[];
+        shopTotals[shopKey].push(p.suma);
+        if(p.ts){
+          var d2=new Date(p.ts),mkey=d2.getFullYear()+"-"+(d2.getMonth()+1<10?"0":"")+(d2.getMonth()+1);
+          if(!monthlyTotals[mkey])monthlyTotals[mkey]=0;
+          monthlyTotals[mkey]+=p.suma;
+        }
+      }
+      (p.produkty||[]).forEach(function(prod){
+        if(!prod.nazwa||!prod.cenaJednostkowa&&!prod.cena)return;
+        var key=prod.nazwa.toLowerCase().slice(0,25);
+        if(!priceMap[key])priceMap[key]={name:prod.nazwa,Biedronka:[],Lidl:[],Inny:[]};
+        var price=prod.cenaJednostkowa||prod.cena||0;
+        if(price>0)(priceMap[key][shopKey]||priceMap[key].Inny).push(price);
+      });
+    });
+    
+    var html='<div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px">Analiza cen — '+purchaseHistory.length+' paragonów</div>';
+    
+    // Porównanie sklepów
+    var compareItems=Object.values(priceMap).filter(function(p){
+      return (p.Biedronka.length>0&&p.Lidl.length>0);
+    });
+    
+    if(compareItems.length){
+      html+='<div style="background:rgba(61,139,255,.08);border:1px solid rgba(61,139,255,.2);border-radius:var(--radius);padding:14px;margin-bottom:14px">';
+      html+='<div style="font-size:11px;font-weight:800;color:var(--blue);margin-bottom:10px;text-transform:uppercase">Biedronka vs Lidl</div>';
+      compareItems.slice(0,8).forEach(function(p){
+        var avgB=(p.Biedronka.reduce(function(a,b){return a+b;},0)/p.Biedronka.length).toFixed(2);
+        var avgL=(p.Lidl.reduce(function(a,b){return a+b;},0)/p.Lidl.length).toFixed(2);
+        var cheaper=parseFloat(avgB)<parseFloat(avgL)?"Biedronka":"Lidl";
+        var diff=Math.abs(parseFloat(avgB)-parseFloat(avgL)).toFixed(2);
+        html+='<div style="padding:8px 0;border-bottom:1px solid var(--border)">';
+        html+='<div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">'+p.name+'</div>';
+        html+='<div style="display:flex;gap:10px;align-items:center">';
+        html+='<span style="font-size:11px">🐝 Biedronka: <b style="color:'+(cheaper==="Biedronka"?"var(--green)":"var(--text2)")+'">'+avgB+' zł</b></span>';
+        html+='<span style="font-size:11px">🏪 Lidl: <b style="color:'+(cheaper==="Lidl"?"var(--green)":"var(--text2)")+'">'+avgL+' zł</b></span>';
+        html+='<span style="font-size:10px;color:var(--amber)">diff: '+diff+' zł</span>';
+        html+='</div></div>';
+      });
+      html+='</div>';
+    }
+    
+    // Wykres wydatków (prosty SVG bar chart)
+    var months=Object.keys(monthlyTotals).sort().slice(-6);
+    if(months.length>1){
+      var maxVal=Math.max.apply(null,months.map(function(m){return monthlyTotals[m];}));
+      html+='<div style="background:var(--bg2);border-radius:var(--radius);padding:14px;margin-bottom:14px;border:1px solid var(--border)">';
+      html+='<div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:12px;text-transform:uppercase">Wydatki miesięcznie (zł)</div>';
+      html+='<svg width="100%" height="100" viewBox="0 0 300 100" preserveAspectRatio="none">';
+      var barW=300/months.length-4;
+      months.forEach(function(m,i){
+        var h2=Math.round((monthlyTotals[m]/maxVal)*80);
+        var x=i*(300/months.length)+2;
+        html+='<rect x="'+x+'" y="'+(100-h2)+'" width="'+barW+'" height="'+h2+'" fill="var(--purple)" rx="2"/>';
+        html+='<text x="'+(x+barW/2)+'" y="98" text-anchor="middle" fill="#6B6B85" font-size="8">'+m.slice(5)+'</text>';
+        html+='<text x="'+(x+barW/2)+'" y="'+(100-h2-3)+'" text-anchor="middle" fill="#B0B0C8" font-size="7">'+Math.round(monthlyTotals[m])+'</text>';
+      });
+      html+='</svg></div>';
+    }
+    
+    // Najczęściej kupowane
+    var sortedProducts=Object.values(priceMap).sort(function(a,b){
+      return(b.Biedronka.length+b.Lidl.length)-(a.Biedronka.length+a.Lidl.length);
+    }).slice(0,8);
+    
+    if(sortedProducts.length){
+      html+='<div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">Najczęściej kupowane</div>';
+      sortedProducts.forEach(function(p,i){
+        var count=p.Biedronka.length+p.Lidl.length+p.Inny.length;
+        var allPrices=p.Biedronka.concat(p.Lidl).concat(p.Inny);
+        var avg=allPrices.length?(allPrices.reduce(function(a,b){return a+b;},0)/allPrices.length).toFixed(2):"?";
+        html+='<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg3);border-radius:8px;margin-bottom:4px">';
+        html+='<span style="font-size:14px;font-weight:900;color:var(--text3);min-width:20px">'+(i+1)+'.</span>';
+        html+='<span style="flex:1;font-size:12px;font-weight:700;color:var(--text)">'+p.name+'</span>';
+        html+='<span style="font-size:11px;color:var(--text3)">'+count+'x</span>';
+        html+='<span style="font-size:12px;font-weight:800;color:var(--amber)">~'+avg+' zł</span>';
+        html+='</div>';
+      });
+    }
+    
+    body.innerHTML=html;
+  });
+}
+
 </script>
 </body>
 </html>
