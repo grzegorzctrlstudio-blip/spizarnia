@@ -303,7 +303,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 #admin-login-overlay,#admin-panel-overlay{display:none}
 #admin-login-overlay.show{display:flex;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.85);align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(12px)}
 #admin-panel-overlay.show{display:flex;position:fixed;inset:0;z-index:500;background:var(--bg);overflow-y:auto;flex-direction:column}
-body.admin-open .bottom-nav{display:none}
+body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
+
+/* ── USER PANEL ── */
+#user-panel-overlay{display:none}
+#user-panel-overlay.show{display:flex;position:fixed;inset:0;z-index:450;background:var(--bg);overflow-y:auto;flex-direction:column}
+.up-row{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--bg2);border-radius:14px;margin-bottom:8px;border:1px solid var(--border);cursor:pointer;transition:background .15s}
+.up-row:active{background:var(--bg3)}
+.up-row-ico{font-size:22px;flex-shrink:0;width:36px;text-align:center}
+.up-row-text{flex:1}
+.up-row-title{font-size:14px;font-weight:700;color:var(--text)}
+.up-row-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.up-row-arrow{color:var(--text3);font-size:18px;flex-shrink:0}
+.user-chip{cursor:pointer}
 .admtab{flex:1;background:none;border:none;color:#6B6B85;padding:14px 12px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
 .admtab.act{color:var(--green);border-bottom-color:var(--green)}
 
@@ -342,7 +354,8 @@ body.admin-open .bottom-nav{display:none}
   <div class="login-logo">🥦</div>
   <div class="login-title">Pełna Lodówka</div>
   <p class="login-sub">Twój domowy asystent zakupów</p>
-  <input class="name-inp" id="name-inp" placeholder="Jak masz na imię?" maxlength="20" onkeydown="if(event.key==='Enter')doLogin()">
+  <input class="name-inp" id="name-inp" placeholder="Imię" maxlength="30" onkeydown="if(event.key==='Enter')document.getElementById('surname-inp').focus()">
+  <input class="name-inp" id="surname-inp" placeholder="Nazwisko" maxlength="40" style="margin-top:10px" onkeydown="if(event.key==='Enter')doLogin()">
   <button class="login-btn" onclick="doLogin()">Wchodzę →</button>
 </div>
 
@@ -358,7 +371,7 @@ body.admin-open .bottom-nav{display:none}
           <div class="sync-dot" id="sdot"></div>
         </div>
         <div class="hdr-right">
-          <div class="user-chip" id="user-pill"></div>
+          <div class="user-chip" id="user-pill" onclick="openUserPanel()" title="Panel użytkownika"></div>
           <div class="icon-btn" onclick="openAdminLogin()" title="Panel administratora">⚙️</div>
           <div class="icon-btn" onclick="openLog()" title="Historia zmian">📋</div>
           <div class="icon-btn" onclick="resetAll()" title="Reset lodówki">🗑️</div>
@@ -603,6 +616,8 @@ body.admin-open .bottom-nav{display:none}
 
 <script>
 
+var APP_VERSION="2026-05-30-repair-user-admin-receipts-v1";
+try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
 var ROOM="room1",RP,LP,EP,PP;
@@ -611,7 +626,7 @@ var PH_PATH=""; // /purchaseHistory/{userId}
 var PANTRY_PATH=""; // /pantry/{userId}
 var pantryData={}; // {productId: {amount, unit, pkgSize, ...}}
 var state={},expiry={},photos={},filter="all",catFilter="all",searchQ="";
-var userName="",shopTs=0,saveTimer=null,apiKey="";
+var userName="",userFirstName="",userLastName="",userDisplayName="",shopTs=0,saveTimer=null,apiKey="";
 var expiryItem=null,scanData=null,scanFromExpiry=false,scanSavesPhoto=false;
 var photoItem=null,activeSlot="front",chatHistory=[],chatBusy=false;
 var receiptData=null,receiptAllProducts=[],receiptMeta={},shopChecked={},shopStore="biedronka";
@@ -1213,24 +1228,88 @@ function applyPresetProfile(name){
 
 
 function updateAISys(){if(!userProfile)return;var st={biedronka:"Biedronke",lidl:"Lidl",both:"Biedronke i Lidl"}[userProfile.stores]||"Biedronke";SYS="Jestes agentem kulinarnym "+userName.split(" ")[0]+". Cel: "+({lose:"redukcja",maintain:"utrzymanie wagi",gain:"masa miesniowa"}[userProfile.goal]||"")+". "+userProfile.kcal+" kcal/dzien. B:"+userProfile.prot+"g W:"+userProfile.carb+"g T:"+userProfile.fat+"g. Sklep: "+st+". Wykluczenia: "+(userProfile.exclude||"brak")+". Odpowiadaj po polsku.";}
-function openProfileModal(){
-  document.getElementById("profile-modal-name").textContent="Profil: "+userName;
-  var cont=document.getElementById("profile-modal-content");
-  if(userProfile&&userProfile.kcal){
-    var pi="<div>Kcal: <b>"+userProfile.kcal+"</b></div>"
-      +"<div>B:<b>"+userProfile.prot+"g</b> W:<b>"+userProfile.carb+"g</b> T:<b>"+userProfile.fat+"g</b></div>"
-      +"<div>Cel: <b>"+({lose:"Redukcja",maintain:"Utrzymanie",gain:"Masa"}[userProfile.goal]||"?")+"</b></div>"
-      +"<div>Sklep: <b>"+({biedronka:"Biedronka",lidl:"Lidl",both:"Oba"}[userProfile.stores]||"?")+"</b></div>"
-      +(userProfile.exclude?"<div>Wykluczone: <b>"+userProfile.exclude+"</b></div>":"")
-      +((userProfile.liked&&userProfile.liked.length)?'<div style="margin-top:4px"><span style="color:var(--green);font-weight:700">Lubi: </span>'+userProfile.liked.join(", ")+"</div>":"")
-      +((userProfile.disliked&&userProfile.disliked.length)?'<div><span style="color:var(--red);font-weight:700">Nie lubi: </span>'+userProfile.disliked.join(", ")+"</div>":"");
-    cont.innerHTML=pi;
+// ── USER PANEL ────────────────────────────────────────────────────────────────
+function openUserPanel(){
+  var el=document.getElementById("user-panel-overlay");if(!el)return;
+  // Header
+  var nameEl=document.getElementById("up-name");
+  var subEl=document.getElementById("up-sub");
+  var avEl=document.getElementById("up-avatar");
+  var verEl=document.getElementById("up-version");
+  var displayName=userDisplayName||(userFirstName?userFirstName+(userLastName?" "+userLastName:""):userName)||"Użytkownik";
+  if(nameEl)nameEl.textContent=displayName;
+  if(subEl)subEl.textContent=(userFirstName?"Cześć, "+userFirstName+"!":"Twoje dane i diety");
+  if(avEl)avEl.textContent=(userFirstName||displayName||"U").charAt(0).toUpperCase();
+  if(verEl)verEl.textContent="Wersja: "+APP_VERSION;
+  // Profile card
+  var card=document.getElementById("up-profile-card");
+  if(card){
+    if(userProfile&&userProfile.kcal){
+      var goalMap={lose:"Redukcja",maintain:"Utrzymanie",gain:"Masa mięśniowa"};
+      var storeMap={biedronka:"Biedronka",lidl:"Lidl",both:"Biedronka + Lidl"};
+      var html="";
+      html+='<div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:8px">'+displayName+'</div>';
+      html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;color:var(--text3)">';
+      if(userProfile.age)html+='<div>Wiek: <b style="color:var(--text)">'+userProfile.age+' lat</b></div>';
+      if(userProfile.weight)html+='<div>Waga: <b style="color:var(--text)">'+userProfile.weight+' kg</b></div>';
+      if(userProfile.height)html+='<div>Wzrost: <b style="color:var(--text)">'+userProfile.height+' cm</b></div>';
+      html+='<div>Cel: <b style="color:var(--text)">'+(goalMap[userProfile.goal]||"?")+'</b></div>';
+      html+='<div>Sklep: <b style="color:var(--text)">'+(storeMap[userProfile.stores]||"?")+'</b></div>';
+      html+='<div>Kcal: <b style="color:var(--amber)">'+userProfile.kcal+'</b></div>';
+      html+='</div>';
+      html+='<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">';
+      html+='<span style="background:rgba(96,165,250,.15);border-radius:50px;padding:3px 10px;font-size:11px;font-weight:700;color:#60A5FA">B: '+(userProfile.prot||"?")+'g</span>';
+      html+='<span style="background:rgba(30,215,96,.12);border-radius:50px;padding:3px 10px;font-size:11px;font-weight:700;color:var(--green)">W: '+(userProfile.carb||"?")+'g</span>';
+      html+='<span style="background:rgba(249,168,212,.15);border-radius:50px;padding:3px 10px;font-size:11px;font-weight:700;color:#F9A8D4">T: '+(userProfile.fat||"?")+'g</span>';
+      html+='</div>';
+      card.innerHTML=html;
+    }else{
+      card.innerHTML='<div style="text-align:center;color:var(--text3);padding:14px;font-size:12px">Brak danych profilu. Kliknij <b>Edytuj profil</b>, aby uzupełnić.</div>';
+    }
   }
-  else{cont.innerHTML='<div style="text-align:center;color:var(--text3);padding:10px">Brak danych. Kliknij Edytuj.</div>';}
-  document.getElementById("profile-overlay").classList.add("show");
+  el.classList.add("show");
+  document.body.classList.add("user-panel-open");
 }
-function closeProfileModal(){document.getElementById("profile-overlay").classList.remove("show");}
-function logoutUser(){dlgConfirm("X","Wylogowanie","Chcesz sie wylogowac?",function(){localStorage.removeItem("spiz_name");userName="";userProfile=null;state={};expiry={};photos={};chatHistory=[];apiKey="";weekPlan={};document.getElementById("app").style.display="none";document.getElementById("login").style.display="flex";document.getElementById("name-inp").value="";document.getElementById("surname-inp").value="";closeProfileModal();},"Wyloguj","danger");}
+function closeUserPanel(){
+  var el=document.getElementById("user-panel-overlay");if(el)el.classList.remove("show");
+  document.body.classList.remove("user-panel-open");
+}
+function editUserProfile(){
+  closeUserPanel();
+  showOb();
+}
+function userPanelGenerateDiet(){
+  if(!userProfile||!userProfile.kcal){
+    dlgAlert("ℹ️","Brak profilu","Najpierw uzupełnij swój profil (Edytuj profil), aby AI wygenerował dietę.");
+    return;
+  }
+  if(typeof generateAIDiet==="function")generateAIDiet(userProfile);
+}
+function openUserPurchaseHistory(){
+  if(typeof openDiet==="function"){openDiet();if(typeof switchDietTab==="function")switchDietTab(3);}
+}
+function openUserPriceAnalysis(){
+  if(typeof openDiet==="function"){openDiet();if(typeof switchDietTab==="function")switchDietTab(4);}
+}
+
+// Stary alias dla kompatybilności
+function openProfileModal(){openUserPanel();}
+function closeProfileModal(){closeUserPanel();}
+
+function logoutUser(){
+  dlgConfirm("X","Wylogowanie","Czy na pewno chcesz się wylogować?",function(){
+    localStorage.removeItem("spiz_name");
+    localStorage.removeItem("spiz_first");
+    localStorage.removeItem("spiz_last");
+    userName="";userFirstName="";userLastName="";userDisplayName="";
+    userProfile=null;state={};expiry={};photos={};chatHistory=[];apiKey="";weekPlan={};
+    document.getElementById("app").style.display="none";
+    document.getElementById("login").style.display="flex";
+    document.getElementById("name-inp").value="";
+    var sn=document.getElementById("surname-inp");if(sn)sn.value="";
+    closeUserPanel();
+  },"Wyloguj","danger");
+}
 
 // ── ONBOARDING ────────────────────────────────────────────────────────────────
 function calcProfile(){
@@ -1617,9 +1696,15 @@ function doLogin(){
   var first=document.getElementById("name-inp").value.trim();
   var last=(document.getElementById("surname-inp")||{}).value||"";last=last.trim();
   if(!first){document.getElementById("name-inp").style.borderColor="var(--red)";document.getElementById("name-inp").focus();return;}
-  userName=last?first+" "+last:first;
+  if(!last){document.getElementById("surname-inp").style.borderColor="var(--red)";document.getElementById("surname-inp").focus();return;}
+  userFirstName=first;
+  userLastName=last;
+  userDisplayName=first+" "+last;
+  userName=userDisplayName;
   localStorage.setItem("spiz_name",userName);
-  var display=last?first+" "+last.charAt(0).toUpperCase()+".":first;
+  localStorage.setItem("spiz_first",first);
+  localStorage.setItem("spiz_last",last);
+  var display=first+" "+last.charAt(0).toUpperCase()+".";
   document.getElementById("user-pill").textContent=display;
   setUserRoom(userName);
   document.getElementById("login").style.display="none";
@@ -1662,8 +1747,25 @@ function startApp(){
 }
 function goOffline(){state=mkState();document.getElementById("splash").style.display="none";document.getElementById("app").style.display="block";buildCatChips();setSyncUI("err");render();}
 function resetAll(){dlgConfirm("X","Reset lodówki","Zresetować wszystkie stany do zera?",function(){state=mkState();render();fbPatch(RP,state).then(function(){addLog("RESET",0,0);});},"Resetuj","danger");}
-function loadUserProfile(name,cb){fbGet(FB+"/profiles/"+profileKey(name)).then(function(p){if(p&&p.kcal){userProfile=p;cb(true);}else{userProfile=null;cb(false);}}).catch(function(){userProfile=null;cb(false);});}
-function saveUserProfile(p){userProfile=p;if(RP)fbPut(FB+"/profiles/"+profileKey(userName),p);}
+function loadUserProfile(name,cb){
+  fbGet(FB+"/profiles/"+profileKey(name)).then(function(p){
+    if(p&&p.kcal){
+      userProfile=p;
+      if(p.firstName)userFirstName=p.firstName;
+      if(p.lastName)userLastName=p.lastName;
+      if(p.displayName)userDisplayName=p.displayName;else if(userFirstName&&userLastName)userDisplayName=userFirstName+" "+userLastName;
+      cb(true);
+    }else{userProfile=null;cb(false);}
+  }).catch(function(){userProfile=null;cb(false);});
+}
+function saveUserProfile(p){
+  if(!p)p={};
+  if(userFirstName)p.firstName=userFirstName;
+  if(userLastName)p.lastName=userLastName;
+  if(userDisplayName)p.displayName=userDisplayName;
+  userProfile=p;
+  if(RP)fbPut(FB+"/profiles/"+profileKey(userName),p);
+}
 
 // ── TOUCH DELEGATION ─────────────────────────────────────────────────────────
 document.addEventListener("touchstart",function(e){
@@ -1683,8 +1785,16 @@ document.addEventListener("click",function(e){
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 document.getElementById("login").style.display="flex";
-var sn=localStorage.getItem("spiz_name");
-if(sn){var snp=sn.trim().split(" ");document.getElementById("name-inp").value=snp[0]||"";if(document.getElementById("surname-inp"))document.getElementById("surname-inp").value=snp.slice(1).join(" ")||"";}
+(function(){
+  var savedFirst=localStorage.getItem("spiz_first")||"";
+  var savedLast=localStorage.getItem("spiz_last")||"";
+  var sn=localStorage.getItem("spiz_name")||"";
+  if(!savedFirst&&sn){var snp=sn.trim().split(" ");savedFirst=snp[0]||"";savedLast=snp.slice(1).join(" ")||"";}
+  if(savedFirst)document.getElementById("name-inp").value=savedFirst;
+  if(savedLast&&document.getElementById("surname-inp"))document.getElementById("surname-inp").value=savedLast;
+  userFirstName=savedFirst;userLastName=savedLast;
+  if(savedFirst&&savedLast)userDisplayName=savedFirst+" "+savedLast;
+})();
 
 
 // ── PREFERENCES ───────────────────────────────────────────────────────────────
@@ -3122,6 +3232,8 @@ function openAdminPanel(){
   var el=document.getElementById("admin-panel-overlay");if(!el)return;
   el.classList.add("show");
   document.body.classList.add("admin-open");
+  var ver=document.getElementById("admin-app-version");
+  if(ver)ver.textContent="v "+APP_VERSION;
   switchAdminTab(0);
   if(typeof loadAdminUsers==="function")loadAdminUsers();
   if(typeof loadAdminStats==="function")loadAdminStats();
@@ -3134,13 +3246,85 @@ function closeAdminPanel(){
 
 
 
+<!-- ══ USER PANEL OVERLAY ════════════════════════════════════════════════ -->
+<div id="user-panel-overlay">
+  <div style="background:rgba(13,13,18,.98);border-bottom:1px solid var(--border);padding:14px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10">
+    <button onclick="closeUserPanel()" style="background:var(--bg3);border:none;color:var(--text3);border-radius:50%;width:38px;height:38px;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">&#8592;</button>
+    <div style="flex:1">
+      <div style="font-size:17px;font-weight:900;color:var(--text)" id="up-name">Panel użytkownika</div>
+      <div style="font-size:11px;color:var(--text3)" id="up-sub">Twoje dane i diety</div>
+    </div>
+    <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green2));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#000;flex-shrink:0" id="up-avatar">U</div>
+  </div>
+  <div style="padding:16px;flex:1">
+    <div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Twój profil</div>
+    <div id="up-profile-card" style="background:var(--bg2);border-radius:14px;padding:14px;margin-bottom:14px;border:1px solid var(--border)"></div>
+
+    <div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Dieta</div>
+    <div class="up-row" onclick="closeUserPanel();openDiet()">
+      <div class="up-row-ico">🍽️</div>
+      <div class="up-row-text">
+        <div class="up-row-title">Moja dieta</div>
+        <div class="up-row-sub">Przepisy, menu, plan tygodnia</div>
+      </div>
+      <div class="up-row-arrow">›</div>
+    </div>
+    <div class="up-row" onclick="closeUserPanel();userPanelGenerateDiet()">
+      <div class="up-row-ico">🤖</div>
+      <div class="up-row-text">
+        <div class="up-row-title">Wygeneruj nową dietę AI</div>
+        <div class="up-row-sub">Pełen plan na podstawie Twojego profilu</div>
+      </div>
+      <div class="up-row-arrow">›</div>
+    </div>
+
+    <div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;margin-top:14px">Zakupy</div>
+    <div class="up-row" onclick="closeUserPanel();openUserPurchaseHistory()">
+      <div class="up-row-ico">🧾</div>
+      <div class="up-row-text">
+        <div class="up-row-title">Historia zakupów</div>
+        <div class="up-row-sub">Twoje zeskanowane paragony</div>
+      </div>
+      <div class="up-row-arrow">›</div>
+    </div>
+    <div class="up-row" onclick="closeUserPanel();openUserPriceAnalysis()">
+      <div class="up-row-ico">📊</div>
+      <div class="up-row-text">
+        <div class="up-row-title">Analiza cen</div>
+        <div class="up-row-sub">Porównanie sklepów i wydatków</div>
+      </div>
+      <div class="up-row-arrow">›</div>
+    </div>
+
+    <div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;margin-top:14px">Ustawienia</div>
+    <div class="up-row" onclick="editUserProfile()">
+      <div class="up-row-ico">✏️</div>
+      <div class="up-row-text">
+        <div class="up-row-title">Edytuj profil</div>
+        <div class="up-row-sub">Imię, nazwisko, parametry, cel, sklep</div>
+      </div>
+      <div class="up-row-arrow">›</div>
+    </div>
+    <div class="up-row" onclick="logoutUser()" style="border-color:rgba(255,77,77,.25)">
+      <div class="up-row-ico">🚪</div>
+      <div class="up-row-text">
+        <div class="up-row-title" style="color:var(--red)">Wyloguj się</div>
+        <div class="up-row-sub">Usuń sesję i wyczyść lokalne dane</div>
+      </div>
+      <div class="up-row-arrow">›</div>
+    </div>
+
+    <div style="text-align:center;font-size:10px;color:var(--text3);margin-top:24px;font-family:monospace" id="up-version"></div>
+  </div>
+</div>
+
 <!-- ══ ADMIN PANEL OVERLAY ═══════════════════════════════════════════════ -->
 <div id="admin-panel-overlay">
   <div style="background:rgba(13,13,18,.98);border-bottom:1px solid var(--border);padding:14px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10">
     <button onclick="closeAdminPanel()" style="background:var(--bg3);border:none;color:var(--text3);border-radius:50%;width:38px;height:38px;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">&#8592;</button>
     <div style="flex:1">
       <div style="font-size:17px;font-weight:900;color:var(--text)">Panel administratora</div>
-      <div style="font-size:11px;color:var(--text3)">Pełna Lodówka &bull; <span id="admin-firebase-status">Firebase</span></div>
+      <div style="font-size:11px;color:var(--text3)">Pełna Lodówka &bull; <span id="admin-firebase-status">Firebase</span> &bull; <span id="admin-app-version" style="font-family:monospace;color:var(--text3)"></span></div>
     </div>
     <div id="admin-api-dot" style="width:8px;height:8px;border-radius:50%;background:var(--green)"></div>
   </div>
