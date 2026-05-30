@@ -2634,6 +2634,36 @@ var PRODUCT_DB = [
   {id:"passata",name:"Passata Pomidorowa",aliases:["passata pomidorowa","passata"],cat:"puszki",shops:["Biedronka","Lidl"],n100:{kcal:35,prot:2,carb:7,fat:0},unit:"g",pkgUnit:"opakowanie",pkgSize:700,soldByWeight:false,days:365},
   {id:"musztarda",name:"Musztarda",aliases:["musztarda","musztarda dijon"],cat:"puszki",shops:["Biedronka","Lidl"],n100:{kcal:66,prot:4,carb:6,fat:4},unit:"g",pkgUnit:"słoik",pkgSize:190,soldByWeight:false,days:365},
   {id:"ketchup",name:"Ketchup bez Cukru",aliases:["ketchup bez cukru","ketchup"],cat:"puszki",shops:["Biedronka","Lidl"],n100:{kcal:60,prot:2,carb:14,fat:0},unit:"g",pkgUnit:"butelka",pkgSize:450,soldByWeight:false,days:365},
+  // Dodatkowe warzywa sprzedawane na sztuki
+  {id:"cebula",name:"Cebula",aliases:["cebula","cebula biala","cebula biała","cebula czerwona"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:40,prot:1,carb:9,fat:0},unit:"szt",pkgUnit:"szt",pkgSize:1,soldByWeight:true,days:30,singleWeight:150},
+  {id:"czosnek",name:"Czosnek",aliases:["czosnek","glowka czosnku"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:149,prot:6,carb:33,fat:0},unit:"szt",pkgUnit:"główka",pkgSize:1,soldByWeight:false,days:60,singleWeight:30},
+  {id:"cytryna",name:"Cytryna",aliases:["cytryna","limonka"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:29,prot:1,carb:9,fat:0},unit:"szt",pkgUnit:"szt",pkgSize:1,soldByWeight:true,days:21,singleWeight:100},
+  {id:"pieczarki",name:"Pieczarki",aliases:["pieczarki","grzyby"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:22,prot:3,carb:3,fat:0},unit:"g",pkgUnit:"opakowanie",pkgSize:400,soldByWeight:false,days:5},
+  {id:"por",name:"Por",aliases:["por"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:61,prot:2,carb:14,fat:0},unit:"szt",pkgUnit:"szt",pkgSize:1,soldByWeight:true,days:14,singleWeight:200},
+  {id:"seler",name:"Seler",aliases:["seler","seler naciowy"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:16,prot:1,carb:3,fat:0},unit:"g",pkgUnit:"szt",pkgSize:400,soldByWeight:true,days:14},
+  {id:"kapusta",name:"Kapusta",aliases:["kapusta","kapusta biala","kapusta pekińska","kapusta pekinska"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:25,prot:1,carb:5,fat:0},unit:"szt",pkgUnit:"szt",pkgSize:1,soldByWeight:true,days:21,singleWeight:800},
+  {id:"salata",name:"Sałata",aliases:["salata","sałata","salata lodowa","salata rukola","rukola","mix sałat"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:15,prot:1,carb:3,fat:0},unit:"g",pkgUnit:"opakowanie",pkgSize:100,soldByWeight:false,days:5},
+  // Mrożonki / dodatkowe owoce
+  {id:"borowki_mrozone",name:"Borówki Mrożone",aliases:["borowki","borówki","borówki mrożone","borowki mrozone"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:57,prot:1,carb:14,fat:0},unit:"g",pkgUnit:"opakowanie",pkgSize:300,soldByWeight:false,days:365},
+  {id:"maliny_mrozone",name:"Maliny Mrożone",aliases:["maliny mrozone","maliny mrożone","maliny"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:52,prot:1,carb:12,fat:0},unit:"g",pkgUnit:"opakowanie",pkgSize:300,soldByWeight:false,days:365},
+  {id:"truskawki_maliny",name:"Truskawki / Maliny (mix)",aliases:["truskawki maliny","truskawki/maliny","truskawki i maliny"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:35,prot:1,carb:8,fat:0},unit:"g",pkgUnit:"opakowanie",pkgSize:400,soldByWeight:false,days:5},
+  {id:"truskawki_swieze",name:"Truskawki Świeże",aliases:["truskawki","truskawki świeże","truskawki swieze"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:32,prot:1,carb:8,fat:0},unit:"g",pkgUnit:"opakowanie",pkgSize:500,soldByWeight:false,days:3},
+  // Tuńczyk / ryby w puszce
+  {id:"tunczyk_w_wodzie",name:"Tuńczyk w wodzie",aliases:["tunczyk","tuńczyk","tunczyk w wodzie","tuńczyk w wodzie"],cat:"puszki",shops:["Biedronka","Lidl"],n100:{kcal:108,prot:23,carb:0,fat:1},unit:"g",pkgUnit:"puszka",pkgSize:185,soldByWeight:false,days:730},
+  {id:"makrela_wedzona",name:"Makrela Wędzona",aliases:["makrela","makrela wedziona","makrela wędzona"],cat:"wedliny",shops:["Biedronka","Lidl"],n100:{kcal:262,prot:21,carb:0,fat:20},unit:"g",pkgUnit:"opakowanie",pkgSize:250,soldByWeight:false,days:7},
+  // Dodatkowe nabiał / ser
+  {id:"parmezan",name:"Parmezan",aliases:["parmezan","parmigiano"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:392,prot:36,carb:0,fat:29},unit:"g",pkgUnit:"opakowanie",pkgSize:100,soldByWeight:false,days:60},
+  {id:"kefir",name:"Kefir",aliases:["kefir","kefir naturalny"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:42,prot:3,carb:5,fat:1},unit:"ml",pkgUnit:"opakowanie",pkgSize:400,soldByWeight:false,days:14},
+  {id:"maslanka",name:"Maślanka",aliases:["maslanka","maślanka"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:40,prot:3,carb:5,fat:1},unit:"ml",pkgUnit:"opakowanie",pkgSize:400,soldByWeight:false,days:14},
+  // Inne dodatki
+  {id:"oliwki",name:"Oliwki",aliases:["oliwki","oliwki zielone","oliwki czarne"],cat:"puszki",shops:["Biedronka","Lidl"],n100:{kcal:115,prot:1,carb:6,fat:11},unit:"g",pkgUnit:"słoik",pkgSize:340,soldByWeight:false,days:365},
+  {id:"fasola_biala",name:"Fasola Biała (Puszka)",aliases:["fasola biala","fasola biała","fasola z puszki"],cat:"puszki",shops:["Biedronka","Lidl"],n100:{kcal:118,prot:7,carb:21,fat:1},unit:"g",pkgUnit:"puszka",pkgSize:400,soldByWeight:false,days:730},
+  {id:"kukurydza",name:"Kukurydza (Puszka)",aliases:["kukurydza","kukurydza z puszki"],cat:"puszki",shops:["Biedronka","Lidl"],n100:{kcal:86,prot:3,carb:19,fat:1},unit:"g",pkgUnit:"puszka",pkgSize:340,soldByWeight:false,days:730},
+  // Brokuł / fasola szparagowa
+  {id:"fasola_szparagowa",name:"Fasola Szparagowa",aliases:["fasola szparagowa"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:31,prot:2,carb:7,fat:0},unit:"g",pkgUnit:"opakowanie",pkgSize:400,soldByWeight:false,days:5},
+  // Tortille / chleb żytni
+  {id:"chleb_zytni",name:"Chleb Żytni",aliases:["chleb zytni","chleb żytni"],cat:"piekarnia",shops:["Biedronka","Lidl"],n100:{kcal:230,prot:8,carb:45,fat:2},unit:"g",pkgUnit:"bochenek",pkgSize:500,soldByWeight:false,days:5},
+  {id:"tortille",name:"Tortille Pełnoziarniste",aliases:["tortille","tortille pelnoziarniste","tortille pełnoziarniste"],cat:"piekarnia",shops:["Biedronka","Lidl"],n100:{kcal:300,prot:9,carb:55,fat:6},unit:"szt",pkgUnit:"opakowanie",pkgSize:6,soldByWeight:false,days:30},
 ];
 
 // ── Helper: znajdź produkt po nazwie ─────────────────────────────────────────
@@ -2753,12 +2783,23 @@ function deductFromPantry(productId, amountG){
 }
 
 function calculateShoppingListFromDiet(days){
-  days=days||1;
+  days=Number(days)||1;
   var d=getDietData();
-  // Użyj Menu 1 lub combine obu
-  var ingr1=getDietIngredients(d,"menu1",days);
+  // Alternacja menu1/menu2 jak w planie tygodnia: dzień parzysty=menu1, nieparzysty=menu2
+  var m1Days=Math.ceil(days/2);
+  var m2Days=Math.floor(days/2);
+  var ingr1=getDietIngredients(d,"menu1",m1Days);
+  var ingr2=getDietIngredients(d,"menu2",m2Days);
   var allIngredients={};
   Object.keys(ingr1).forEach(function(k){allIngredients[k]=ingr1[k];});
+  Object.keys(ingr2).forEach(function(k){
+    if(allIngredients[k]){
+      allIngredients[k].totalAmount+=ingr2[k].totalAmount;
+      ingr2[k].meals.forEach(function(m){if(allIngredients[k].meals.indexOf(m)===-1)allIngredients[k].meals.push(m);});
+    }else{
+      allIngredients[k]=ingr2[k];
+    }
+  });
   
   var shopList=[];
   Object.keys(allIngredients).forEach(function(pid){
@@ -2775,7 +2816,7 @@ function calculateShoppingListFromDiet(days){
       });
       return;
     }
-    var buyInfo=convertToPurchaseUnits(ing.product,missing);
+    var buyInfo=convertToPurchaseUnits(ing.product,missing,ing.name);
     shopList.push({
       pid:pid,name:ing.name,product:ing.product,
       required:Math.round(ing.totalAmount),available:Math.round(available),
@@ -2792,21 +2833,36 @@ function calculateShoppingListFromDiet(days){
 // Klasyfikuje pozycję zakupową wg typu opakowania w sklepie
 function shopItemPackType(item){
   var prod=item.product;
-  if(!prod){
-    // brak danych produktu w PRODUCT_DB - oszacuj po nazwie / jednostce
-    var unit=(item.unit||"").toLowerCase();
-    if(unit==="szt"||unit==="szt.")return {key:"sztuki",label:"Sztuki",ico:"🥬",order:3};
-    return {key:"wagowe",label:"Na wagę",ico:"⚖️",order:1};
+  // Jeśli mamy dane z PRODUCT_DB → ufaj im
+  if(prod){
+    if(prod.soldByWeight&&prod.unit!=="szt")return {key:"wagowe",label:"Na wagę",ico:"⚖️",order:1};
+    var pu=String(prod.pkgUnit||"").toLowerCase();
+    if(pu.indexOf("bochenek")!==-1)return {key:"bochenki",label:"Pieczywo (bochenki)",ico:"🍞",order:5};
+    if(pu.indexOf("butelka")!==-1)return {key:"butelki",label:"Butelki",ico:"🫙",order:6};
+    if(pu.indexOf("puszka")!==-1)return {key:"puszki",label:"Puszki / słoiki",ico:"🥫",order:7};
+    if(pu.indexOf("słoik")!==-1||pu.indexOf("sloik")!==-1)return {key:"puszki",label:"Puszki / słoiki",ico:"🥫",order:7};
+    if(pu.indexOf("litr")!==-1)return {key:"butelki",label:"Płyny / litry",ico:"🥛",order:6};
+    if(pu.indexOf("kg")!==-1)return {key:"wagowe",label:"Na wagę",ico:"⚖️",order:1};
+    if(prod.unit==="szt"||pu.indexOf("szt")!==-1||pu.indexOf("główk")!==-1)return {key:"sztuki",label:"Sztuki",ico:"🥬",order:3};
+    return {key:"opakowania",label:"Opakowania",ico:"📦",order:4};
   }
-  if(prod.soldByWeight)return {key:"wagowe",label:"Na wagę",ico:"⚖️",order:1};
-  var pu=String(prod.pkgUnit||"").toLowerCase();
-  if(pu.indexOf("bochenek")!==-1)return {key:"bochenki",label:"Pieczywo (bochenki)",ico:"🍞",order:5};
-  if(pu.indexOf("butelka")!==-1)return {key:"butelki",label:"Butelki",ico:"🫙",order:6};
-  if(pu.indexOf("puszka")!==-1)return {key:"puszki",label:"Puszki / słoiki",ico:"🥫",order:7};
-  if(pu.indexOf("słoik")!==-1||pu.indexOf("sloik")!==-1)return {key:"puszki",label:"Puszki / słoiki",ico:"🫙",order:7};
-  if(pu.indexOf("litr")!==-1)return {key:"butelki",label:"Płyny / litry",ico:"🥛",order:6};
-  if(pu.indexOf("kg")!==-1)return {key:"wagowe",label:"Na wagę",ico:"⚖️",order:1};
-  if(prod.unit==="szt")return {key:"sztuki",label:"Sztuki",ico:"🥬",order:3};
+  // Brak prod — zgaduj z nazwy
+  var n=String(item.name||"").toLowerCase();
+  if(/mrożon|mrozon|frozen/.test(n))return {key:"opakowania",label:"Opakowania (mrożone)",ico:"🧊",order:4};
+  if(/puszka|w wodzie|w sosie|tunczyk|tuńczyk|fasola|ciecierzy|kukurydza/.test(n))return {key:"puszki",label:"Puszki / słoiki",ico:"🥫",order:7};
+  if(/sloik|słoik|musztarda|oliwki|miod|miód|dżem|dzem/.test(n))return {key:"puszki",label:"Puszki / słoiki",ico:"🫙",order:7};
+  if(/butel|olej|oliwa|sok|napój|napoj|mleko/.test(n))return {key:"butelki",label:"Butelki / Płyny",ico:"🥛",order:6};
+  if(/chleb|bułk|bulka|bochen|pieczyw/.test(n))return {key:"bochenki",label:"Pieczywo (bochenki)",ico:"🍞",order:5};
+  if(/jajk|jaja/.test(n))return {key:"sztuki",label:"Sztuki",ico:"🥚",order:3};
+  if(/cebula|czosnek|cytryna|por|seler|kapust|jabłk|jablk|banan|por|por|brokul|brokuł/.test(n))return {key:"sztuki",label:"Sztuki",ico:"🥬",order:3};
+  if(/mięso|mieso|kurczak|wołowin|wolowin|łosoś|losos|dorsz|indyk/.test(n))return {key:"wagowe",label:"Na wagę",ico:"⚖️",order:1};
+  if(/papryk|pomidor|ogur|cukini|szpinak|sałat|salat|marchew|ziemniak|batat/.test(n))return {key:"wagowe",label:"Na wagę",ico:"⚖️",order:1};
+  if(/jogurt|skyr|twaróg|twarog|serek|kefir|maślank|maslank|mozzarell|parmezan/.test(n))return {key:"opakowania",label:"Opakowania (nabiał)",ico:"🧀",order:4};
+  if(/kasz|ryż|ryz|makaron|płatk|platk|mąka|maka|tortill|wafl/.test(n))return {key:"opakowania",label:"Opakowania (suche)",ico:"📦",order:4};
+  if(/orzech|migdał|migdal|nasion|pestk|chia|sezam/.test(n))return {key:"opakowania",label:"Opakowania (orzechy)",ico:"🥜",order:4};
+  // Ostateczny fallback: opakowanie zamiast "na wagę" (większość AI produktów to opakowania)
+  var unit=(item.unit||"").toLowerCase();
+  if(unit==="szt"||unit==="szt.")return {key:"sztuki",label:"Sztuki",ico:"🥬",order:3};
   return {key:"opakowania",label:"Opakowania",ico:"📦",order:4};
 }
 
@@ -3182,14 +3238,53 @@ function applyPurchasedItemsToPantry(shopList){
 }
 
 // ── Przelicz brakującą ilość na realne opakowania ────────────────────────────
-function convertToPurchaseUnits(product, missingAmount){
-  if(!product)return{pcs:1,label:Math.ceil(missingAmount)+"g",surplus:0,total:missingAmount,byWeight:true};
-  if(product.soldByWeight){
-    return{pcs:1,label:Math.ceil(missingAmount)+product.unit,surplus:0,total:missingAmount,byWeight:true};
+function convertToPurchaseUnits(product, missingAmount, nameHint){
+  // Brak produktu w PRODUCT_DB → zgaduj z nazwy zamiast wsadzać w "na wagę"
+  if(!product){
+    var nm=String(nameHint||"").toLowerCase();
+    var amt=Math.ceil(missingAmount);
+    if(/jajk|jaja/.test(nm)){
+      var n=Math.max(1,amt);
+      var packs=Math.ceil(n/10);
+      return{pcs:packs,label:packs+" opakowanie (10 szt.)",surplus:packs*10-n,total:packs*10,byWeight:false};
+    }
+    if(/mrożon|mrozon|frozen/.test(nm)){
+      var p=Math.max(1,Math.ceil(amt/300));
+      return{pcs:p,label:p+" opakowanie (300g)",surplus:p*300-amt,total:p*300,byWeight:false};
+    }
+    if(/puszka|w wodzie|tunczyk|tuńczyk|fasola|ciecierzy|kukurydza/.test(nm)){
+      var pz=Math.max(1,Math.ceil(amt/400));
+      return{pcs:pz,label:pz+" puszka (~400g)",surplus:pz*400-amt,total:pz*400,byWeight:false};
+    }
+    if(/chleb|bochen/.test(nm)){
+      var b=Math.max(1,Math.ceil(amt/500));
+      return{pcs:b,label:b+" bochenek (500g)",surplus:b*500-amt,total:b*500,byWeight:false};
+    }
+    if(/oliwa|olej|butel/.test(nm)){
+      var bu=Math.max(1,Math.ceil(amt/500));
+      return{pcs:bu,label:bu+" butelka (500ml)",surplus:bu*500-amt,total:bu*500,byWeight:false};
+    }
+    if(/jogurt|skyr|twarog|twaróg|serek|kefir/.test(nm)){
+      var pj=Math.max(1,Math.ceil(amt/400));
+      return{pcs:pj,label:pj+" opakowanie (~400g)",surplus:pj*400-amt,total:pj*400,byWeight:false};
+    }
+    if(/kasz|ryż|ryz|makaron|płatk|platk|mąka|maka/.test(nm)){
+      var pk=Math.max(1,Math.ceil(amt/500));
+      return{pcs:pk,label:pk+" opakowanie (500g)",surplus:pk*500-amt,total:pk*500,byWeight:false};
+    }
+    // Domyślnie: pokaż jako gramy (bez "na wagę")
+    return{pcs:1,label:amt+" g",surplus:0,total:amt,byWeight:false};
+  }
+  if(product.soldByWeight&&product.unit!=="szt"){
+    return{pcs:1,label:Math.ceil(missingAmount)+" "+product.unit,surplus:0,total:Math.ceil(missingAmount),byWeight:true};
   }
   var pkgSize=product.pkgSize||100;
   if(product.unit==="szt"){
     var need=Math.ceil(missingAmount);
+    if(product.soldByWeight){
+      // owoce/warzywa na sztuki ale sprzedawane luzem
+      return{pcs:need,label:need+" "+product.pkgUnit,surplus:0,total:need,byWeight:false};
+    }
     var pkgs=Math.ceil(need/pkgSize);
     var total=pkgs*pkgSize;
     return{pcs:pkgs,label:pkgs+" "+product.pkgUnit+" ("+pkgSize+" szt.)",surplus:total-need,total:total};
