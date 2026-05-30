@@ -175,6 +175,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ob-opt.sel{border-color:var(--green);background:rgba(30,215,96,.08)}
 .ob-opt span{font-size:20px;flex-shrink:0}
 .meal-gen-btn{background:rgba(61,139,255,.12);border:1px solid rgba(61,139,255,.3);border-radius:50px;padding:5px 12px;font-size:10px;font-weight:700;color:var(--blue);cursor:pointer;white-space:nowrap}
+
+.pref-chip{padding:6px 12px;border-radius:50px;border:1.5px solid var(--border2);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s}
+.pref-chip.active{border-color:var(--green);background:rgba(30,215,96,.15);color:var(--green)}
+.pref-chip.dislike.active{border-color:var(--red);background:rgba(255,77,77,.12);color:var(--red)}
 </style>
 </head>
 <body>
@@ -267,8 +271,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         </div>
       </div>
       <div class="receipt-drop" onclick="openReceipt()"><div style="font-size:36px;margin-bottom:8px">&#129534;</div><div style="font-size:13px;color:var(--text2);font-weight:700">Skanuj paragon</div><div style="font-size:11px;color:var(--text3);margin-top:4px">AI odczyta produkty i zaktualizuje lodowke</div></div>
-      <div class="receipt-results" id="receipt-results"><h4 style="font-size:13px;font-weight:800;margin-bottom:10px">Produkty z paragonu</h4><div id="receipt-items"></div><button class="receipt-apply" onclick="applyReceipt()">Zaktualizuj lodowke</button></div>
-      <button class="gen-btn" id="gen-btn" onclick="generateShopList()"><div class="gen-spin" id="gen-spin"></div><span id="gen-btn-txt">Generuj liste zakupow AI</span></button>
+      <div class="receipt-results" id="receipt-results"><h4 style="font-size:13px;font-weight:800;margin-bottom:10px">Produkty z paragonu</h4><div id="receipt-items"></div><div style="display:flex;gap:8px;margin-top:10px">
+  <button class="receipt-apply" onclick="applyReceiptSelected()" style="flex:2">Dodaj zaznaczone do lodowki</button>
+  <button onclick="document.getElementById('receipt-results').style.display='none'" style="flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:50px;padding:13px;font-size:13px;font-weight:700;cursor:pointer">Anuluj</button>
+</div></div>
+      <button class="gen-btn" id="gen-btn" onclick="generateSmartShopList()"><div class="gen-spin" id="gen-spin"></div><span id="gen-btn-txt">Generuj liste zakupow AI</span></button>
       <button class="copy-btn" id="copy-btn" onclick="copyShopList()">Kopiuj liste</button>
       <div id="shop-list-content"></div>
     </div>
@@ -409,6 +416,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <button id="dtab-0" onclick="switchDietTab(0)" style="flex:1;padding:12px;border:none;background:none;font-size:13px;font-weight:700;cursor:pointer;border-bottom:3px solid var(--green);color:var(--green)">Przepisy</button>
     <button id="dtab-1" onclick="switchDietTab(1)" style="flex:1;padding:12px;border:none;background:none;color:var(--text3);font-size:13px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent">Plan tygodnia</button>
     <button id="dtab-2" onclick="switchDietTab(2)" style="flex:1;padding:12px;border:none;background:none;color:var(--text3);font-size:13px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent">Wgraj diete</button>
+    <button id="dtab-3" onclick="switchDietTab(3)" style="flex:1;padding:12px;border:none;background:none;color:var(--text3);font-size:12px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent">Historia</button>
   </div>
   <div id="diet-body" style="flex:1;overflow-y:auto;padding:16px"></div>
 </div>
@@ -453,6 +461,43 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="ob-opt" onclick="selectOb('stores','lidl',this)"><span>&#127978;&#65039;</span><div><div style="font-size:13px;font-weight:700">Lidl</div></div></div>
       <div class="ob-opt" onclick="selectOb('stores','both',this)"><span>&#128722;</span><div><div style="font-size:13px;font-weight:700">Oba sklepy</div></div></div>
       <div style="margin-top:12px"><div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:6px">Wykluczenia (opcjonalnie)</div><input id="ob-exclude" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px;font-size:14px;color:var(--text);outline:none" placeholder="np. laktoza, orzechy, ryby..."></div>
+    </div>
+    <div class="ob-step" id="ob-step-4b" style="display:none">
+      <div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.8px">Preferencje i wykluczenia</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Wybierz co lubisz &#8212; AI bedzie to priorytetyzowac w diecie:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px" id="liked-chips">
+        <button class="pref-chip" data-val="kurczak" onclick="togglePref(this,'liked')">&#127859; Kurczak</button>
+        <button class="pref-chip" data-val="wolowina" onclick="togglePref(this,'liked')">&#129385; Wolowina</button>
+        <button class="pref-chip" data-val="losos" onclick="togglePref(this,'liked')">&#127820; Losos</button>
+        <button class="pref-chip" data-val="dorsz" onclick="togglePref(this,'liked')">&#128031; Dorsz</button>
+        <button class="pref-chip" data-val="jaja" onclick="togglePref(this,'liked')">&#129370; Jaja</button>
+        <button class="pref-chip" data-val="twarog" onclick="togglePref(this,'liked')">&#129472; Twarog</button>
+        <button class="pref-chip" data-val="ryz" onclick="togglePref(this,'liked')">&#127795; Ryz</button>
+        <button class="pref-chip" data-val="kasza" onclick="togglePref(this,'liked')">&#127806; Kasza</button>
+        <button class="pref-chip" data-val="makaron" onclick="togglePref(this,'liked')">&#127837; Makaron</button>
+        <button class="pref-chip" data-val="platki owsiane" onclick="togglePref(this,'liked')">&#127868; Platki</button>
+        <button class="pref-chip" data-val="ciecierzyca" onclick="togglePref(this,'liked')">&#129752; Ciecierzyca</button>
+        <button class="pref-chip" data-val="bataty" onclick="togglePref(this,'liked')">&#129364; Bataty</button>
+        <button class="pref-chip" data-val="brokuł" onclick="togglePref(this,'liked')">&#129382; Brokul</button>
+        <button class="pref-chip" data-val="szpinak" onclick="togglePref(this,'liked')">&#129376; Szpinak</button>
+        <button class="pref-chip" data-val="avocado" onclick="togglePref(this,'liked')">&#129361; Awokado</button>
+        <button class="pref-chip" data-val="maslo orzechowe" onclick="togglePref(this,'liked')">&#129386; Maslo orz.</button>
+        <button class="pref-chip" data-val="jogurt" onclick="togglePref(this,'liked')">&#129371; Jogurt/Skyr</button>
+        <button class="pref-chip" data-val="orzechy" onclick="togglePref(this,'liked')">&#127802; Orzechy</button>
+      </div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Czego <b style="color:var(--red)">nie lubisz lub nie mozesz jesc</b>:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px" id="disliked-chips">
+        <button class="pref-chip dislike" data-val="ryby" onclick="togglePref(this,'disliked')">&#128031; Ryby</button>
+        <button class="pref-chip dislike" data-val="laktoza" onclick="togglePref(this,'disliked')">&#129371; Laktoza</button>
+        <button class="pref-chip dislike" data-val="gluten" onclick="togglePref(this,'disliked')">&#127798; Gluten</button>
+        <button class="pref-chip dislike" data-val="orzechy" onclick="togglePref(this,'disliked')">&#127802; Orzechy</button>
+        <button class="pref-chip dislike" data-val="wieprzowina" onclick="togglePref(this,'disliked')">&#127830; Wieprzowina</button>
+        <button class="pref-chip dislike" data-val="jaja" onclick="togglePref(this,'disliked')">&#129370; Jaja</button>
+        <button class="pref-chip dislike" data-val="cebula" onclick="togglePref(this,'disliked')">&#129382; Cebula</button>
+        <button class="pref-chip dislike" data-val="czosnek" onclick="togglePref(this,'disliked')">&#129382; Czosnek</button>
+      </div>
+      <div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:6px;text-transform:uppercase">Dodatkowe wykluczenia (wpisz recznie)</div>
+      <input id="ob-exclude" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px;font-size:14px;color:var(--text);outline:none" placeholder="np. laktoza, orzechy, wieprzowina...">
     </div>
     <div class="ob-step" id="ob-step-5" style="display:none">
       <p style="font-size:13px;color:var(--text2);margin-bottom:10px">Na podstawie Twoich danych:</p>
@@ -499,7 +544,7 @@ var state={},expiry={},photos={},filter="all",catFilter="all",searchQ="";
 var userName="",shopTs=0,saveTimer=null,apiKey="";
 var expiryItem=null,scanData=null,scanFromExpiry=false,scanSavesPhoto=false;
 var photoItem=null,activeSlot="front",chatHistory=[],chatBusy=false;
-var receiptData=null,shopChecked={},shopStore="biedronka";
+var receiptData=null,receiptAllProducts=[],receiptMeta={},shopChecked={},shopStore="biedronka";
 var userProfile=null,obStep=0,obSels={},obMethod="manual";
 var dietTab=0,dietMenu=1,expandedMeal=null,weekPlan={};
 var editMealCtx={section:null,idx:null};
@@ -704,81 +749,122 @@ function handleReceiptPhoto(input){
     document.getElementById("receipt-loading").style.display="block";
     document.getElementById("receipt-scan-result").style.display="none";
     var b64=e.target.result.split(",")[1],mime=input.files[0].type||"image/jpeg";
+    // Lista produktow z lodowki do dopasowania
     var allP=[];CATS.forEach(function(cat){cat.items.forEach(function(it){allP.push(it.n);});});
-    // Krotki prompt + wiecej tokenow = mniej szans na uciety JSON
-    var prompt="To jest paragon z Biedronki. Znajdz produkty ktore pasuja do tej listy: "+allP.join(", ")+". Zwroc TYLKO poprawny JSON (bez markdown): {\"produkty\":[{\"n\":\"nazwa z listy lub null\",\"ilosc\":1}]}. Jesli nie pasuje — pominij. Max 15 produktow. Odpowiedz krotko.";
-    callAPI([{role:"user",content:[
-      {type:"image",source:{type:"base64",media_type:mime,data:b64}},
-      {type:"text",text:prompt}
-    ]}],
-    "Jestes asystentem lodowki. TYLKO JSON. Bez markdown.",
+    var prompt="Przeanalizuj paragon i zwroc 2 listy w JSON:\n"
+      +"1. 'dopasowane' - produkty ktore pasuja do listy lodowki: "+allP.join(", ")+"\n"
+      +"2. 'wszystkie' - WSZYSTKIE produkty z paragonu (nazwy, ilosci, ceny)\n"
+      +"TYLKO JSON bez markdown:\n"
+      +'{"dopasowane":[{"n":"nazwa z listy lodowki","ilosc":1}],'
+      +'"wszystkie":[{"nazwa":"pelna nazwa z paragonu","ilosc":1,"cena":0.0,"jednostka":"szt"}],'
+      +'"suma":0.0,"sklep":"nazwa sklepu","data":"DD.MM.YYYY lub null"}';
+    callAPI([
+      {role:"user",content:[
+        {type:"image",source:{type:"base64",media_type:mime,data:b64}},
+        {type:"text",text:prompt}
+      ]}
+    ],"Jestes asystentem analizy paragonow. TYLKO JSON. Bez markdown.",
     function(txt){
       document.getElementById("receipt-loading").style.display="none";
-      // Robust JSON extraction
       var clean=txt.replace(/```json/gi,"").replace(/```/g,"").trim();
       var s=clean.indexOf("{"),e=clean.lastIndexOf("}");
       if(s===-1||e===-1){
-        document.getElementById("receipt-result-txt").textContent="Nie znaleziono produktow na paragonie.";
+        document.getElementById("receipt-result-txt").textContent="Nie udalo sie odczytac paragonu.";
         document.getElementById("receipt-scan-result").style.display="block";
         return;
       }
       try{
-        // Fix common AI mistakes: trailing commas, unclosed strings
-        var jsonStr=clean.slice(s,e+1);
-        // Remove trailing commas before ] or }
-        jsonStr=jsonStr.replace(/,\s*([}\]])/g,"$1");
-        // Try to parse
+        var jsonStr=clean.slice(s,e+1).replace(/,\s*([}\]])/g,"$1");
         var parsed=JSON.parse(jsonStr);
-        var products=parsed.produkty||[];
-        // Convert to old format for compatibility
-        receiptData=products.filter(function(p){return p.n&&p.n!=="null";}).map(function(p){
-          return{nazwa_z_paragonu:p.n,dopasowanie:p.n,ilosc:p.ilosc||1};
-        });
-        if(!receiptData.length){
-          document.getElementById("receipt-result-txt").textContent="Nie znaleziono pasujacych produktow.";
-          document.getElementById("receipt-scan-result").style.display="block";
-          return;
+        // Zapisz wszystkie produkty jako historia zakupow
+        receiptData=parsed.dopasowane||[];
+        receiptAllProducts=parsed.wszystkie||[];
+        receiptMeta={suma:parsed.suma||0,sklep:parsed.sklep||"",data:parsed.data||""};
+        // Zapisz history do Firebase
+        if(receiptAllProducts.length&&LP){
+          fbPost(LP,{who:userName,what:"PARAGON",sklep:receiptMeta.sklep,
+            suma:receiptMeta.suma,data:receiptMeta.data,
+            produkty:receiptAllProducts,ts:Date.now()});
         }
         closeReceiptModal();
         showReceiptResults();
       }catch(err){
-        // Try to salvage partial JSON by extracting produkty array manually
-        var arrStart=clean.indexOf('"produkty"');
-        if(arrStart!==-1){
-          var arrS=clean.indexOf("[",arrStart),arrE=clean.lastIndexOf("]");
-          if(arrS!==-1&&arrE!==-1&&arrE>arrS){
-            try{
-              var partialArr=JSON.parse(clean.slice(arrS,arrE+1).replace(/,\s*([}\]])/g,"$1"));
-              receiptData=partialArr.filter(function(p){return p.n&&p.n!=="null";}).map(function(p){
-                return{nazwa_z_paragonu:p.n,dopasowanie:p.n,ilosc:p.ilosc||1};
-              });
-              if(receiptData.length){closeReceiptModal();showReceiptResults();return;}
-            }catch(e2){}
+        // Proba odratowania czesciowego JSON
+        try{
+          var dStart=clean.indexOf('"dopasowane"');
+          if(dStart!==-1){
+            var aS=clean.indexOf("[",dStart),aE=clean.indexOf("]",aS);
+            if(aS!==-1&&aE!==-1){
+              receiptData=JSON.parse(clean.slice(aS,aE+1).replace(/,\s*]/g,"]")||"[]");
+              receiptAllProducts=[];receiptMeta={};
+              closeReceiptModal();showReceiptResults();return;
+            }
           }
-        }
-        document.getElementById("receipt-result-txt").textContent="Blad odczytu: "+err.message.slice(0,60)+". Sprobuj ponownie.";
+        }catch(e2){}
+        document.getElementById("receipt-result-txt").textContent="Blad odczytu JSON. Sprobuj ponownie z lepszym oswietleniem.";
         document.getElementById("receipt-scan-result").style.display="block";
       }
-    },
-    function(err){
+    },function(err){
       document.getElementById("receipt-loading").style.display="none";
-      document.getElementById("receipt-result-txt").textContent="Blad API: "+err;
+      document.getElementById("receipt-result-txt").textContent="Blad: "+err;
       document.getElementById("receipt-scan-result").style.display="block";
-    },
-    2000  // wiecej tokenow
-    );
+    },2500);
   };
   reader.readAsDataURL(input.files[0]);
 }
-function showReceiptResults(){if(!receiptData||!receiptData.length)return;showPage("shop");document.getElementById("receipt-results").style.display="block";document.getElementById("receipt-items").innerHTML=receiptData.map(function(p){var m=p.dopasowanie&&p.dopasowanie!=="null";return'<div class="rp-item"><div class="rp-info"><div class="rp-name">'+p.nazwa_z_paragonu+'</div>'+(m?'<div class="rp-mapped">'+p.dopasowanie+'</div>':'<div class="rp-skip">Nie dopasowano</div>')+'</div><div class="rp-qty">x'+(p.ilosc||1)+'</div></div>';}).join("");}
-function applyReceipt(){
-  if(!receiptData)return;
+
+
+function showReceiptResults(){
+  showPage("shop");
+  document.getElementById("receipt-results").style.display="block";
+  var html="";
+  // Meta
+  if(receiptMeta&&(receiptMeta.sklep||receiptMeta.suma)){
+    html+='<div style="background:var(--bg4);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:var(--text3)">';
+    if(receiptMeta.sklep)html+='<b style="color:var(--text)">'+receiptMeta.sklep+'</b> ';
+    if(receiptMeta.data)html+=receiptMeta.data+' ';
+    if(receiptMeta.suma)html+='Suma: <b style="color:var(--amber)">'+receiptMeta.suma+' zl</b>';
+    html+='</div>';
+  }
+  // Dopasowane — z checkboxami
+  if(receiptData&&receiptData.length){
+    html+='<div style="font-size:11px;font-weight:800;color:var(--green);margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">Dopasowane do lodowki ('+receiptData.length+') — zaznacz co dodac:</div>';
+    receiptData.forEach(function(p,i){
+      html+='<div style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--bg3);border-radius:10px;margin-bottom:6px;border:1px solid var(--border)">';
+      html+='<input type="checkbox" id="rp-cb-'+i+'" checked style="width:18px;height:18px;accent-color:var(--green);cursor:pointer;flex-shrink:0">';
+      html+='<label for="rp-cb-'+i+'" style="flex:1;cursor:pointer"><div style="font-size:13px;font-weight:700;color:var(--text)">'+p.n+'</div></label>';
+      html+='<div style="font-size:12px;font-weight:800;color:var(--amber)">x'+(p.ilosc||1)+'</div>';
+      html+='</div>';
+    });
+  }
+  // Pozostale
+  if(receiptAllProducts&&receiptAllProducts.length){
+    var notMatched=receiptAllProducts.filter(function(p){return!receiptData.some(function(r){return r.n===p.nazwa;});});
+    if(notMatched.length){
+      html+='<div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:6px;margin-top:14px;text-transform:uppercase;letter-spacing:.8px">Pozostale z paragonu — zapisane w historii ('+notMatched.length+')</div>';
+      notMatched.slice(0,12).forEach(function(p){
+        html+='<div style="display:flex;justify-content:space-between;padding:6px 10px;font-size:12px;color:var(--text3);border-bottom:1px solid var(--border)">';
+        html+='<span>'+p.nazwa+'</span>';
+        html+='<span>'+(p.cena?p.cena+' zl ':'')+' x'+(p.ilosc||1)+' '+p.jednostka+'</span>';
+        html+='</div>';
+      });
+      if(notMatched.length>12)html+='<div style="font-size:11px;color:var(--text3);text-align:center;padding:6px">... i '+(notMatched.length-12)+' wiecej</div>';
+    }
+  }
+  document.getElementById("receipt-items").innerHTML=html;
+}
+
+
+function applyReceiptSelected(){
+  if(!receiptData||!receiptData.length){dlgAlert("?","Brak produktow","Brak dopasowanych produktow.");return;}
   var patch={},updated=[];
-  receiptData.forEach(function(p){
-    var matchName=p.dopasowanie||p.nazwa_z_paragonu;
+  receiptData.forEach(function(p,i){
+    var cb=document.getElementById("rp-cb-"+i);
+    if(!cb||!cb.checked)return;// Skip unchecked
+    var matchName=p.n||p.dopasowanie;
     if(!matchName||matchName==="null")return;
     CATS.forEach(function(cat){cat.items.forEach(function(it){
-      if(it.n===matchName||it.n.toLowerCase()===matchName.toLowerCase()){
+      if(it.n.toLowerCase()===matchName.toLowerCase()||it.n===matchName){
         var id=fbk(cat.id,it.n),cur=state[id]||0,nv=Math.min(it.target*2,cur+(parseInt(p.ilosc)||1));
         state[id]=nv;patch[id]=nv;updated.push(it.n);
       }
@@ -789,14 +875,16 @@ function applyReceipt(){
     fbPatch(RP,patch).then(function(){addLog("PARAGON",0,Object.keys(patch).length);});
     updateShopBar();render();
     document.getElementById("receipt-results").style.display="none";
-    dlgAlert("OK","Lodowka zaktualizowana","Dodano "+updated.length+" produktow: "+updated.join(", "));
-
+    var extra=(receiptAllProducts&&receiptAllProducts.length>receiptData.length)?" Pozostale "+( receiptAllProducts.length-receiptData.length)+" prod. zapisane w historii.":"";
+    dlgAlert("OK","Zaktualizowano lodowke","Dodano "+updated.length+" produktow."+extra);
   }else{
-    dlgAlert("?","Brak dopasowania","Produkty z paragonu nie pasuja do listy lodowki.");
+    dlgAlert("?","Nic nie zaznaczono","Zaznacz produkty ktore chcesz dodac do lodowki.");
   }
 }
 
-// ── PHOTOS ────────────────────────────────────────────────────────────────────
+function applyReceipt(){applyReceiptSelected();}
+
+
 function compressPhoto(dataUrl,cb){var img=new Image();img.onload=function(){var canvas=document.createElement("canvas"),size=120;canvas.width=size;canvas.height=size;var ctx=canvas.getContext("2d");var s=Math.min(img.width,img.height),ox=(img.width-s)/2,oy=(img.height-s)/2;ctx.drawImage(img,ox,oy,s,s,0,0,size,size);cb(canvas.toDataURL("image/jpeg",.7));};img.onerror=function(){cb(dataUrl);};img.src=dataUrl;}
 function openPhoto(name){photoItem=name;document.getElementById("photo-modal-name").textContent=name;["front","side","top","expiry"].forEach(function(slot){var key=fbk("p_"+slot,name),src=photos[key];var img=document.getElementById("slot-"+slot+"-img"),empty=document.getElementById("slot-"+slot+"-empty");if(src&&img){img.src=src;img.style.display="block";if(empty)empty.style.display="none";}else{if(img)img.style.display="none";if(empty)empty.style.display="flex";}});document.getElementById("photo-overlay").classList.add("show");}
 function closePhoto(){document.getElementById("photo-overlay").classList.remove("show");render();}
@@ -829,7 +917,7 @@ function clearSearch(){document.getElementById("sinp").value="";onSearch("");}
 
 // ── SHOP LIST ─────────────────────────────────────────────────────────────────
 function selectShopStore(store){shopStore=store;["biedronka","lidl","both"].forEach(function(s){var btn=document.getElementById("store-sel-"+s);if(!btn)return;btn.style.borderColor=s===store?"var(--green)":"var(--border)";btn.style.background=s===store?"rgba(30,215,96,.12)":"transparent";btn.style.color=s===store?"var(--green)":"var(--text3)";});}
-function generateShopList(){if(!apiKey){dlgAlert("X","Niedostepne","Skonfiguruj klucz API");return;}var btn=document.getElementById("gen-btn"),spin=document.getElementById("gen-spin"),txt=document.getElementById("gen-btn-txt");btn.disabled=true;spin.style.display="block";txt.textContent="Generuje...";var missing=[],expiring=[];CATS.forEach(function(cat){cat.items.forEach(function(it){var cur=state[fbk(cat.id,it.n)]||0;if(cur<it.target)missing.push(it.n+"(mam:"+cur+",potrzeba:"+it.target+" "+it.unit+")");var d=getDaysLeft(it);if(d!==null&&d<=3&&cur>0)expiring.push(it.n+"("+d+"dni)");});});var storeName={biedronka:"Biedronka",lidl:"Lidl",both:"Biedronka i Lidl"}[shopStore]||"Biedronka";var prompt="Lista zakupow do "+storeName+". Braki: "+missing.join("; ")+". Wygasaja: "+(expiring.join("; ")||"nic")+". TYLKO JSON: {\"komentarz\":\"\",\"produkty\":[{\"nazwa\":\"\",\"ilosc\":\"\",\"priorytet\":\"wysoki/sredni/niski\",\"powod\":\"\"}]}";callAPI([{role:"user",content:prompt}],SYS,function(res){btn.disabled=false;spin.style.display="none";txt.textContent="Odswiez liste";var clean=res.replace(/```json/gi,"").replace(/```/g,"").trim();var s=clean.indexOf("{"),e=clean.lastIndexOf("}");try{renderShopList(JSON.parse(s!==-1&&e!==-1?clean.slice(s,e+1):clean));}catch(ex){document.getElementById("shop-list-content").innerHTML='<div class="ai-note">'+res+'</div>';}},function(err){btn.disabled=false;spin.style.display="none";txt.textContent="Generuj liste AI";document.getElementById("shop-list-content").innerHTML='<div class="ai-note" style="color:var(--red)">Blad: '+err+'</div>';});}
+function generateShopList(){if(!apiKey){dlgAlert("X","Niedostepne","Skonfiguruj klucz API");return;}var btn=document.getElementById("gen-btn"),spin=document.getElementById("gen-spin"),txt=document.getElementById("gen-btn-txt");btn.disabled=true;spin.style.display="block";txt.textContent="Generuje...";var missing=[],expiring=[];CATS.forEach(function(cat){cat.items.forEach(function(it){var cur=state[fbk(cat.id,it.n)]||0;if(cur<it.target)missing.push(it.n+"(mam:"+cur+",potrzeba:"+it.target+" "+it.unit+")");var d=getDaysLeft(it);if(d!==null&&d<=3&&cur>0)expiring.push(it.n+"("+d+"dni)");});});var storeName={biedronka:"Biedronka",lidl:"Lidl",both:"Biedronka i Lidl"}[shopStore]||"Biedronka";var prompt="Lista zakupow do "+storeName+". Braki w lodowce: "+missing.join("; ")+". Wygasaja wkrotce: "+(expiring.join("; ")||"nic")+". Jezeli uzytkownik ostatnio kupowal cos w Biedronce uwzgledniej te produkty przy priorytetach. TYLKO JSON: {\"komentarz\":\"\",\"produkty\":[{\"nazwa\":\"\",\"ilosc\":\"\",\"priorytet\":\"wysoki/sredni/niski\",\"powod\":\"\"}]}";callAPI([{role:"user",content:prompt}],SYS,function(res){btn.disabled=false;spin.style.display="none";txt.textContent="Odswiez liste";var clean=res.replace(/```json/gi,"").replace(/```/g,"").trim();var s=clean.indexOf("{"),e=clean.lastIndexOf("}");try{renderShopList(JSON.parse(s!==-1&&e!==-1?clean.slice(s,e+1):clean));}catch(ex){document.getElementById("shop-list-content").innerHTML='<div class="ai-note">'+res+'</div>';}},function(err){btn.disabled=false;spin.style.display="none";txt.textContent="Generuj liste AI";document.getElementById("shop-list-content").innerHTML='<div class="ai-note" style="color:var(--red)">Blad: '+err+'</div>';});}
 function renderShopList(data){shopChecked={};document.getElementById("copy-btn").classList.add("show");var high=[],med=[],low=[];(data.produkty||[]).forEach(function(p){if(p.priorytet==="wysoki"||p.priorytet==="high")high.push(p);else if(p.priorytet==="niski"||p.priorytet==="low")low.push(p);else med.push(p);});var html='<div class="ai-note">'+(data.komentarz||"")+'</div>';function sec(items,title,cls){if(!items.length)return"";var s='<div style="margin-bottom:14px"><div class="shop-sec-title">'+title+'</div>';items.forEach(function(p,i){var id="si-"+cls+i;s+='<div class="shop-item" id="'+id+'" onclick="toggleShopItem(this.id)"><div class="shop-item-check"></div><div class="shop-item-info"><div class="shop-item-name">'+p.nazwa+'</div><div class="shop-item-detail">'+p.ilosc+' - '+p.powod+'</div></div><span class="prio prio-'+cls+'">'+p.priorytet+'</span></div>';});return s+"</div>";}html+=sec(high,"Pilne","high")+sec(med,"Wazne","med")+sec(low,"Warto miec","low");document.getElementById("shop-list-content").innerHTML=html;}
 function toggleShopItem(id){var el=document.getElementById(id);if(!el)return;shopChecked[id]=!shopChecked[id];el.classList[shopChecked[id]?"add":"remove"]("checked");el.querySelector(".shop-item-check").textContent=shopChecked[id]?"v":"";}
 function copyShopList(silent){var items=[];document.querySelectorAll(".shop-item:not(.checked) .shop-item-name").forEach(function(el){items.push("- "+el.textContent);});if(!items.length){CATS.forEach(function(cat){cat.items.forEach(function(it){var cur=state[fbk(cat.id,it.n)]||0;if(cur<it.target)items.push("- "+it.n+" ("+Math.max(0,it.target-cur)+" "+it.unit+")");});});}if(!items.length){if(!silent)dlgAlert("?","Brak produktow","Wygeneruj najpierw liste AI");return false;}var text="PELNA LODOWKA - Lista zakupow\n"+new Date().toLocaleDateString("pl-PL")+"\n\n"+items.join("\n");navigator.clipboard.writeText(text).then(function(){if(!silent)dlgAlert("OK","Skopiowano!",items.length+" produktow.");}).catch(function(){var ta=document.createElement("textarea");ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand("copy");document.body.removeChild(ta);if(!silent)dlgAlert("OK","Skopiowano!","Lista skopiowana.");});return true;}
@@ -906,7 +994,16 @@ function updateAISys(){if(!userProfile)return;var st={biedronka:"Biedronke",lidl
 function openProfileModal(){
   document.getElementById("profile-modal-name").textContent="Profil: "+userName;
   var cont=document.getElementById("profile-modal-content");
-  if(userProfile&&userProfile.kcal){cont.innerHTML="<div>Kcal: <b>"+userProfile.kcal+"</b></div><div>B: <b>"+userProfile.prot+"g</b> | W: <b>"+userProfile.carb+"g</b> | T: <b>"+userProfile.fat+"g</b></div><div>Cel: <b>"+({lose:"Redukcja",maintain:"Utrzymanie",gain:"Masa"}[userProfile.goal]||"?")+"</b></div><div>Sklep: <b>"+({biedronka:"Biedronka",lidl:"Lidl",both:"Oba"}[userProfile.stores]||"?")+"</b></div>"+(userProfile.exclude?"<div>Wykluczone: <b>"+userProfile.exclude+"</b></div>":"");}
+  if(userProfile&&userProfile.kcal){
+    var pi="<div>Kcal: <b>"+userProfile.kcal+"</b></div>"
+      +"<div>B:<b>"+userProfile.prot+"g</b> W:<b>"+userProfile.carb+"g</b> T:<b>"+userProfile.fat+"g</b></div>"
+      +"<div>Cel: <b>"+({lose:"Redukcja",maintain:"Utrzymanie",gain:"Masa"}[userProfile.goal]||"?")+"</b></div>"
+      +"<div>Sklep: <b>"+({biedronka:"Biedronka",lidl:"Lidl",both:"Oba"}[userProfile.stores]||"?")+"</b></div>"
+      +(userProfile.exclude?"<div>Wykluczone: <b>"+userProfile.exclude+"</b></div>":"")
+      +((userProfile.liked&&userProfile.liked.length)?'<div style="margin-top:4px"><span style="color:var(--green);font-weight:700">Lubi: </span>'+userProfile.liked.join(", ")+"</div>":"")
+      +((userProfile.disliked&&userProfile.disliked.length)?'<div><span style="color:var(--red);font-weight:700">Nie lubi: </span>'+userProfile.disliked.join(", ")+"</div>":"");
+    cont.innerHTML=pi;
+  }
   else{cont.innerHTML='<div style="text-align:center;color:var(--text3);padding:10px">Brak danych. Kliknij Edytuj.</div>';}
   document.getElementById("profile-overlay").classList.add("show");
 }
@@ -914,19 +1011,52 @@ function closeProfileModal(){document.getElementById("profile-overlay").classLis
 function logoutUser(){dlgConfirm("X","Wylogowanie","Chcesz sie wylogowac?",function(){localStorage.removeItem("spiz_name");userName="";userProfile=null;state={};expiry={};photos={};chatHistory=[];apiKey="";weekPlan={};document.getElementById("app").style.display="none";document.getElementById("login").style.display="flex";document.getElementById("name-inp").value="";document.getElementById("surname-inp").value="";closeProfileModal();},"Wyloguj","danger");}
 
 // ── ONBOARDING ────────────────────────────────────────────────────────────────
-function calcProfile(){var age=parseInt(document.getElementById("ob-age").value)||30,weight=parseInt(document.getElementById("ob-weight").value)||75,height=parseInt(document.getElementById("ob-height").value)||175,gender=document.getElementById("ob-gender").value||"m",activity=obSels.activity||"mod",goal=obSels.goal||"maintain",stores=obSels.stores||"biedronka";var exclude=(document.getElementById("ob-exclude")||{}).value||"";var bmr=gender==="m"?10*weight+6.25*height-5*age+5:10*weight+6.25*height-5*age-161;var kcal=Math.round(bmr*({sed:1.2,light:1.375,mod:1.55,active:1.725}[activity]||1.55))+({lose:-400,maintain:0,gain:400}[goal]||0);var prot=Math.round(weight*2),fat=Math.round(kcal*.27/9),carb=Math.round((kcal-prot*4-fat*9)/4);return{age:age,weight:weight,height:height,gender:gender,activity:activity,goal:goal,stores:stores,exclude:exclude,kcal:kcal,prot:prot,fat:fat,carb:carb};}
+function calcProfile(){var age=parseInt(document.getElementById("ob-age").value)||30,weight=parseInt(document.getElementById("ob-weight").value)||75,height=parseInt(document.getElementById("ob-height").value)||175,gender=document.getElementById("ob-gender").value||"m",activity=obSels.activity||"mod",goal=obSels.goal||"maintain",stores=obSels.stores||"biedronka";var exclude=(document.getElementById("ob-exclude")||{}).value||"";var bmr=gender==="m"?10*weight+6.25*height-5*age+5:10*weight+6.25*height-5*age-161;var kcal=Math.round(bmr*({sed:1.2,light:1.375,mod:1.55,active:1.725}[activity]||1.55))+({lose:-400,maintain:0,gain:400}[goal]||0);var prot=Math.round(weight*2),fat=Math.round(kcal*.27/9),carb=Math.round((kcal-prot*4-fat*9)/4);return{age:age,weight:weight,height:height,gender:gender,activity:activity,goal:goal,stores:stores,exclude:exclude,kcal:kcal,prot:prot,fat:fat,carb:carb,liked:obSels.liked||[],disliked:obSels.disliked||[]};}
 function showOb(){obStep=0;obSels={};obMethod="manual";renderObStep();document.getElementById("ob-overlay").classList.add("show");}
 function hideOb(){document.getElementById("ob-overlay").classList.remove("show");}
 function renderObStep(){for(var i=0;i<6;i++){var el=document.getElementById("ob-step-"+i);if(el)el.style.display=i===obStep?"block":"none";}var dots="";for(var j=0;j<6;j++)dots+='<div style="width:8px;height:8px;border-radius:50%;background:'+(j===obStep?"var(--green)":"var(--border2)")+'" ></div>';document.getElementById("ob-progress").innerHTML=dots;document.getElementById("ob-back-btn").style.display=obStep>0?"block":"none";document.getElementById("ob-next-btn").textContent=obStep===5?"Zaczynamy!":"Dalej";if(obStep===5){var p=calcProfile();document.getElementById("ob-res-kcal").textContent=p.kcal+" kcal";document.getElementById("ob-res-prot").textContent=p.prot+"g";document.getElementById("ob-res-carb").textContent=p.carb+"g";document.getElementById("ob-res-fat").textContent=p.fat+"g";}}
 function selectObMethod(m,el){obMethod=m;document.getElementById("ob-method-manual").classList[m==="manual"?"add":"remove"]("sel");document.getElementById("ob-method-ai").classList[m==="ai"?"add":"remove"]("sel");document.getElementById("ob-ai-input").style.display=m==="ai"?"block":"none";}
 function selectOb(type,val,el){obSels[type]=val;el.parentElement.querySelectorAll(".ob-opt").forEach(function(o){o.classList.remove("sel");});el.classList.add("sel");}
 function obNext(){
-  if(obStep===0){if(!obMethod)return;if(obMethod==="ai"){var txt=document.getElementById("ob-diet-text").value.trim();if(!txt)return;document.getElementById("ob-next-btn").disabled=true;var st=document.getElementById("ob-ai-status");st.textContent="Analizuje...";st.style.color="var(--amber)";callAPI([{role:"user",content:'Przeanalizuj plan diety. TYLKO JSON: {"kcal":3060,"prot":244,"carb":281,"fat":107,"sklep":"biedronka","wykluczenia":"","cel":"gain"}. Plan: '+txt}],"Jestes dietetykiem. TYLKO JSON.",function(res){try{var p=JSON.parse(res.replace(/```json|```/g,"").trim());saveUserProfile({kcal:p.kcal||2000,prot:p.prot||150,carb:p.carb||200,fat:p.fat||70,stores:p.sklep||"biedronka",exclude:p.wykluczenia||"",goal:p.cel||"maintain",activity:"mod",age:30,weight:75,height:175,gender:"m"});hideOb();updateAISys();}catch(e){st.textContent="Blad";document.getElementById("ob-next-btn").disabled=false;}},function(){st.textContent="Blad API";document.getElementById("ob-next-btn").disabled=false;});return;}obStep++;renderObStep();return;}
+  if(obStep===0){
+    if(!obMethod)return;
+    if(obMethod==="ai"){
+      var txt2=document.getElementById("ob-diet-text").value.trim();if(!txt2)return;
+      document.getElementById("ob-next-btn").disabled=true;
+      var st=document.getElementById("ob-ai-status");st.textContent="Analizuje...";st.style.color="var(--amber)";
+      callAPI([{role:"user",content:'Przeanalizuj plan diety. TYLKO JSON: {"kcal":3060,"prot":244,"carb":281,"fat":107,"sklep":"biedronka","wykluczenia":"","cel":"gain"}. Plan: '+txt2}],
+        "Jestes dietetykiem. TYLKO JSON.",
+        function(res){try{var p=JSON.parse(res.replace(/```json|```/g,"").trim());saveUserProfile({kcal:p.kcal||2000,prot:p.prot||150,carb:p.carb||200,fat:p.fat||70,stores:p.sklep||"biedronka",exclude:p.wykluczenia||"",goal:p.cel||"maintain",activity:"mod",age:30,weight:75,height:175,gender:"m"});hideOb();updateAISys();}catch(e){st.textContent="Blad";document.getElementById("ob-next-btn").disabled=false;}},
+        function(){st.textContent="Blad API";document.getElementById("ob-next-btn").disabled=false;});
+      return;
+    }
+    obStep++;renderObStep();return;
+  }
   if(obStep===1&&(!document.getElementById("ob-age").value||!document.getElementById("ob-weight").value)){dlgAlert("?","Uzupelnij dane","Wpisz wiek i wage");return;}
   if(obStep===2&&!obSels.activity){dlgAlert("?","Wybierz aktywnosc","");return;}
   if(obStep===3&&!obSels.goal){dlgAlert("?","Wybierz cel","");return;}
   if(obStep===4&&!obSels.stores){dlgAlert("?","Wybierz sklep","");return;}
-  if(obStep===5){var fp=calcProfile();saveUserProfile(fp);updateAISys();hideOb();generateAIDiet(fp);return;}
+  if(obStep===4){
+    // Go to 4b (preferences)
+    obStep=40;// use 40 as "4b"
+    var el=document.getElementById("ob-step-4b");
+    if(el){
+      for(var i=0;i<6;i++){var s2=document.getElementById("ob-step-"+i);if(s2)s2.style.display="none";}
+      document.getElementById("ob-step-5")&&(document.getElementById("ob-step-5").style.display="none");
+      el.style.display="block";
+    }
+    var dots="";for(var j=0;j<6;j++)dots+='<div style="width:8px;height:8px;border-radius:50%;background:'+(j===4?"var(--green)":"var(--border2)")+'"></div>';
+    document.getElementById("ob-progress").innerHTML=dots;
+    document.getElementById("ob-back-btn").style.display="block";
+    document.getElementById("ob-next-btn").textContent="Dalej";
+    return;
+  }
+  if(obStep===40){
+    // Preferences done, go to step 5
+    obHandlePrefsStep();
+    obStep=5;renderObStep();return;
+  }
+  if(obStep===5){var fp=calcProfile();saveUserProfile(fp);updateAISys();hideOb();startDietGeneration();return;}
   obStep++;renderObStep();
 }
 function obBack(){if(obStep>0){obStep--;renderObStep();}}
@@ -934,9 +1064,9 @@ function obBack(){if(obStep>0){obStep--;renderObStep();}}
 // ── DIET ──────────────────────────────────────────────────────────────────────
 function openDiet(){document.getElementById("diet-user-name").textContent=userName;document.getElementById("diet-overlay").classList.add("show");switchDietTab(0);}
 function closeDiet(){document.getElementById("diet-overlay").classList.remove("show");}
-function switchDietTab(n){dietTab=n;for(var i=0;i<3;i++){var t=document.getElementById("dtab-"+i);if(t){t.style.borderBottom=i===n?"3px solid var(--green)":"3px solid transparent";t.style.color=i===n?"var(--green)":"var(--text3)";}}renderDietBody();}
+function switchDietTab(n){dietTab=n;for(var i=0;i<4;i++){var t=document.getElementById("dtab-"+i);if(t){t.style.borderBottom=i===n?"3px solid var(--green)":"3px solid transparent";t.style.color=i===n?"var(--green)":"var(--text3)";}}renderDietBody();}
 function getDietData(){return(userProfile&&userProfile.dietData)?userProfile.dietData:GRZES_DIET;}
-function renderDietBody(){var body=document.getElementById("diet-body");if(!body)return;if(dietTab===0)body.innerHTML=renderRecipes();else if(dietTab===1)body.innerHTML=renderWeekPlan();else body.innerHTML=renderUploadDiet();}
+function renderDietBody(){var body=document.getElementById("diet-body");if(!body)return;if(dietTab===0)body.innerHTML=renderRecipes();else if(dietTab===1)body.innerHTML=renderWeekPlan();else if(dietTab===2)body.innerHTML=renderUploadDiet();else openPurchaseHistory();}
 
 function renderRecipes(){
   var d=getDietData(),menu=dietMenu===1?d.menu1:d.menu2;
@@ -995,7 +1125,7 @@ function generateSingleMeal(menuNum,section,replaceIdx){
   var mealName={sniadania:"sniadanie",obiady:"obiad",kolacje:"kolacja"}[section]||section;
   var mK=Math.round(userProfile.kcal/3),mP=Math.round(userProfile.prot/3),mC=Math.round(userProfile.carb/3),mF=Math.round(userProfile.fat/3);
   var storeName={biedronka:"Biedronka",lidl:"Lidl",both:"Biedronka i Lidl"}[userProfile.stores]||"Biedronka";
-  var prompt="Wygeneruj 1 posilek ("+mealName+"). Cel: "+mK+" kcal B:"+mP+"g W:"+mC+"g T:"+mF+"g (+/-5%). Sklep: "+storeName+". "+(userProfile.exclude?"Wykluczone: "+userProfile.exclude+". ":"")+
+  var userLiked2=(userProfile.liked&&userProfile.liked.length)?"Lubie: "+userProfile.liked.join(", ")+". ":"";  var userDisliked2=(userProfile.disliked&&userProfile.disliked.length)?"NIE lubie: "+userProfile.disliked.join(", ")+". ":"";  var prompt="Wygeneruj 1 posilek ("+mealName+"). Cel: "+mK+" kcal B:"+mP+"g W:"+mC+"g T:"+mF+"g (+/-5%). Sklep: "+storeName+". "+(userProfile.exclude?"Wykluczone: "+userProfile.exclude+". ":"")+userLiked2+userDisliked2+
     (existing?"NIE POWTARZAJ: "+existing+". ":"Cos nowego. ")+
     "Produkty: "+FULL_PRODUCTS+". Realne gramy (bialko 100-250g, weglowodany 60-200g). TYLKO JSON: {\"nazwa\":\"...\",\"czas\":\"15 min\",\"kcal\":LICZBA,\"prot\":LICZBA,\"carb\":LICZBA,\"fat\":LICZBA,\"skladniki\":[{\"n\":\"Produkt\",\"il\":\"150g\"}],\"przepis\":\"1. Krok.\"}";
   var body=document.getElementById("diet-body");
@@ -1079,7 +1209,8 @@ function generateAIDiet(profile){
   var storeName={biedronka:"Biedronka",lidl:"Lidl",both:"Biedronka i Lidl"}[profile.stores]||"Biedronka";
   var goalTxt={lose:"redukcja tluszczu",maintain:"utrzymanie wagi",gain:"masa miesniowa"}[profile.goal]||profile.goal;
   var mK=Math.round(profile.kcal/3),mP=Math.round(profile.prot/3),mC=Math.round(profile.carb/3),mF=Math.round(profile.fat/3);
-  var base="Uzytkownik: "+goalTxt+", "+profile.kcal+" kcal/dzien, B:"+profile.prot+"g W:"+profile.carb+"g T:"+profile.fat+"g. Na posilek: "+mK+" kcal B:"+mP+"g W:"+mC+"g T:"+mF+"g (+/-5%). Sklep: "+storeName+"."+(profile.exclude?" Wykluczone: "+profile.exclude+".":" ")+" Produkty: "+FULL_PRODUCTS+". Zasady: realne gramy (bialko 100-250g, weglowodany 60-200g), min 10g kazdego skladnika, policz makro dokladnie, max 30 min, proste dania. TYLKO JSON.";
+  var likedStr=(profile.liked&&profile.liked.length)?" PRIORYTETUJ lubiane: "+profile.liked.join(", "):"";
+  var dislikedStr=(profile.disliked&&profile.disliked.length)?" WYKLUCZ nielubiane: "+profile.disliked.join(", "):"";  var base="Uzytkownik: "+goalTxt+", "+profile.kcal+" kcal/dzien, B:"+profile.prot+"g W:"+profile.carb+"g T:"+profile.fat+"g. Na posilek: "+mK+" kcal B:"+mP+"g W:"+mC+"g T:"+mF+"g (+/-5%). Sklep: "+storeName+"."+(profile.exclude?" Wykluczone: "+profile.exclude+".":"")+likedStr+dislikedStr+" Produkty: "+FULL_PRODUCTS+". Zasady: realne gramy (bialko 100-250g, weglowodany 60-200g), min 10g kazdego skladnika, policz makro dokladnie, max 30 min, proste dania. TYLKO JSON.";
   var fmt='{"sniadania":[{"nazwa":"...","czas":"15 min","kcal":0,"prot":0,"carb":0,"fat":0,"skladniki":[{"n":"Produkt","il":"150g"}],"przepis":"1. Krok."}],"obiady":[...],"kolacje":[...]}';
   var sys="Jestes dietetykiem. TYLKO JSON bez markdown. Nie pisz nic przed ani po JSON.";
   document.getElementById("diet-overlay").classList.add("show");
@@ -1218,6 +1349,145 @@ document.getElementById("login").style.display="flex";
 var sn=localStorage.getItem("spiz_name");
 if(sn){var snp=sn.trim().split(" ");document.getElementById("name-inp").value=snp[0]||"";if(document.getElementById("surname-inp"))document.getElementById("surname-inp").value=snp.slice(1).join(" ")||"";}
 
+
+// ── PREFERENCES ───────────────────────────────────────────────────────────────
+var obPrefs={liked:[],disliked:[]};
+function togglePref(el,type){
+  var val=el.dataset.val;
+  var arr=obPrefs[type];
+  var idx=arr.indexOf(val);
+  if(idx===-1){arr.push(val);el.classList.add("active");}
+  else{arr.splice(idx,1);el.classList.remove("active");}
+}
+
+// ── OVERRIDE obNext to handle 6 steps (added 4b) ─────────────────────────────
+var OB_STEP_ORDER=["0","1","2","3","4","4b","5"];
+function obNextStep(){
+  var cur=obStep,next=cur+1;
+  // Step 4 -> 4b: skip to prefs
+  if(cur===4)return "4b";
+  if(cur==="4b"||cur===40)return 5;
+  return next;
+}
+
+// ── HISTORIA ZAKUPOW ──────────────────────────────────────────────────────────
+var purchaseHistory=[];
+
+function loadPurchaseHistory(cb){
+  fbGet(LP).then(function(data){
+    if(!data){purchaseHistory=[];if(cb)cb();return;}
+    purchaseHistory=Object.values(data)
+      .filter(function(e){return e.what==="PARAGON"&&e.produkty;})
+      .sort(function(a,b){return b.ts-a.ts;})
+      .slice(0,20);
+    if(cb)cb();
+  }).catch(function(){purchaseHistory=[];if(cb)cb();});
+}
+
+function openPurchaseHistory(){
+  loadPurchaseHistory(function(){
+    var body=document.getElementById("diet-body");
+    if(!body)return;
+    if(!purchaseHistory.length){
+      body.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px">&#129534;</div>Brak zeskanowanych paragonow.<br><br>Uzyj skanera paragonu w zakladce Zakupy.</div>';
+      return;
+    }
+    var html='<div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px">'+purchaseHistory.length+' paragonow</div>';
+    // Price analysis
+    var priceMap={};
+    purchaseHistory.forEach(function(p){
+      (p.produkty||[]).forEach(function(prod){
+        if(!prod.nazwa||!prod.cena)return;
+        var key=prod.nazwa.toLowerCase();
+        if(!priceMap[key])priceMap[key]={name:prod.nazwa,prices:[],sklepy:{}};
+        priceMap[key].prices.push(prod.cena);
+        if(p.sklep){
+          if(!priceMap[key].sklepy[p.sklep])priceMap[key].sklepy[p.sklep]=[];
+          priceMap[key].sklepy[p.sklep].push(prod.cena);
+        }
+      });
+    });
+    // Show price insights if multiple shops
+    var insights=Object.values(priceMap).filter(function(p){return Object.keys(p.sklepy).length>1;});
+    if(insights.length){
+      html+='<div style="background:rgba(61,139,255,.08);border:1px solid rgba(61,139,255,.2);border-radius:var(--radius);padding:14px;margin-bottom:14px">';
+      html+='<div style="font-size:11px;font-weight:800;color:var(--blue);margin-bottom:10px;text-transform:uppercase;letter-spacing:.8px">Porownanie cen Biedronka vs Lidl</div>';
+      insights.slice(0,5).forEach(function(p){
+        html+='<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px">';
+        html+='<div style="font-weight:700;color:var(--text);margin-bottom:4px">'+p.name+'</div>';
+        Object.entries(p.sklepy).forEach(function(entry){
+          var sklep=entry[0],prices=entry[1];
+          var avg=(prices.reduce(function(a,b){return a+b;},0)/prices.length).toFixed(2);
+          html+='<span style="display:inline-block;margin-right:12px;color:var(--text3)">'+sklep+': <b style="color:var(--amber)">'+avg+' zl</b></span>';
+        });
+        html+='</div>';
+      });
+      html+='</div>';
+    }
+    // Receipts list
+    purchaseHistory.forEach(function(p,i){
+      var d=p.ts?new Date(p.ts).toLocaleDateString("pl-PL"):"?";
+      var skladCount=(p.produkty||[]).length;
+      html+='<div style="background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:10px;overflow:hidden">';
+      html+='<div onclick="toggleReceiptDetails(this)" style="padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:10px">';
+      html+='<div style="font-size:24px">&#129534;</div>';
+      html+='<div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--text)">'+(p.sklep||"Sklep")+'</div>';
+      html+='<div style="font-size:11px;color:var(--text3)">'+d+' &bull; '+skladCount+' produktow'+(p.suma?' &bull; <b style="color:var(--amber)">'+p.suma+' zl</b>':'')+'</div></div>';
+      html+='<span style="color:var(--text3);font-size:14px">v</span></div>';
+      html+='<div style="display:none;padding:0 14px 12px">';
+      (p.produkty||[]).forEach(function(prod){
+        html+='<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bg3);font-size:12px">';
+        html+='<span style="color:var(--text2)">'+prod.nazwa+'</span>';
+        html+='<span style="color:var(--text3)">'+prod.ilosc+' '+prod.jednostka+(prod.cena?' &bull; <b style="color:var(--amber)">'+prod.cena+' zl</b>':'')+'</span>';
+        html+='</div>';
+      });
+      html+='</div></div>';
+    });
+    body.innerHTML=html;
+  });
+}
+
+// ── SMART SHOPPING LIST — oparty na diecie + lodowce ─────────────────────────
+function generateSmartShopList(){
+  if(!apiKey){dlgAlert("X","Brak API","Skonfiguruj klucz API.");return;}
+  if(!userProfile||!userProfile.kcal){dlgAlert("X","Brak profilu","Uzupelnij profil.");return;}
+  var btn=document.getElementById("gen-btn"),spin=document.getElementById("gen-spin"),txt=document.getElementById("gen-btn-txt");
+  btn.disabled=true;spin.style.display="block";txt.textContent="Generuje inteligentna liste...";
+  var missing=[],expiring=[];
+  CATS.forEach(function(cat){cat.items.forEach(function(it){
+    var cur=state[fbk(cat.id,it.n)]||0;
+    if(cur<it.target)missing.push(it.n+"(mam:"+cur+",cel:"+it.target+" "+it.unit+")");
+    var d=getDaysLeft(it);if(d!==null&&d<=3&&cur>0)expiring.push(it.n+"("+d+"dni)");
+  });});
+  var storeName={biedronka:"Biedronka",lidl:"Lidl",both:"Biedronka i Lidl"}[shopStore]||"Biedronka";
+  var liked=(userProfile.liked||[]).join(", ");
+  var disliked=(userProfile.disliked||[]).join(", ");
+  var recentProducts=[];
+  purchaseHistory.slice(0,3).forEach(function(p){(p.produkty||[]).forEach(function(pr){if(pr.nazwa)recentProducts.push(pr.nazwa);});});
+  var prompt="Lista zakupow dla "+storeName+". Profil: "+userProfile.kcal+"kcal B:"+userProfile.prot+"g W:"+userProfile.carb+"g T:"+userProfile.fat+"g. Cel: "+({lose:"redukcja",maintain:"utrzymanie wagi",gain:"masa miesniowa"}[userProfile.goal]||"")+"."
+    +(liked?" Lubi: "+liked+".":"")
+    +(disliked?" Nie lubi: "+disliked+".":"")
+    +(userProfile.exclude?" Wykluczone: "+userProfile.exclude+".":"")
+    +" Braki w lodowce: "+missing.join("; ")+"."
+    +(expiring.length?" Wygasaja: "+expiring.join("; ")+".":"")
+    +(recentProducts.length?" Ostatnio kupione: "+recentProducts.slice(0,8).join(", ")+".":"")
+    +" Zasady: priorytetuj lubiane, wyklucz nielubiane, uwzgledniaj stan lodowki."
+    +' TYLKO JSON: {"komentarz":"","produkty":[{"nazwa":"","ilosc":"","jednostka":"","kategoria":"","priorytet":"wysoki/sredni/niski","powod":""}]}';
+  callAPI([{role:"user",content:prompt}],SYS,function(res){
+    btn.disabled=false;spin.style.display="none";txt.textContent="Odswiez liste";
+    var clean=res.replace(/```json/gi,"").replace(/```/g,"").trim();
+    var s=clean.indexOf("{"),e=clean.lastIndexOf("}");
+    try{renderShopList(JSON.parse(s!==-1&&e!==-1?clean.slice(s,e+1):clean));}
+    catch(ex){document.getElementById("shop-list-content").innerHTML='<div class="ai-note">'+res+'</div>';}
+  },function(err){
+    btn.disabled=false;spin.style.display="none";txt.textContent="Generuj liste AI";
+    document.getElementById("shop-list-content").innerHTML='<div class="ai-note" style="color:var(--red)">Blad: '+err+'</div>';
+  });
+}
+function toggleReceiptDetails(el){
+  var next=el.nextElementSibling;
+  if(next)next.style.display=next.style.display==="none"?"block":"none";
+}
 </script>
 </body>
 </html>
