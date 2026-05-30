@@ -245,8 +245,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       </div>
       <div id="shop-lbl" style="display:none"></div><div id="shop-ago" style="display:none"></div><div id="pantry-status-bar" style="background:var(--bg3);border-radius:12px;padding:10px 14px;margin-bottom:10px;border:1px solid var(--border)">
         <div style="font-size:12px;color:var(--text3)">Ładowanie stanu lodówki...</div>
-      
-      
+      </div>
       <div class="search-wrap">
         <span class="search-ico">&#128269;</span>
         <input class="search-inp" id="sinp" placeholder="Szukaj w lodówce..." oninput="onSearch(this.value)">
@@ -308,14 +307,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 </div>
 
-<!-- SHOP DATE MODAL -->
-<div class="overlay" id="shop-date-overlay" onclick="if(event.target===this)closeShopDateModal()">
-  <div class="modal"><h3>Data zakupow</h3>
-    <button class="mbtn ok" style="width:100%;margin-bottom:10px;padding:14px" onclick="markShoppingNow()">Dzisiaj byłem/byłam w sklepie</button>
-    <div style="display:flex;gap:8px;margin-bottom:14px"><input type="date" class="modal-inp" id="shop-date-inp" style="margin-bottom:0;flex:1;color-scheme:dark"><button class="mbtn ok" style="flex-shrink:0;padding:13px 16px" onclick="saveShopDate()">OK</button></div>
-    <button class="mbtn cancel" style="width:100%" onclick="closeShopDateModal()">Zamknij</button>
-  </div>
-</div>
+
 <!-- EXPIRY MODAL -->
 <div class="overlay" id="exp-overlay" onclick="if(event.target===this)closeExpiry()">
   <div class="modal"><h3>Data ważności</h3><p id="exp-name" style="color:var(--text2);margin-bottom:12px"></p>
@@ -428,7 +420,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <p id="profile-modal-name" style="color:var(--green);font-weight:800;font-size:14px;margin-bottom:12px"></p>
     <div id="profile-modal-content" style="background:var(--bg3);border-radius:12px;padding:14px;margin-bottom:14px;border:1px solid var(--border);font-size:13px;color:var(--text2);line-height:2.2"></div>
     <button class="mbtn ok" style="width:100%;margin-bottom:8px;padding:13px" onclick="closeProfileModal();openDiet()">Moja dieta i przepisy</button>
-    <button class="mbtn" style="width:100%;margin-bottom:8px;padding:13px;background:rgba(139,92,246,.15);color:var(--purple);border:1px solid rgba(139,92,246,.3)" onclick="closeProfileModal();openDiet();setTimeouts połączenia(function(){switchDietTab(4);},100)">📊 Analiza cen</button>
+    <button class="mbtn" style="width:100%;margin-bottom:8px;padding:13px;background:rgba(139,92,246,.15);color:var(--purple);border:1px solid rgba(139,92,246,.3)" onclick="closeProfileModal();openDiet();setTimeout(function(){switchDietTab(4);},100)">📊 Analiza cen</button>
     <button class="mbtn ok" style="width:100%;margin-bottom:8px;padding:13px;background:var(--purple)" onclick="startDietGeneration()">Wygeneruj nową dietę AI</button>
     <button class="mbtn blue" style="width:100%;margin-bottom:8px;padding:13px" onclick="closeProfileModal();showOb()">Edytuj profil</button>
     <button class="mbtn cancel" style="width:100%;margin-bottom:4px" onclick="closeProfileModal()">Zamknij</button>
@@ -491,7 +483,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="ob-opt" onclick="selectOb('stores','biedronka',this)"><span>&#128030;</span><div><div style="font-size:13px;font-weight:700">Biedronka</div></div></div>
       <div class="ob-opt" onclick="selectOb('stores','lidl',this)"><span>&#127978;&#65039;</span><div><div style="font-size:13px;font-weight:700">Lidl</div></div></div>
       <div class="ob-opt" onclick="selectOb('stores','both',this)"><span>&#128722;</span><div><div style="font-size:13px;font-weight:700">Oba sklepy</div></div></div>
-      <div style="margin-top:12px"><div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:6px">Wykluczenia żywieniowe (opcjonalne)</div><input id="ob-exclude" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px;font-size:14px;color:var(--text);outline:none" placeholder="np. laktoza, orzechy, ryby..."></div>
+      <div style="margin-top:12px"><div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:6px">Wykluczenia żywieniowe (opcjonalne)</div><input id="ob-exclude-main" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px;font-size:14px;color:var(--text);outline:none" placeholder="np. laktoza, orzechy, ryby..."></div>
     </div>
     <div class="ob-step" id="ob-step-4b" style="display:none">
       <div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.8px">Preferencje i wykluczenia</div>
@@ -528,7 +520,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <button class="pref-chip dislike" data-val="czosnek" onclick="togglePref(this,'disliked')">&#129382; Czosnek</button>
       </div>
       <div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:6px;text-transform:uppercase">Dodatkowe wykluczenia (wpisz ręcznie)</div>
-      <input id="ob-exclude" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px;font-size:14px;color:var(--text);outline:none" placeholder="np. laktoza, orzechy, wieprzowina...">
+      <input id="ob-exclude-extra" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px;font-size:14px;color:var(--text);outline:none" placeholder="np. laktoza, orzechy, wieprzowina...">
     </div>
     <div class="ob-step" id="ob-step-5" style="display:none">
       <p style="font-size:13px;color:var(--text2);margin-bottom:10px">Na podstawie Twoich danych:</p>
@@ -717,11 +709,11 @@ function callAPI(messages,system,onOk,onErr,maxTok){
 }
 
 // ── SHOP DATE ─────────────────────────────────────────────────────────────────
-function openShopDateModal(){document.getElementById("shop-date-overlay").classList.add("show");}
-function closeShopDateModal(){document.getElementById("shop-date-overlay").classList.remove("show");}
-function markShopping(){dlgConfirm("?","Aktualizacja stanu lodówki","Ustawić dzisiejszą datę zakupów?",function(){shopTs=Date.now();fbPatch(RP,{__shopTs:shopTs});updateShopBar();render();},"Tak");}
-function markShoppingNow(){shopTs=Date.now();fbPatch(RP,{__shopTs:shopTs});updateShopBar();render();closeShopDateModal();}
-function saveShopDate(){var v=document.getElementById("shop-date-inp").value;if(!v)return;shopTs=new Date(v).getTime();fbPatch(RP,{__shopTs:shopTs});updateShopBar();render();closeShopDateModal();}
+
+
+
+
+
 function updateShopBar(){
   var l=document.getElementById("shop-lbl"),a=document.getElementById("shop-ago");if(!l)return;
   if(!shopTs){l.textContent="Nie ustawiono daty aktualizacji lodówki";if(a)a.textContent="";return;}
@@ -732,7 +724,9 @@ function updateShopBar(){
 
 // ── FRESHNESS ─────────────────────────────────────────────────────────────────
 function getDaysLeft(it){var ek=fbk("e",it.n);if(expiry[ek])return Math.round((expiry[ek]-Date.now())/86400000);if(it.days&&shopTs)return Math.round(it.days-(Date.now()-shopTs)/86400000);return null;}
-function fHtml(it){var d=getDaysLeft(it);if(d===null)return"";if(d<=0)return'<div class="fresh-bad">Przeterminowane!</div>';if(d===1)return'<div class="fresh-bad">Zostaje 1 dzień</div>';if(d<=2)return'<div class="fresh-warn">Zostaja '+d+' dni</div>';return'<div class="fresh-ok">Swieze - '+d+' dni</div>';}
+function isExpired(it){var d=getDaysLeft(it);return d!==null&&d<=0;}
+function isExpiringSoon(it){var d=getDaysLeft(it);return d!==null&&d>0&&d<=3;}
+function fHtml(it){var d=getDaysLeft(it);if(d===null)return"";if(d<=0)return'<div class="fresh-bad">Przeterminowane!</div>';if(d===1)return'<div class="fresh-bad">Zostaje 1 dzień</div>';if(d<=2)return'<div class="fresh-warn">Zostają '+d+' dni</div>';return'<div class="fresh-ok">Świeże — '+d+' dni</div>';}
 function expiringSoon(it){var d=getDaysLeft(it);return d!==null&&d<=3;}
 
 // ── EXPIRY MODAL ──────────────────────────────────────────────────────────────
@@ -1028,7 +1022,7 @@ function openSettingsModal(){document.getElementById("admin-pass-inp").value="";
 function closeAdminPass(){document.getElementById("admin-pass-overlay").classList.remove("show");}
 function checkAdminPass(){var p=document.getElementById("admin-pass-inp").value;if(p!==ADMIN_PASS){dlgAlert("X","Nieprawidłowe hasło","Spróbuj ponownie.");return;}closeAdminPass();fbGet(CP).then(function(k){var el=document.getElementById("admin-api-status");if(k){el.textContent="Klucz API aktywny";el.style.color="var(--green)";}else{el.textContent="Brak skonfigurowanego klucza API";el.style.color="var(--amber)";}}).catch(function(){});document.getElementById("api-key-inp").value="";document.getElementById("settings-overlay").classList.add("show");}
 function closeSettings(){document.getElementById("settings-overlay").classList.remove("show");}
-function saveApiKey(){var v=document.getElementById("api-key-inp").value.trim();if(!v||!v.startsWith("sk-ant-")){dlgAlert("X","Nieprawidłowy klucz API API","Klucz powinien zaczynać się od sk-ant-");return;}fbPut(CP,v).then(function(){apiKey=v;var el=document.getElementById("admin-api-status");el.textContent="Klucz API zapisany!";el.style.color="var(--green)";setTimeout(closeSettings,1500);}).catch(function(e){dlgAlert("X","Błąd",e.message);});}
+function saveApiKey(){var v=document.getElementById("api-key-inp").value.trim();if(!v||!v.startsWith("sk-ant-")){dlgAlert("X","Nieprawidłowy klucz API","Klucz powinien zaczynać się od sk-ant-");return;}fbPut(CP,v).then(function(){apiKey=v;var el=document.getElementById("admin-api-status");el.textContent="Klucz API zapisany!";el.style.color="var(--green)";setTimeout(closeSettings,1500);}).catch(function(e){dlgAlert("X","Błąd",e.message);});}
 function clearApiKey(){fbPut(CP,null).then(function(){apiKey="";document.getElementById("api-key-inp").value="";document.getElementById("admin-api-status").textContent="Klucz API usunięty";document.getElementById("admin-api-status").style.color="var(--red)";});}
 
 // ── LOG ───────────────────────────────────────────────────────────────────────
@@ -1105,7 +1099,7 @@ function render(){
   var body=document.getElementById("body"),nR=0,nG=0,tot=0;
   CATS.forEach(function(c){c.items.forEach(function(it){cls(state[fbk(c.id,it.n)]||0,it.target)==="grn"?nG++:nR++;tot++;});});
   document.getElementById("n-red").textContent=nR;document.getElementById("n-grn").textContent=nG;document.getElementById("n-all").textContent=tot;
-  var nExp=0;CATS.forEach(function(c){c.items.forEach(function(it){var d=getDaysLeft(it);if(d!==null&&d<=0)nExp++;});});
+  var nExp=0;CATS.forEach(function(cat){cat.items.forEach(function(it){if(isExpired(it))nExp++;});});
   var expEl=document.getElementById("n-exp");if(expEl)expEl.textContent=nExp;
   var expCount=0;CATS.forEach(function(c){c.items.forEach(function(it){if(expiringSoon(it))expCount++;});});
   var expEl=document.getElementById("n-exp");if(expEl)expEl.textContent=expCount;var et=document.getElementById("exp-alert-txt");if(et)et.textContent=expCount>0?"Wygasa\n"+expCount+" prod.":"Data\nwaznosci";
@@ -1113,7 +1107,7 @@ function render(){
   CATS.forEach(function(cat){
     if(catFilter!=="all"&&cat.id!==catFilter)return;
     var catColor=cat.color||"var(--text3)";
-    var vis=cat.items.filter(function(it){var c=cls(state[fbk(cat.id,it.n)]||0,it.target);if(filter==="red"&&c==="grn")return false;if(filter==="grn"&&c!=="grn")return false;if(filter==="exp"&&!expiringSoon(it))return false;if(searchQ&&it.n.toLowerCase().indexOf(searchQ)===-1)return false;return true;});
+    var vis=cat.items.filter(function(it){var c=cls(state[fbk(cat.id,it.n)]||0,it.target);if(filter==="red"&&c==="grn")return false;if(filter==="grn"&&c!=="grn")return false;if(filter==="exp"&&!isExpired(it))return false;if(searchQ&&it.n.toLowerCase().indexOf(searchQ)===-1)return false;return true;});
     if(!vis.length)return;
     any=true;
     html+='<div class="cat-section"><div class="cat-hdr" style="color:'+catColor+'">'+cat.label+'</div>';
@@ -1142,7 +1136,7 @@ function render(){
     });
     html+='</div>';
   });
-  if(!any){html='<div class="empty"><div style="font-size:48px;margin-bottom:12px;opacity:.5">'+(filter==="exp"?"??":searchQ?"??":"??")+'</div>'+(filter==="exp"?"Zaden produkt nie wygasa":searchQ?"Brak wynikow: "+searchQ:filter==="red"?"Wszystko jest!":"Brak produktów")+'</div>';}
+  if(!any){html='<div class="empty"><div style="font-size:48px;margin-bottom:12px;opacity:.5">'+(filter==="exp"?"??":searchQ?"??":"??")+'</div>'+(filter==="exp"?"Brak przeterminowanych produktów":searchQ?"Brak wynikow: "+searchQ:filter==="red"?"Wszystko jest!":"Brak produktów")+'</div>';}
   body.innerHTML=html;
 }
 
@@ -1189,7 +1183,7 @@ function calcProfile(){
   var activity=obSels.activity||"mod";
   var goal=obSels.goal||"maintain";
   var stores=obSels.stores||"biedronka";
-  var exclude=((document.getElementById("ob-exclude")||{}).value||"").trim();
+  var _ex1=((document.getElementById("ob-exclude-main")||{}).value||"").trim();var _ex2=((document.getElementById("ob-exclude-extra")||{}).value||"").trim();var exclude=[_ex1,_ex2].filter(Boolean).join(", ");
   var bmr=gender==="m"?10*weight+6.25*height-5*age+5:10*weight+6.25*height-5*age-161;
   var multMap={sed:1.2,light:1.375,mod:1.55,active:1.725};
   var kcal=Math.round(bmr*(multMap[activity]||1.55))+({lose:-400,maintain:0,gain:400}[goal]||0);
@@ -1500,7 +1494,7 @@ function generateAIDiet(profile){
   var sys="Jestes dietetykiem. TYLKO JSON bez markdown. Nie pisz nic przed ani po JSON.";
   document.getElementById("diet-overlay").classList.add("show");
   var body=document.getElementById("diet-body");
-  body.innerHTML='<div style="text-align:center;padding:60px 20px"><div style="font-size:50px;margin-bottom:16px">AI</div><div id="diet-gen-step" style="font-size:14px;color:var(--text2);margin-bottom:20px">Generuje Menu 1...</div><div class="spin" style="margin:0 auto"></div></div>';
+  body.innerHTML='<div style="text-align:center;padding:60px 20px"><div style="font-size:50px;margin-bottom:16px">AI</div><div id="diet-gen-step-2" style="font-size:14px;color:var(--text2);margin-bottom:20px">Generuje Menu 1...</div><div class="spin" style="margin:0 auto"></div></div>';
   callAPI([{role:"user",content:base+" MENU 1 - 3 sniadania+3 obiady+3 kolacje: "+fmt}],sys,function(r1){
     var m1=parseMenuJSON(r1);if(!m1){showDietError("Menu 1: "+getJSONError(r1));return;}
     m1=fixMenuMacros(m1,profile);
@@ -1585,9 +1579,11 @@ function startApp(){
     else fbPatch(RP,state);
     expiry={};if(exp)Object.keys(exp).forEach(function(k){if(exp[k])expiry[k]=exp[k];});
     photos={};if(ph)Object.keys(ph).forEach(function(k){if(ph[k])photos[k]=ph[k];});
+    pantryData=pnt||{};
     document.getElementById("splash").style.display="none";
     document.getElementById("app").style.display="block";
     buildCatChips();updateShopBar();setSyncUI("ok");render();
+    loadLastPantryUpdate();
     loadUserProfile(userName,function(hasProfile){
       if(hasProfile){updateAISys();}
       else{var preset=applyPresetProfile(userName);if(preset){saveUserProfile(preset);updateAISys();}else{setTimeout(showOb,600);}}
