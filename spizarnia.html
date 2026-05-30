@@ -58,8 +58,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .cat-section:first-child .cat-hdr{border-top:none;padding-top:4px}
 .item{background:var(--bg2);border-radius:var(--radius);margin-bottom:8px;padding:13px;border:1px solid var(--border);border-left-width:5px}
 .item-main{display:flex;align-items:center;gap:11px;margin-bottom:9px}
-.item-photo-thumb{width:46px;height:46px;border-radius:10px;object-fit:cover;flex-shrink:0;border:1px solid var(--border);cursor:pointer}
-.item-photo-empty{width:46px;height:46px;border-radius:10px;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;flex-shrink:0;color:var(--text3)}
+.item-photo-thumb{width:40px;height:40px;border-radius:10px;object-fit:cover;flex-shrink:0;border:1px solid var(--border);cursor:pointer}
+.item-photo-empty{width:40px;height:40px;border-radius:10px;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;flex-shrink:0;color:var(--text3)}
 .item-info{flex:1;min-width:0}
 .item-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px}
 .fresh-ok{font-size:11px;color:var(--green);font-weight:600}
@@ -76,7 +76,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .item.red .prog-fill{background:var(--red)}.item.low .prog-fill{background:var(--amber)}.item.grn .prog-fill{background:var(--green)}
 .prog-label{font-size:10px;color:var(--text3);font-weight:600}
 .qty-ctrl{display:flex;align-items:center;gap:5px}
-.qty-btn{width:52px;height:52px;border:none;border-radius:10px;font-size:26px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;-webkit-user-select:none;user-select:none}
+.qty-btn{width:42px;height:42px;border:none;border-radius:10px;font-size:22px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;-webkit-user-select:none;user-select:none}
 .qty-btn:active{opacity:.75}
 .qty-btn.minus{background:#DC2626;color:#fff}
 .qty-btn.plus{background:#16A34A;color:#fff}
@@ -200,11 +200,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   position:sticky;
   top:0;
   z-index:40;
-  background:rgba(10,10,15,.92);
+  background:rgba(10,10,15,.95);
   backdrop-filter:blur(20px);
   -webkit-backdrop-filter:blur(20px);
   border-bottom:1px solid var(--glass-border);
-  padding:10px var(--pad);
+  padding:7px var(--pad);
   display:flex;
 }
 .top-nav-inner{
@@ -223,13 +223,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:6px;
-  padding:9px 12px;
+  gap:5px;
+  padding:8px 8px;
   border-radius:50px;
   border:none;
   background:transparent;
   color:var(--text3);
-  font-size:13px;
+  font-size:12px;
   font-weight:700;
   cursor:pointer;
   transition:all .2s;
@@ -416,10 +416,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .item{
   background:var(--glass);
   border-radius:var(--r);
-  margin-bottom:8px;
-  padding:14px;
+  margin-bottom:6px;
+  padding:10px 12px;
   border:1px solid var(--glass-border);
-  border-left-width:4px;
+  border-left-width:3px;
   transition:border-color .2s;
 }
 .item:active{background:rgba(255,255,255,.04)}
@@ -443,6 +443,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   .top-nav-btn .tnav-lbl{font-size:11px}
 }
 .copy-btn.show,.copy-btn[style*="display:block"]{display:flex!important}
+
+/* ── ADMIN PANEL ────────────────────────────────────────────────────────── */
+#admin-panel-overlay.show{display:flex}
+#admin-login-overlay.show{display:flex}
+.admtab{flex:1;padding:12px 8px;border:none;background:none;color:#6B6B85;font-size:11px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;min-width:70px}
+.admtab.act{color:#1ED760;border-bottom-color:#1ED760}
+.admtab:active{background:rgba(255,255,255,.04)}
 </style>
 </head>
 <body>
@@ -1319,12 +1326,13 @@ function handleProductPhoto(input){handleSlotPhoto(input);}
 function deleteProductPhoto(){["front","side","top","expiry"].forEach(function(slot){var k=fbk("p_"+slot,photoItem),p={};delete photos[k];p[k]=null;fbPatch(PP,p);var img=document.getElementById("slot-"+slot+"-img"),empty=document.getElementById("slot-"+slot+"-empty");if(img)img.style.display="none";if(empty)empty.style.display="flex";});var mk=fbk("p",photoItem),mp={};delete photos[mk];mp[mk]=null;fbPatch(PP,mp);render();}
 
 // ── ADMIN ─────────────────────────────────────────────────────────────────────
-function openSettingsModal(){document.getElementById("admin-pass-inp").value="";document.getElementById("admin-pass-overlay").classList.add("show");setTimeout(function(){document.getElementById("admin-pass-inp").focus();},100);}
-function closeAdminPass(){document.getElementById("admin-pass-overlay").classList.remove("show");}
-function checkAdminPass(){var p=document.getElementById("admin-pass-inp").value;if(p!==ADMIN_PASS){dlgAlert("X","Nieprawidłowe hasło","Spróbuj ponownie.");return;}closeAdminPass();fbGet(CP).then(function(k){var el=document.getElementById("admin-api-status");if(k){el.textContent="Klucz API aktywny";el.style.color="var(--green)";}else{el.textContent="Brak skonfigurowanego klucza API";el.style.color="var(--amber)";}}).catch(function(){});document.getElementById("api-key-inp").value="";document.getElementById("settings-overlay").classList.add("show");}
-function closeSettings(){document.getElementById("settings-overlay").classList.remove("show");}
-function saveApiKey(){var v=document.getElementById("api-key-inp").value.trim();if(!v||!v.startsWith("sk-ant-")){dlgAlert("X","Nieprawidłowy klucz API","Klucz powinien zaczynać się od sk-ant-");return;}fbPut(CP,v).then(function(){apiKey=v;var el=document.getElementById("admin-api-status");el.textContent="Klucz API zapisany!";el.style.color="var(--green)";setTimeout(closeSettings,1500);}).catch(function(e){dlgAlert("X","Błąd",e.message);});}
-function clearApiKey(){fbPut(CP,null).then(function(){apiKey="";document.getElementById("api-key-inp").value="";document.getElementById("admin-api-status").textContent="Klucz API usunięty";document.getElementById("admin-api-status").style.color="var(--red)";});}
+function openSettingsModal(){openAdminLogin();}
+
+
+
+
+
+
 
 // ── LOG ───────────────────────────────────────────────────────────────────────
 function addLog(w,o,n){if(LP)fbPost(LP,{who:userName,what:w,delta:n-o,newVal:n,ts:Date.now()});}
@@ -2632,53 +2640,21 @@ var cmsUsers = {}; // {userId: profileData}
 var cmsSelectedUser = null;
 
 // ── Wejście do CMS ────────────────────────────────────────────────────────────
-function openCMS() {
-  document.getElementById("cms-pass-inp").value = "";
-  document.getElementById("cms-pass-overlay").classList.add("show");
-  setTimeout(function() { document.getElementById("cms-pass-inp").focus(); }, 100);
-}
 
-function checkCMSPass() {
-  var p = document.getElementById("cms-pass-inp").value;
-  if (p !== CMS_PASS) { dlgAlert("X", "Nieprawidłowe hasło", ""); return; }
-  document.getElementById("cms-pass-overlay").classList.remove("show");
-  document.getElementById("cms-overlay").classList.add("show");
-  loadCMSData();
-}
 
-function closeCMS() {
-  document.getElementById("cms-overlay").classList.remove("show");
-}
+
+
+
 
 function closeCMSUser() {
   document.getElementById("cms-user-overlay").classList.remove("show");
 }
 
 // ── Załaduj dane z Firebase ───────────────────────────────────────────────────
-function loadCMSData() {
-  var body = document.getElementById("cms-body");
-  body.innerHTML = '<div style="text-align:center;padding:40px;color:#6B6B85"><div class="spin" style="margin:0 auto 16px"></div>Ładowanie danych...</div>';
-  fbGet(FB + "/profiles").then(function(data) {
-    if (!data) { cmsUsers = {}; renderCMSTab(); return; }
-    cmsUsers = data;
-    renderCMSTab();
-  }).catch(function(e) {
-    body.innerHTML = '<div style="text-align:center;padding:40px;color:#FF4D4D">Błąd: ' + e.message + '</div>';
-  });
-}
+
 
 // ── Przełącz zakładkę ─────────────────────────────────────────────────────────
-function switchCMSTab(n) {
-  cmsTab = n;
-  for (var i = 0; i < 4; i++) {
-    var t = document.getElementById("cmstab-" + i);
-    if (t) {
-      t.style.borderBottom = i === n ? "2px solid #1ED760" : "2px solid transparent";
-      t.style.color = i === n ? "#1ED760" : "#6B6B85";
-    }
-  }
-  renderCMSTab();
-}
+
 
 function renderCMSTab() {
   if (cmsTab === 0) renderCMSUsers();
@@ -2710,319 +2686,29 @@ function userCard(uid, p) {
 }
 
 // ══ ZAKŁADKA 1: Użytkownicy ════════════════════════════════════════════════════
-function renderCMSUsers() {
-  var body = document.getElementById("cms-body");
-  var users = Object.entries(cmsUsers);
-  if (!users.length) {
-    body.innerHTML = '<div style="text-align:center;padding:40px;color:#6B6B85">Brak użytkowników w bazie.</div>';
-    return;
-  }
-  var html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
-    + '<div style="font-size:13px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px">Wszyscy użytkownicy (' + users.length + ')</div>'
-    + '<button onclick="loadCMSData()" style="background:#1A1A24;border:1px solid #2A2A3A;color:#6B6B85;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer">Odśwież</button>'
-    + '</div>';
-  users.forEach(function(entry) {
-    html += userCard(entry[0], entry[1]);
-  });
-  body.innerHTML = html;
-}
+
 
 // ══ ZAKŁADKA 2: Diety ═════════════════════════════════════════════════════════
-function renderCMSDiets() {
-  var body = document.getElementById("cms-body");
-  var users = Object.entries(cmsUsers);
-  var withDiet = users.filter(function(e) { return e[1].dietData; });
-  var withoutDiet = users.filter(function(e) { return !e[1].dietData; });
-  var html = '<div style="margin-bottom:16px">';
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">';
-  html += '<div style="background:#111118;border-radius:12px;padding:14px;border:1px solid #2A2A3A;text-align:center"><div style="font-size:28px;font-weight:900;color:#1ED760">' + withDiet.length + '</div><div style="font-size:11px;color:#6B6B85;margin-top:4px">Z dietą</div></div>';
-  html += '<div style="background:#111118;border-radius:12px;padding:14px;border:1px solid #2A2A3A;text-align:center"><div style="font-size:28px;font-weight:900;color:#FF4D4D">' + withoutDiet.length + '</div><div style="font-size:11px;color:#6B6B85;margin-top:4px">Bez diety</div></div>';
-  html += '</div>';
-  if (withDiet.length) {
-    html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Użytkownicy z dietą</div>';
-    withDiet.forEach(function(e) {
-      var p = e[1]; var d = p.dietData;
-      var m1meals = (d.menu1 ? ((d.menu1.sniadania||[]).length + (d.menu1.obiady||[]).length + (d.menu1.kolacje||[]).length) : 0);
-      var m2meals = (d.menu2 ? ((d.menu2.sniadania||[]).length + (d.menu2.obiady||[]).length + (d.menu2.kolacje||[]).length) : 0);
-      var name = e[0].replace(/_/g, " ").replace(/\b\w/g, function(l) { return l.toUpperCase(); });
-      html += '<div onclick="openCMSUser(\'' + e[0] + '\')" style="background:#111118;border-radius:12px;padding:12px 14px;margin-bottom:8px;border:1px solid #2A2A3A;cursor:pointer;display:flex;align-items:center;gap:10px">';
-      html += '<div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#1ED760,#17A84A);display:flex;align-items:center;justify-content:center;font-weight:900;color:#000;flex-shrink:0">' + name.charAt(0) + '</div>';
-      html += '<div style="flex:1"><div style="font-size:13px;font-weight:700;color:#fff">' + name + '</div>';
-      html += '<div style="font-size:11px;color:#6B6B85">Menu 1: ' + m1meals + ' posiłków &bull; Menu 2: ' + m2meals + ' posiłków</div></div>';
-      html += '<div style="font-size:12px;font-weight:800;color:#F59E0B">' + (p.kcal || "?") + ' kcal</div>';
-      html += '</div>';
-    });
-  }
-  if (withoutDiet.length) {
-    html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;margin-top:14px">Bez diety</div>';
-    withoutDiet.forEach(function(e) {
-      var name = e[0].replace(/_/g, " ").replace(/\b\w/g, function(l) { return l.toUpperCase(); });
-      html += '<div style="background:#111118;border-radius:12px;padding:10px 14px;margin-bottom:6px;border:1px solid #FF4D4D22;display:flex;align-items:center;gap:8px">';
-      html += '<div style="width:28px;height:28px;border-radius:50%;background:#FF4D4D22;display:flex;align-items:center;justify-content:center;font-weight:900;color:#FF4D4D;font-size:12px">' + name.charAt(0) + '</div>';
-      html += '<span style="font-size:13px;color:#B0B0C8">' + name + '</span>';
-      html += '<span style="margin-left:auto;font-size:10px;color:#FF4D4D">Brak diety</span>';
-      html += '</div>';
-    });
-  }
-  html += '</div>';
-  body.innerHTML = html;
-}
+
 
 // ══ ZAKŁADKA 3: Paragony ══════════════════════════════════════════════════════
-function renderCMSReceipts() {
-  var body = document.getElementById("cms-body");
-  body.innerHTML = '<div style="text-align:center;padding:30px;color:#6B6B85"><div class="spin" style="margin:0 auto 16px"></div>Ładowanie paragonów...</div>';
-  var userIds = Object.keys(cmsUsers);
-  var allReceipts = [];
-  var loaded = 0;
-  if (!userIds.length) { body.innerHTML = '<div style="text-align:center;padding:40px;color:#6B6B85">Brak użytkowników.</div>'; return; }
-  userIds.forEach(function(uid) {
-    fbGet(FB + "/purchaseHistory/" + uid).then(function(data) {
-      if (data) {
-        Object.values(data).forEach(function(r) { allReceipts.push(Object.assign({}, r, { _userId: uid })); });
-      }
-      loaded++;
-      if (loaded === userIds.length) showCMSReceipts(allReceipts);
-    }).catch(function() {
-      loaded++;
-      if (loaded === userIds.length) showCMSReceipts(allReceipts);
-    });
-  });
-}
 
-function showCMSReceipts(receipts) {
-  var body = document.getElementById("cms-body");
-  receipts.sort(function(a, b) { return (b.ts || 0) - (a.ts || 0); });
-  if (!receipts.length) {
-    body.innerHTML = '<div style="text-align:center;padding:40px;color:#6B6B85"><div style="font-size:40px;margin-bottom:12px">🧾</div>Brak zeskanowanych paragonów.</div>';
-    return;
-  }
-  var totalSum = receipts.reduce(function(s, r) { return s + (r.suma || 0); }, 0);
-  var html = '<div style="background:#111118;border-radius:12px;padding:14px;margin-bottom:14px;border:1px solid #2A2A3A">';
-  html += '<div style="display:flex;justify-content:space-between;align-items:center">';
-  html += '<div><div style="font-size:24px;font-weight:900;color:#fff">' + receipts.length + '</div><div style="font-size:11px;color:#6B6B85">Paragonów łącznie</div></div>';
-  html += '<div style="text-align:right"><div style="font-size:20px;font-weight:900;color:#F59E0B">' + totalSum.toFixed(2) + ' zł</div><div style="font-size:11px;color:#6B6B85">Suma wydatków</div></div>';
-  html += '</div></div>';
-  receipts.forEach(function(r) {
-    var name = (r._userId || "").replace(/_/g, " ").replace(/\b\w/g, function(l) { return l.toUpperCase(); });
-    var d = r.ts ? new Date(r.ts).toLocaleDateString("pl-PL") : (r.data || "?");
-    var pCount = (r.produkty || []).length;
-    html += '<div style="background:#111118;border-radius:12px;padding:12px 14px;margin-bottom:8px;border:1px solid #2A2A3A">';
-    html += '<div style="display:flex;align-items:center;gap:10px">';
-    html += '<div style="font-size:26px">🧾</div>';
-    html += '<div style="flex:1">';
-    html += '<div style="font-size:13px;font-weight:800;color:#fff">' + (r.sklep || "Sklep") + '</div>';
-    html += '<div style="font-size:11px;color:#6B6B85">' + name + ' &bull; ' + d + ' &bull; ' + pCount + ' produktów</div>';
-    html += '</div>';
-    if (r.suma) html += '<div style="font-size:14px;font-weight:900;color:#F59E0B">' + r.suma + ' zł</div>';
-    html += '</div>';
-    if (pCount > 0) {
-      html += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid #1A1A24">';
-      (r.produkty || []).slice(0, 5).forEach(function(p) {
-        html += '<div style="display:flex;justify-content:space-between;font-size:11px;color:#6B6B85;padding:2px 0">';
-        html += '<span>' + (p.rawName || p.nazwa || p.matchedName || "?") + '</span>';
-        html += '<span>' + (p.cenaCalkowita || p.cena || "") + (p.cenaCalkowita ? " zł" : "") + '</span>';
-        html += '</div>';
-      });
-      if (pCount > 5) html += '<div style="font-size:10px;color:#6B6B85;text-align:center;margin-top:4px">... i ' + (pCount - 5) + ' więcej</div>';
-      html += '</div>';
-    }
-    html += '</div>';
-  });
-  body.innerHTML = html;
-}
+
+
 
 // ══ ZAKŁADKA 4: Statystyki ════════════════════════════════════════════════════
-function renderCMSStats() {
-  var body = document.getElementById("cms-body");
-  var users = Object.values(cmsUsers);
-  if (!users.length) { body.innerHTML = '<div style="text-align:center;padding:40px;color:#6B6B85">Brak danych.</div>'; return; }
-  var totalUsers = users.length;
-  var withDiet = users.filter(function(u) { return u.dietData; }).length;
-  var goals = { lose: 0, maintain: 0, gain: 0 };
-  var stores = { biedronka: 0, lidl: 0, both: 0 };
-  var avgKcal = 0, avgWeight = 0, avgAge = 0, counted = 0;
-  users.forEach(function(u) {
-    if (u.goal) goals[u.goal] = (goals[u.goal] || 0) + 1;
-    if (u.stores) stores[u.stores] = (stores[u.stores] || 0) + 1;
-    if (u.kcal) { avgKcal += u.kcal; counted++; }
-    if (u.weight) avgWeight += u.weight;
-    if (u.age) avgAge += u.age;
-  });
-  if (counted) { avgKcal = Math.round(avgKcal / counted); avgWeight = Math.round(avgWeight / counted); avgAge = Math.round(avgAge / counted); }
 
-  function statCard(label, value, color) {
-    return '<div style="background:#111118;border-radius:12px;padding:14px;border:1px solid #2A2A3A;text-align:center">'
-      + '<div style="font-size:26px;font-weight:900;color:' + (color || "#fff") + '">' + value + '</div>'
-      + '<div style="font-size:11px;color:#6B6B85;margin-top:4px">' + label + '</div></div>';
-  }
-  function bar(label, val, total, color) {
-    var pct = total > 0 ? Math.round(val / total * 100) : 0;
-    return '<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;color:#B0B0C8;margin-bottom:4px"><span>' + label + '</span><span style="font-weight:700;color:' + color + '">' + val + ' (' + pct + '%)</span></div>'
-      + '<div style="height:6px;background:#1A1A24;border-radius:4px"><div style="height:100%;width:' + pct + '%;background:' + color + ';border-radius:4px"></div></div></div>';
-  }
-
-  var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">';
-  html += statCard("Użytkownicy", totalUsers, "#1ED760");
-  html += statCard("Z dietą", withDiet, "#8B5CF6");
-  html += statCard("Śr. kcal/dzień", avgKcal || "?", "#F59E0B");
-  html += statCard("Śr. wiek", avgAge ? avgAge + " lat" : "?", "#60A5FA");
-  html += '</div>';
-  html += '<div style="background:#111118;border-radius:12px;padding:14px;border:1px solid #2A2A3A;margin-bottom:12px">';
-  html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Cele użytkowników</div>';
-  html += bar("Redukcja tłuszczu", goals.lose || 0, totalUsers, "#FF4D4D");
-  html += bar("Utrzymanie masy ciała", goals.maintain || 0, totalUsers, "#F59E0B");
-  html += bar("Masa mięśniowa", goals.gain || 0, totalUsers, "#1ED760");
-  html += '</div>';
-  html += '<div style="background:#111118;border-radius:12px;padding:14px;border:1px solid #2A2A3A;margin-bottom:12px">';
-  html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Sklepy</div>';
-  html += bar("Biedronka", stores.biedronka || 0, totalUsers, "#DC2626");
-  html += bar("Lidl", stores.lidl || 0, totalUsers, "#1D4ED8");
-  html += bar("Oba sklepy", stores.both || 0, totalUsers, "#7C3AED");
-  html += '</div>';
-  // Wykres kcal (SVG)
-  var kcalData = users.filter(function(u) { return u.kcal; }).map(function(u) { return u.kcal; }).sort(function(a,b){return a-b;});
-  if (kcalData.length > 1) {
-    var minK = kcalData[0], maxK = kcalData[kcalData.length-1], rangeK = maxK - minK || 1;
-    html += '<div style="background:#111118;border-radius:12px;padding:14px;border:1px solid #2A2A3A">';
-    html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Rozkład kalorii</div>';
-    html += '<svg width="100%" height="60" viewBox="0 0 300 60">';
-    kcalData.forEach(function(k, i) {
-      var x = Math.round(i / (kcalData.length - 1) * 280 + 10);
-      var h = Math.round((k - minK) / rangeK * 45 + 5);
-      html += '<rect x="' + (x-3) + '" y="' + (60-h) + '" width="6" height="' + h + '" fill="#1ED760" rx="2" opacity="0.8"/>';
-    });
-    html += '<text x="10" y="58" fill="#6B6B85" font-size="9">' + minK + ' kcal</text>';
-    html += '<text x="240" y="58" fill="#6B6B85" font-size="9">' + maxK + ' kcal</text>';
-    html += '</svg></div>';
-  }
-  body.innerHTML = html;
-}
 
 // ══ WIDOK SZCZEGÓŁOWY UŻYTKOWNIKA ═════════════════════════════════════════════
-function openCMSUser(uid) {
-  cmsSelectedUser = uid;
-  var p = cmsUsers[uid] || {};
-  var name = uid.replace(/_/g, " ").replace(/\b\w/g, function(l) { return l.toUpperCase(); });
-  document.getElementById("cms-user-name-hdr").textContent = name;
-  document.getElementById("cms-user-overlay").classList.add("show");
-  renderCMSUserDetail(uid, p);
-}
 
-function renderCMSUserDetail(uid, p) {
-  var body = document.getElementById("cms-user-body");
-  var name = uid.replace(/_/g, " ").replace(/\b\w/g, function(l) { return l.toUpperCase(); });
-  var html = "";
 
-  // Profil
-  html += '<div style="background:#111118;border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid #2A2A3A">';
-  html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Profil</div>';
-  var fields = [
-    ["Imię / ID", name], ["Wiek", p.age ? p.age + " lat" : "?"],
-    ["Waga", p.weight ? p.weight + " kg" : "?"], ["Wzrost", p.height ? p.height + " cm" : "?"],
-    ["Płeć", p.gender === "m" ? "Mężczyzna" : p.gender === "f" ? "Kobieta" : "?"],
-    ["Aktywność", {sed:"Siedzący",light:"Lekki",mod:"Umiarkowany",active:"Aktywny"}[p.activity] || p.activity || "?"],
-    ["Cel", {lose:"Redukcja",maintain:"Utrzymanie",gain:"Masa"}[p.goal] || p.goal || "?"],
-    ["Sklep", {biedronka:"Biedronka",lidl:"Lidl",both:"Oba sklepy"}[p.stores] || p.stores || "?"],
-    ["Wykluczenia", p.exclude || "Brak"],
-  ];
-  fields.forEach(function(f) {
-    html += '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1A1A24">';
-    html += '<span style="font-size:12px;color:#6B6B85">' + f[0] + '</span>';
-    html += '<span style="font-size:12px;font-weight:700;color:#fff">' + f[1] + '</span>';
-    html += '</div>';
-  });
-  html += '</div>';
 
-  // Makro
-  if (p.kcal) {
-    html += '<div style="background:#111118;border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid #2A2A3A">';
-    html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Cel kaloryczny i makro</div>';
-    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
-    [["Kalorie", p.kcal + " kcal", "#F59E0B"], ["Białko", (p.prot||"?") + "g", "#60A5FA"], ["Węglowodany", (p.carb||"?") + "g", "#1ED760"], ["Tłuszcze", (p.fat||"?") + "g", "#F9A8D4"]].forEach(function(m) {
-      html += '<div style="background:#0D0D15;border-radius:10px;padding:10px;text-align:center;border:1px solid #2A2A3A">';
-      html += '<div style="font-size:18px;font-weight:900;color:' + m[2] + '">' + m[1] + '</div>';
-      html += '<div style="font-size:10px;color:#6B6B85;margin-top:2px">' + m[0] + '</div></div>';
-    });
-    html += '</div></div>';
-  }
-
-  // Preferencje
-  if ((p.liked && p.liked.length) || (p.disliked && p.disliked.length)) {
-    html += '<div style="background:#111118;border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid #2A2A3A">';
-    html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Preferencje</div>';
-    if (p.liked && p.liked.length) {
-      html += '<div style="margin-bottom:8px"><span style="font-size:11px;color:#1ED760;font-weight:700">Lubi: </span>';
-      html += p.liked.map(function(x) { return '<span style="background:#1ED76015;border:1px solid #1ED76033;border-radius:50px;padding:2px 10px;font-size:11px;color:#1ED760;margin-right:4px">' + x + '</span>'; }).join("");
-      html += '</div>';
-    }
-    if (p.disliked && p.disliked.length) {
-      html += '<div><span style="font-size:11px;color:#FF4D4D;font-weight:700">Nie lubi: </span>';
-      html += p.disliked.map(function(x) { return '<span style="background:#FF4D4D15;border:1px solid #FF4D4D33;border-radius:50px;padding:2px 10px;font-size:11px;color:#FF4D4D;margin-right:4px">' + x + '</span>'; }).join("");
-      html += '</div>';
-    }
-    html += '</div>';
-  }
-
-  // Dieta — podsumowanie
-  if (p.dietData) {
-    html += '<div style="background:#111118;border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid #2A2A3A">';
-    html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Dieta</div>';
-    ["menu1", "menu2"].forEach(function(mk, mi) {
-      var menu = p.dietData[mk];
-      if (!menu) return;
-      html += '<div style="margin-bottom:10px"><div style="font-size:12px;font-weight:800;color:#8B5CF6;margin-bottom:6px">Menu ' + (mi + 1) + '</div>';
-      ["sniadania", "obiady", "kolacje"].forEach(function(t) {
-        (menu[t] || []).forEach(function(meal) {
-          html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:#0D0D15;border-radius:8px;margin-bottom:4px">';
-          html += '<span style="font-size:11px;color:#6B6B85;width:60px;flex-shrink:0">' + {sniadania:"Śniadanie",obiady:"Obiad",kolacje:"Kolacja"}[t] + '</span>';
-          html += '<span style="font-size:12px;font-weight:700;color:#fff;flex:1">' + (meal.nazwa || "?") + '</span>';
-          html += '<span style="font-size:11px;color:#F59E0B">' + (meal.kcal || "?") + ' kcal</span>';
-          html += '</div>';
-        });
-      });
-      html += '</div>';
-    });
-    html += '</div>';
-  }
-
-  // Historia zakupów
-  fbGet(FB + "/purchaseHistory/" + uid).then(function(data) {
-    var receipts = data ? Object.values(data).sort(function(a, b) { return (b.ts||0)-(a.ts||0); }) : [];
-    var extraHtml = '<div style="background:#111118;border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid #2A2A3A">';
-    extraHtml += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Historia zakupów (' + receipts.length + ' paragonów)</div>';
-    if (!receipts.length) {
-      extraHtml += '<div style="font-size:12px;color:#6B6B85;text-align:center;padding:10px">Brak paragonów</div>';
-    } else {
-      var totalSum = receipts.reduce(function(s, r) { return s + (r.suma || 0); }, 0);
-      extraHtml += '<div style="font-size:13px;font-weight:800;color:#F59E0B;margin-bottom:10px">Suma: ' + totalSum.toFixed(2) + ' zł</div>';
-      receipts.slice(0, 5).forEach(function(r) {
-        var d = r.ts ? new Date(r.ts).toLocaleDateString("pl-PL") : (r.data || "?");
-        extraHtml += '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:#0D0D15;border-radius:8px;margin-bottom:4px">';
-        extraHtml += '<div><div style="font-size:12px;font-weight:700;color:#fff">' + (r.sklep || "Sklep") + '</div><div style="font-size:10px;color:#6B6B85">' + d + ' &bull; ' + (r.produkty||[]).length + ' prod.</div></div>';
-        if (r.suma) extraHtml += '<span style="font-size:13px;font-weight:800;color:#F59E0B">' + r.suma + ' zł</span>';
-        extraHtml += '</div>';
-      });
-      if (receipts.length > 5) extraHtml += '<div style="font-size:11px;color:#6B6B85;text-align:center;padding:6px">... i ' + (receipts.length - 5) + ' więcej paragonów</div>';
-    }
-    extraHtml += '</div>';
-    document.getElementById("cms-user-body").innerHTML += extraHtml;
-  }).catch(function() {});
-
-  body.innerHTML = html;
-}
 
 // ── Otwórz CMS z URL hash lub przycisku ──────────────────────────────────────
-function checkCMSRoute() {
-  if (window.location.hash === "#admin" || window.location.hash === "#cms") {
-    openCMS();
-    window.history.replaceState(null, "", window.location.pathname);
-  }
-}
-window.addEventListener("load", checkCMSRoute);
-window.addEventListener("hashchange", function() {
-  if (window.location.hash === "#admin" || window.location.hash === "#cms") { checkCMSRoute(); }
-});
+
+
+
+
 
 
 // ── Normalizacja produktu z paragonu ─────────────────────────────────────────
@@ -3100,39 +2786,443 @@ function showUpdatePantryModal(){
     +'<button class="dlg-btn ok" onclick="document.getElementById(\'dlg\').classList.remove(\'show\');openReceipt()">Skanuj paragon</button>';
 }
 
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ADMIN PANEL — kompletna logika
+// ══════════════════════════════════════════════════════════════════════════════
+var ADMIN_PASS_LOCAL = "spizarnia2025";
+var adminCurrentTab = 0;
+var adminUsersData = {};
+
+function openAdminLogin() {
+  var el = document.getElementById("admin-login-overlay");
+  if (!el) return;
+  document.getElementById("admin-pass-inp").value = "";
+  var err = document.getElementById("admin-pass-error");
+  if (err) err.style.display = "none";
+  el.style.display = "flex";
+  setTimeout(function(){ document.getElementById("admin-pass-inp").focus(); }, 100);
+}
+
+function closeAdminLogin() {
+  var el = document.getElementById("admin-login-overlay");
+  if (el) el.style.display = "none";
+}
+
+function checkAdminPassword() {
+  var p = (document.getElementById("admin-pass-inp") || {value:""}).value;
+  var err = document.getElementById("admin-pass-error");
+  if (p === ADMIN_PASS_LOCAL) {
+    closeAdminLogin();
+    openAdminPanel();
+  } else {
+    if (err) err.style.display = "block";
+  }
+}
+
+function openAdminPanel() {
+  var el = document.getElementById("admin-panel-overlay");
+  if (!el) return;
+  el.style.display = "flex";
+  // Odśwież status Firebase
+  var fbSt = document.getElementById("admin-firebase-status");
+  if (fbSt) fbSt.textContent = "Firebase " + (FB ? "✓" : "?");
+  // Załaduj dane i pokaż domyślną zakładkę
+  switchAdminTab(0);
+}
+
+function closeAdminPanel() {
+  var el = document.getElementById("admin-panel-overlay");
+  if (el) el.style.display = "none";
+}
+
+function switchAdminTab(n) {
+  adminCurrentTab = n;
+  for (var i = 0; i < 5; i++) {
+    var t = document.getElementById("admtab-" + i);
+    if (t) {
+      t.classList.remove("act");
+      if (i === n) t.classList.add("act");
+    }
+  }
+  var body = document.getElementById("admin-body");
+  if (!body) return;
+  body.innerHTML = '<div style="text-align:center;padding:40px;color:#6B6B85"><div style="width:32px;height:32px;border:3px solid #1A1A24;border-top-color:#1ED760;border-radius:50%;animation:rot 1s linear infinite;margin:0 auto 16px"></div>Ładowanie...</div>';
+  if (n === 0) loadAdminUsers();
+  else if (n === 1) loadAdminDiets();
+  else if (n === 2) loadAdminReceipts();
+  else if (n === 3) loadAdminStats();
+  else if (n === 4) renderAdminApi();
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function adminStat(val, label, color) {
+  return '<div style="background:#111118;border-radius:14px;padding:14px;border:1px solid rgba(255,255,255,.06);text-align:center">'
+    + '<div style="font-size:24px;font-weight:900;color:' + (color||"#fff") + '">' + (val||"0") + '</div>'
+    + '<div style="font-size:11px;color:#6B6B85;margin-top:4px">' + label + '</div></div>';
+}
+
+function adminUserCard(uid, p, receiptsCount) {
+  var name = uid.replace(/_/g, " ").replace(/\b\w/g, function(l){ return l.toUpperCase(); });
+  var hasDiet = !!(p.dietData && (p.dietData.menu1 || p.dietData.menu2));
+  var goalMap = {lose:"Redukcja", maintain:"Utrzymanie", gain:"Masa"};
+  return '<div style="background:#111118;border-radius:16px;padding:14px;margin-bottom:10px;border:1px solid rgba(255,255,255,.06)">'
+    + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
+    + '<div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#1ED760,#17A84A);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#000;flex-shrink:0">' + name.charAt(0) + '</div>'
+    + '<div style="flex:1"><div style="font-size:14px;font-weight:800;color:#fff">' + name + '</div>'
+    + '<div style="font-size:11px;color:#6B6B85">' + uid + '</div></div>'
+    + '<button onclick="deleteAdminUser(\'' + uid + '\')" style="background:#FF4D4D15;border:1px solid #FF4D4D44;color:#FF4D4D;border-radius:10px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer">Usuń</button>'
+    + '</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">'
+    + '<div style="background:#0D0D15;border-radius:10px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:900;color:' + (p.kcal?"#F59E0B":"#6B6B85") + '">' + (p.kcal||"—") + '</div><div style="font-size:9px;color:#6B6B85;margin-top:2px">kcal</div></div>'
+    + '<div style="background:#0D0D15;border-radius:10px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:900;color:' + (hasDiet?"#1ED760":"#FF4D4D") + '">' + (hasDiet?"✓":"✗") + '</div><div style="font-size:9px;color:#6B6B85;margin-top:2px">Dieta</div></div>'
+    + '<div style="background:#0D0D15;border-radius:10px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:900;color:#60A5FA">' + (receiptsCount||0) + '</div><div style="font-size:9px;color:#6B6B85;margin-top:2px">Paragony</div></div>'
+    + '</div>'
+    + (p.goal ? '<div style="margin-top:8px;font-size:11px;color:#6B6B85">Cel: <b style="color:#fff">' + (goalMap[p.goal]||p.goal) + '</b>'
+      + (p.stores?' &bull; <b style="color:#fff">' + ({biedronka:"Biedronka",lidl:"Lidl",both:"Oba sklepy"}[p.stores]||p.stores) + '</b>':"") + '</div>' : "")
+    + '</div>';
+}
+
+// ── UŻYTKOWNICY ──────────────────────────────────────────────────────────────
+function loadAdminUsers() {
+  fbGet(FB + "/profiles").then(function(data) {
+    adminUsersData = data || {};
+    var uids = Object.keys(adminUsersData);
+    if (!uids.length) {
+      document.getElementById("admin-body").innerHTML = '<div style="text-align:center;padding:40px;color:#6B6B85">Brak użytkowników w bazie.</div>';
+      return;
+    }
+    // Load receipts counts for each user
+    var counts = {}, loaded = 0;
+    uids.forEach(function(uid) {
+      fbGet(FB + "/purchaseHistory/" + uid).then(function(d) {
+        counts[uid] = d ? Object.keys(d).length : 0;
+        loaded++;
+        if (loaded === uids.length) renderAdminUsers(adminUsersData, counts);
+      }).catch(function() {
+        counts[uid] = 0; loaded++;
+        if (loaded === uids.length) renderAdminUsers(adminUsersData, counts);
+      });
+    });
+  }).catch(function(e) {
+    document.getElementById("admin-body").innerHTML = '<div style="text-align:center;padding:40px;color:#FF4D4D">Błąd: ' + e.message + '</div>';
+  });
+}
+
+function renderAdminUsers(data, counts) {
+  var body = document.getElementById("admin-body");
+  var uids = Object.keys(data);
+  var html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">'
+    + '<div style="font-size:12px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px">Użytkownicy (' + uids.length + ')</div>'
+    + '<button onclick="loadAdminUsers()" style="background:#1A1A24;border:1px solid rgba(255,255,255,.08);color:#6B6B85;border-radius:10px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer">Odśwież</button>'
+    + '</div>';
+  uids.forEach(function(uid) {
+    html += adminUserCard(uid, data[uid] || {}, counts[uid] || 0);
+  });
+  body.innerHTML = html;
+}
+
+function deleteAdminUser(uid) {
+  showDlg("⚠️", "Usuń użytkownika", "Czy na pewno chcesz usunąć użytkownika \"" + uid + "\" i wszystkie jego dane? Tej operacji nie można cofnąć.",
+    [{label:"Anuluj", cls:"cancel"},
+     {label:"Usuń", cls:"danger", cb: function() {
+      var paths = [
+        FB + "/profiles/" + uid,
+        FB + "/rooms/user_" + uid,
+        FB + "/logs/user_" + uid,
+        FB + "/expiry/user_" + uid,
+        FB + "/photos/user_" + uid,
+        FB + "/purchaseHistory/" + uid,
+        FB + "/pantry/" + uid,
+        FB + "/pantryState/" + uid,
+      ];
+      var done = 0, errors = 0;
+      paths.forEach(function(path) {
+        fbPut(path, null).then(function() {
+          done++;
+          if (done + errors === paths.length) {
+            dlgAlert("✅", "Usunięto", "Użytkownik " + uid + " został usunięty.");
+            loadAdminUsers();
+          }
+        }).catch(function() {
+          errors++;
+          if (done + errors === paths.length) {
+            dlgAlert("❌", "Błąd", "Nie udało się usunąć wszystkich danych. Spróbuj ponownie.");
+          }
+        });
+      });
+    }}]
+  );
+}
+
+// ── DIETY ────────────────────────────────────────────────────────────────────
+function loadAdminDiets() {
+  fbGet(FB + "/profiles").then(function(data) {
+    renderAdminDiets(data || {});
+  }).catch(function(e) {
+    document.getElementById("admin-body").innerHTML = '<div style="text-align:center;padding:40px;color:#FF4D4D">Błąd: ' + e.message + '</div>';
+  });
+}
+
+function renderAdminDiets(data) {
+  var body = document.getElementById("admin-body");
+  var uids = Object.keys(data);
+  var withDiet = uids.filter(function(u) { return data[u] && data[u].dietData; });
+  var noDiet = uids.filter(function(u) { return !data[u] || !data[u].dietData; });
+  var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">'
+    + adminStat(withDiet.length, "Z dietą", "#1ED760")
+    + adminStat(noDiet.length, "Bez diety", "#FF4D4D")
+    + '</div>';
+  if (withDiet.length) {
+    html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Diety użytkowników</div>';
+    withDiet.forEach(function(uid) {
+      var p = data[uid];
+      var name = uid.replace(/_/g, " ").replace(/\b\w/g, function(l){ return l.toUpperCase(); });
+      var d = p.dietData || {};
+      var m1 = d.menu1 || {}; var m2 = d.menu2 || {};
+      var meals1 = (m1.sniadania||[]).length + (m1.obiady||[]).length + (m1.kolacje||[]).length;
+      var meals2 = (m2.sniadania||[]).length + (m2.obiady||[]).length + (m2.kolacje||[]).length;
+      html += '<div style="background:#111118;border-radius:14px;padding:12px 14px;margin-bottom:8px;border:1px solid rgba(255,255,255,.06)">'
+        + '<div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:6px">' + name + '</div>'
+        + '<div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:#6B6B85">'
+        + '<span>Cel: <b style="color:#fff">' + ({lose:"Redukcja",maintain:"Utrzymanie",gain:"Masa"}[p.goal]||p.goal||"?") + '</b></span>'
+        + '<span>' + (p.kcal||"?") + ' kcal</span>'
+        + '<span>B:' + (p.prot||"?") + 'g W:' + (p.carb||"?") + 'g T:' + (p.fat||"?") + 'g</span>'
+        + '<span>M1: ' + meals1 + ' posiłków</span>'
+        + '<span>M2: ' + meals2 + ' posiłków</span>'
+        + '</div></div>';
+    });
+  }
+  if (noDiet.length) {
+    html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;margin-top:14px">Bez diety (' + noDiet.length + ')</div>';
+    noDiet.forEach(function(uid) {
+      var name = uid.replace(/_/g, " ").replace(/\b\w/g, function(l){ return l.toUpperCase(); });
+      html += '<div style="background:#111118;border-radius:12px;padding:10px 14px;margin-bottom:6px;border:1px solid rgba(255,77,77,.15);display:flex;justify-content:space-between;align-items:center">'
+        + '<span style="font-size:12px;font-weight:700;color:#B0B0C8">' + name + '</span>'
+        + '<span style="font-size:11px;color:#FF4D4D">Brak diety</span></div>';
+    });
+  }
+  body.innerHTML = html;
+}
+
+// ── PARAGONY ─────────────────────────────────────────────────────────────────
+function loadAdminReceipts() {
+  fbGet(FB + "/profiles").then(function(data) {
+    var uids = Object.keys(data || {});
+    if (!uids.length) {
+      document.getElementById("admin-body").innerHTML = '<div style="text-align:center;padding:40px;color:#6B6B85">Brak użytkowników.</div>';
+      return;
+    }
+    var allReceipts = [], loaded = 0;
+    uids.forEach(function(uid) {
+      fbGet(FB + "/purchaseHistory/" + uid).then(function(d) {
+        if (d) Object.values(d).forEach(function(r) { allReceipts.push(Object.assign({}, r, {_uid: uid})); });
+        loaded++;
+        if (loaded === uids.length) renderAdminReceipts(allReceipts);
+      }).catch(function() { loaded++; if (loaded === uids.length) renderAdminReceipts(allReceipts); });
+    });
+  });
+}
+
+function renderAdminReceipts(receipts) {
+  var body = document.getElementById("admin-body");
+  receipts.sort(function(a, b) { return (b.ts||0)-(a.ts||0); });
+  var totalSum = receipts.reduce(function(s, r) { return s + (Number(r.suma)||0); }, 0);
+  if (!receipts.length) {
+    body.innerHTML = '<div style="text-align:center;padding:40px;color:#6B6B85"><div style="font-size:36px;margin-bottom:12px">🧾</div>Brak paragonów w bazie.</div>';
+    return;
+  }
+  var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">'
+    + adminStat(receipts.length, "Paragonów", "#1ED760")
+    + adminStat(totalSum.toFixed(2) + " zł", "Suma", "#F59E0B")
+    + '</div>';
+  receipts.forEach(function(r) {
+    var uid = r._uid || "";
+    var name = uid.replace(/_/g, " ").replace(/\b\w/g, function(l){ return l.toUpperCase(); });
+    var d = r.ts ? new Date(r.ts).toLocaleDateString("pl-PL") : (r.data||"?");
+    var products = (r.produkty||[]);
+    html += '<div style="background:#111118;border-radius:14px;padding:12px 14px;margin-bottom:8px;border:1px solid rgba(255,255,255,.06)">'
+      + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">'
+      + '<div><div style="font-size:13px;font-weight:800;color:#fff">' + (r.sklep||"Sklep") + '</div>'
+      + '<div style="font-size:11px;color:#6B6B85">' + name + ' &bull; ' + d + '</div></div>'
+      + (r.suma ? '<div style="font-size:14px;font-weight:900;color:#F59E0B">' + Number(r.suma).toFixed(2) + ' zł</div>' : '')
+      + '</div>';
+    if (products.length) {
+      html += '<div style="border-top:1px solid rgba(255,255,255,.06);padding-top:6px">';
+      products.slice(0, 5).forEach(function(p) {
+        var np = typeof normalizeReceiptProduct === "function" ? normalizeReceiptProduct(p) : p;
+        var pname = (np.matchedName || np.rawName || np.nazwa || np.n || "Nieznany produkt").trim() || "Nieznany produkt";
+        var price = np.totalPrice || np.cena || 0;
+        html += '<div style="display:flex;justify-content:space-between;font-size:11px;color:#6B6B85;padding:3px 0">'
+          + '<span>' + pname + '</span>'
+          + '<span>' + (price ? Number(price).toFixed(2) + " zł" : "") + '</span></div>';
+      });
+      if (products.length > 5) html += '<div style="font-size:10px;color:#6B6B85;text-align:center;padding:4px">... i ' + (products.length-5) + ' więcej</div>';
+      html += '</div>';
+    }
+    html += '</div>';
+  });
+  body.innerHTML = html;
+}
+
+// ── STATYSTYKI ───────────────────────────────────────────────────────────────
+function loadAdminStats() {
+  fbGet(FB + "/profiles").then(function(pdata) {
+    var users = Object.values(pdata || {});
+    var uids = Object.keys(pdata || {});
+    var allReceipts = [], loaded = 0;
+    if (!uids.length) { renderAdminStats([], users); return; }
+    uids.forEach(function(uid) {
+      fbGet(FB + "/purchaseHistory/" + uid).then(function(d) {
+        if (d) Object.values(d).forEach(function(r){ allReceipts.push(r); });
+        loaded++;
+        if (loaded === uids.length) renderAdminStats(allReceipts, users);
+      }).catch(function(){ loaded++; if(loaded===uids.length) renderAdminStats(allReceipts,users); });
+    });
+  });
+}
+
+function renderAdminStats(receipts, users) {
+  var body = document.getElementById("admin-body");
+  if (!users.length) { body.innerHTML = '<div style="text-align:center;padding:40px;color:#6B6B85">Brak danych do statystyk.</div>'; return; }
+  var withDiet = users.filter(function(u){ return u.dietData; }).length;
+  var totalSum = receipts.reduce(function(s,r){ return s+(Number(r.suma)||0); },0);
+  var avgVal = receipts.length ? (totalSum/receipts.length).toFixed(2) : 0;
+  var shopCount = {}; users.forEach(function(u){ if(u.stores)(shopCount[u.stores]=(shopCount[u.stores]||0)+1); });
+  var topShop = Object.entries(shopCount).sort(function(a,b){return b[1]-a[1];})[0];
+  var avgKcal = users.filter(function(u){return u.kcal;}).reduce(function(s,u){return s+(u.kcal||0);},0);
+  var kcalCount = users.filter(function(u){return u.kcal;}).length;
+  var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">'
+    + adminStat(users.length, "Użytkownicy", "#1ED760")
+    + adminStat(withDiet, "Z dietą", "#8B5CF6")
+    + adminStat(receipts.length, "Paragony", "#60A5FA")
+    + adminStat(totalSum.toFixed(0) + " zł", "Suma zakupów", "#F59E0B")
+    + adminStat(avgVal + " zł", "Śr. paragon", "#F9A8D4")
+    + adminStat(topShop ? topShop[0] : "?", "Główny sklep", "#1ED760")
+    + (kcalCount ? adminStat(Math.round(avgKcal/kcalCount) + " kcal", "Śr. kaloryczność", "#F59E0B") : "")
+    + '</div>';
+  // Goals breakdown
+  var goals = {}; users.forEach(function(u){ if(u.goal)(goals[u.goal]=(goals[u.goal]||0)+1); });
+  html += '<div style="background:#111118;border-radius:14px;padding:14px;border:1px solid rgba(255,255,255,.06);margin-bottom:12px">'
+    + '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Cele użytkowników</div>';
+  [{key:"gain",label:"Budowa masy",c:"#1ED760"},{key:"maintain",label:"Utrzymanie",c:"#F59E0B"},{key:"lose",label:"Redukcja",c:"#FF4D4D"}].forEach(function(g){
+    var n = goals[g.key]||0; var pct = users.length ? Math.round(n/users.length*100) : 0;
+    html += '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="color:#B0B0C8">' + g.label + '</span><span style="color:'+g.c+';font-weight:700">' + n + ' (' + pct + '%)</span></div>'
+      + '<div style="height:5px;background:#1A1A24;border-radius:4px"><div style="height:100%;width:'+pct+'%;background:'+g.c+';border-radius:4px"></div></div></div>';
+  });
+  html += '</div>';
+  body.innerHTML = html;
+}
+
+// ── API ───────────────────────────────────────────────────────────────────────
+function renderAdminApi() {
+  var body = document.getElementById("admin-body");
+  fbGet(FB + "/config/apikey").then(function(key) {
+    var hasKey = !!(key && key.length > 10);
+    var maskedKey = hasKey ? "sk-ant-••••••••••••••" : "Brak klucza";
+    var html = '<div style="background:#111118;border-radius:14px;padding:16px;margin-bottom:12px;border:1px solid rgba(255,255,255,.06)">'
+      + '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Klucz Claude API</div>'
+      + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">'
+      + '<div style="width:10px;height:10px;border-radius:50%;background:' + (hasKey ? "#1ED760" : "#FF4D4D") + ';flex-shrink:0"></div>'
+      + '<div style="font-size:13px;font-weight:700;color:#fff">' + (hasKey ? "Klucz API aktywny" : "Brak klucza API") + '</div></div>'
+      + '<div style="font-size:12px;color:#6B6B85;font-family:monospace;background:#0D0D15;border-radius:10px;padding:10px;margin-bottom:14px">' + maskedKey + '</div>'
+      + '<input id="admin-api-inp" type="password" placeholder="sk-ant-api03-..." '
+      + 'style="width:100%;background:#1A1A24;border:1.5px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 14px;font-size:13px;color:#fff;outline:none;margin-bottom:10px;color-scheme:dark">'
+      + '<div style="display:flex;gap:8px">'
+      + '<button onclick="adminSaveApiKey()" style="flex:2;padding:12px;border-radius:12px;border:none;background:#1ED760;color:#000;font-size:13px;font-weight:800;cursor:pointer">Zapisz klucz</button>'
+      + (hasKey ? '<button onclick="adminDeleteApiKey()" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(255,77,77,.4);background:rgba(255,77,77,.08);color:#FF4D4D;font-size:12px;font-weight:700;cursor:pointer">Usuń klucz</button>' : "")
+      + '</div></div>'
+      + '<button onclick="testAdminApi()" style="width:100%;padding:13px;border-radius:12px;border:1px solid rgba(61,139,255,.3);background:rgba(61,139,255,.08);color:#60A5FA;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:10px">🔗 Testuj połączenie API</button>'
+      + '<div id="admin-api-test-result"></div>';
+    body.innerHTML = html;
+  }).catch(function() {
+    body.innerHTML = '<div style="text-align:center;padding:40px;color:#FF4D4D">Błąd ładowania danych API.</div>';
+  });
+}
+
+function adminSaveApiKey() {
+  var v = (document.getElementById("admin-api-inp")||{value:""}).value.trim();
+  if (!v || !v.startsWith("sk-ant-")) { dlgAlert("❌","Błąd","Klucz powinien zaczynać się od sk-ant-"); return; }
+  fbPut(FB + "/config/apikey", v).then(function() {
+    apiKey = v;
+    dlgAlert("✅","Zapisano","Klucz API zapisany dla wszystkich użytkowników.");
+    renderAdminApi();
+  }).catch(function(e){ dlgAlert("❌","Błąd",e.message); });
+}
+
+function adminDeleteApiKey() {
+  dlgConfirm("⚠️","Usuń klucz API","Czy na pewno chcesz usunąć klucz API?",function(){
+    fbPut(FB + "/config/apikey", null).then(function() {
+      apiKey = "";
+      dlgAlert("✅","Usunięto","Klucz API został usunięty.");
+      renderAdminApi();
+    });
+  }, "Usuń", "danger");
+}
+
+function testAdminApi() {
+  if (!apiKey) { dlgAlert("❌","Brak klucza","Dodaj klucz API przed testem."); return; }
+  var r = document.getElementById("admin-api-test-result");
+  if (r) r.innerHTML = '<div style="text-align:center;padding:10px;color:#6B6B85">Testowanie połączenia...</div>';
+  callAPI([{role:"user",content:"Odpowiedz jednym słowem: OK"}], "Odpowiedz jednym słowem: OK",
+    function(resp) { if (r) r.innerHTML = '<div style="background:rgba(30,215,96,.08);border:1px solid rgba(30,215,96,.2);border-radius:10px;padding:12px;text-align:center;font-size:13px;color:#1ED760;font-weight:700">✅ API działa poprawnie</div>'; },
+    function(err) { if (r) r.innerHTML = '<div style="background:rgba(255,77,77,.08);border:1px solid rgba(255,77,77,.2);border-radius:10px;padding:12px;text-align:center;font-size:13px;color:#FF4D4D;font-weight:700">❌ Nie udało się połączyć z API</div>'; },
+    100
+  );
+}
+
+// Remove old CMS functions to avoid conflicts
+var openCMS = openAdminPanel;
+var closeCMS = closeAdminPanel;
+var switchCMSTab = switchAdminTab;
+var checkCMSPass = checkAdminPassword;
+
 </script>
-    <button onclick="closeCMS()" style="background:#1A1A24;border:none;color:#6B6B85;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer">&#8592;</button>
-    <div>
+
+<!-- ══ ADMIN PANEL OVERLAY (hidden by default) ══════════════════════════ -->
+<div id="admin-panel-overlay" style="display:none;position:fixed;inset:0;z-index:500;background:#0A0A0F;overflow-y:auto;flex-direction:column">
+
+  <!-- Admin Header -->
+  <div style="background:rgba(13,13,18,.98);border-bottom:1px solid rgba(255,255,255,.08);padding:14px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10">
+    <button onclick="closeAdminPanel()" style="background:#1A1A24;border:none;color:#6B6B85;border-radius:50%;width:38px;height:38px;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">&#8592;</button>
+    <div style="flex:1">
       <div style="font-size:17px;font-weight:900;color:#fff">Panel administratora</div>
-      <div style="font-size:11px;color:#6B6B85">Pełna Lodówka CMS</div>
+      <div style="font-size:11px;color:#6B6B85">Pełna Lodówka CMS &bull; <span id="admin-firebase-status">Firebase</span></div>
     </div>
-    <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-      <div id="cms-sync-dot" style="width:8px;height:8px;border-radius:50%;background:#1ED760"></div>
-      <span style="font-size:11px;color:#6B6B85">Firebase</span>
-    </div>
+    <div id="admin-api-dot" style="width:8px;height:8px;border-radius:50%;background:#1ED760"></div>
   </div>
 
-  <!-- Tabs -->
-  <div style="display:flex;background:#111118;border-bottom:1px solid #2A2A3A;flex-shrink:0">
-    <button id="cmstab-0" onclick="switchCMSTab(0)" style="flex:1;padding:11px;border:none;background:none;color:#1ED760;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid #1ED760">Użytkownicy</button>
-    <button id="cmstab-1" onclick="switchCMSTab(1)" style="flex:1;padding:11px;border:none;background:none;color:#6B6B85;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent">Diety</button>
-    <button id="cmstab-2" onclick="switchCMSTab(2)" style="flex:1;padding:11px;border:none;background:none;color:#6B6B85;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent">Paragony</button>
-    <button id="cmstab-3" onclick="switchCMSTab(3)" style="flex:1;padding:11px;border:none;background:none;color:#6B6B85;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent">Statystyki</button>
+  <!-- Admin Tabs -->
+  <div style="display:flex;background:#111118;border-bottom:1px solid rgba(255,255,255,.06);overflow-x:auto;flex-shrink:0">
+    <button id="admtab-0" onclick="switchAdminTab(0)" class="admtab act">Użytkownicy</button>
+    <button id="admtab-1" onclick="switchAdminTab(1)" class="admtab">Diety</button>
+    <button id="admtab-2" onclick="switchAdminTab(2)" class="admtab">Paragony</button>
+    <button id="admtab-3" onclick="switchAdminTab(3)" class="admtab">Statystyki</button>
+    <button id="admtab-4" onclick="switchAdminTab(4)" class="admtab">API</button>
   </div>
 
-  <div id="cms-body" style="flex:1;overflow-y:auto;padding:16px;background:#0A0A0F"></div>
+  <!-- Admin Body -->
+  <div id="admin-body" style="padding:16px;flex:1"></div>
 </div>
 
-
-<!-- CMS USER DETAIL PANEL -->
-<div class="overlay" id="cms-user-overlay" style="align-items:stretch;justify-content:flex-start;padding:0;flex-direction:column;overflow:hidden;z-index:210">
-  <div style="background:#0D0D15;border-bottom:1px solid #2A2A3A;padding:14px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0">
-    <button onclick="closeCMSUser()" style="background:#1A1A24;border:none;color:#6B6B85;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer">&#8592;</button>
-    <div id="cms-user-name-hdr" style="font-size:16px;font-weight:900;color:#fff">Użytkownik</div>
+<!-- Admin Login Modal -->
+<div id="admin-login-overlay" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.85);align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(6px)">
+  <div style="background:#111118;border-radius:20px;padding:24px;width:100%;max-width:340px;border:1px solid rgba(255,255,255,.08);text-align:center">
+    <div style="font-size:36px;margin-bottom:12px">🔐</div>
+    <div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:6px">Panel administratora</div>
+    <div style="font-size:13px;color:#6B6B85;margin-bottom:18px">Wpisz hasło administratora</div>
+    <input id="admin-pass-inp" type="password" placeholder="Hasło administratora"
+      style="width:100%;background:#1A1A24;border:1.5px solid rgba(255,255,255,.1);border-radius:12px;padding:13px 16px;font-size:14px;color:#fff;outline:none;margin-bottom:6px;color-scheme:dark"
+      onkeydown="if(event.key==='Enter')checkAdminPassword()">
+    <div id="admin-pass-error" style="font-size:12px;color:#FF4D4D;margin-bottom:12px;display:none">Nieprawidłowe hasło administratora.</div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button onclick="closeAdminLogin()" style="flex:1;padding:13px;border-radius:50px;border:1px solid rgba(255,255,255,.1);background:transparent;color:#6B6B85;font-size:13px;font-weight:700;cursor:pointer">Anuluj</button>
+      <button onclick="checkAdminPassword()" style="flex:1;padding:13px;border-radius:50px;border:none;background:#1ED760;color:#000;font-size:13px;font-weight:800;cursor:pointer">Wejdź</button>
+    </div>
   </div>
-  <div id="cms-user-body" style="flex:1;overflow-y:auto;padding:16px;background:#0A0A0F"></div>
 </div>
 
+<!-- (cms-user-detail removed, now in admin-panel-overlay) -->
 <!-- CMS PASSWORD -->
 <div class="dlg-overlay" id="cms-pass-overlay">
   <div class="dlg-box" style="max-width:340px">
