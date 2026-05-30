@@ -2243,15 +2243,28 @@ function renderRecipes(){
     h+='</div>';
     secMeals.forEach(function(m,mIdx){
       var uid=sec.k+"_"+mIdx+"_m"+dietMenu,open=expandedMeal===uid;
+      // Liczymy makro WPROST ze składników (zamiast docelowych m.kcal/m.prot itd.)
+      var calc=calculateMealMacroFromIngredients(m);
+      var hasCalc=calc.matchedCount>0;
+      // Jeżeli mamy dane z bazy — pokaż wyliczone; inaczej fallback do zapisanych
+      var dispKcal=hasCalc?calc.kcal:(m.kcal||0);
+      var dispProt=hasCalc?calc.prot:(m.prot||0);
+      var dispCarb=hasCalc?calc.carb:(m.carb||0);
+      var dispFat=hasCalc?calc.fat:(m.fat||0);
+      // Czy AI target i wyliczone się rozjeżdżają? (różnica >5%)
+      var diffPct=hasCalc&&m.kcal?Math.round(Math.abs(calc.kcal-m.kcal)/m.kcal*100):0;
+      var showDiff=hasCalc&&m.kcal&&diffPct>5;
       h+='<div style="background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:8px;overflow:hidden">';
       h+='<div style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between">';
       h+='<div style="flex:1;cursor:pointer" onclick="expandedMeal=expandedMeal===\''+uid+'\'?null:\''+uid+'\';renderDietBody()">';
       h+='<div style="font-size:14px;font-weight:800;color:var(--text)">'+m.nazwa+'</div>';
-      h+='<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px">';
-      h+='<span style="background:rgba(245,158,11,.15);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;color:var(--amber)">'+m.kcal+' kcal</span>';
-      h+='<span style="background:rgba(96,165,250,.15);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;color:#60A5FA">B '+m.prot+'g</span>';
-      h+='<span style="background:rgba(30,215,96,.12);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;color:var(--green)">W '+m.carb+'g</span>';
-      h+='<span style="background:rgba(249,168,212,.15);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;color:#F9A8D4">T '+m.fat+'g</span>';
+      h+='<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;align-items:center">';
+      h+='<span style="background:rgba(245,158,11,.15);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;color:var(--amber)">'+dispKcal+' kcal</span>';
+      h+='<span style="background:rgba(96,165,250,.15);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;color:#60A5FA">B '+dispProt+'g</span>';
+      h+='<span style="background:rgba(30,215,96,.12);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;color:var(--green)">W '+dispCarb+'g</span>';
+      h+='<span style="background:rgba(249,168,212,.15);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;color:#F9A8D4">T '+dispFat+'g</span>';
+      if(hasCalc)h+='<span title="Wyliczone ze składników z bazy produktów" style="background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.4);border-radius:6px;padding:2px 6px;font-size:10px;font-weight:700;color:var(--purple)">✓ realne</span>';
+      if(showDiff)h+='<span title="AI założył '+m.kcal+' kcal, faktyczne składniki dają '+calc.kcal+' kcal" style="background:rgba(255,77,77,.12);border:1px solid rgba(255,77,77,.35);border-radius:6px;padding:2px 6px;font-size:10px;font-weight:700;color:var(--red)">AI '+m.kcal+' / Δ'+diffPct+'%</span>';
       h+='</div></div>';
       h+='<div style="display:flex;gap:5px;align-items:center;flex-shrink:0;margin-left:8px">';
       h+='<button class="meal-gen-btn" onclick="event.stopPropagation();generateSingleMeal('+dietMenu+',\''+sec.k+'\','+mIdx+')">Inna</button>';
@@ -2259,15 +2272,83 @@ function renderRecipes(){
       h+='<span style="color:var(--text3);font-size:14px;cursor:pointer" onclick="event.stopPropagation();expandedMeal=expandedMeal===\''+uid+'\'?null:\''+uid+'\';renderDietBody()">'+(open?"^":"v")+'</span>';
       h+='</div></div>';
       if(open){
-        h+='<div style="padding:0 14px 14px"><table style="width:100%;border-collapse:collapse;margin-bottom:10px;font-size:12px"><thead><tr><th style="text-align:left;color:var(--text3);padding:4px 0;border-bottom:1px solid var(--border)">Skladnik</th><th style="text-align:right;color:var(--text3);padding:4px 0;border-bottom:1px solid var(--border)">Ilosc</th></tr></thead><tbody>';
-        (m.skladniki||[]).forEach(function(sk){h+='<tr><td style="padding:5px 0;color:var(--text2);border-bottom:1px solid var(--bg3)">'+sk.n+'</td><td style="text-align:right;padding:5px 0;color:var(--amber);border-bottom:1px solid var(--bg3)">'+sk.il+'</td></tr>';});
-        h+='</tbody></table><div style="background:var(--bg3);border-radius:10px;padding:12px;font-size:12px;color:var(--text2);line-height:1.8"><b style="color:var(--text);display:block;margin-bottom:6px">Przygotowanie:</b>'+(m.przepis||"").replace(/\n/g,"<br>")+'</div></div>';
+        h+='<div style="padding:0 14px 14px">';
+        // Tabela składników z per-row macro
+        h+='<div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Składniki i makro</div>';
+        h+='<table style="width:100%;border-collapse:collapse;margin-bottom:10px;font-size:12px;background:var(--bg3);border-radius:10px;overflow:hidden">';
+        h+='<thead><tr style="background:var(--bg4)">';
+        h+='<th style="text-align:left;color:var(--text3);padding:8px 10px;font-weight:700">Składnik</th>';
+        h+='<th style="text-align:right;color:var(--text3);padding:8px 6px;font-weight:700">Ilość</th>';
+        h+='<th style="text-align:right;color:var(--amber);padding:8px 6px;font-weight:700">kcal</th>';
+        h+='<th style="text-align:right;color:#60A5FA;padding:8px 6px;font-weight:700">B</th>';
+        h+='<th style="text-align:right;color:var(--green);padding:8px 6px;font-weight:700">W</th>';
+        h+='<th style="text-align:right;color:#F9A8D4;padding:8px 10px;font-weight:700">T</th>';
+        h+='</tr></thead><tbody>';
+        calc.rows.forEach(function(r){
+          var nameStyle=r.matched?"color:var(--text2)":"color:var(--text3);font-style:italic";
+          h+='<tr>';
+          h+='<td style="padding:6px 10px;'+nameStyle+';border-bottom:1px solid var(--bg2)">'+r.name+(r.matched?"":" <span title=\"Brak w bazie produktów\" style=\"font-size:9px;color:var(--red)\">?</span>")+'</td>';
+          h+='<td style="text-align:right;padding:6px 6px;color:var(--text3);border-bottom:1px solid var(--bg2)">'+r.amountText+'</td>';
+          h+='<td style="text-align:right;padding:6px 6px;color:'+(r.matched?"var(--amber)":"var(--text3)")+';border-bottom:1px solid var(--bg2)">'+(r.matched?r.kcal:"—")+'</td>';
+          h+='<td style="text-align:right;padding:6px 6px;color:'+(r.matched?"#60A5FA":"var(--text3)")+';border-bottom:1px solid var(--bg2)">'+(r.matched?r.prot:"—")+'</td>';
+          h+='<td style="text-align:right;padding:6px 6px;color:'+(r.matched?"var(--green)":"var(--text3)")+';border-bottom:1px solid var(--bg2)">'+(r.matched?r.carb:"—")+'</td>';
+          h+='<td style="text-align:right;padding:6px 10px;color:'+(r.matched?"#F9A8D4":"var(--text3)")+';border-bottom:1px solid var(--bg2)">'+(r.matched?r.fat:"—")+'</td>';
+          h+='</tr>';
+        });
+        // Wiersz SUMA
+        h+='<tr style="background:rgba(30,215,96,.06);font-weight:900">';
+        h+='<td style="padding:8px 10px;color:var(--green)" colspan="2">SUMA ze składników</td>';
+        h+='<td style="text-align:right;padding:8px 6px;color:var(--amber)">'+calc.kcal+'</td>';
+        h+='<td style="text-align:right;padding:8px 6px;color:#60A5FA">'+calc.prot+'</td>';
+        h+='<td style="text-align:right;padding:8px 6px;color:var(--green)">'+calc.carb+'</td>';
+        h+='<td style="text-align:right;padding:8px 10px;color:#F9A8D4">'+calc.fat+'</td>';
+        h+='</tr>';
+        // Wiersz porównawczy AI target
+        if(m.kcal){
+          h+='<tr style="background:rgba(139,92,246,.06);font-size:11px">';
+          h+='<td style="padding:6px 10px;color:var(--text3);font-style:italic" colspan="2">AI target (założenie)</td>';
+          h+='<td style="text-align:right;padding:6px 6px;color:var(--text3)">'+m.kcal+'</td>';
+          h+='<td style="text-align:right;padding:6px 6px;color:var(--text3)">'+(m.prot||0)+'</td>';
+          h+='<td style="text-align:right;padding:6px 6px;color:var(--text3)">'+(m.carb||0)+'</td>';
+          h+='<td style="text-align:right;padding:6px 10px;color:var(--text3)">'+(m.fat||0)+'</td>';
+          h+='</tr>';
+        }
+        h+='</tbody></table>';
+        if(calc.matchedCount<calc.totalCount){
+          h+='<div style="font-size:11px;color:var(--text3);background:rgba(255,77,77,.06);border:1px solid rgba(255,77,77,.2);border-radius:8px;padding:8px 10px;margin-bottom:10px">⚠️ '+(calc.totalCount-calc.matchedCount)+' z '+calc.totalCount+' składników nie ma w bazie produktów — wartości makro mogą być niepełne. Edytuj posiłek aby dopasować nazwy do bazy.</div>';
+        }
+        // Przepis
+        h+='<div style="background:var(--bg3);border-radius:10px;padding:12px;font-size:12px;color:var(--text2);line-height:1.8"><b style="color:var(--text);display:block;margin-bottom:6px">Przygotowanie:</b>'+(m.przepis||"").replace(/\n/g,"<br>")+'</div>';
+        h+='</div>';
       }
       h+='</div>';
     });
     h+='</div>';
   });
-  if(userProfile&&userProfile.kcal){var totalKcal=0;secs.forEach(function(sec){(menu[sec.k]||[]).forEach(function(m){totalKcal+=m.kcal||0;});});var diffOk=Math.abs(totalKcal-userProfile.kcal)<userProfile.kcal*0.07;h+='<div style="background:'+(diffOk?"rgba(30,215,96,.08)":"rgba(255,77,77,.08)")+';border:1px solid '+(diffOk?"var(--green)":"var(--red)")+';border-radius:var(--radius);padding:12px;margin-bottom:12px"><div style="font-size:10px;font-weight:800;color:var(--text3);margin-bottom:6px;text-transform:uppercase">Bilans Menu '+dietMenu+'</div><div style="font-size:12px;font-weight:700;color:'+(diffOk?"var(--green)":"var(--red)")+'">'+totalKcal+' / '+userProfile.kcal+' kcal</div></div>';}
+  if(userProfile&&userProfile.kcal){
+    var totalCalc={kcal:0,prot:0,carb:0,fat:0};
+    var totalAI={kcal:0,prot:0,carb:0,fat:0};
+    secs.forEach(function(sec){(menu[sec.k]||[]).forEach(function(m){
+      var c=calculateMealMacroFromIngredients(m);
+      totalCalc.kcal+=c.kcal;totalCalc.prot+=c.prot;totalCalc.carb+=c.carb;totalCalc.fat+=c.fat;
+      totalAI.kcal+=m.kcal||0;totalAI.prot+=m.prot||0;totalAI.carb+=m.carb||0;totalAI.fat+=m.fat||0;
+    });});
+    var diffOk=Math.abs(totalCalc.kcal-userProfile.kcal)<userProfile.kcal*0.07;
+    var color=diffOk?"var(--green)":"var(--red)";
+    h+='<div style="background:'+(diffOk?"rgba(30,215,96,.08)":"rgba(255,77,77,.08)")+';border:1px solid '+color+';border-radius:var(--radius);padding:14px 16px;margin-bottom:12px">';
+    h+='<div style="font-size:10px;font-weight:800;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.6px">Bilans Menu '+dietMenu+' — realne ze składników</div>';
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:8px">';
+    h+='<div style="text-align:center"><div style="font-size:18px;font-weight:900;color:'+color+'">'+totalCalc.kcal+'</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">kcal</div></div>';
+    h+='<div style="text-align:center"><div style="font-size:18px;font-weight:900;color:#60A5FA">'+totalCalc.prot+'g</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Białko</div></div>';
+    h+='<div style="text-align:center"><div style="font-size:18px;font-weight:900;color:var(--green)">'+totalCalc.carb+'g</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Węgle</div></div>';
+    h+='<div style="text-align:center"><div style="font-size:18px;font-weight:900;color:#F9A8D4">'+totalCalc.fat+'g</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Tłuszcze</div></div>';
+    h+='</div>';
+    h+='<div style="font-size:11px;color:var(--text3);font-weight:600">Cel: '+userProfile.kcal+' kcal &bull; B:'+userProfile.prot+'g W:'+userProfile.carb+'g T:'+userProfile.fat+'g</div>';
+    if(Math.abs(totalCalc.kcal-totalAI.kcal)>50){
+      h+='<div style="font-size:10px;color:var(--text3);margin-top:6px;font-style:italic">AI założenie: '+totalAI.kcal+' kcal — faktyczne składniki dają '+totalCalc.kcal+' kcal.</div>';
+    }
+    h+='</div>';
+  }
   h+='<button onclick="generateShopFromDiet()" style="width:100%;background:linear-gradient(135deg,var(--purple),#4F46E5);color:#fff;border:none;border-radius:50px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;margin-top:4px">Generuj liste zakupow z diety</button>';
   return h;
 }
@@ -2795,6 +2876,51 @@ function parseAmount(str,unit){
   if(s.indexOf("łyżka")!==-1||s.indexOf("lyzka")!==-1)return n*15;
   if(s.indexOf("łyżeczk")!==-1||s.indexOf("lyzeczk")!==-1)return n*5;
   return n;
+}
+
+// ── Realne makro z ingrediencji (n100 × gramatura) ──────────────────────
+// Zwraca: {kcal, prot, carb, fat, rows:[{name, grams, kcal, prot, carb, fat, matched}], matchedCount, totalCount}
+function calculateMealMacroFromIngredients(meal){
+  var result={kcal:0,prot:0,carb:0,fat:0,rows:[],matchedCount:0,totalCount:0};
+  if(!meal||!meal.skladniki)return result;
+  meal.skladniki.forEach(function(sk){
+    var name=sk.n||sk.name||"";
+    var amountText=String(sk.il||sk.amount||"");
+    var prod=findProduct(name);
+    var parsed=parseAmount(amountText);
+    var row={name:name,amountText:amountText,grams:0,kcal:0,prot:0,carb:0,fat:0,matched:!!prod};
+    result.totalCount++;
+    if(!prod||!prod.n100||!parsed){
+      result.rows.push(row);
+      return;
+    }
+    result.matchedCount++;
+    var grams=parsed;
+    // Jeśli ilość w "szt." a produkt ma singleWeight - przelicz na gramy
+    var lc=amountText.toLowerCase();
+    var isPiece=/szt|sztuk/.test(lc);
+    if(isPiece&&prod.singleWeight){
+      grams=parsed*prod.singleWeight;
+    }else if(prod.unit==="szt"&&prod.singleWeight&&!/g\b|ml\b|kg\b|l\b/.test(lc)){
+      grams=parsed*prod.singleWeight;
+    }
+    var f=grams/100;
+    row.grams=Math.round(grams);
+    row.kcal=Math.round((prod.n100.kcal||0)*f);
+    row.prot=Math.round((prod.n100.prot||0)*f*10)/10;
+    row.carb=Math.round((prod.n100.carb||0)*f*10)/10;
+    row.fat=Math.round((prod.n100.fat||0)*f*10)/10;
+    result.kcal+=row.kcal;
+    result.prot+=row.prot;
+    result.carb+=row.carb;
+    result.fat+=row.fat;
+    result.rows.push(row);
+  });
+  result.kcal=Math.round(result.kcal);
+  result.prot=Math.round(result.prot);
+  result.carb=Math.round(result.carb);
+  result.fat=Math.round(result.fat);
+  return result;
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
