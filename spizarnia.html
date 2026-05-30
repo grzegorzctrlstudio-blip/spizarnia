@@ -74,44 +74,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .icon-btn{width:36px;height:36px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:background .15s}
 .icon-btn:active{background:var(--bg4)}
 
-/* ── STATS CARDS ── */
-.stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
-.stat-card{background:var(--bg3);border-radius:var(--radius);padding:14px 10px 12px;text-align:center;border:1px solid var(--border);position:relative;overflow:hidden}
-.stat-card::before{content:"";position:absolute;inset:0;opacity:.06;border-radius:var(--radius)}
-.stat-card.red::before{background:var(--red)}
-.stat-card.green::before{background:var(--green)}
-.stat-card.neutral::before{background:#ffffff}
-.stat-n{font-size:32px;font-weight:900;line-height:1;letter-spacing:-1px}
-.stat-card.red .stat-n{color:var(--red)}
-.stat-card.green .stat-n{color:var(--green)}
-.stat-card.neutral .stat-n{color:var(--text)}
-.stat-label{font-size:10px;font-weight:700;margin-top:4px;text-transform:uppercase;letter-spacing:.8px}
-.stat-card.red .stat-label{color:var(--red)}
-.stat-card.green .stat-label{color:var(--green)}
-.stat-card.neutral .stat-label{color:var(--text3)}
-.stat-icon{font-size:18px;margin-bottom:4px}
-
-/* ── QUICK ACTIONS BAR ── */
-.actions-bar{display:flex;gap:8px;margin-bottom:14px}
-.action-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:12px 8px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-size:12px;font-weight:800;letter-spacing:.2px;transition:transform .15s,filter .15s}
-.action-btn:active{transform:scale(.96);filter:brightness(.9)}
-.action-btn.primary{background:var(--green);color:#000}
-.action-btn.secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border2)}
-.action-btn.purple{background:var(--purple);color:#fff}
-.action-btn-ico{font-size:16px}
-
-/* ── DATE CHIP ── */
-.date-chip{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.date-chip-left{display:flex;align-items:center;gap:10px}
-.date-chip-ico{font-size:20px}
-.date-chip-text strong{color:var(--text);font-size:13px;font-weight:700;display:block}
-.date-chip-text span{font-size:11px;color:var(--text3)}
-.date-edit-row{display:none;align-items:center;gap:8px;margin-top:8px}
-.date-edit-row.show{display:flex}
-.date-inp{background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--text);outline:none;flex:1}
-.date-save{background:var(--green);border:none;color:#000;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:800;cursor:pointer}
-.date-cancel{background:var(--bg4);border:none;color:var(--text3);border-radius:8px;padding:8px 10px;font-size:12px;cursor:pointer}
-
 /* ── SEARCH ── */
 .search-wrap{position:relative;margin-bottom:12px}
 .search-ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--text3);pointer-events:none}
@@ -438,7 +400,7 @@ body.admin-open .bottom-nav{display:none}
 
       <!-- SEARCH -->
       <div class="search-wrap">
-        <span class="search-ico">??</span>
+        <span class="search-ico">🔍</span>
         <input class="search-inp" id="sinp" placeholder="Szukaj w lodówce..." oninput="onSearch(this.value)">
         <button class="search-clear" id="xbtn" onclick="clearSearch()">✕</button>
       </div>
@@ -446,7 +408,7 @@ body.admin-open .bottom-nav{display:none}
       <!-- CATEGORY CHIPS -->
       <div class="cat-chips" id="cat-chips">
         <button class="cat-chip act" id="chip-all" onclick="setCatFilter('all')">
-          <span class="cat-chip-ico">??</span>Wszystko
+          <span class="cat-chip-ico">📋</span>Wszystko
         </button>
       </div>
 
@@ -493,36 +455,36 @@ body.admin-open .bottom-nav{display:none}
       <p>Lista AI + szybkie zamówienie online</p>
     </div>
     <div class="shop-body">
-      <div style="font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:10px">??️ Zamów online</div>
+      <div style="font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:10px">🛍️ Zamów online</div>
       <div class="stores-grid">
         <button class="store-card" onclick="openStore('biedronka')" style="background:linear-gradient(135deg,#DC2626,#991B1B)">
-          <span class="store-card-ico">??</span>
+          <span class="store-card-ico">🐝</span>
           <span class="store-card-name">Biedronka Go</span>
           <span class="store-card-sub">Dostawa ~2h</span>
         </button>
         <button class="store-card" onclick="openStore('frisco')" style="background:linear-gradient(135deg,#16A34A,#14532D)">
-          <span class="store-card-ico">??</span>
+          <span class="store-card-ico">🚚</span>
           <span class="store-card-name">Frisco.pl</span>
           <span class="store-card-sub">Nast. dzień</span>
         </button>
         <button class="store-card" onclick="openStore('glovo')" style="background:linear-gradient(135deg,#D97706,#92400E)">
-          <span class="store-card-ico">??</span>
+          <span class="store-card-ico">⚡</span>
           <span class="store-card-name">Glovo</span>
           <span class="store-card-sub">Ekspresowo</span>
         </button>
         <button class="store-card" onclick="openStore('lisek')" style="background:linear-gradient(135deg,#7C3AED,#4C1D95)">
-          <span class="store-card-ico">??</span>
+          <span class="store-card-ico">🦊</span>
           <span class="store-card-name">Lisek</span>
           <span class="store-card-sub">~15 minut</span>
         </button>
       </div>
       <div class="receipt-drop" onclick="openReceipt()">
-        <div style="font-size:40px;margin-bottom:10px">??</div>
+        <div style="font-size:40px;margin-bottom:10px">🧾</div>
         <div style="font-size:14px;color:var(--text2);font-weight:700">Zeskanuj paragon</div>
         <div style="font-size:12px;color:var(--text3);margin-top:5px">Zdjęcie paragonu → AI aktualizuje lodówkę</div>
       </div>
       <div class="receipt-results" id="receipt-results">
-        <h4>?? Produkty z paragonu</h4>
+        <h4>🧾 Produkty z paragonu</h4>
         <div id="receipt-items"></div>
         <button class="receipt-apply" onclick="applyReceipt()">✅ Zaktualizuj lodówkę</button>
       </div>
@@ -530,7 +492,7 @@ body.admin-open .bottom-nav{display:none}
         <div class="gen-spin" id="gen-spin"></div>
         <span id="gen-btn-txt">🛒 Generuj listę zakupów z diety</span>
       </button>
-      <button class="copy-btn" id="copy-btn" onclick="copyShopList()">?? Kopiuj listę do schowka</button>
+      <button class="copy-btn" id="copy-btn" onclick="copyShopList()">📋 Kopiuj listę do schowka</button>
       <div id="shop-list-content"></div>
     </div>
   </div>
@@ -552,15 +514,15 @@ body.admin-open .bottom-nav{display:none}
 <!-- EXPIRY MODAL -->
 <div class="overlay" id="exp-overlay" onclick="if(event.target===this)closeExpiry()">
   <div class="modal">
-    <h3>?? Data przydatności</h3>
+    <h3>📅 Data przydatności</h3>
     <p id="exp-name" style="color:var(--text2);margin-bottom:12px"></p>
     <input type="date" class="modal-inp" id="exp-date-inp">
     <div class="modal-btns" style="margin-bottom:8px">
-      <button class="mbtn blue" onclick="openScannerFromExpiry()">?? Skanuj</button>
+      <button class="mbtn blue" onclick="openScannerFromExpiry()">📷 Skanuj</button>
       <button class="mbtn ok" onclick="saveExpiry()">✅ Zapisz</button>
     </div>
     <div class="modal-btns">
-      <button class="mbtn del" onclick="clearExpiry()">??️ Usuń datę</button>
+      <button class="mbtn del" onclick="clearExpiry()">🗑️ Usuń datę</button>
       <button class="mbtn cancel" onclick="closeExpiry()">Zamknij</button>
     </div>
   </div>
@@ -569,7 +531,7 @@ body.admin-open .bottom-nav{display:none}
 <!-- SCANNER MODAL -->
 <div class="overlay" id="scan-overlay" onclick="if(event.target===this)closeScanner()">
   <div class="modal">
-    <h3>?? Skaner AI</h3>
+    <h3>🤖 Skaner AI</h3>
     <img class="scan-preview" id="scan-img" alt="">
     <div class="scan-loading" id="scan-loading"><div class="scan-spin"></div>Claude analizuje...</div>
     <div class="scan-result" id="scan-result">
@@ -578,7 +540,7 @@ body.admin-open .bottom-nav{display:none}
       <div id="scan-note" style="font-size:11px;color:var(--text3);margin-top:4px"></div>
     </div>
     <div class="modal-btns" style="margin-bottom:8px">
-      <button class="mbtn blue" onclick="triggerScanPhoto()">?? Zdjęcie</button>
+      <button class="mbtn blue" onclick="triggerScanPhoto()">📷 Zdjęcie</button>
       <button class="mbtn ok" id="scan-apply" style="display:none" onclick="applyScan()">✅ Zastosuj</button>
     </div>
     <button class="mbtn cancel" style="width:100%" onclick="closeScanner()">Zamknij</button>
@@ -589,13 +551,13 @@ body.admin-open .bottom-nav{display:none}
 <!-- RECEIPT MODAL -->
 <div class="overlay" id="receipt-overlay" onclick="if(event.target===this)closeReceiptModal()">
   <div class="modal">
-    <h3>?? Skaner paragonu</h3>
-    <p>Zrób zdjęcie paragonu z Biedronki — AI odczyta produkty i zaktualizuje lodówkę.</p>
+    <h3>🧾 Skaner paragonu</h3>
+    <p>Zrób zdjęcie paragonu — AI odczyta produkty i zaktualizuje lodówkę.</p>
     <img class="scan-preview" id="receipt-img" alt="">
     <div class="scan-loading" id="receipt-loading"><div class="scan-spin"></div>Czytam paragon...</div>
     <div class="scan-result" id="receipt-scan-result"><b id="receipt-result-txt"></b></div>
     <div class="modal-btns">
-      <button class="mbtn blue" onclick="triggerReceiptPhoto()">?? Zrób zdjęcie</button>
+      <button class="mbtn blue" onclick="triggerReceiptPhoto()">📷 Zrób zdjęcie</button>
       <button class="mbtn cancel" onclick="closeReceiptModal()">Zamknij</button>
     </div>
     <input type="file" id="receipt-file" accept="image/*" capture="environment" style="display:none" onchange="handleReceiptPhoto(this)">
@@ -605,16 +567,16 @@ body.admin-open .bottom-nav{display:none}
 <!-- PHOTO MODAL -->
 <div class="overlay" id="photo-overlay" onclick="if(event.target===this)closePhoto()">
   <div class="modal">
-    <h3>?? Zdjęcie produktu</h3>
+    <h3>📷 Zdjęcie produktu</h3>
     <p id="photo-modal-name" style="color:var(--text2);margin-bottom:12px"></p>
     <img class="photo-modal-img" id="photo-modal-img" alt="">
     <div class="photo-modal-empty" id="photo-modal-placeholder">
-      <span style="font-size:40px">??</span>
+      <span style="font-size:40px">📷</span>
       <span style="font-size:12px;font-weight:600">Brak zdjęcia</span>
     </div>
     <div class="modal-btns" style="margin-bottom:8px">
-      <button class="mbtn blue" onclick="triggerProductPhoto()">?? Zrób zdjęcie</button>
-      <button class="mbtn del" id="photo-delete-btn" style="display:none" onclick="deleteProductPhoto()">??️ Usuń</button>
+      <button class="mbtn blue" onclick="triggerProductPhoto()">📷 Zrób zdjęcie</button>
+      <button class="mbtn del" id="photo-delete-btn" style="display:none" onclick="deleteProductPhoto()">🗑️ Usuń</button>
     </div>
     <button class="mbtn cancel" style="width:100%" onclick="closePhoto()">Zamknij</button>
     <input type="file" id="product-photo-file" accept="image/*" capture="environment" style="display:none" onchange="handleProductPhoto(this)">
@@ -624,7 +586,7 @@ body.admin-open .bottom-nav{display:none}
 <!-- LOG MODAL -->
 <div class="overlay bottom" id="log-overlay" onclick="if(event.target===this)closeLog()">
   <div class="log-modal">
-    <div class="log-hdr"><h3>?? Historia zmian</h3><button class="log-close" onclick="closeLog()">Zamknij</button></div>
+    <div class="log-hdr"><h3>📋 Historia zmian</h3><button class="log-close" onclick="closeLog()">Zamknij</button></div>
     <div class="log-body" id="log-body"></div>
   </div>
 </div>
