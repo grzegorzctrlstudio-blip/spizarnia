@@ -324,6 +324,38 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .photo-modal-img{width:100%;border-radius:var(--radius-sm);max-height:260px;object-fit:cover;margin-bottom:12px;display:none;border:1px solid var(--border)}
 .photo-modal-empty{width:100%;height:160px;background:var(--bg3);border-radius:var(--radius-sm);border:2px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;color:var(--text3)}
 
+/* ── SINGLE PRODUCT PICKER MODAL ── */
+#single-product-overlay{display:none;position:fixed;inset:0;z-index:390;background:rgba(0,0,0,.78);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px}
+#single-product-overlay.show{display:flex}
+.spp-modal{background:var(--bg2);border-radius:24px;padding:22px;width:100%;max-width:480px;max-height:90vh;display:flex;flex-direction:column;border:1px solid var(--border2);overflow:hidden}
+.spp-hdr{margin-bottom:14px}
+.spp-title{font-size:18px;font-weight:900;color:var(--text);letter-spacing:-.3px;display:flex;align-items:center;gap:10px}
+.spp-sub{font-size:12px;color:var(--text3);margin-top:4px}
+.spp-search{width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:14px;padding:13px 16px;font-size:14px;color:var(--text);outline:none;margin-bottom:10px;color-scheme:dark;transition:border .15s}
+.spp-search:focus{border-color:var(--green)}
+.spp-list{flex:1;overflow-y:auto;background:var(--bg3);border-radius:14px;padding:6px;border:1px solid var(--border);max-height:360px}
+.spp-item{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;cursor:pointer;transition:background .15s;border:1px solid transparent}
+.spp-item:hover{background:var(--bg4)}
+.spp-item.sel{background:rgba(30,215,96,.1);border-color:var(--green)}
+.spp-item-name{flex:1;font-size:14px;font-weight:700;color:var(--text);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spp-item-cur{font-size:13px;font-weight:800;color:var(--amber);flex-shrink:0;min-width:50px;text-align:right}
+.spp-item-unit{font-size:10px;color:var(--text3);font-weight:600;flex-shrink:0;min-width:38px}
+.spp-empty{text-align:center;padding:30px 20px;color:var(--text3);font-size:13px}
+.spp-qty-section{margin-top:14px;background:var(--bg3);border-radius:14px;padding:14px;border:1px solid var(--border)}
+.spp-qty-name{font-size:15px;font-weight:800;color:var(--text);margin-bottom:6px}
+.spp-qty-meta{font-size:11px;color:var(--text3);margin-bottom:12px}
+.spp-qty-controls{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:8px}
+.spp-qty-btn{width:56px;height:56px;border:none;border-radius:14px;font-size:28px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.spp-qty-btn.minus{background:var(--bg4);color:var(--red)}
+.spp-qty-btn.plus{background:var(--green);color:#000}
+.spp-qty-input{flex:1;max-width:120px;background:var(--bg4);border:2px solid var(--border2);border-radius:14px;padding:12px;font-size:24px;font-weight:900;color:var(--text);outline:none;text-align:center;color-scheme:dark}
+.spp-qty-input:focus{border-color:var(--green)}
+.spp-actions{display:flex;gap:10px;margin-top:16px}
+.spp-actions button{flex:1;border:none;border-radius:50px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;transition:filter .15s}
+.spp-actions button:active{filter:brightness(.9)}
+.spp-back{background:var(--bg3);color:var(--text2);border:1px solid var(--border)!important}
+.spp-save{background:var(--green);color:#000;flex:2!important}
+
 /* ── UPDATE PANTRY MODAL — 3 duże pionowe opcje ── */
 #pantry-update-overlay{display:none;position:fixed;inset:0;z-index:380;background:rgba(0,0,0,.78);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px}
 #pantry-update-overlay.show{display:flex}
@@ -841,6 +873,55 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
   </div>
 </div>
 
+<!-- ══ GENERIC PROMPT MODAL (zastąpienie window.prompt) ════════════════ -->
+<div id="prompt-overlay" class="dlg-overlay">
+  <div class="dlg-box">
+    <div class="dlg-ico" id="prompt-ico">✏️</div>
+    <div class="dlg-title" id="prompt-title">Wpisz wartość</div>
+    <div class="dlg-msg" id="prompt-msg"></div>
+    <input type="text" id="prompt-input" class="modal-inp" style="margin-bottom:12px;text-align:left;width:100%" onkeydown="if(event.key==='Enter')dlgPromptOk();if(event.key==='Escape')dlgPromptCancel()">
+    <div class="dlg-btns">
+      <button class="dlg-btn cancel" onclick="dlgPromptCancel()">Anuluj</button>
+      <button class="dlg-btn ok" onclick="dlgPromptOk()">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SINGLE PRODUCT PICKER ════════════════════════════════════════════ -->
+<div id="single-product-overlay" onclick="if(event.target===this)closeSingleProductPicker()">
+  <div class="spp-modal">
+    <div class="spp-hdr">
+      <div class="spp-title">✏️ <span id="spp-title-text">Aktualizuj produkt</span></div>
+      <div class="spp-sub" id="spp-sub-text">Wybierz produkt z listy lub wpisz nazwę.</div>
+    </div>
+
+    <!-- Lista produktów -->
+    <div id="spp-list-view">
+      <input type="text" id="spp-search" class="spp-search" placeholder="🔍 Szukaj produktu..." oninput="filterSppList()">
+      <div class="spp-list" id="spp-list"></div>
+    </div>
+
+    <!-- Sekcja ilości (ukryta, pokazywana po wyborze) -->
+    <div id="spp-qty-view" style="display:none">
+      <div class="spp-qty-section">
+        <div class="spp-qty-name" id="spp-qty-name">—</div>
+        <div class="spp-qty-meta" id="spp-qty-meta">—</div>
+        <div class="spp-qty-controls">
+          <button class="spp-qty-btn minus" onclick="sppChangeQty(-1)">−</button>
+          <input type="number" inputmode="numeric" id="spp-qty-input" class="spp-qty-input" min="0" value="0" oninput="sppOnInput()">
+          <button class="spp-qty-btn plus" onclick="sppChangeQty(1)">+</button>
+        </div>
+        <div style="text-align:center;font-size:11px;color:var(--text3);margin-top:6px"><span id="spp-qty-unit">szt.</span></div>
+      </div>
+    </div>
+
+    <div class="spp-actions">
+      <button class="spp-back" onclick="closeSingleProductPicker()" id="spp-cancel-btn">Anuluj</button>
+      <button class="spp-save" onclick="sppSave()" id="spp-save-btn" style="display:none">Zapisz</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ UPDATE PANTRY MODAL ═══════════════════════════════════════════════ -->
 <div id="pantry-update-overlay" onclick="if(event.target===this)closePantryUpdateModal()">
   <div class="pu-modal">
@@ -1024,6 +1105,27 @@ function showDlg(ico,title,msg,btns){
 }
 function dlgAlert(ico,title,msg){showDlg(ico,title,msg,[{label:"OK",cls:"ok"}]);}
 function dlgConfirm(ico,title,msg,onOk,okLabel,okCls){showDlg(ico,title,msg,[{label:"Anuluj",cls:"cancel"},{label:okLabel||"OK",cls:okCls||"ok",cb:onOk}]);}
+// Własna implementacja prompt (bez natywnego window.prompt)
+var _dlgPromptCb=null;
+function dlgPrompt(title,msg,defaultValue,cb){
+  _dlgPromptCb=cb;
+  var t=document.getElementById("prompt-title");if(t)t.textContent=title||"Wpisz wartość";
+  var m=document.getElementById("prompt-msg");if(m)m.textContent=msg||"";
+  var inp=document.getElementById("prompt-input");if(inp)inp.value=defaultValue||"";
+  document.getElementById("prompt-overlay").classList.add("show");
+  setTimeout(function(){if(inp){inp.focus();inp.select();}},100);
+}
+function dlgPromptCancel(){
+  document.getElementById("prompt-overlay").classList.remove("show");
+  var cb=_dlgPromptCb;_dlgPromptCb=null;
+  if(cb)cb(null);
+}
+function dlgPromptOk(){
+  var val=document.getElementById("prompt-input").value;
+  document.getElementById("prompt-overlay").classList.remove("show");
+  var cb=_dlgPromptCb;_dlgPromptCb=null;
+  if(cb)cb(val);
+}
 
 // ── FIREBASE ──────────────────────────────────────────────────────────────────
 function fbf(path,opts){var ctrl=new AbortController(),t=setTimeout(function(){ctrl.abort();},8000);return fetch(path+".json",Object.assign({signal:ctrl.signal},opts||{})).then(function(r){clearTimeout(t);if(!r.ok)throw new Error("HTTP "+r.status);return r.json();}).catch(function(e){clearTimeout(t);if(e.name==="AbortError")throw new Error("Timeout");throw e;});}
@@ -3902,19 +4004,20 @@ function confirmUncertain(idx,decision){
 function confirmUncertainManual(idx){
   var item=receiptUncertain[idx];if(!item)return;
   var raw=item.rawName||item.nazwa||item.name||"";
-  var name=window.prompt("Wpisz nazwę produktu lub opis:",raw);
-  if(!name||!name.trim())return;
-  name=name.trim();
-  receiptData.push({
-    rawName:raw,matchedName:name,
-    quantity:Number(item.quantity||item.ilosc||1),
-    unit:item.unit||item.jednostka||"szt.",
-    totalPrice:Number(item.totalPrice||item.cena||0),
-    type:"product",needsReview:false
+  dlgPrompt("✏️ Wpisz nazwę produktu","Skanuje paragon — uściślij nazwę pozycji:",raw,function(name){
+    if(!name||!name.trim())return;
+    name=name.trim();
+    receiptData.push({
+      rawName:raw,matchedName:name,
+      quantity:Number(item.quantity||item.ilosc||1),
+      unit:item.unit||item.jednostka||"szt.",
+      totalPrice:Number(item.totalPrice||item.cena||0),
+      type:"product",needsReview:false
+    });
+    saveReceiptLearning(raw,{type:"product",userDecision:"product",matchedName:name});
+    receiptUncertain.splice(idx,1);
+    showReceiptResults();
   });
-  saveReceiptLearning(raw,{type:"product",userDecision:"product",matchedName:name});
-  receiptUncertain.splice(idx,1);
-  showReceiptResults();
 }
 // Stary alias dla kompatybilności
 function confirmUncertainCustom(idx){confirmUncertainManual(idx);}
@@ -4129,20 +4232,113 @@ function closePantryUpdateModal(){
   var el=document.getElementById("pantry-update-overlay");
   if(el)el.classList.remove("show");
 }
-// Wybór jednego produktu do aktualizacji ręcznej
+// ── Modal: ręcznie wybrany produkt (zastępuje window.prompt) ────────────
+var sppList=[];
+var sppSelected=null;
+
 function openSingleProductPicker(){
-  var list=buildDietProductAuditList();
-  var names=list.map(function(p){return p.n;});
-  var input=window.prompt("Wpisz nazwę produktu, który chcesz zaktualizować:\n\nDostępne (z diety lub lodówki): "+names.slice(0,30).join(", ")+(names.length>30?" ...":""));
-  if(!input||!input.trim())return;
-  var q=input.trim().toLowerCase();
-  var found=list.filter(function(p){return p.n.toLowerCase().indexOf(q)!==-1;})[0];
-  if(!found){dlgAlert("X","Nie znaleziono","Nie znaleziono produktu pasującego do: "+input);return;}
-  var val=window.prompt('Wpisz aktualną ilość dla "'+found.n+'" ('+found.unit+"):",String(found.cur||0));
-  if(val===null)return;
-  var amt=Math.max(0,Number(val)||0);
-  var key=found._key||fbk(found.cat,found.n);
-  pantryAuditData={};pantryAuditData[key]=amt;
+  sppList=buildDietProductAuditList();
+  sppSelected=null;
+  // Reset widoków
+  var listView=document.getElementById("spp-list-view");
+  var qtyView=document.getElementById("spp-qty-view");
+  var saveBtn=document.getElementById("spp-save-btn");
+  var cancelBtn=document.getElementById("spp-cancel-btn");
+  if(listView)listView.style.display="block";
+  if(qtyView)qtyView.style.display="none";
+  if(saveBtn)saveBtn.style.display="none";
+  if(cancelBtn)cancelBtn.textContent="Anuluj";
+  // Reset wyszukiwarki
+  var s=document.getElementById("spp-search");
+  if(s)s.value="";
+  // Tytuł
+  document.getElementById("spp-title-text").textContent="Aktualizuj produkt";
+  document.getElementById("spp-sub-text").textContent="Wybierz produkt z listy lub wpisz nazwę aby filtrować.";
+  // Renderuj listę
+  renderSppList(sppList);
+  // Pokaż modal
+  document.getElementById("single-product-overlay").classList.add("show");
+  setTimeout(function(){if(s)s.focus();},150);
+}
+function closeSingleProductPicker(){
+  var el=document.getElementById("single-product-overlay");
+  if(el)el.classList.remove("show");
+  sppSelected=null;
+}
+function renderSppList(items){
+  var listEl=document.getElementById("spp-list");
+  if(!listEl)return;
+  if(!items||!items.length){
+    listEl.innerHTML='<div class="spp-empty">Nie znaleziono produktów pasujących do wyszukiwania.</div>';
+    return;
+  }
+  var html="";
+  items.forEach(function(p){
+    var k=p._key||fbk(p.cat,p.n);
+    var sk=k.replace(/'/g,"\\'");
+    html+='<div class="spp-item" data-key="'+sk+'" onclick="sppSelectProduct(\''+sk+'\')">';
+    html+='<div class="spp-item-name">'+p.n+'</div>';
+    html+='<div class="spp-item-cur">'+(p.cur||0)+'</div>';
+    html+='<div class="spp-item-unit">'+(p.unit||"szt.")+'</div>';
+    html+='</div>';
+  });
+  listEl.innerHTML=html;
+}
+function filterSppList(){
+  var s=document.getElementById("spp-search");
+  var q=(s?s.value:"").toLowerCase().trim();
+  if(!q){renderSppList(sppList);return;}
+  var filtered=sppList.filter(function(p){return p.n.toLowerCase().indexOf(q)!==-1;});
+  renderSppList(filtered);
+}
+function sppSelectProduct(key){
+  var prod=sppList.filter(function(p){return (p._key||fbk(p.cat,p.n))===key;})[0];
+  if(!prod)return;
+  sppSelected=prod;
+  // Przejdź do widoku ilości
+  document.getElementById("spp-list-view").style.display="none";
+  document.getElementById("spp-qty-view").style.display="block";
+  document.getElementById("spp-save-btn").style.display="block";
+  document.getElementById("spp-cancel-btn").textContent="← Wstecz";
+  document.getElementById("spp-cancel-btn").onclick=sppBackToList;
+  document.getElementById("spp-title-text").textContent=prod.n;
+  document.getElementById("spp-sub-text").textContent="Cel: "+prod.target+" "+prod.unit+(prod.meals&&prod.meals.length?" • W posiłkach: "+prod.meals.slice(0,2).join(", "):"");
+  document.getElementById("spp-qty-name").textContent=prod.n;
+  document.getElementById("spp-qty-meta").textContent="Cel z diety: "+prod.target+" "+prod.unit;
+  document.getElementById("spp-qty-input").value=prod.cur||0;
+  document.getElementById("spp-qty-unit").textContent=prod.unit||"szt.";
+  setTimeout(function(){
+    var inp=document.getElementById("spp-qty-input");
+    if(inp){inp.focus();inp.select();}
+  },150);
+}
+function sppBackToList(){
+  sppSelected=null;
+  document.getElementById("spp-list-view").style.display="block";
+  document.getElementById("spp-qty-view").style.display="none";
+  document.getElementById("spp-save-btn").style.display="none";
+  document.getElementById("spp-cancel-btn").textContent="Anuluj";
+  document.getElementById("spp-cancel-btn").onclick=closeSingleProductPicker;
+  document.getElementById("spp-title-text").textContent="Aktualizuj produkt";
+  document.getElementById("spp-sub-text").textContent="Wybierz produkt z listy lub wpisz nazwę aby filtrować.";
+}
+function sppChangeQty(delta){
+  var inp=document.getElementById("spp-qty-input");
+  if(!inp)return;
+  var v=Math.max(0,(Number(inp.value)||0)+delta);
+  inp.value=v;
+}
+function sppOnInput(){
+  var inp=document.getElementById("spp-qty-input");
+  if(!inp)return;
+  var v=Number(inp.value);
+  if(isNaN(v)||v<0)inp.value=0;
+}
+function sppSave(){
+  if(!sppSelected)return;
+  var inp=document.getElementById("spp-qty-input");
+  var amt=Math.max(0,Number(inp.value)||0);
+  var key=sppSelected._key||fbk(sppSelected.cat,sppSelected.n);
   if(key in state){state[key]=amt;}
   var rpU={},pU={};
   if(key in state)rpU[key]=amt;
@@ -4152,9 +4348,12 @@ function openSingleProductPicker(){
   if(PANTRY_PATH)ps.push(fbPatch(PANTRY_PATH,pU));
   Promise.all(ps).then(function(){
     savePantryUpdateDate("manual_single","","");
-    dlgAlert("✅","Zapisano",'"'+found.n+'" zaktualizowano na '+amt+" "+found.unit);
+    closeSingleProductPicker();
+    dlgAlert("✅","Zapisano",'"'+sppSelected.n+'" zaktualizowano na '+amt+" "+(sppSelected.unit||"szt."));
     render();
-  }).catch(function(err){dlgAlert("X","Błąd","Nie udało się zapisać.");});
+  }).catch(function(){
+    dlgAlert("X","Błąd","Nie udało się zapisać.");
+  });
 }
 
 // ── Admin panel wiring ─────────────────────────────────────────────────────
