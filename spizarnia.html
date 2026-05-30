@@ -1787,28 +1787,31 @@ function render(){
       var catTint=catColor+'14';
       var catTintStrong=catColor+'22';
       html+='<div class="item" style="background:linear-gradient(135deg,'+catTint+' 0%,'+catTintStrong+' 100%);border-left:5px solid '+borderColor+';border-color:'+catColor+'33">';
-      html+='<div style="display:flex;align-items:center;gap:10px">';
+      html+='<div style="display:flex;align-items:flex-start;gap:10px">';
       html+=photoHtml;
       html+='<div style="flex:1;min-width:0">';
-      html+='<div style="display:flex;align-items:center;justify-content:space-between;gap:6px">';
+      // Górny wiersz: nazwa + (po prawej) status uzupełnienia (Wystarczy/Brakuje N)
+      html+='<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:4px">';
       html+='<div style="font-size:15px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+it.n+'</div>';
-      html+=dateHtml;
       html+='</div>';
-      html+='<div style="display:flex;align-items:center;gap:8px;margin-top:6px">';
+      // Status świeżości pod nazwą + 1 chip "Edytuj/Dodaj datę"
+      var dateLabel=hasDate?"Edytuj datę":"Dodaj datę";
+      var dateBtnColor=hasDate?"var(--amber)":"var(--text3)";
+      var dateBtnBg=hasDate?"rgba(245,158,11,.15)":"var(--bg4)";
+      var dateBtnBorder=hasDate?"var(--amber)":"var(--border)";
+      html+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">';
+      if(dateHtml)html+='<div style="flex:1;min-width:0">'+dateHtml+'</div>';
+      else html+='<div style="flex:1;font-size:11px;color:var(--text3)">Brak daty</div>';
+      html+='<button onclick="openExpiry(\''+ne+'\')" style="background:'+dateBtnBg+';border:1px solid '+dateBtnBorder+';color:'+dateBtnColor+';border-radius:50px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;flex-shrink:0">📅 '+dateLabel+'</button>';
+      html+='</div>';
+      // Progress bar + ile brakuje
+      html+='<div style="display:flex;align-items:center;gap:8px;margin-top:4px">';
       html+='<div style="flex:1;height:5px;background:var(--bg4);border-radius:4px"><div style="height:100%;width:'+pct+'%;background:'+borderColor+';border-radius:4px"></div></div>';
       html+=ql;
       html+='</div>';
-      // Chipsy: data ważności (zawsze) + skanuj produkt (tylko gdy cat.scan)
-      // Zdjęcia → kliknięcie ikonki aparatu po lewej stronie karty
-      html+='<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">';
-      var dateLabel=cat.scan?(hasDate?"Data":"Dodaj datę"):(hasDate?"Data":"Świeżość");
-      html+='<button onclick="openExpiry(\''+ne+'\')" style="background:'+(hasDate?"rgba(245,158,11,.15)":"var(--bg4)")+';border:1px solid '+(hasDate?"var(--amber)":"var(--border)")+';color:'+(hasDate?"var(--amber)":"var(--text3)")+';border-radius:50px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px">📅 '+dateLabel+'</button>';
-      if(cat.scan){
-        html+='<button onclick="openScannerAndPhoto(\''+ne+'\')" style="background:rgba(61,139,255,.12);border:1px solid rgba(61,139,255,.35);color:#60A5FA;border-radius:50px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px">🔍 Skanuj AI</button>';
-      }
       html+='</div>';
-      html+='</div>';
-      html+='<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">';
+      // +/- po prawej stronie karty
+      html+='<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;align-self:center">';
       html+='<button class="qty-btn" style="background:var(--bg3);color:var(--text)" onclick="adj(\''+id+'\',\''+cat.id+'\',\''+ne+'\',-1)">−</button>';
       html+='<div style="min-width:44px;text-align:center;font-weight:800;color:var(--text)"><span style="font-size:20px;line-height:1.1">'+cur+'</span><span style="font-size:10px;color:var(--text3);display:block;margin-top:2px">'+it.unit+'</span></div>';
       html+='<button class="qty-btn" style="background:var(--green);color:#000" onclick="adj(\''+id+'\',\''+cat.id+'\',\''+ne+'\',1)">+</button>';
@@ -2929,30 +2932,53 @@ function renderSmartShoppingList(list){
           packLine='<span style="font-size:22px;font-weight:900;color:var(--green)">'+pcs+' '+pkgUnit+'</span>'
             +(pkgSize?'<span style="font-size:13px;color:var(--text3);font-weight:600"> × '+pkgSize+unit+' = '+totalAmount+unit+'</span>':'');
         }
+        // Sklep badge (mini)
         var shopBadge="";
         if(prod&&prod.shops&&prod.shops.length){
           var sh=prod.shops[0];
           var color=sh.toLowerCase().indexOf("biedronka")!==-1?"#DC2626":sh.toLowerCase().indexOf("lidl")!==-1?"#1D4ED8":"#7C3AED";
-          shopBadge='<span style="background:'+color+'22;border:1px solid '+color+'66;color:'+color+';border-radius:50px;padding:3px 10px;font-size:10px;font-weight:800;margin-left:auto">'+sh+'</span>';
+          shopBadge='<span style="background:'+color+'22;border:1px solid '+color+'66;color:'+color+';border-radius:50px;padding:2px 8px;font-size:10px;font-weight:800;flex-shrink:0">'+sh.substring(0,3)+'</span>';
         }
-        html+='<div style="background:var(--bg2);border-radius:16px;padding:14px 16px;margin-bottom:10px;border:1px solid var(--border);border-left:5px solid var(--red)">';
-        html+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">';
-        html+='<input type="checkbox" id="shop-cb-'+idx+'" data-shop-cb style="width:20px;height:20px;accent-color:var(--green);cursor:pointer;flex-shrink:0" onchange="toggleShopItemChecked(this,'+idx+')">';
-        html+='<div style="font-size:16px;font-weight:800;color:var(--text);flex:1;line-height:1.2">'+item.name+'</div>';
-        html+=shopBadge;
+        // Pakowanie (krótka linia w wierszu)
+        var quickLine="";
+        if(byWeight){
+          quickLine=Math.ceil(totalAmount)+' '+unit;
+        }else if(prod&&prod.unit==="szt"&&pkgSize>1){
+          quickLine=pcs+'×'+pkgUnit+' ('+pkgSize+' szt)';
+        }else if(prod&&prod.unit==="szt"){
+          quickLine=pcs+' '+pkgUnit;
+        }else if(pkgSize){
+          quickLine=pcs+'×'+pkgSize+unit;
+        }else{
+          quickLine=Math.ceil(totalAmount)+' '+unit;
+        }
+        // KOMPAKTOWY WIERSZ
+        html+='<div style="background:var(--bg2);border-radius:12px;border:1px solid var(--border);border-left:4px solid var(--red);margin-bottom:6px;overflow:hidden">';
+        html+='<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer" onclick="toggleShopRow(this)">';
+        html+='<input type="checkbox" id="shop-cb-'+idx+'" data-shop-cb style="width:22px;height:22px;accent-color:var(--green);cursor:pointer;flex-shrink:0" onclick="event.stopPropagation();toggleShopItemChecked(this,'+idx+')">';
+        html+='<div style="flex:1;min-width:0">';
+        html+='<div style="font-size:14px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+item.name+'</div>';
+        html+='<div style="font-size:12px;color:var(--green);font-weight:700;margin-top:2px">'+quickLine+'</div>';
         html+='</div>';
-        html+='<div style="background:rgba(30,215,96,.08);border-radius:10px;padding:10px 12px;margin-bottom:8px"><div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Kup</div>'+packLine+'</div>';
-        html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;font-size:11px;margin-bottom:6px">';
-        html+='<div style="background:var(--bg3);border-radius:8px;padding:6px 8px;text-align:center"><div style="color:var(--text3);font-weight:600">Potrzebne</div><div style="color:var(--text);font-weight:800;margin-top:2px">'+item.required+' '+unit+'</div></div>';
-        html+='<div style="background:var(--bg3);border-radius:8px;padding:6px 8px;text-align:center"><div style="color:var(--text3);font-weight:600">Masz</div><div style="color:var(--text);font-weight:800;margin-top:2px">'+item.available+' '+unit+'</div></div>';
-        html+='<div style="background:rgba(255,77,77,.08);border-radius:8px;padding:6px 8px;text-align:center"><div style="color:var(--red);font-weight:600">Brakuje</div><div style="color:var(--red);font-weight:800;margin-top:2px">'+item.missing+' '+unit+'</div></div>';
+        html+=shopBadge;
+        html+='<span style="color:var(--text3);font-size:11px;flex-shrink:0;font-weight:700">'+item.missing+unit+'</span>';
+        html+='<span class="shop-row-arrow" style="color:var(--text3);font-size:14px;flex-shrink:0;transition:transform .2s">›</span>';
+        html+='</div>';
+        // ROZWIJANE szczegóły (domyślnie ukryte)
+        html+='<div class="shop-row-details" style="display:none;padding:0 12px 12px;border-top:1px solid var(--border)">';
+        html+='<div style="background:rgba(30,215,96,.06);border-radius:8px;padding:8px 10px;margin-top:8px;margin-bottom:6px;font-size:13px;color:var(--text2)"><b style="color:var(--green)">Kup:</b> '+packLine+'</div>';
+        html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;font-size:11px;margin-bottom:4px">';
+        html+='<div style="background:var(--bg3);border-radius:6px;padding:5px 6px;text-align:center"><div style="color:var(--text3);font-size:10px">Potrzebne</div><div style="color:var(--text);font-weight:800">'+item.required+' '+unit+'</div></div>';
+        html+='<div style="background:var(--bg3);border-radius:6px;padding:5px 6px;text-align:center"><div style="color:var(--text3);font-size:10px">Masz</div><div style="color:var(--text);font-weight:800">'+item.available+' '+unit+'</div></div>';
+        html+='<div style="background:rgba(255,77,77,.08);border-radius:6px;padding:5px 6px;text-align:center"><div style="color:var(--red);font-size:10px">Brakuje</div><div style="color:var(--red);font-weight:800">'+item.missing+' '+unit+'</div></div>';
         html+='</div>';
         if(buy.surplus>0){
-          html+='<div style="font-size:11px;color:var(--amber);font-weight:600;margin-top:4px">+ Nadwyżka po zakupie: '+buy.surplus+' '+unit+' (na zapas)</div>';
+          html+='<div style="font-size:11px;color:var(--amber);font-weight:600;margin-top:4px">+ Nadwyżka: '+buy.surplus+' '+unit+'</div>';
         }
         if(item.meals&&item.meals.length){
-          html+='<div style="font-size:10px;color:var(--text3);margin-top:6px;border-top:1px solid var(--border);padding-top:6px">Do posiłków: <i>'+item.meals.join(", ")+'</i></div>';
+          html+='<div style="font-size:10px;color:var(--text3);margin-top:4px">Do: <i>'+item.meals.join(", ")+'</i></div>';
         }
+        html+='</div>';
         html+='</div>';
       });
     });
@@ -2970,11 +2996,26 @@ function renderSmartShoppingList(list){
   }
   return html;
 }
-// Toggle przy checkboxie listy zakupów
+// Rozwijanie szczegółów wiersza listy zakupów (klik w wiersz)
+function toggleShopRow(rowDiv){
+  var card=rowDiv.parentElement;
+  var details=card.querySelector('.shop-row-details');
+  var arrow=rowDiv.querySelector('.shop-row-arrow');
+  if(!details)return;
+  var open=details.style.display!=="none";
+  details.style.display=open?"none":"block";
+  if(arrow)arrow.style.transform=open?"rotate(0deg)":"rotate(90deg)";
+}
+// Toggle przy checkboxie listy zakupów (line-through, opacity)
 function toggleShopItemChecked(cb,idx){
-  var label=cb.parentElement.querySelector('[style*="font-size:16px"]');
-  if(label)label.style.textDecoration=cb.checked?"line-through":"none";
-  if(label)label.style.opacity=cb.checked?".5":"1";
+  var card=cb.closest('div[style*="border-left:4px solid"]')||cb.parentElement.parentElement;
+  if(!card)return;
+  card.style.opacity=cb.checked?".55":"1";
+  // Linia przekreślenia na nazwie
+  var nameDiv=card.querySelector('div[style*="font-size:14px"][style*="font-weight:800"]');
+  if(nameDiv){
+    nameDiv.style.textDecoration=cb.checked?"line-through":"none";
+  }
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
