@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Pelna Lodowka</title>
+<title>Pełna Lodówka</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 :root{--bg:#0A0A0F;--bg2:#111118;--bg3:#1A1A24;--bg4:#22222F;--border:#2A2A3A;--border2:#33334A;--text:#FFF;--text2:#B0B0C8;--text3:#6B6B85;--green:#1ED760;--green2:#17A84A;--red:#FF4D4D;--amber:#F59E0B;--blue:#3D8BFF;--purple:#8B5CF6;--radius:16px}
@@ -184,18 +184,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <body>
 <div id="splash" style="display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;min-height:100vh">
   <div style="font-size:52px">&#127968;</div>
-  <div style="font-size:20px;font-weight:900">PELNA LODOWKA</div>
+  <div style="font-size:20px;font-weight:900">PEŁNA LODÓWKA</div>
   <div class="spin"></div>
-  <p style="font-size:13px;color:var(--text3);text-align:center" id="splash-lbl">Laczenie...</p>
+  <p style="font-size:13px;color:var(--text3);text-align:center" id="splash-lbl">Łączenie...</p>
 </div>
 
 <div id="login">
   <div style="font-size:64px">&#127968;</div>
-  <div style="font-size:26px;font-weight:900;letter-spacing:-.5px">PELNA LODOWKA</div>
-  <p style="font-size:13px;color:var(--text3);text-align:center;max-width:300px;line-height:1.6">Spersonalizowana dieta i lista zakupow</p>
-  <input class="name-inp" id="name-inp" placeholder="Imie" maxlength="20" onkeydown="if(event.key==='Tab'||event.key==='Enter'){event.preventDefault();document.getElementById('surname-inp').focus()}">
+  <div style="font-size:26px;font-weight:900;letter-spacing:-.5px">PEŁNA LODÓWKA</div>
+  <p style="font-size:13px;color:var(--text3);text-align:center;max-width:300px;line-height:1.6">Spersonalizowana dieta i lista zakupów</p>
+  <input class="name-inp" id="name-inp" placeholder="Imię" maxlength="20" onkeydown="if(event.key==='Tab'||event.key==='Enter'){event.preventDefault();document.getElementById('surname-inp').focus()}">
   <input class="name-inp" id="surname-inp" placeholder="Nazwisko" maxlength="30" onkeydown="if(event.key==='Enter')doLogin()">
-  <button class="login-btn" onclick="doLogin()">Wchodze &rarr;</button>
+  <button class="login-btn" onclick="doLogin()">Wchodzę → &rarr;</button>
 </div>
 
 <div id="app" style="display:none">
@@ -204,7 +204,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="hdr-top">
         <div style="display:flex;align-items:center;gap:8px">
           <span style="font-size:22px">&#127968;</span>
-          <span style="font-size:17px;font-weight:900">PELNA LODOWKA</span>
+          <span style="font-size:17px;font-weight:900">PEŁNA LODÓWKA</span>
           <div class="sync-dot" id="sdot"></div>
         </div>
         <div style="display:flex;align-items:center;gap:6px">
@@ -224,7 +224,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         </div>
         <div class="stat-card green" onclick="setFilter('grn')" style="padding:14px 12px">
           <div style="display:flex;align-items:center;justify-content:space-between">
-            <div><div class="stat-n" id="n-grn" style="font-size:30px">0</div><div class="stat-label">W lodowce</div></div>
+            <div><div class="stat-n" id="n-grn" style="font-size:30px">0</div><div class="stat-label">W lodówce</div></div>
             <div style="font-size:26px;opacity:.4">&#9989;</div>
           </div>
         </div>
@@ -244,8 +244,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         </div>
       </div>
       <div id="shop-lbl" style="display:none"></div><div id="shop-ago" style="display:none"></div><div id="pantry-status-bar" style="background:var(--bg3);border-radius:12px;padding:10px 14px;margin-bottom:10px;border:1px solid var(--border)">
-        <div style="font-size:12px;color:var(--text3)">Ladowanie stanu lodowki...</div>
-      </div><div class="stat-n" id="n-grn">0</div><div class="stat-label">W lodowce</div></div>
+        <div style="font-size:12px;color:var(--text3)">Ładowanie stanu lodówki...</div>
+      </div><div class="stat-n" id="n-grn">0</div><div class="stat-label">W lodówce</div></div>
         <div class="stat-card neutral"><div style="font-size:16px">&#128230;</div><div class="stat-n" id="n-all">0</div><div class="stat-label">Pozycji</div></div>
         <button class="action-card primary" onclick="markShopping()"><span style="font-size:18px">&#128717;&#65039;</span><span style="font-size:8px;font-weight:800;text-transform:uppercase">Bylem w<br>sklepie</span></button>
         <button class="action-card expiry" onclick="setFilter('exp')"><span style="font-size:18px">&#9200;</span><span style="font-size:8px;font-weight:800;text-transform:uppercase;color:var(--amber)" id="exp-alert-txt">Data<br>waznosci</span></button>
@@ -253,7 +253,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       
       <div class="search-wrap">
         <span class="search-ico">&#128269;</span>
-        <input class="search-inp" id="sinp" placeholder="Szukaj w lodowce..." oninput="onSearch(this.value)">
+        <input class="search-inp" id="sinp" placeholder="Szukaj w lodówce..." oninput="onSearch(this.value)">
         <button class="search-clear" id="xbtn" onclick="clearSearch()">x</button>
       </div>
       <div class="cat-chips" id="cat-chips"></div>
@@ -262,24 +262,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 
   <div class="page-flex" id="page-chat">
-    <div class="chat-hdr"><h2 style="font-size:19px;font-weight:900">Agent AI</h2><p style="font-size:12px;color:var(--text3);margin-top:3px">Przepisy i porady na bazie Twojej lodowki i diety</p></div>
+    <div class="chat-hdr"><h2 style="font-size:19px;font-weight:900">Agent AI</h2><p style="font-size:12px;color:var(--text3);margin-top:3px">Sposób przygotowaniay i porady na podstawie Twojej lodówki i diety</p></div>
     <div class="chat-sugs">
-      <button class="sug-btn" onclick="sendSug('Co moge ugotowac z tego co mam?')">Co ugotowac?</button>
-      <button class="sug-btn" onclick="sendSug('Zaproponuj mi obiad na dzis')">Obiad dzis</button>
-      <button class="sug-btn" onclick="sendSug('Co wkrotce wygasnie?')">Co wygasa?</button>
-      <button class="sug-btn" onclick="sendSug('Nowe sniadanie')">Sniadanie</button>
+      <button class="sug-btn" onclick="sendSug('Co moge ugotowac z tego co mam?')">Co ugotować?</button>
+      <button class="sug-btn" onclick="sendSug('Zaproponuj mi obiad na dzis')">Obiad na dziś</button>
+      <button class="sug-btn" onclick="sendSug('Co wkrotce wygasnie?')">Co wkrótce wygasa?</button>
+      <button class="sug-btn" onclick="sendSug('Nowe śniadanie')">Sniadanie</button>
     </div>
     <div class="chat-msgs" id="chat-msgs"></div>
     <div class="chat-inp-row">
-      <textarea class="chat-inp" id="chat-inp" placeholder="Napisz do agenta..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+      <textarea class="chat-inp" id="chat-inp" placeholder="Napisz wiadomość do asystenta..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
       <button class="chat-send" id="chat-send-btn" onclick="sendChat()">&#8593;</button>
     </div>
   </div>
 
   <div class="page-flex" id="page-shop">
-    <div class="shop-hdr"><h2 style="font-size:19px;font-weight:900">&#128722; Zakupy</h2><p style="font-size:12px;color:var(--text3);margin-top:3px">Lista AI + zamowienie online</p></div>
+    <div class="shop-hdr"><h2 style="font-size:19px;font-weight:900">&#128722; Zakupy</h2><p style="font-size:12px;color:var(--text3);margin-top:3px">Lista zakupów i zamówienie online</p></div>
     <div class="shop-body">
-      <div style="font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:10px">Zamow online</div>
+      <div style="font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:10px">Zamów online</div>
       <div class="stores-grid">
         <button class="store-card" onclick="openStore('biedronka')" style="background:linear-gradient(135deg,#DC2626,#991B1B)"><span style="font-size:26px">&#128030;</span><span style="font-size:12px;font-weight:800;color:#fff">Biedronka Go</span></button>
         <button class="store-card" onclick="openStore('frisco')" style="background:linear-gradient(135deg,#16A34A,#14532D)"><span style="font-size:26px">&#128722;</span><span style="font-size:12px;font-weight:800;color:#fff">Frisco.pl</span></button>
@@ -287,26 +287,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <button class="store-card" onclick="openStore('lisek')" style="background:linear-gradient(135deg,#7C3AED,#4C1D95)"><span style="font-size:26px">&#129418;</span><span style="font-size:12px;font-weight:800;color:#fff">Lisek</span></button>
       </div>
       <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:12px 14px;margin-bottom:12px">
-        <div style="font-size:10px;font-weight:800;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Sklep do listy zakupow</div>
+        <div style="font-size:10px;font-weight:800;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Sklep do listy zakupów</div>
         <div style="display:flex;gap:8px">
           <button id="store-sel-biedronka" onclick="selectShopStore('biedronka')" style="flex:1;padding:9px 6px;border-radius:10px;border:2px solid var(--green);background:rgba(30,215,96,.12);color:var(--green);font-size:11px;font-weight:800;cursor:pointer">Biedronka</button>
           <button id="store-sel-lidl" onclick="selectShopStore('lidl')" style="flex:1;padding:9px 6px;border-radius:10px;border:2px solid var(--border);background:transparent;color:var(--text3);font-size:11px;font-weight:800;cursor:pointer">Lidl</button>
           <button id="store-sel-both" onclick="selectShopStore('both')" style="flex:1;padding:9px 6px;border-radius:10px;border:2px solid var(--border);background:transparent;color:var(--text3);font-size:11px;font-weight:800;cursor:pointer">Oba sklepy</button>
         </div>
       </div>
-      <div class="receipt-drop" onclick="openReceipt()"><div style="font-size:36px;margin-bottom:8px">&#129534;</div><div style="font-size:13px;color:var(--text2);font-weight:700">Skanuj paragon</div><div style="font-size:11px;color:var(--text3);margin-top:4px">AI odczyta produkty i zaktualizuje lodowke</div></div>
+      <div class="receipt-drop" onclick="openReceipt()"><div style="font-size:36px;margin-bottom:8px">&#129534;</div><div style="font-size:13px;color:var(--text2);font-weight:700">Skanuj paragon</div><div style="font-size:11px;color:var(--text3);margin-top:4px">AI odczyta produkty i zaktualizuje lodówkę</div></div>
       <div class="receipt-results" id="receipt-results"><h4 style="font-size:13px;font-weight:800;margin-bottom:10px">Produkty z paragonu</h4><div id="receipt-items"></div><div style="display:flex;gap:8px;margin-top:10px">
-  <button class="receipt-apply" onclick="applyReceiptSelected()" style="flex:2">Dodaj zaznaczone do lodowki</button>
+  <button class="receipt-apply" onclick="applyReceiptSelected()" style="flex:2">Dodaj zaznaczone do lodówki</button>
   <button onclick="document.getElementById('receipt-results').style.display='none'" style="flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:50px;padding:13px;font-size:13px;font-weight:700;cursor:pointer">Anuluj</button>
 </div></div>
-      <button class="gen-btn" id="gen-btn" onclick="generateDietShoppingList(1)"><div class="gen-spin" id="gen-spin"></div><span id="gen-btn-txt">Generuj liste zakupow AI</span></button>
-      <button class="copy-btn" id="copy-btn" onclick="copyShopList()">Kopiuj liste</button>
+      <button class="gen-btn" id="gen-btn" onclick="generateDietShoppingList(1)"><div class="gen-spin" id="gen-spin"></div><span id="gen-btn-txt">Generuj listę zakupów z diety</span></button>
+      <button class="copy-btn" id="copy-btn" onclick="copyShopList()">Kopiuj listę</button>
       <div id="shop-list-content"></div>
     </div>
   </div>
 
   <div class="bottom-nav">
-    <button class="nav-btn act" id="nav-pantry" onclick="showPage('pantry')"><span class="nav-ico">&#127968;</span><span class="nav-lbl">Lodowka</span></button>
+    <button class="nav-btn act" id="nav-pantry" onclick="showPage('pantry')"><span class="nav-ico">&#127968;</span><span class="nav-lbl">Lodówka</span></button>
     <button class="nav-btn" id="nav-chat" onclick="showPage('chat')"><span class="nav-ico">&#129302;</span><span class="nav-lbl">Agent AI</span></button>
     <button class="nav-btn" id="nav-shop" onclick="showPage('shop')"><span class="nav-ico">&#128722;</span><span class="nav-lbl">Zakupy</span></button>
   </div>
@@ -315,14 +315,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- SHOP DATE MODAL -->
 <div class="overlay" id="shop-date-overlay" onclick="if(event.target===this)closeShopDateModal()">
   <div class="modal"><h3>Data zakupow</h3>
-    <button class="mbtn ok" style="width:100%;margin-bottom:10px;padding:14px" onclick="markShoppingNow()">Dzis bylem w sklepie</button>
+    <button class="mbtn ok" style="width:100%;margin-bottom:10px;padding:14px" onclick="markShoppingNow()">Dzisiaj byłem/byłam w sklepie</button>
     <div style="display:flex;gap:8px;margin-bottom:14px"><input type="date" class="modal-inp" id="shop-date-inp" style="margin-bottom:0;flex:1;color-scheme:dark"><button class="mbtn ok" style="flex-shrink:0;padding:13px 16px" onclick="saveShopDate()">OK</button></div>
     <button class="mbtn cancel" style="width:100%" onclick="closeShopDateModal()">Zamknij</button>
   </div>
 </div>
 <!-- EXPIRY MODAL -->
 <div class="overlay" id="exp-overlay" onclick="if(event.target===this)closeExpiry()">
-  <div class="modal"><h3>Data waznosci</h3><p id="exp-name" style="color:var(--text2);margin-bottom:12px"></p>
+  <div class="modal"><h3>Data ważności</h3><p id="exp-name" style="color:var(--text2);margin-bottom:12px"></p>
     <input type="date" class="modal-inp" id="exp-date-inp" style="color-scheme:dark">
     <div class="modal-btns"><button class="mbtn blue" onclick="openScannerFromExpiry()">Skanuj</button><button class="mbtn ok" onclick="saveExpiry()">Zapisz</button></div>
     <div class="modal-btns"><button class="mbtn del" onclick="clearExpiry()">Usun date</button><button class="mbtn cancel" onclick="closeExpiry()">Zamknij</button></div>
@@ -330,8 +330,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </div>
 <!-- SCAN MODAL -->
 <div class="overlay" id="scan-overlay" onclick="if(event.target===this)closeScanner()">
-  <div class="modal"><h3>Skaner daty waznosci</h3>
-    <p style="font-size:12px;color:var(--text3);margin-bottom:12px">Zrob zdjecie daty na opakowaniu — AI rozpozna date</p>
+  <div class="modal"><h3>Skaner daty ważności</h3>
+    <p style="font-size:12px;color:var(--text3);margin-bottom:12px">Zrób zdjęcie daty na opakowaniu — AI rozpozna date</p>
     <img class="scan-preview" id="scan-img" alt="">
     <div class="scan-loading" id="scan-loading"><div class="scan-spin"></div>Claude analizuje...</div>
     <div class="scan-result" id="scan-result">
@@ -343,7 +343,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       </div>
       <div id="scan-note" style="font-size:11px;color:var(--text3)"></div>
     </div>
-    <div class="modal-btns" style="margin-bottom:8px"><button class="mbtn blue" onclick="triggerScanPhoto()">Nowe zdjecie</button><button class="mbtn ok" id="scan-apply" style="display:none" onclick="applyScanEdited()">Zastosuj date</button></div>
+    <div class="modal-btns" style="margin-bottom:8px"><button class="mbtn blue" onclick="triggerScanPhoto()">Nowe zdjecie</button><button class="mbtn ok" id="scan-apply" style="display:none" onclick="applyScanEdited()">Zastosuj datę</button></div>
     <button class="mbtn cancel" style="width:100%" onclick="closeScanner()">Zamknij</button>
     <input type="file" id="scan-file" accept="image/*" style="display:none" onchange="handleScanPhoto(this)">
   </div>
@@ -354,7 +354,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <img class="scan-preview" id="receipt-img" alt="">
     <div class="scan-loading" id="receipt-loading"><div class="scan-spin"></div>Czytam paragon...</div>
     <div class="scan-result" id="receipt-scan-result"><b id="receipt-result-txt"></b></div>
-    <div class="modal-btns"><button class="mbtn blue" onclick="triggerReceiptPhoto()">Zrob zdjecie</button><button class="mbtn cancel" onclick="closeReceiptModal()">Zamknij</button></div>
+    <div class="modal-btns"><button class="mbtn blue" onclick="triggerReceiptPhoto()">Zrób zdjęcie</button><button class="mbtn cancel" onclick="closeReceiptModal()">Zamknij</button></div>
     <input type="file" id="receipt-file" accept="image/*" style="display:none" onchange="handleReceiptPhoto(this)">
   </div>
 </div>
@@ -363,14 +363,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="modal" style="max-width:460px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
       <div>
-        <h3 style="font-size:16px;margin-bottom:2px">Zdjecia produktu</h3>
-        <p style="font-size:11px;color:var(--text3)">Zdjecia beda widoczne jako miniaturki na liscie</p>
+        <h3 style="font-size:16px;margin-bottom:2px">Zdjęcia produktu</h3>
+        <p style="font-size:11px;color:var(--text3)">Zdjęcia będą widoczne jako miniaturki na liscie</p>
       </div>
       <button onclick="closePhoto()" style="background:var(--bg3);border:none;color:var(--text2);border-radius:50%;width:30px;height:30px;font-size:15px;cursor:pointer">&#215;</button>
     </div>
     <p id="photo-modal-name" style="color:var(--green);margin-bottom:14px;font-weight:800;font-size:14px;padding:8px 12px;background:rgba(30,215,96,.08);border-radius:10px;border:1px solid rgba(30,215,96,.2)"></p>
 
-    <!-- 3 sloty: Przod (ikona), Bok, Gora -->
+    <!-- 3 sloty: Przód (ikona), Bok, Gora -->
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
       <div>
         <div style="font-size:9px;font-weight:800;color:var(--green);margin-bottom:5px;text-align:center;text-transform:uppercase;letter-spacing:.6px">Przod &#11088;<br><span style="color:var(--text3);font-weight:600">(ikona listy)</span></div>
@@ -397,30 +397,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
     <!-- Separator: data ważności oddzielnie -->
     <div style="border-top:1px solid var(--border);padding-top:12px;margin-bottom:12px">
-      <div style="font-size:10px;font-weight:800;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">Zeskanuj date waznosci</div>
+      <div style="font-size:10px;font-weight:800;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">Zeskanuj datę ważności</div>
       <div style="display:flex;gap:8px;align-items:center">
         <div onclick="triggerSlotPhotoAndScan('expiry')" style="width:80px;height:70px;background:var(--bg3);border:2px dashed var(--amber);border-radius:10px;cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0">
           <img id="slot-expiry-img" style="display:none;width:100%;height:100%;object-fit:cover" alt="">
           <div id="slot-expiry-empty" style="text-align:center;color:var(--amber)"><div style="font-size:22px">&#128197;</div><div style="font-size:8px;margin-top:2px;font-weight:700">Skanuj</div></div>
         </div>
         <div style="flex:1;font-size:11px;color:var(--text3);line-height:1.6">
-          Zrob zdjecie kodu daty na opakowaniu — AI automatycznie rozpozna date i ja zapisze.<br>
-          <span style="color:var(--amber);font-weight:700">Format: DD.MM.YYYY</span>
+          Zrób zdjęcie kodu daty na opakowaniu — AI automatycznie rozpozna date i ja zapisze.<br>
+          <span style="color:var(--amber);font-weight:700">Format: DD.MM.RRRR</span>
         </div>
       </div>
     </div>
 
     <div style="font-size:10px;color:var(--text3);text-align:center;margin-bottom:12px;padding:8px;background:var(--bg3);border-radius:8px;line-height:1.5">
-      Zdjecie <b style="color:var(--green)">Przodu</b> bedzie widoczne jako ikona produktu na liscie lodowki
+      Zdjecie <b style="color:var(--green)">Przodu</b> bedzie widoczne jako ikona produktu na liście lodówki
     </div>
     <button class="mbtn cancel" style="width:100%" onclick="closePhoto()">Gotowe</button>
     <input type="file" id="photo-slot-file" accept="image/*" capture="environment" style="display:none" onchange="handleSlotPhoto(this)">
   </div>
 </div>
 <!-- SETTINGS -->
-<div class="overlay" id="admin-pass-overlay"><div class="modal" style="text-align:center"><div style="font-size:38px;margin-bottom:10px">&#128272;</div><h3>Panel admina</h3><p style="color:var(--text3);margin-bottom:14px">Wpisz haslo zeby zarzadzac kluczem API</p><input class="modal-inp" id="admin-pass-inp" type="password" placeholder="Haslo administratora" onkeydown="if(event.key==='Enter')checkAdminPass()"><div class="modal-btns"><button class="mbtn cancel" onclick="closeAdminPass()">Anuluj</button><button class="mbtn ok" onclick="checkAdminPass()">Wejdz</button></div></div></div>
+<div class="overlay" id="admin-pass-overlay"><div class="modal" style="text-align:center"><div style="font-size:38px;margin-bottom:10px">&#128272;</div><h3>Panel admina</h3><p style="color:var(--text3);margin-bottom:14px">Wpisz haslo zeby zarzadzac kluczem API</p><input class="modal-inp" id="admin-pass-inp" type="password" placeholder="Hasło administratora" onkeydown="if(event.key==='Enter')checkAdminPass()"><div class="modal-btns"><button class="mbtn cancel" onclick="closeAdminPass()">Anuluj</button><button class="mbtn ok" onclick="checkAdminPass()">Wejdz</button></div></div></div>
 <div class="overlay" id="settings-overlay" onclick="if(event.target===this)closeSettings()"><div class="modal"><h3>Panel administratora</h3>
-    <button onclick="closeSettings();openCMS()" style="width:100%;background:linear-gradient(135deg,#8B5CF6,#4F46E5);color:#fff;border:none;border-radius:10px;padding:10px;font-size:12px;font-weight:800;cursor:pointer;margin-bottom:12px">&#128102; Otwórz CMS — zarządzanie użytkownikami</button><div style="background:#3D8BFF15;border:1px solid #3D8BFF44;border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#93C5FD" id="admin-api-status">Sprawdzam klucz...</div><input class="modal-inp" id="api-key-inp" type="password" placeholder="sk-ant-api03-..." style="font-size:12px;font-family:monospace"><div class="modal-btns" style="margin-bottom:8px"><button class="mbtn ok" onclick="saveApiKey()">Zapisz dla wszystkich</button></div><div class="modal-btns"><button class="mbtn del" onclick="clearApiKey()">Usun klucz</button><button class="mbtn cancel" onclick="closeSettings()">Zamknij</button></div></div></div>
+    <button onclick="closeSettings();openCMS()" style="width:100%;background:linear-gradient(135deg,#8B5CF6,#4F46E5);color:#fff;border:none;border-radius:10px;padding:10px;font-size:12px;font-weight:800;cursor:pointer;margin-bottom:12px">&#128102; Otwórz CMS — zarządzanie użytkownikami</button><div style="background:#3D8BFF15;border:1px solid #3D8BFF44;border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#93C5FD" id="admin-api-status">Sprawdzam klucz...</div><input class="modal-inp" id="api-key-inp" type="password" placeholder="sk-ant-... (klucz API)" style="font-size:12px;font-family:monospace"><div class="modal-btns" style="margin-bottom:8px"><button class="mbtn ok" onclick="saveApiKey()">Zapisz dla wszystkich użytkowników</button></div><div class="modal-btns"><button class="mbtn del" onclick="clearApiKey()">Usuń klucz</button><button class="mbtn cancel" onclick="closeSettings()">Zamknij</button></div></div></div>
 <!-- LOG MODAL -->
 <div class="overlay bottom" id="log-overlay" onclick="if(event.target===this)closeLog()"><div class="log-modal"><div class="log-hdr"><h3 style="font-size:16px;font-weight:800">Historia zmian</h3><button onclick="closeLog()" style="background:var(--bg3);border:none;color:var(--text2);border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer">Zamknij</button></div><div class="log-body" id="log-body"></div></div></div>
 <!-- DIALOG -->
@@ -428,28 +428,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- PROFILE MODAL -->
 <div class="overlay" id="profile-overlay" onclick="if(event.target===this)closeProfileModal()">
   <div class="modal">
-    <h3>Moj profil</h3>
+    <h3>Mój profil</h3>
     <p id="profile-modal-name" style="color:var(--green);font-weight:800;font-size:14px;margin-bottom:12px"></p>
     <div id="profile-modal-content" style="background:var(--bg3);border-radius:12px;padding:14px;margin-bottom:14px;border:1px solid var(--border);font-size:13px;color:var(--text2);line-height:2.2"></div>
     <button class="mbtn ok" style="width:100%;margin-bottom:8px;padding:13px" onclick="closeProfileModal();openDiet()">Moja dieta i przepisy</button>
-    <button class="mbtn" style="width:100%;margin-bottom:8px;padding:13px;background:rgba(139,92,246,.15);color:var(--purple);border:1px solid rgba(139,92,246,.3)" onclick="closeProfileModal();openDiet();setTimeout(function(){switchDietTab(4);},100)">📊 Analiza cen</button>
-    <button class="mbtn ok" style="width:100%;margin-bottom:8px;padding:13px;background:var(--purple)" onclick="startDietGeneration()">Generuj nowa diete AI</button>
+    <button class="mbtn" style="width:100%;margin-bottom:8px;padding:13px;background:rgba(139,92,246,.15);color:var(--purple);border:1px solid rgba(139,92,246,.3)" onclick="closeProfileModal();openDiet();setTimeouts połączenia(function(){switchDietTab(4);},100)">📊 Analiza cen</button>
+    <button class="mbtn ok" style="width:100%;margin-bottom:8px;padding:13px;background:var(--purple)" onclick="startDietGeneration()">Wygeneruj nową dietę AI</button>
     <button class="mbtn blue" style="width:100%;margin-bottom:8px;padding:13px" onclick="closeProfileModal();showOb()">Edytuj profil</button>
     <button class="mbtn cancel" style="width:100%;margin-bottom:4px" onclick="closeProfileModal()">Zamknij</button>
-    <button onclick="logoutUser()" style="width:100%;background:none;border:none;color:var(--text3);font-size:12px;font-weight:600;cursor:pointer;padding:8px;text-decoration:underline">Wyloguj sie</button>
+    <button onclick="logoutUser()" style="width:100%;background:none;border:none;color:var(--text3);font-size:12px;font-weight:600;cursor:pointer;padding:8px;text-decoration:underline">Wyloguj się</button>
   </div>
 </div>
 <!-- DIET OVERLAY -->
 <div class="overlay" id="diet-overlay" style="align-items:stretch;justify-content:flex-start;padding:0;flex-direction:column;overflow:hidden;backdrop-filter:none;background:#0A0A0F">
   <div style="background:var(--bg2);padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0">
     <button onclick="closeDiet()" style="background:var(--bg3);border:none;color:var(--text2);border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer">&#8592;</button>
-    <div style="font-size:18px;font-weight:900;color:var(--text);flex:1">Moja Dieta</div>
+    <div style="font-size:18px;font-weight:900;color:var(--text);flex:1">Moja dieta</div>
     <div style="font-size:12px;color:var(--text3)" id="diet-user-name"></div>
   </div>
   <div style="display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0">
-    <button id="dtab-0" onclick="switchDietTab(0)" style="flex:1;padding:12px;border:none;background:none;font-size:13px;font-weight:700;cursor:pointer;border-bottom:3px solid var(--green);color:var(--green)">Przepisy</button>
+    <button id="dtab-0" onclick="switchDietTab(0)" style="flex:1;padding:12px;border:none;background:none;font-size:13px;font-weight:700;cursor:pointer;border-bottom:3px solid var(--green);color:var(--green)">Sposób przygotowaniay</button>
     <button id="dtab-1" onclick="switchDietTab(1)" style="flex:1;padding:12px;border:none;background:none;color:var(--text3);font-size:13px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent">Plan tygodnia</button>
-    <button id="dtab-2" onclick="switchDietTab(2)" style="flex:1;padding:12px;border:none;background:none;color:var(--text3);font-size:13px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent">Wgraj diete</button>
+    <button id="dtab-2" onclick="switchDietTab(2)" style="flex:1;padding:12px;border:none;background:none;color:var(--text3);font-size:13px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent">Wgraj dietę</button>
     <button id="dtab-3" onclick="switchDietTab(3)" style="flex:1;padding:12px;border:none;background:none;color:var(--text3);font-size:12px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent">Historia</button>
     <button id="dtab-4" onclick="switchDietTab(4)" style="flex:1;padding:12px;border:none;background:none;color:var(--text3);font-size:11px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent">Ceny</button>
   </div>
@@ -460,87 +460,87 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div style="background:var(--bg2);border-radius:20px;padding:24px;width:100%;max-width:440px;border:1px solid var(--border2);margin:auto">
     <div style="display:flex;justify-content:flex-end;margin-bottom:4px"><button onclick="hideOb()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text3);border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer">&#215;</button></div>
     <div style="text-align:center;font-size:48px;margin-bottom:8px">&#127968;</div>
-    <div style="font-size:20px;font-weight:900;color:var(--text);text-align:center;margin-bottom:4px">Witaj w Pelnej Lodowce</div>
-    <p style="font-size:12px;color:var(--text3);text-align:center;margin-bottom:20px">Odpowiedz na kilka pytan — dobierzemy diete i liste zakupow</p>
+    <div style="font-size:20px;font-weight:900;color:var(--text);text-align:center;margin-bottom:4px">Witaj w Pełnej Lodówce</div>
+    <p style="font-size:12px;color:var(--text3);text-align:center;margin-bottom:20px">Odpowiedz na kilka pytań — dobierzemy dietę i listę zakupów</p>
     <div id="ob-progress" style="display:flex;gap:6px;margin-bottom:20px;justify-content:center"></div>
     <div class="ob-step" id="ob-step-0">
-      <div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.8px">Jak ustawic profil?</div>
-      <div id="ob-method-manual" class="ob-opt" onclick="selectObMethod('manual',this)"><span>&#10000;&#65039;</span><div><div style="font-size:13px;font-weight:700">Wypelnij recznie</div><div style="font-size:11px;color:var(--text3)">Wiek, waga, cel — kalkulator wyliczy kalorie</div></div></div>
-      <div id="ob-method-ai" class="ob-opt" onclick="selectObMethod('ai',this)"><span>&#129302;</span><div><div style="font-size:13px;font-weight:700">Wgraj plan diety AI</div><div style="font-size:11px;color:var(--text3)">Wklej tekst planu — AI wyciagnie makro</div></div></div>
-      <div id="ob-ai-input" style="display:none;margin-top:12px"><textarea id="ob-diet-text" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px;font-size:13px;color:var(--text);outline:none;min-height:100px;font-family:inherit" placeholder="Wklej tekst planu zywieniowego..."></textarea><div id="ob-ai-status" style="font-size:11px;color:var(--text3);margin-top:4px"></div></div>
+      <div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.8px">Jak ustawić profil?</div>
+      <div id="ob-method-manual" class="ob-opt" onclick="selectObMethod('manual',this)"><span>&#10000;&#65039;</span><div><div style="font-size:13px;font-weight:700">Wypełnij ręcznie</div><div style="font-size:11px;color:var(--text3)">Wiek, waga, cel — kalkulator wyliczy kalorie</div></div></div>
+      <div id="ob-method-ai" class="ob-opt" onclick="selectObMethod('ai',this)"><span>&#129302;</span><div><div style="font-size:13px;font-weight:700">Wgraj plan diety AI</div><div style="font-size:11px;color:var(--text3)">Wklej tekst planu — AI wyciągnie makro</div></div></div>
+      <div id="ob-ai-input" style="display:none;margin-top:12px"><textarea id="ob-diet-text" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px;font-size:13px;color:var(--text);outline:none;min-height:100px;font-family:inherit" placeholder="Wklej tekst planu żywieniowego..."></textarea><div id="ob-ai-status" style="font-size:11px;color:var(--text3);margin-top:4px"></div></div>
     </div>
     <div class="ob-step" id="ob-step-1" style="display:none">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
         <div><div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:6px">Wiek</div><input id="ob-age" type="number" placeholder="30" min="15" max="80" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px;font-size:16px;color:var(--text);outline:none;color-scheme:dark"></div>
         <div><div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:6px">Waga (kg)</div><input id="ob-weight" type="number" placeholder="80" min="40" max="200" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px;font-size:16px;color:var(--text);outline:none;color-scheme:dark"></div>
         <div><div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:6px">Wzrost (cm)</div><input id="ob-height" type="number" placeholder="180" min="140" max="220" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px;font-size:16px;color:var(--text);outline:none;color-scheme:dark"></div>
-        <div><div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:6px">Plec</div><select id="ob-gender" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px;font-size:16px;color:var(--text);outline:none;color-scheme:dark"><option value="m">Mezczyzna</option><option value="f">Kobieta</option></select></div>
+        <div><div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:6px">Płeć</div><select id="ob-gender" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px;font-size:16px;color:var(--text);outline:none;color-scheme:dark"><option value="m">Mężczyzna</option><option value="f">Kobieta</option></select></div>
       </div>
     </div>
     <div class="ob-step" id="ob-step-2" style="display:none">
-      <div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:10px;text-transform:uppercase">Poziom aktywnosci</div>
-      <div class="ob-opt" onclick="selectOb('activity','sed',this)"><span>&#128715;&#65039;</span><div><div style="font-size:13px;font-weight:700">Siedzacy tryb zycia</div><div style="font-size:11px;color:var(--text3)">Praca biurowa, brak sportu</div></div></div>
-      <div class="ob-opt" onclick="selectOb('activity','light',this)"><span>&#128694;</span><div><div style="font-size:13px;font-weight:700">Lekka aktywnosc</div><div style="font-size:11px;color:var(--text3)">Sport 1-2x w tygodniu</div></div></div>
-      <div class="ob-opt" onclick="selectOb('activity','mod',this)"><span>&#127939;</span><div><div style="font-size:13px;font-weight:700">Umiarkowana</div><div style="font-size:11px;color:var(--text3)">Sport 3-5x w tygodniu</div></div></div>
-      <div class="ob-opt" onclick="selectOb('activity','active',this)"><span>&#128170;</span><div><div style="font-size:13px;font-weight:700">Wysoka aktywnosc</div><div style="font-size:11px;color:var(--text3)">Ciezki trening 6-7x w tygodniu</div></div></div>
+      <div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:10px;text-transform:uppercase">Poziom aktywności</div>
+      <div class="ob-opt" onclick="selectOb('activity','sed',this)"><span>&#128715;&#65039;</span><div><div style="font-size:13px;font-weight:700">Siedzący tryb życia</div><div style="font-size:11px;color:var(--text3)">Praca biurowa, brak sportu</div></div></div>
+      <div class="ob-opt" onclick="selectOb('activity','light',this)"><span>&#128694;</span><div><div style="font-size:13px;font-weight:700">Lekka aktywność</div><div style="font-size:11px;color:var(--text3)">Sport 1–2× w tygodniu</div></div></div>
+      <div class="ob-opt" onclick="selectOb('activity','mod',this)"><span>&#127939;</span><div><div style="font-size:13px;font-weight:700">Umiarkowana aktywność</div><div style="font-size:11px;color:var(--text3)">Sport 3–5× w tygodniu</div></div></div>
+      <div class="ob-opt" onclick="selectOb('activity','active',this)"><span>&#128170;</span><div><div style="font-size:13px;font-weight:700">Wysoka aktywność</div><div style="font-size:11px;color:var(--text3)">Ciężki trening 6–7× w tygodniu</div></div></div>
     </div>
     <div class="ob-step" id="ob-step-3" style="display:none">
-      <div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:10px;text-transform:uppercase">Twoj cel</div>
-      <div class="ob-opt" onclick="selectOb('goal','lose',this)"><span>&#128202;</span><div><div style="font-size:13px;font-weight:700">Redukcja tluszczu</div><div style="font-size:11px;color:var(--text3)">Deficyt -400 kcal</div></div></div>
-      <div class="ob-opt" onclick="selectOb('goal','maintain',this)"><span>&#9878;&#65039;</span><div><div style="font-size:13px;font-weight:700">Utrzymanie wagi</div><div style="font-size:11px;color:var(--text3)">Normokaloryczna</div></div></div>
-      <div class="ob-opt" onclick="selectOb('goal','gain',this)"><span>&#128170;</span><div><div style="font-size:13px;font-weight:700">Masa miesniowa</div><div style="font-size:11px;color:var(--text3)">Nadwyzka +400 kcal</div></div></div>
+      <div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:10px;text-transform:uppercase">Twój cel</div>
+      <div class="ob-opt" onclick="selectOb('goal','lose',this)"><span>&#128202;</span><div><div style="font-size:13px;font-weight:700">Redukcja tkanki tłuszczowej</div><div style="font-size:11px;color:var(--text3)">Deficyt kaloryczny −400 kcal</div></div></div>
+      <div class="ob-opt" onclick="selectOb('goal','maintain',this)"><span>&#9878;&#65039;</span><div><div style="font-size:13px;font-weight:700">Utrzymanie masy ciała</div><div style="font-size:11px;color:var(--text3)">Dieta normokaloryczna</div></div></div>
+      <div class="ob-opt" onclick="selectOb('goal','gain',this)"><span>&#128170;</span><div><div style="font-size:13px;font-weight:700">Budowa masy mięśniowej</div><div style="font-size:11px;color:var(--text3)">Nadwyżka kaloryczna +400 kcal</div></div></div>
     </div>
     <div class="ob-step" id="ob-step-4" style="display:none">
       <div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:10px;text-transform:uppercase">Gdzie robisz zakupy?</div>
       <div class="ob-opt" onclick="selectOb('stores','biedronka',this)"><span>&#128030;</span><div><div style="font-size:13px;font-weight:700">Biedronka</div></div></div>
       <div class="ob-opt" onclick="selectOb('stores','lidl',this)"><span>&#127978;&#65039;</span><div><div style="font-size:13px;font-weight:700">Lidl</div></div></div>
       <div class="ob-opt" onclick="selectOb('stores','both',this)"><span>&#128722;</span><div><div style="font-size:13px;font-weight:700">Oba sklepy</div></div></div>
-      <div style="margin-top:12px"><div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:6px">Wykluczenia (opcjonalnie)</div><input id="ob-exclude" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px;font-size:14px;color:var(--text);outline:none" placeholder="np. laktoza, orzechy, ryby..."></div>
+      <div style="margin-top:12px"><div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:6px">Wykluczenia żywieniowe (opcjonalne)</div><input id="ob-exclude" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px;font-size:14px;color:var(--text);outline:none" placeholder="np. laktoza, orzechy, ryby..."></div>
     </div>
     <div class="ob-step" id="ob-step-4b" style="display:none">
       <div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.8px">Preferencje i wykluczenia</div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Wybierz co lubisz &#8212; AI bedzie to priorytetyzowac w diecie:</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Wybierz, co lubisz &#8212; AI będzie to priorytetyzować w diecie:</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px" id="liked-chips">
-        <button class="pref-chip" data-val="kurczak" onclick="togglePref(this,'liked')">&#127859; Kurczak</button>
-        <button class="pref-chip" data-val="wolowina" onclick="togglePref(this,'liked')">&#129385; Wolowina</button>
-        <button class="pref-chip" data-val="losos" onclick="togglePref(this,'liked')">&#127820; Losos</button>
-        <button class="pref-chip" data-val="dorsz" onclick="togglePref(this,'liked')">&#128031; Dorsz</button>
-        <button class="pref-chip" data-val="jaja" onclick="togglePref(this,'liked')">&#129370; Jaja</button>
-        <button class="pref-chip" data-val="twarog" onclick="togglePref(this,'liked')">&#129472; Twarog</button>
-        <button class="pref-chip" data-val="ryz" onclick="togglePref(this,'liked')">&#127795; Ryz</button>
-        <button class="pref-chip" data-val="kasza" onclick="togglePref(this,'liked')">&#127806; Kasza</button>
-        <button class="pref-chip" data-val="makaron" onclick="togglePref(this,'liked')">&#127837; Makaron</button>
-        <button class="pref-chip" data-val="platki owsiane" onclick="togglePref(this,'liked')">&#127868; Platki</button>
-        <button class="pref-chip" data-val="ciecierzyca" onclick="togglePref(this,'liked')">&#129752; Ciecierzyca</button>
-        <button class="pref-chip" data-val="bataty" onclick="togglePref(this,'liked')">&#129364; Bataty</button>
-        <button class="pref-chip" data-val="brokuł" onclick="togglePref(this,'liked')">&#129382; Brokul</button>
-        <button class="pref-chip" data-val="szpinak" onclick="togglePref(this,'liked')">&#129376; Szpinak</button>
-        <button class="pref-chip" data-val="avocado" onclick="togglePref(this,'liked')">&#129361; Awokado</button>
-        <button class="pref-chip" data-val="maslo orzechowe" onclick="togglePref(this,'liked')">&#129386; Maslo orz.</button>
-        <button class="pref-chip" data-val="jogurt" onclick="togglePref(this,'liked')">&#129371; Jogurt/Skyr</button>
-        <button class="pref-chip" data-val="orzechy" onclick="togglePref(this,'liked')">&#127802; Orzechy</button>
+        <button class="pref-chip" data-val="kurczak" onclick="togglePref(this,'liked')">🍗 Kurczak</button>
+        <button class="pref-chip" data-val="wolowina" onclick="togglePref(this,'liked')">🥩 Wołowina</button>
+        <button class="pref-chip" data-val="losos" onclick="togglePref(this,'liked')">🍣 Łosoś</button>
+        <button class="pref-chip" data-val="dorsz" onclick="togglePref(this,'liked')">🐟 Dorsz</button>
+        <button class="pref-chip" data-val="jaja" onclick="togglePref(this,'liked')">🥚 Jaja</button>
+        <button class="pref-chip" data-val="twarog" onclick="togglePref(this,'liked')">🧀 Twaróg</button>
+        <button class="pref-chip" data-val="ryz" onclick="togglePref(this,'liked')">🌾 Ryż</button>
+        <button class="pref-chip" data-val="kasza" onclick="togglePref(this,'liked')">🌾 Kasza</button>
+        <button class="pref-chip" data-val="makaron" onclick="togglePref(this,'liked')">🍝 Makaron</button>
+        <button class="pref-chip" data-val="platki owsiane" onclick="togglePref(this,'liked')">🥣 Płatki</button>
+        <button class="pref-chip" data-val="ciecierzyca" onclick="togglePref(this,'liked')">🫘 Ciecierzyca</button>
+        <button class="pref-chip" data-val="bataty" onclick="togglePref(this,'liked')">🍠 Bataty</button>
+        <button class="pref-chip" data-val="brokuł" onclick="togglePref(this,'liked')">🥦 Brokuł</button>
+        <button class="pref-chip" data-val="szpinak" onclick="togglePref(this,'liked')">🥬 Szpinak</button>
+        <button class="pref-chip" data-val="avocado" onclick="togglePref(this,'liked')">🥑 Awokado</button>
+        <button class="pref-chip" data-val="maslo orzechowe" onclick="togglePref(this,'liked')">🥜 Masło orz.</button>
+        <button class="pref-chip" data-val="jogurt" onclick="togglePref(this,'liked')">🥛 Jogurt/Skyr</button>
+        <button class="pref-chip" data-val="orzechy" onclick="togglePref(this,'liked')">🌰 Orzechy</button>
       </div>
       <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Czego <b style="color:var(--red)">nie lubisz lub nie mozesz jesc</b>:</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px" id="disliked-chips">
-        <button class="pref-chip dislike" data-val="ryby" onclick="togglePref(this,'disliked')">&#128031; Ryby</button>
-        <button class="pref-chip dislike" data-val="laktoza" onclick="togglePref(this,'disliked')">&#129371; Laktoza</button>
-        <button class="pref-chip dislike" data-val="gluten" onclick="togglePref(this,'disliked')">&#127798; Gluten</button>
-        <button class="pref-chip dislike" data-val="orzechy" onclick="togglePref(this,'disliked')">&#127802; Orzechy</button>
-        <button class="pref-chip dislike" data-val="wieprzowina" onclick="togglePref(this,'disliked')">&#127830; Wieprzowina</button>
-        <button class="pref-chip dislike" data-val="jaja" onclick="togglePref(this,'disliked')">&#129370; Jaja</button>
-        <button class="pref-chip dislike" data-val="cebula" onclick="togglePref(this,'disliked')">&#129382; Cebula</button>
+        <button class="pref-chip dislike" data-val="ryby" onclick="togglePref(this,'disliked')">🐟 Ryby</button>
+        <button class="pref-chip dislike" data-val="laktoza" onclick="togglePref(this,'disliked')">🥛 Laktoza</button>
+        <button class="pref-chip dislike" data-val="gluten" onclick="togglePref(this,'disliked')">🌾 Gluten</button>
+        <button class="pref-chip dislike" data-val="orzechy" onclick="togglePref(this,'disliked')">🌰 Orzechy</button>
+        <button class="pref-chip dislike" data-val="wieprzowina" onclick="togglePref(this,'disliked')">🥩 Wieprzowina</button>
+        <button class="pref-chip dislike" data-val="jaja" onclick="togglePref(this,'disliked')">🥚 Jaja</button>
+        <button class="pref-chip dislike" data-val="cebula" onclick="togglePref(this,'disliked')">🥦 Cebula</button>
         <button class="pref-chip dislike" data-val="czosnek" onclick="togglePref(this,'disliked')">&#129382; Czosnek</button>
       </div>
-      <div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:6px;text-transform:uppercase">Dodatkowe wykluczenia (wpisz recznie)</div>
+      <div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:6px;text-transform:uppercase">Dodatkowe wykluczenia (wpisz ręcznie)</div>
       <input id="ob-exclude" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px;font-size:14px;color:var(--text);outline:none" placeholder="np. laktoza, orzechy, wieprzowina...">
     </div>
     <div class="ob-step" id="ob-step-5" style="display:none">
       <p style="font-size:13px;color:var(--text2);margin-bottom:10px">Na podstawie Twoich danych:</p>
       <div style="background:var(--bg3);border-radius:12px;padding:14px;border:1px solid var(--border)">
         <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)"><span style="font-size:12px;color:var(--text3)">Kalorie</span><span style="font-size:14px;font-weight:800;color:var(--green)" id="ob-res-kcal">-</span></div>
-        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)"><span style="font-size:12px;color:var(--text3)">Bialko</span><span style="font-size:14px;font-weight:800;color:var(--green)" id="ob-res-prot">-</span></div>
-        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)"><span style="font-size:12px;color:var(--text3)">Weglowodany</span><span style="font-size:14px;font-weight:800;color:var(--green)" id="ob-res-carb">-</span></div>
-        <div style="display:flex;justify-content:space-between;padding:6px 0"><span style="font-size:12px;color:var(--text3)">Tluszcze</span><span style="font-size:14px;font-weight:800;color:var(--green)" id="ob-res-fat">-</span></div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)"><span style="font-size:12px;color:var(--text3)">Białko</span><span style="font-size:14px;font-weight:800;color:var(--green)" id="ob-res-prot">-</span></div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)"><span style="font-size:12px;color:var(--text3)">Węglowodany</span><span style="font-size:14px;font-weight:800;color:var(--green)" id="ob-res-carb">-</span></div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0"><span style="font-size:12px;color:var(--text3)">Tłuszcze</span><span style="font-size:14px;font-weight:800;color:var(--green)" id="ob-res-fat">-</span></div>
       </div>
     </div>
     <div style="display:flex;gap:8px;margin-top:20px">
@@ -552,18 +552,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- EDIT MEAL MODAL -->
 <div class="overlay" id="edit-meal-overlay" style="align-items:flex-start;overflow-y:auto;padding:16px">
   <div style="background:var(--bg2);border-radius:20px;padding:20px;width:100%;max-width:500px;border:1px solid var(--border2);margin:auto">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><h3 style="font-size:17px;font-weight:800">Edytuj posilek</h3><button onclick="closeEditMeal()" style="background:var(--bg3);border:none;color:var(--text2);border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer">&#215;</button></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><h3 style="font-size:17px;font-weight:800">Edytuj posiłek</h3><button onclick="closeEditMeal()" style="background:var(--bg3);border:none;color:var(--text2);border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer">&#215;</button></div>
     <div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:6px">Nazwa</div>
-    <input id="edit-meal-name" class="modal-inp" style="margin-bottom:12px" placeholder="Nazwa posilku">
+    <input id="edit-meal-name" class="modal-inp" style="margin-bottom:12px" placeholder="Nazwa posiłku">
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:12px">
       <div><div style="font-size:10px;font-weight:800;color:var(--amber);margin-bottom:4px">kcal</div><input id="edit-meal-kcal" type="number" class="modal-inp" style="margin-bottom:0;padding:10px;text-align:center;color-scheme:dark"></div>
       <div><div style="font-size:10px;font-weight:800;color:#60A5FA;margin-bottom:4px">B(g)</div><input id="edit-meal-prot" type="number" class="modal-inp" style="margin-bottom:0;padding:10px;text-align:center;color-scheme:dark"></div>
       <div><div style="font-size:10px;font-weight:800;color:var(--green);margin-bottom:4px">W(g)</div><input id="edit-meal-carb" type="number" class="modal-inp" style="margin-bottom:0;padding:10px;text-align:center;color-scheme:dark"></div>
       <div><div style="font-size:10px;font-weight:800;color:#F9A8D4;margin-bottom:4px">T(g)</div><input id="edit-meal-fat" type="number" class="modal-inp" style="margin-bottom:0;padding:10px;text-align:center;color-scheme:dark"></div>
     </div>
-    <div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:6px">Skladniki (Nazwa - Ilosc, 1 na linie)</div>
+    <div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:6px">Składniki (Nazwa — Ilość, 1 na linię)</div>
     <textarea id="edit-meal-ingr" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px;font-size:12px;color:var(--text);outline:none;min-height:100px;font-family:inherit;resize:vertical;margin-bottom:12px"></textarea>
-    <div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:6px">Przepis</div>
+    <div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:6px">Sposób przygotowania</div>
     <textarea id="edit-meal-recipe" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px;font-size:12px;color:var(--text);outline:none;min-height:80px;font-family:inherit;resize:vertical;margin-bottom:14px"></textarea>
     <div style="display:flex;gap:8px"><button onclick="closeEditMeal()" class="mbtn cancel" style="flex:1">Anuluj</button><button onclick="saveEditMeal()" class="mbtn ok" style="flex:2">Zapisz zmiany</button></div>
   </div>
@@ -590,7 +590,7 @@ var SYS="Jestes agentem kulinarnym. Odpowiadaj po polsku.";
 
 // ── CATS ──────────────────────────────────────────────────────────────────────
 var CATS=[
-{id:"warzywa",label:"Warzywa i Owoce",ic:"V",color:"#16A34A",items:[
+{id:"warzywa",label:"Warzywa i owoce",ic:"V",color:"#16A34A",items:[
   {n:"Papryka",target:2,unit:"szt.",days:5},{n:"Pomidory",target:3,unit:"szt.",days:4},
   {n:"Ogurek",target:3,unit:"szt.",days:4},{n:"Cukinia",target:2,unit:"szt.",days:5},
   {n:"Pieczarki",target:1,unit:"opak.",days:4},{n:"Marchew",target:4,unit:"szt.",days:21},
@@ -601,10 +601,10 @@ var CATS=[
   {n:"Bataty",target:4,unit:"szt.",days:30},{n:"Brokuł",target:2,unit:"szt.",days:5},
   {n:"Szpinak",target:1,unit:"opak.",days:4}
 ]},
-{id:"piekarnia",label:"Piekarnia",ic:"B",color:"#D97706",scan:true,items:[
+{id:"piekarnia",label:"Pieczywo",ic:"B",color:"#D97706",scan:true,items:[
   {n:"Chleb Pelnoziarnisty",target:2,unit:"bochenek",days:5}
 ]},
-{id:"suche",label:"Platki Kasze Ryze",ic:"P",color:"#B45309",scan:true,items:[
+{id:"suche",label:"Płatki, kasze i ryże",ic:"P",color:"#B45309",scan:true,items:[
   {n:"Platki Owsiane Blyskawiczne",target:3,unit:"opak. 500g",days:180},
   {n:"Platki Jaglane",target:1,unit:"opak.",days:180},
   {n:"Ryz Basmati",target:1,unit:"opak. 1kg",days:365},
@@ -612,31 +612,31 @@ var CATS=[
   {n:"Kasza Jaglana",target:1,unit:"opak. 500g",days:365},
   {n:"Makaron Pelnoziarnisty",target:2,unit:"opak.",days:365}
 ]},
-{id:"puszki",label:"Puszki i Sosy",ic:"C",color:"#0891B2",scan:true,items:[
+{id:"puszki",label:"Puszki i sosy",ic:"C",color:"#0891B2",scan:true,items:[
   {n:"Ciecierzyca Puszka",target:2,unit:"puszka",days:730},
   {n:"Passata Pomidorowa",target:1,unit:"opak.",days:365},
   {n:"Ketchup Bez Cukru",target:1,unit:"butelka",days:180},
   {n:"Musztarda",target:1,unit:"sloik",days:365},
   {n:"Soczewica Czerwona",target:1,unit:"opak.",days:365}
 ]},
-{id:"tluszcze",label:"Orzechy i Tluszcze",ic:"O",color:"#7C3AED",scan:true,items:[
+{id:"tluszcze",label:"Orzechy i tłuszcze",ic:"O",color:"#7C3AED",scan:true,items:[
   {n:"Oliwa z Oliwek",target:1,unit:"butelka 500ml",days:365},
   {n:"Maslo Orzechowe Vitanella",target:2,unit:"opak. 350g",days:180},
   {n:"Platki Migdalow",target:1,unit:"opak. 200g",days:180},
   {n:"Orzechy Wloskie",target:1,unit:"opak. 200g",days:180},
   {n:"Kakao 100%",target:1,unit:"opak.",days:365}
 ]},
-{id:"maki",label:"Maki",ic:"M",color:"#9333EA",scan:true,items:[
+{id:"maki",label:"Mąki",ic:"M",color:"#9333EA",scan:true,items:[
   {n:"Maka Ryzowa",target:1,unit:"opak. 400g",days:365},
   {n:"Maka Jaglana",target:1,unit:"opak. 400g",days:365}
 ]},
-{id:"mieso",label:"Mieso Swieze",ic:"Mi",color:"#DC2626",scan:true,items:[
+{id:"mieso",label:"Mięso świeże",ic:"Mi",color:"#DC2626",scan:true,items:[
   {n:"Piers z Kurczaka",target:3,unit:"szt.",days:3},
-  {n:"Wolowina Mielona",target:1,unit:"opak. 400g",days:2},
+  {n:"Wołowina Mielona",target:1,unit:"opak. 400g",days:2},
   {n:"Filet z Lososia",target:1,unit:"szt.",days:2},
   {n:"Polędwica z Indyka",target:2,unit:"opak.",days:5}
 ]},
-{id:"nabial",label:"Nabial",ic:"N",color:"#2563EB",scan:true,items:[
+{id:"nabial",label:"Nabiał",ic:"N",color:"#2563EB",scan:true,items:[
   {n:"Skyr Naturalny",target:4,unit:"opak. 350g",days:10},
   {n:"Ser Twarogowy Chudy",target:3,unit:"opak. 400g",days:7},
   {n:"Serek Wiejski Light",target:3,unit:"opak. 400g",days:7},
@@ -647,7 +647,7 @@ var CATS=[
 {id:"jaja",label:"Jaja",ic:"J",color:"#CA8A04",scan:true,items:[
   {n:"Jaja L",target:2,unit:"opak. 10 szt.",days:28}
 ]},
-{id:"wedliny",label:"Wedliny i Ryby",ic:"W",color:"#E11D48",scan:true,items:[
+{id:"wedliny",label:"Wędliny i ryby",ic:"W",color:"#E11D48",scan:true,items:[
   {n:"Polędwica z Indyka Kraina Mies",target:3,unit:"opak.",days:7},
   {n:"Szynka z Indyka Kraina Wedlin",target:2,unit:"opak.",days:7},
   {n:"Losos Wedzony",target:2,unit:"opak.",days:14}
@@ -688,7 +688,7 @@ function dlgAlert(ico,title,msg){showDlg(ico,title,msg,[{label:"OK",cls:"ok"}]);
 function dlgConfirm(ico,title,msg,onOk,okLabel,okCls){showDlg(ico,title,msg,[{label:"Anuluj",cls:"cancel"},{label:okLabel||"OK",cls:okCls||"ok",cb:onOk}]);}
 
 // ── FIREBASE ──────────────────────────────────────────────────────────────────
-function fbf(path,opts){var ctrl=new AbortController(),t=setTimeout(function(){ctrl.abort();},8000);return fetch(path+".json",Object.assign({signal:ctrl.signal},opts||{})).then(function(r){clearTimeout(t);if(!r.ok)throw new Error("HTTP "+r.status);return r.json();}).catch(function(e){clearTimeout(t);if(e.name==="AbortError")throw new Error("Timeout");throw e;});}
+function fbf(path,opts){var ctrl=new AbortController(),t=setTimeout(function(){ctrl.abort();},8000);return fetch(path+".json",Object.assign({signal:ctrl.signal},opts||{})).then(function(r){clearTimeout(t);if(!r.ok)throw new Error("HTTP "+r.status);return r.json();}).catch(function(e){clearTimeout(t);if(e.name==="AbortError")throw new Error("Przekroczono czas połączenia");throw e;});}
 function fbGet(p){return fbf(p);}
 function fbPatch(p,d){return fbf(p,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)});}
 function fbPost(p,d){return fbf(p,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)});}
@@ -709,13 +709,13 @@ function showPage(p){
 
 // ── API ───────────────────────────────────────────────────────────────────────
 function callAPI(messages,system,onOk,onErr,maxTok){
-  if(!apiKey){onErr("Brak klucza API");return;}
+  if(!apiKey){onErr("Brak klucza API API");return;}
   var body={model:"claude-opus-4-5",max_tokens:maxTok||1400,messages:messages};
   if(system)body.system=system;
   fetch(PROXY,{method:"POST",headers:{"Content-Type":"application/json","x-api-key":apiKey,"anthropic-version":"2023-06-01"},body:JSON.stringify(body)})
   .then(function(r){return r.text();})
   .then(function(raw){
-    try{var data=JSON.parse(raw);if(data.error)throw new Error(data.error.message);var txt=data.content&&data.content[0]&&data.content[0].text;if(!txt)throw new Error("Pusta odpowiedz");onOk(txt);}
+    try{var data=JSON.parse(raw);if(data.error)throw new Error(data.error.message);var txt=data.content&&data.content[0]&&data.content[0].text;if(!txt)throw new Error("Pusta odpowiedź z API");onOk(txt);}
     catch(e){onErr(e.message);}
   }).catch(function(e){onErr(e.message);});
 }
@@ -728,7 +728,7 @@ function markShoppingNow(){shopTs=Date.now();fbPatch(RP,{__shopTs:shopTs});updat
 function saveShopDate(){var v=document.getElementById("shop-date-inp").value;if(!v)return;shopTs=new Date(v).getTime();fbPatch(RP,{__shopTs:shopTs});updateShopBar();render();closeShopDateModal();}
 function updateShopBar(){
   var l=document.getElementById("shop-lbl"),a=document.getElementById("shop-ago");if(!l)return;
-  if(!shopTs){l.textContent="Nie ustawiono daty zakupow";if(a)a.textContent="";return;}
+  if(!shopTs){l.textContent="Nie ustawiono daty aktualizacji lodówki";if(a)a.textContent="";return;}
   var d=new Date(shopTs),days=Math.floor((Date.now()-shopTs)/86400000);
   l.textContent="Zakupy: "+d.toLocaleDateString("pl-PL",{weekday:"long",day:"numeric",month:"long"});
   if(a)a.textContent=days===0?"dzis":days===1?"wczoraj":days+" dni temu";
@@ -736,13 +736,13 @@ function updateShopBar(){
 
 // ── FRESHNESS ─────────────────────────────────────────────────────────────────
 function getDaysLeft(it){var ek=fbk("e",it.n);if(expiry[ek])return Math.round((expiry[ek]-Date.now())/86400000);if(it.days&&shopTs)return Math.round(it.days-(Date.now()-shopTs)/86400000);return null;}
-function fHtml(it){var d=getDaysLeft(it);if(d===null)return"";if(d<=0)return'<div class="fresh-bad">Przeterminowane!</div>';if(d===1)return'<div class="fresh-bad">Zostaje 1 dzien</div>';if(d<=2)return'<div class="fresh-warn">Zostaja '+d+' dni</div>';return'<div class="fresh-ok">Swieze - '+d+' dni</div>';}
+function fHtml(it){var d=getDaysLeft(it);if(d===null)return"";if(d<=0)return'<div class="fresh-bad">Przeterminowane!</div>';if(d===1)return'<div class="fresh-bad">Zostaje 1 dzień</div>';if(d<=2)return'<div class="fresh-warn">Zostaja '+d+' dni</div>';return'<div class="fresh-ok">Swieze - '+d+' dni</div>';}
 function expiringSoon(it){var d=getDaysLeft(it);return d!==null&&d<=3;}
 
 // ── EXPIRY MODAL ──────────────────────────────────────────────────────────────
 function openExpiry(name){expiryItem=name;document.getElementById("exp-name").textContent=name;var ek=fbk("e",name);document.getElementById("exp-date-inp").value=expiry[ek]?new Date(expiry[ek]).toISOString().slice(0,10):"";document.getElementById("exp-overlay").classList.add("show");}
 function closeExpiry(){document.getElementById("exp-overlay").classList.remove("show");}
-function saveExpiry(){var v=document.getElementById("exp-date-inp").value;if(!v){dlgAlert("?","Brak daty","Wpisz date waznosci");return;}var ts=new Date(v).getTime(),ek=fbk("e",expiryItem),p={};expiry[ek]=ts;p[ek]=ts;fbPatch(EP,p);closeExpiry();render();}
+function saveExpiry(){var v=document.getElementById("exp-date-inp").value;if(!v){dlgAlert("?","Brak daty","Wpisz datę ważności");return;}var ts=new Date(v).getTime(),ek=fbk("e",expiryItem),p={};expiry[ek]=ts;p[ek]=ts;fbPatch(EP,p);closeExpiry();render();}
 function clearExpiry(){var ek=fbk("e",expiryItem),p={};delete expiry[ek];p[ek]=null;fbPatch(EP,p);closeExpiry();render();}
 
 // ── SCANNER ───────────────────────────────────────────────────────────────────
@@ -754,7 +754,7 @@ function openExpiryScanner(name){
 }
 
 function openScannerAndPhoto(name){expiryItem=name;scanFromExpiry=true;photoItem=name;scanSavesPhoto=true;openScanner();}
-function openScanner(){if(!apiKey){dlgAlert("X","Niedostepne","Skonfiguruj klucz API");return;}document.getElementById("scan-img").style.display="none";document.getElementById("scan-loading").style.display="none";document.getElementById("scan-result").style.display="none";document.getElementById("scan-apply").style.display="none";scanData=null;document.getElementById("scan-overlay").classList.add("show");}
+function openScanner(){if(!apiKey){dlgAlert("X","Niedostępne","Skonfiguruj klucz API w ustawieniach");return;}document.getElementById("scan-img").style.display="none";document.getElementById("scan-loading").style.display="none";document.getElementById("scan-result").style.display="none";document.getElementById("scan-apply").style.display="none";scanData=null;document.getElementById("scan-overlay").classList.add("show");}
 function closeScanner(){document.getElementById("scan-overlay").classList.remove("show");scanSavesPhoto=false;}
 function triggerScanPhoto(){document.getElementById("scan-file").click();}
 function handleScanPhoto(input){
@@ -764,7 +764,7 @@ function handleScanPhoto(input){
     var img=document.getElementById("scan-img");img.src=e.target.result;img.style.display="block";
     document.getElementById("scan-result").style.display="none";document.getElementById("scan-apply").style.display="none";document.getElementById("scan-loading").style.display="block";
     var b64=e.target.result.split(",")[1],mime=input.files[0].type||"image/jpeg";
-    callAPI([{role:"user",content:[{type:"image",source:{type:"base64",media_type:mime,data:b64}},{type:"text",text:"Przeanalizuj zdjecie produktu. ZNAJDZ DATE PRZYDATNOSCI: Format polskich produktow DD.MM.YYYY lub DD.MM.RR. PRZYKLAD: 14.06.28 = dzien 14, miesiac 06, rok 2028 (NIE 2014!). Rok dwucyfrowy 25-35 = 2025-2035. TYLKO JSON: {\"produkt\":\"pelna nazwa\",\"data\":\"DD.MM.YYYY lub null\",\"uwaga\":\"\"}"}]}],null,function(txt){
+    callAPI([{role:"user",content:[{type:"image",source:{type:"base64",media_type:mime,data:b64}},{type:"text",text:"Przeanalizuj zdjecie produktu. ZNAJDZ DATE PRZYDATNOSCI: Format polskich produktow DD.MM.YYYY lub DD.MM.RR. PRZYKLAD: 14.06.28 = dzień 14, miesiac 06, rok 2028 (NIE 2014!). Rok dwucyfrowy 25-35 = 2025-2035. TYLKO JSON: {\"produkt\":\"pelna nazwa\",\"data\":\"DD.MM.YYYY lub null\",\"uwaga\":\"\"}"}]}],null,function(txt){
       document.getElementById("scan-loading").style.display="none";
       try{var p=JSON.parse(txt.replace(/```json|```/g,"").trim());scanData=p;document.getElementById("scan-product").textContent=p.produkt||"Nieznany";
           // Ustaw edytowalne pole daty
@@ -815,7 +815,7 @@ function saveScanDate(iso){
 }
 function applyScan(){applyScanEdited();}
 
-function openReceipt(){if(!apiKey){dlgAlert("X","Niedostepne","Skonfiguruj klucz API");return;}document.getElementById("receipt-img").style.display="none";document.getElementById("receipt-loading").style.display="none";document.getElementById("receipt-scan-result").style.display="none";receiptData=null;document.getElementById("receipt-overlay").classList.add("show");}
+function openReceipt(){if(!apiKey){dlgAlert("X","Niedostępne","Skonfiguruj klucz API w ustawieniach");return;}document.getElementById("receipt-img").style.display="none";document.getElementById("receipt-loading").style.display="none";document.getElementById("receipt-scan-result").style.display="none";receiptData=null;document.getElementById("receipt-overlay").classList.add("show");}
 function closeReceiptModal(){document.getElementById("receipt-overlay").classList.remove("show");}
 function triggerReceiptPhoto(){document.getElementById("receipt-file").click();}
 function handleReceiptPhoto(input){
@@ -841,7 +841,7 @@ function handleReceiptPhoto(input){
         {type:"image",source:{type:"base64",media_type:mime,data:b64}},
         {type:"text",text:prompt}
       ]}
-    ],"Jestes asystentem analizy paragonow. TYLKO JSON. Bez markdown.",
+    ],"Jestes asystentem analizy paragonów. TYLKO JSON. Bez markdown.",
     function(txt){
       document.getElementById("receipt-loading").style.display="none";
       var clean=txt.replace(/```json/gi,"").replace(/```/g,"").trim();
@@ -901,7 +901,7 @@ function handleReceiptPhoto(input){
             }
           }
         }catch(e2){}
-        document.getElementById("receipt-result-txt").textContent="Blad odczytu JSON. Sprobuj ponownie z lepszym oswietleniem.";
+        document.getElementById("receipt-result-txt").textContent="Błąd odczytu JSON. Spróbuj ponownie przy lepszym oświetleniu.";
         document.getElementById("receipt-scan-result").style.display="block";
       }
     },function(err){
@@ -971,7 +971,7 @@ function showReceiptResults(){
 
 
 function applyReceiptSelected(){
-  if(!receiptData||!receiptData.length){dlgAlert("?","Brak produktow","Brak dopasowanych produktow.");return;}
+  if(!receiptData||!receiptData.length){dlgAlert("?","Brak produktów","Brak dopasowanych produktów.");return;}
   var updated=[], patch={};
   receiptData.forEach(function(p,i){
     var cb=document.getElementById("rp-cb-"+i);
@@ -1030,16 +1030,16 @@ function deleteProductPhoto(){["front","side","top","expiry"].forEach(function(s
 // ── ADMIN ─────────────────────────────────────────────────────────────────────
 function openSettingsModal(){document.getElementById("admin-pass-inp").value="";document.getElementById("admin-pass-overlay").classList.add("show");setTimeout(function(){document.getElementById("admin-pass-inp").focus();},100);}
 function closeAdminPass(){document.getElementById("admin-pass-overlay").classList.remove("show");}
-function checkAdminPass(){var p=document.getElementById("admin-pass-inp").value;if(p!==ADMIN_PASS){dlgAlert("X","Bledne haslo","Sprobuj ponownie.");return;}closeAdminPass();fbGet(CP).then(function(k){var el=document.getElementById("admin-api-status");if(k){el.textContent="Klucz API aktywny";el.style.color="var(--green)";}else{el.textContent="Brak klucza";el.style.color="var(--amber)";}}).catch(function(){});document.getElementById("api-key-inp").value="";document.getElementById("settings-overlay").classList.add("show");}
+function checkAdminPass(){var p=document.getElementById("admin-pass-inp").value;if(p!==ADMIN_PASS){dlgAlert("X","Nieprawidłowe hasło","Spróbuj ponownie.");return;}closeAdminPass();fbGet(CP).then(function(k){var el=document.getElementById("admin-api-status");if(k){el.textContent="Klucz API aktywny";el.style.color="var(--green)";}else{el.textContent="Brak skonfigurowanego klucza API";el.style.color="var(--amber)";}}).catch(function(){});document.getElementById("api-key-inp").value="";document.getElementById("settings-overlay").classList.add("show");}
 function closeSettings(){document.getElementById("settings-overlay").classList.remove("show");}
-function saveApiKey(){var v=document.getElementById("api-key-inp").value.trim();if(!v||!v.startsWith("sk-ant-")){dlgAlert("X","Nieprawidlowy klucz","Klucz powinien zaczynac sie od sk-ant-");return;}fbPut(CP,v).then(function(){apiKey=v;var el=document.getElementById("admin-api-status");el.textContent="Klucz zapisany!";el.style.color="var(--green)";setTimeout(closeSettings,1500);}).catch(function(e){dlgAlert("X","Blad",e.message);});}
-function clearApiKey(){fbPut(CP,null).then(function(){apiKey="";document.getElementById("api-key-inp").value="";document.getElementById("admin-api-status").textContent="Klucz usuniety";document.getElementById("admin-api-status").style.color="var(--red)";});}
+function saveApiKey(){var v=document.getElementById("api-key-inp").value.trim();if(!v||!v.startsWith("sk-ant-")){dlgAlert("X","Nieprawidłowy klucz API API","Klucz powinien zaczynać się od sk-ant-");return;}fbPut(CP,v).then(function(){apiKey=v;var el=document.getElementById("admin-api-status");el.textContent="Klucz API zapisany!";el.style.color="var(--green)";setTimeout(closeSettings,1500);}).catch(function(e){dlgAlert("X","Błąd",e.message);});}
+function clearApiKey(){fbPut(CP,null).then(function(){apiKey="";document.getElementById("api-key-inp").value="";document.getElementById("admin-api-status").textContent="Klucz API usunięty";document.getElementById("admin-api-status").style.color="var(--red)";});}
 
 // ── LOG ───────────────────────────────────────────────────────────────────────
 function addLog(w,o,n){if(LP)fbPost(LP,{who:userName,what:w,delta:n-o,newVal:n,ts:Date.now()});}
 function openLog(){document.getElementById("log-overlay").classList.add("show");renderLog();}
 function closeLog(){document.getElementById("log-overlay").classList.remove("show");}
-function renderLog(){var b=document.getElementById("log-body");b.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3)">Ladowanie...</div>';fbGet(LP).then(function(data){if(!data){b.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3)">Brak zmian</div>';return;}var en=Object.values(data).sort(function(a,b){return b.ts-a.ts;}).slice(0,200);b.innerHTML=en.map(function(e){var d=new Date(e.ts),g=d.toLocaleDateString("pl-PL",{day:"2-digit",month:"2-digit"})+" "+d.toLocaleTimeString("pl-PL",{hour:"2-digit",minute:"2-digit"});var delta=e.delta||0,badge=delta>0?'<span class="lbadge up">+'+delta+'</span>':'<span class="lbadge dn">'+delta+'</span>';return'<div class="log-entry"><div class="log-av" style="background:'+nc(e.who||"?")+'">'+ni(e.who||"?")+'</div><div class="log-info"><div class="log-who">'+(e.who||"?")+'</div><div class="log-what">'+(delta>0?"dodal":"zabral")+" "+Math.abs(delta)+" x "+(e.what||"?")+'</div><div class="log-when">'+g+'</div></div>'+badge+'</div>';}).join("");}).catch(function(){b.innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">Blad</div>';});}
+function renderLog(){var b=document.getElementById("log-body");b.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3)">Ładowanie...</div>';fbGet(LP).then(function(data){if(!data){b.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3)">Brak zapisanych zmian</div>';return;}var en=Object.values(data).sort(function(a,b){return b.ts-a.ts;}).slice(0,200);b.innerHTML=en.map(function(e){var d=new Date(e.ts),g=d.toLocaleDateString("pl-PL",{day:"2-digit",month:"2-digit"})+" "+d.toLocaleTimeString("pl-PL",{hour:"2-digit",minute:"2-digit"});var delta=e.delta||0,badge=delta>0?'<span class="lbadge up">+'+delta+'</span>':'<span class="lbadge dn">'+delta+'</span>';return'<div class="log-entry"><div class="log-av" style="background:'+nc(e.who||"?")+'">'+ni(e.who||"?")+'</div><div class="log-info"><div class="log-who">'+(e.who||"?")+'</div><div class="log-what">'+(delta>0?"dodał":"zabrał")+" "+Math.abs(delta)+" x "+(e.what||"?")+'</div><div class="log-when">'+g+'</div></div>'+badge+'</div>';}).join("");}).catch(function(){b.innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">Blad</div>';});}
 
 // ── CAT CHIPS ─────────────────────────────────────────────────────────────────
 function buildCatChips(){var wrap=document.getElementById("cat-chips");if(!wrap)return;wrap.innerHTML='<button class="cat-chip act" id="chip-all" onclick="setCatFilter(\'all\')">Wszystko</button>';CATS.forEach(function(cat){var btn=document.createElement("button");btn.className="cat-chip";btn.id="chip-"+cat.id;btn.innerHTML=cat.label;if(cat.color)btn.style.borderColor=cat.color;btn.onclick=(function(id){return function(){setCatFilter(id);};})(cat.id);wrap.appendChild(btn);});}
@@ -1050,7 +1050,7 @@ function clearSearch(){document.getElementById("sinp").value="";onSearch("");}
 
 // ── SHOP LIST ─────────────────────────────────────────────────────────────────
 function selectShopStore(store){shopStore=store;["biedronka","lidl","both"].forEach(function(s){var btn=document.getElementById("store-sel-"+s);if(!btn)return;btn.style.borderColor=s===store?"var(--green)":"var(--border)";btn.style.background=s===store?"rgba(30,215,96,.12)":"transparent";btn.style.color=s===store?"var(--green)":"var(--text3)";});}
-function generateShopList(){if(!apiKey){dlgAlert("X","Niedostepne","Skonfiguruj klucz API");return;}var btn=document.getElementById("gen-btn"),spin=document.getElementById("gen-spin"),txt=document.getElementById("gen-btn-txt");btn.disabled=true;spin.style.display="block";txt.textContent="Generuje...";var missing=[],expiring=[];CATS.forEach(function(cat){cat.items.forEach(function(it){var cur=state[fbk(cat.id,it.n)]||0;if(cur<it.target)missing.push(it.n+"(mam:"+cur+",potrzeba:"+it.target+" "+it.unit+")");var d=getDaysLeft(it);if(d!==null&&d<=3&&cur>0)expiring.push(it.n+"("+d+"dni)");});});var storeName={biedronka:"Biedronka",lidl:"Lidl",both:"Biedronka i Lidl"}[shopStore]||"Biedronka";var prompt="Lista zakupow do "+storeName+". Braki w lodowce: "+missing.join("; ")+". Wygasaja wkrotce: "+(expiring.join("; ")||"nic")+". Jezeli uzytkownik ostatnio kupowal cos w Biedronce uwzgledniej te produkty przy priorytetach. TYLKO JSON: {\"komentarz\":\"\",\"produkty\":[{\"nazwa\":\"\",\"ilosc\":\"\",\"priorytet\":\"wysoki/sredni/niski\",\"powod\":\"\"}]}";callAPI([{role:"user",content:prompt}],SYS,function(res){btn.disabled=false;spin.style.display="none";txt.textContent="Odswiez liste";var clean=res.replace(/```json/gi,"").replace(/```/g,"").trim();var s=clean.indexOf("{"),e=clean.lastIndexOf("}");try{renderShopList(JSON.parse(s!==-1&&e!==-1?clean.slice(s,e+1):clean));}catch(ex){document.getElementById("shop-list-content").innerHTML='<div class="ai-note">'+res+'</div>';}},function(err){btn.disabled=false;spin.style.display="none";txt.textContent="Generuj liste AI";document.getElementById("shop-list-content").innerHTML='<div class="ai-note" style="color:var(--red)">Blad: '+err+'</div>';});}
+function generateShopList(){if(!apiKey){dlgAlert("X","Niedostępne","Skonfiguruj klucz API w ustawieniach");return;}var btn=document.getElementById("gen-btn"),spin=document.getElementById("gen-spin"),txt=document.getElementById("gen-btn-txt");btn.disabled=true;spin.style.display="block";txt.textContent="Generuje...";var missing=[],expiring=[];CATS.forEach(function(cat){cat.items.forEach(function(it){var cur=state[fbk(cat.id,it.n)]||0;if(cur<it.target)missing.push(it.n+"(mam:"+cur+",potrzeba:"+it.target+" "+it.unit+")");var d=getDaysLeft(it);if(d!==null&&d<=3&&cur>0)expiring.push(it.n+"("+d+"dni)");});});var storeName={biedronka:"Biedronka",lidl:"Lidl",both:"Biedronka i Lidl"}[shopStore]||"Biedronka";var prompt="Lista zakupow do "+storeName+". Braki w lodowce: "+missing.join("; ")+". Wygasaja wkrotce: "+(expiring.join("; ")||"nic")+". Jezeli uzytkownik ostatnio kupowal cos w Biedronce uwzgledniej te produkty przy priorytetach. TYLKO JSON: {\"komentarz\":\"\",\"produkty\":[{\"nazwa\":\"\",\"ilosc\":\"\",\"priorytet\":\"wysoki/sredni/niski\",\"powod\":\"\"}]}";callAPI([{role:"user",content:prompt}],SYS,function(res){btn.disabled=false;spin.style.display="none";txt.textContent="Odśwież listę";var clean=res.replace(/```json/gi,"").replace(/```/g,"").trim();var s=clean.indexOf("{"),e=clean.lastIndexOf("}");try{renderShopList(JSON.parse(s!==-1&&e!==-1?clean.slice(s,e+1):clean));}catch(ex){document.getElementById("shop-list-content").innerHTML='<div class="ai-note">'+res+'</div>';}},function(err){btn.disabled=false;spin.style.display="none";txt.textContent="Generuj liste AI";document.getElementById("shop-list-content").innerHTML='<div class="ai-note" style="color:var(--red)">Blad: '+err+'</div>';});}
 function renderShopList(data){shopChecked={};document.getElementById("copy-btn").classList.add("show");var high=[],med=[],low=[];(data.produkty||[]).forEach(function(p){if(p.priorytet==="wysoki"||p.priorytet==="high")high.push(p);else if(p.priorytet==="niski"||p.priorytet==="low")low.push(p);else med.push(p);});var html='<div class="ai-note">'+(data.komentarz||"")+'</div>';function sec(items,title,cls){if(!items.length)return"";var s='<div style="margin-bottom:14px"><div class="shop-sec-title">'+title+'</div>';items.forEach(function(p,i){var id="si-"+cls+i;s+='<div class="shop-item" id="'+id+'" onclick="toggleShopItem(this.id)"><div class="shop-item-check"></div><div class="shop-item-info"><div class="shop-item-name">'+p.nazwa+'</div><div class="shop-item-detail">'+p.ilosc+' - '+p.powod+'</div></div><span class="prio prio-'+cls+'">'+p.priorytet+'</span></div>';});return s+"</div>";}html+=sec(high,"Pilne","high")+sec(med,"Wazne","med")+sec(low,"Warto miec","low");document.getElementById("shop-list-content").innerHTML=html;}
 function toggleShopItem(id){var el=document.getElementById(id);if(!el)return;shopChecked[id]=!shopChecked[id];el.classList[shopChecked[id]?"add":"remove"]("checked");el.querySelector(".shop-item-check").textContent=shopChecked[id]?"v":"";}
 function copyShopList(silent){
@@ -1082,7 +1082,7 @@ function copyShopList(silent){
       if(cur<it.target)detailedLines.push("- "+it.n+" ("+Math.max(0,it.target-cur)+" "+it.unit+")");
     });});
   }
-  if(!detailedLines.length){if(!silent)dlgAlert("?","Brak listy","Wygeneruj najpierw listę zakupów.");return false;}
+  if(!detailedLines.length){if(!silent)dlgAlert("?","Brak listy zakupów","Wygeneruj najpierw listę zakupów.");return false;}
   var text="Pełna Lodówka — lista zakupów\n"+new Date().toLocaleDateString("pl-PL")+"\n\n"+detailedLines.join("\n");
   navigator.clipboard.writeText(text).then(function(){
     if(!silent)dlgAlert("OK","Skopiowano!","Lista skopiowana do schowka.");
@@ -1093,15 +1093,15 @@ function copyShopList(silent){
   return true;
 }
 
-function openStore(store){var urls={biedronka:"https://biedronkago.pl",frisco:"https://www.frisco.pl",glovo:"https://glovoapp.com/pl/pl/warszawa/",lisek:"https://lisek.app"};copyShopList(true);dlgConfirm("?","Lista skopiowana","Otworzyc "+store+"?",function(){window.open(urls[store],"_blank");},"Otworz");}
+function openStore(store){var urls={biedronka:"https://biedronkago.pl",frisco:"https://www.frisco.pl",glovo:"https://glovoapp.com/pl/pl/warszawa/",lisek:"https://lisek.app"};copyShopList(true);dlgConfirm("?","Lista skopiowana","Otwórzyc "+store+"?",function(){window.open(urls[store],"_blank");},"Otwórz");}
 
 // ── CHAT ──────────────────────────────────────────────────────────────────────
-function addWelcome(){addMsg("ai","Czesc "+userName.split(" ")[0]+"! Znam zawartosc Twojej lodowki"+(userProfile?" i Twoja diete "+userProfile.kcal+" kcal.":". Wpisz co chcesz ugotowac!"));}
+function addWelcome(){addMsg("ai","Cześć "+userName.split(" ")[0]+"! Znam zawartość Twojej lodówki"+(userProfile?" i Twoją dietę "+userProfile.kcal+" kcal.":". Napisz, co chcesz ugotować!"));}
 function addMsg(role,text){var msgs=document.getElementById("chat-msgs");var div=document.createElement("div");div.className="msg "+role;var now=new Date().toLocaleTimeString("pl-PL",{hour:"2-digit",minute:"2-digit"});var ini=userName?ni(userName):"G";var bub=text.replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br>");div.innerHTML='<div class="msg-av">'+(role==="ai"?"AI":ini)+'</div><div><div class="msg-bub">'+bub+'</div><div class="msg-time">'+now+'</div></div>';msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;chatHistory.push({role:role==="ai"?"assistant":"user",content:text});}
 function addTyping(){var msgs=document.getElementById("chat-msgs");var div=document.createElement("div");div.className="msg ai";div.id="typing";div.innerHTML='<div class="msg-av">AI</div><div class="typing-bub"><span></span><span></span><span></span></div>';msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;}
 function removeTyping(){var el=document.getElementById("typing");if(el)el.remove();}
 function getPantryCtx(){var inStock=[],missing=[];CATS.forEach(function(cat){cat.items.forEach(function(it){var cur=state[fbk(cat.id,it.n)]||0;if(cur>=it.target)inStock.push(it.n);else missing.push(it.n+"("+cur+"/"+it.target+")");});});return"LODOWKA:\nJest: "+inStock.join(",")+"\nBrakuje: "+missing.join(",");}
-function sendChat(){if(chatBusy)return;var inp=document.getElementById("chat-inp"),text=inp.value.trim();if(!text)return;if(!apiKey){dlgAlert("X","Niedostepne","Skonfiguruj klucz API");return;}inp.value="";inp.style.height="auto";addMsg("user",text);chatBusy=true;document.getElementById("chat-send-btn").disabled=true;addTyping();callAPI([{role:"user",content:getPantryCtx()+"\n\nPytanie: "+text}],SYS,function(reply){removeTyping();addMsg("ai",reply);chatBusy=false;document.getElementById("chat-send-btn").disabled=false;},function(err){removeTyping();addMsg("ai","Blad: "+err);chatBusy=false;document.getElementById("chat-send-btn").disabled=false;});}
+function sendChat(){if(chatBusy)return;var inp=document.getElementById("chat-inp"),text=inp.value.trim();if(!text)return;if(!apiKey){dlgAlert("X","Niedostępne","Skonfiguruj klucz API w ustawieniach");return;}inp.value="";inp.style.height="auto";addMsg("user",text);chatBusy=true;document.getElementById("chat-send-btn").disabled=true;addTyping();callAPI([{role:"user",content:getPantryCtx()+"\n\nPytanie: "+text}],SYS,function(reply){removeTyping();addMsg("ai",reply);chatBusy=false;document.getElementById("chat-send-btn").disabled=false;},function(err){removeTyping();addMsg("ai","Blad: "+err);chatBusy=false;document.getElementById("chat-send-btn").disabled=false;});}
 function sendSug(text){document.getElementById("chat-inp").value=text;sendChat();}
 
 // ── RENDER ────────────────────────────────────────────────────────────────────
@@ -1146,7 +1146,7 @@ function render(){
     });
     html+='</div>';
   });
-  if(!any){html='<div class="empty"><div style="font-size:48px;margin-bottom:12px;opacity:.5">'+(filter==="exp"?"??":searchQ?"??":"??")+'</div>'+(filter==="exp"?"Zaden produkt nie wygasa":searchQ?"Brak wynikow: "+searchQ:filter==="red"?"Wszystko jest!":"Brak produktow")+'</div>';}
+  if(!any){html='<div class="empty"><div style="font-size:48px;margin-bottom:12px;opacity:.5">'+(filter==="exp"?"??":searchQ?"??":"??")+'</div>'+(filter==="exp"?"Zaden produkt nie wygasa":searchQ?"Brak wynikow: "+searchQ:filter==="red"?"Wszystko jest!":"Brak produktów")+'</div>';}
   body.innerHTML=html;
 }
 
@@ -1164,7 +1164,7 @@ function applyPresetProfile(name){
 }
 
 
-function updateAISys(){if(!userProfile)return;var st={biedronka:"Biedronke",lidl:"Lidl",both:"Biedronke i Lidl"}[userProfile.stores]||"Biedronke";SYS="Jestes agentem kulinarnym "+userName.split(" ")[0]+". Cel: "+({lose:"redukcja",maintain:"utrzymanie wagi",gain:"masa miesniowa"}[userProfile.goal]||"")+". "+userProfile.kcal+" kcal/dzien. B:"+userProfile.prot+"g W:"+userProfile.carb+"g T:"+userProfile.fat+"g. Sklep: "+st+". Wykluczenia: "+(userProfile.exclude||"brak")+". Odpowiadaj po polsku.";}
+function updateAISys(){if(!userProfile)return;var st={biedronka:"Biedronke",lidl:"Lidl",both:"Biedronke i Lidl"}[userProfile.stores]||"Biedronke";SYS="Jestes agentem kulinarnym "+userName.split(" ")[0]+". Cel: "+({lose:"redukcja",maintain:"utrzymanie wagi",gain:"masa miesniowa"}[userProfile.goal]||"")+". "+userProfile.kcal+" kcal/dzień. B:"+userProfile.prot+"g W:"+userProfile.carb+"g T:"+userProfile.fat+"g. Sklep: "+st+". Wykluczenia: "+(userProfile.exclude||"brak")+". Odpowiadaj po polsku.";}
 function openProfileModal(){
   document.getElementById("profile-modal-name").textContent="Profil: "+userName;
   var cont=document.getElementById("profile-modal-content");
@@ -1182,7 +1182,7 @@ function openProfileModal(){
   document.getElementById("profile-overlay").classList.add("show");
 }
 function closeProfileModal(){document.getElementById("profile-overlay").classList.remove("show");}
-function logoutUser(){dlgConfirm("X","Wylogowanie","Chcesz sie wylogowac?",function(){localStorage.removeItem("spiz_name");userName="";userProfile=null;state={};expiry={};photos={};chatHistory=[];apiKey="";weekPlan={};document.getElementById("app").style.display="none";document.getElementById("login").style.display="flex";document.getElementById("name-inp").value="";document.getElementById("surname-inp").value="";closeProfileModal();},"Wyloguj","danger");}
+function logoutUser(){dlgConfirm("X","Wylogowanie","Czy chcesz się wylogować?",function(){localStorage.removeItem("spiz_name");userName="";userProfile=null;state={};expiry={};photos={};chatHistory=[];apiKey="";weekPlan={};document.getElementById("app").style.display="none";document.getElementById("login").style.display="flex";document.getElementById("name-inp").value="";document.getElementById("surname-inp").value="";closeProfileModal();},"Wyloguj","danger");}
 
 // ── ONBOARDING ────────────────────────────────────────────────────────────────
 function calcProfile(){
@@ -1301,7 +1301,7 @@ function obNext(){
       var nextBtn=document.getElementById("ob-next-btn");
       if(nextBtn)nextBtn.disabled=true;
       var st=document.getElementById("ob-ai-status");
-      if(st){st.textContent="Analizuje...";st.style.color="var(--amber)";}
+      if(st){st.textContent="Analizuję...";st.style.color="var(--amber)";}
       callAPI([{role:"user",content:'Przeanalizuj plan diety. TYLKO JSON: {"kcal":3060,"prot":244,"carb":281,"fat":107,"sklep":"biedronka","wykluczenia":"","cel":"gain"}. Plan: '+txt2}],
         "Jestes dietetykiem. TYLKO JSON.",
         function(res){
@@ -1312,12 +1312,12 @@ function obNext(){
               activity:"mod",age:30,weight:75,height:175,gender:"m",liked:[],disliked:[]});
             hideOb();updateAISys();
           }catch(e){
-            if(st)st.textContent="Blad analizy";
+            if(st)st.textContent="Błąd analizy planu diety";
             if(nextBtn)nextBtn.disabled=false;
           }
         },
         function(){
-          if(st)st.textContent="Blad API";
+          if(st)st.textContent="Błąd połączenia z API";
           if(nextBtn)nextBtn.disabled=false;
         }
       );
@@ -1327,10 +1327,10 @@ function obNext(){
   }
   if(step==="1"){
     if(!(document.getElementById("ob-age")||{}).value||!(document.getElementById("ob-weight")||{}).value){
-      dlgAlert("?","Uzupelnij dane","Wpisz wiek i wage.");return;
+      dlgAlert("?","Uzupełnij dane","Wpisz wiek i wagę.");return;
     }
   }
-  if(step==="2"&&!obSels.activity){dlgAlert("?","Wybierz aktywnosc","");return;}
+  if(step==="2"&&!obSels.activity){dlgAlert("?","Wybierz poziom aktywności","");return;}
   if(step==="3"&&!obSels.goal){dlgAlert("?","Wybierz cel","");return;}
   if(step==="4"&&!obSels.stores){dlgAlert("?","Wybierz sklep","");return;}
   // Krok 4b — preferencje są opcjonalne, zawsze przechodzimy dalej
@@ -1397,18 +1397,18 @@ function renderRecipes(){
     h+='</div>';
   });
   if(userProfile&&userProfile.kcal){var totalKcal=0;secs.forEach(function(sec){(menu[sec.k]||[]).forEach(function(m){totalKcal+=m.kcal||0;});});var diffOk=Math.abs(totalKcal-userProfile.kcal)<userProfile.kcal*0.07;h+='<div style="background:'+(diffOk?"rgba(30,215,96,.08)":"rgba(255,77,77,.08)")+';border:1px solid '+(diffOk?"var(--green)":"var(--red)")+';border-radius:var(--radius);padding:12px;margin-bottom:12px"><div style="font-size:10px;font-weight:800;color:var(--text3);margin-bottom:6px;text-transform:uppercase">Bilans Menu '+dietMenu+'</div><div style="font-size:12px;font-weight:700;color:'+(diffOk?"var(--green)":"var(--red)")+'">'+totalKcal+' / '+userProfile.kcal+' kcal</div></div>';}
-  h+='<button onclick="generateShopFromDiet()" style="width:100%;background:linear-gradient(135deg,var(--purple),#4F46E5);color:#fff;border:none;border-radius:50px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;margin-top:4px">Generuj liste zakupow z diety</button>';
+  h+='<button onclick="generateShopFromDiet()" style="width:100%;background:linear-gradient(135deg,var(--purple),#4F46E5);color:#fff;border:none;border-radius:50px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;margin-top:4px">Generuj listę zakupów z diety</button>';
   return h;
 }
 
-function renderUploadDiet(){return'<button onclick="generateAIDiet(userProfile)" style="width:100%;background:linear-gradient(135deg,var(--green2),var(--green));color:#000;border:none;border-radius:50px;padding:14px;font-size:14px;font-weight:900;cursor:pointer;margin-bottom:16px">Generuj diete AI na nowo</button><div style="font-size:13px;font-weight:700;color:var(--text3);margin-bottom:8px">lub wklej tekst planu:</div><textarea id="diet-upload-text" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px;font-size:13px;color:var(--text);outline:none;min-height:100px;font-family:inherit;resize:vertical;margin-bottom:10px" placeholder="Wklej tekst planu zywieniowego..."></textarea><button onclick="parseDietText()" style="width:100%;background:linear-gradient(135deg,var(--purple),#4F46E5);color:#fff;border:none;border-radius:50px;padding:13px;font-size:14px;font-weight:800;cursor:pointer">Analizuj z AI</button>';}
+function renderUploadDiet(){return'<button onclick="generateAIDiet(userProfile)" style="width:100%;background:linear-gradient(135deg,var(--green2),var(--green));color:#000;border:none;border-radius:50px;padding:14px;font-size:14px;font-weight:900;cursor:pointer;margin-bottom:16px">Generuj diete AI na nowo</button><div style="font-size:13px;font-weight:700;color:var(--text3);margin-bottom:8px">lub wklej tekst planu:</div><textarea id="diet-upload-text" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px;font-size:13px;color:var(--text);outline:none;min-height:100px;font-family:inherit;resize:vertical;margin-bottom:10px" placeholder="Wklej tekst planu żywieniowego..."></textarea><button onclick="parseDietText()" style="width:100%;background:linear-gradient(135deg,var(--purple),#4F46E5);color:#fff;border:none;border-radius:50px;padding:13px;font-size:14px;font-weight:800;cursor:pointer">Analizuj z AI</button>';}
 function parseDietText(){var txt=document.getElementById("diet-upload-text");if(!txt||!txt.value.trim())return;if(!apiKey)return;var body=document.getElementById("diet-body");body.innerHTML='<div style="text-align:center;padding:40px"><div class="spin" style="margin:0 auto"></div></div>';callAPI([{role:"user",content:'Przeanalizuj plan diety. TYLKO JSON: {"menu1":{"sniadania":[{"nazwa":"","czas":"","kcal":0,"prot":0,"carb":0,"fat":0,"skladniki":[{"n":"","il":""}],"przepis":""}],"obiady":[...],"kolacje":[...]},"menu2":{...}}. Plan: '+txt.value}],"Jestes dietetykiem. TYLKO JSON bez markdown.",function(res){try{var clean=res.replace(/```json/gi,"").replace(/```/g,"").trim();var p=JSON.parse(clean.slice(clean.indexOf("{"),clean.lastIndexOf("}")+1));if(!userProfile)userProfile={};userProfile.dietData=p;saveUserProfile(userProfile);switchDietTab(0);}catch(e){renderDietBody();}},function(){renderDietBody();},3500);}
-function generateShopFromDiet(){var d=getDietData(),menu=dietMenu===1?d.menu1:d.menu2;var allIngr=[];["sniadania","obiady","kolacje"].forEach(function(t){(menu[t]||[]).forEach(function(m){(m.skladniki||[]).forEach(function(s){allIngr.push(s.n+" "+s.il);});});});var inStock=[];CATS.forEach(function(cat){cat.items.forEach(function(it){if((state[fbk(cat.id,it.n)]||0)>=it.target)inStock.push(it.n);});});closeDiet();showPage("shop");callAPI([{role:"user",content:"Skladniki z diety: "+allIngr.join(", ")+". Mam juz: "+inStock.join(", ")+". Lista zakupow. TYLKO JSON: {\"komentarz\":\"\",\"produkty\":[{\"nazwa\":\"\",\"ilosc\":\"\",\"priorytet\":\"wysoki\",\"powod\":\"\"}]}"}],SYS,function(res){var clean=res.replace(/```json/gi,"").replace(/```/g,"").trim();try{renderShopList(JSON.parse(clean.slice(clean.indexOf("{"),clean.lastIndexOf("}")+1)));}catch(e){document.getElementById("shop-list-content").innerHTML='<div class="ai-note">'+res+'</div>';}},function(err){dlgAlert("X","Blad",err);});}
+function generateShopFromDiet(){var d=getDietData(),menu=dietMenu===1?d.menu1:d.menu2;var allIngr=[];["sniadania","obiady","kolacje"].forEach(function(t){(menu[t]||[]).forEach(function(m){(m.skladniki||[]).forEach(function(s){allIngr.push(s.n+" "+s.il);});});});var inStock=[];CATS.forEach(function(cat){cat.items.forEach(function(it){if((state[fbk(cat.id,it.n)]||0)>=it.target)inStock.push(it.n);});});closeDiet();showPage("shop");callAPI([{role:"user",content:"Skladniki z diety: "+allIngr.join(", ")+". Mam juz: "+inStock.join(", ")+". Lista zakupow. TYLKO JSON: {\"komentarz\":\"\",\"produkty\":[{\"nazwa\":\"\",\"ilosc\":\"\",\"priorytet\":\"wysoki\",\"powod\":\"\"}]}"}],SYS,function(res){var clean=res.replace(/```json/gi,"").replace(/```/g,"").trim();try{renderShopList(JSON.parse(clean.slice(clean.indexOf("{"),clean.lastIndexOf("}")+1)));}catch(e){document.getElementById("shop-list-content").innerHTML='<div class="ai-note">'+res+'</div>';}},function(err){dlgAlert("X","Błąd",err);});}
 
 // ── SINGLE MEAL GENERATION ────────────────────────────────────────────────────
 function generateSingleMeal(menuNum,section,replaceIdx){
-  if(!apiKey){dlgAlert("X","Brak klucza API","Skonfiguruj klucz API.");return;}
-  if(!userProfile||!userProfile.kcal){dlgAlert("X","Brak profilu","Uzupelnij profil.");return;}
+  if(!apiKey){dlgAlert("X","Brak klucza API API","Skonfiguruj klucz API w ustawieniach.");return;}
+  if(!userProfile||!userProfile.kcal){dlgAlert("X","Brak profilu użytkownika","Uzupełnij profil.");return;}
   var d=getDietData(),menuKey="menu"+menuNum,menu=d[menuKey]||{};
   var existing=(menu[section]||[]).filter(function(m,i){return i!==replaceIdx;}).map(function(m){return m.nazwa;}).join(", ");
   var mealName={sniadania:"sniadanie",obiady:"obiad",kolacje:"kolacja"}[section]||section;
@@ -1422,10 +1422,10 @@ function generateSingleMeal(menuNum,section,replaceIdx){
   callAPI([{role:"user",content:prompt}],"Jestes dietetykiem. TYLKO JSON bez markdown.",function(res){
     var clean=res.replace(/```json/gi,"").replace(/```/g,"").trim();
     var s=clean.indexOf("{"),e=clean.lastIndexOf("}");
-    if(s===-1||e===-1){renderDietBody();dlgAlert("X","Blad","Sprobuj ponownie.");return;}
+    if(s===-1||e===-1){renderDietBody();dlgAlert("X","Błąd","Spróbuj ponownie.");return;}
     try{
       var meal=JSON.parse(clean.slice(s,e+1).replace(/,\s*([}\]])/g,"$1"));
-      if(!meal.nazwa||!meal.kcal)throw new Error("Brakujace pola");
+      if(!meal.nazwa||!meal.kcal)throw new Error("Brakujące pola");
       if(!userProfile.dietData)userProfile.dietData=JSON.parse(JSON.stringify(GRZES_DIET));
       var mk="menu"+menuNum;
       if(!userProfile.dietData[mk])userProfile.dietData[mk]={};
@@ -1433,46 +1433,46 @@ function generateSingleMeal(menuNum,section,replaceIdx){
       if(replaceIdx!==null&&replaceIdx!==undefined&&replaceIdx>=0){userProfile.dietData[mk][section][replaceIdx]=meal;}
       else{userProfile.dietData[mk][section].push(meal);}
       saveUserProfile(userProfile);dietMenu=menuNum;expandedMeal=null;renderDietBody();
-    }catch(ex){renderDietBody();dlgAlert("X","Blad",ex.message);}
-  },function(err){renderDietBody();dlgAlert("X","Blad API",err);},2500);
+    }catch(ex){renderDietBody();dlgAlert("X","Błąd",ex.message);}
+  },function(err){renderDietBody();dlgAlert("X","Błąd połączenia z API",err);},2500);
 }
 
 // ── GENERATE FULL DIET ────────────────────────────────────────────────────────
 function startDietGeneration(){
   if(!userProfile||!userProfile.kcal){
     closeProfileModal();
-    dlgAlert("?","Brak profilu","Najpierw uzupelnij profil klikajac Edytuj profil.");
+    dlgAlert("?","Brak profilu użytkownika","Najpierw uzupelnij profil klikajac Edytuj profil.");
     return;
   }
   closeProfileModal();
   // Pokaż natychmiastowy feedback w diet-overlay
   document.getElementById("diet-overlay").classList.add("show");
   document.getElementById("diet-user-name").textContent=userName;
-  // Aktywuj zakładkę Przepisy
+  // Aktywuj zakładkę Sposób przygotowaniay
   for(var i=0;i<3;i++){var t=document.getElementById("dtab-"+i);if(t){t.style.borderBottom=i===0?"3px solid var(--green)":"3px solid transparent";t.style.color=i===0?"var(--green)":"var(--text3)";}}
   var body=document.getElementById("diet-body");
   var storeName={biedronka:"Biedronka",lidl:"Lidl",both:"Biedronka i Lidl"}[userProfile.stores]||"Biedronka";
   body.innerHTML=
     '<div style="text-align:center;padding:40px 20px">'
     +'<div style="font-size:60px;margin-bottom:16px;animation:spin_diet 2s linear infinite;display:inline-block">&#129302;</div>'
-    +'<div style="font-size:18px;font-weight:900;color:var(--text);margin-bottom:8px">Generuje Twoja diete...</div>'
-    +'<div style="font-size:13px;color:var(--text3);margin-bottom:6px">Claude AI dobiera posilki z '+storeName+'</div>'
+    +'<div style="font-size:18px;font-weight:900;color:var(--text);margin-bottom:8px">Generuję Twoją dietę...</div>'
+    +'<div style="font-size:13px;color:var(--text3);margin-bottom:6px">Claude AI dobiera posiłki z '+storeName+'</div>'
     +'<div style="font-size:12px;color:var(--text3);margin-bottom:24px">'
-    +'Cel: <b style="color:var(--green)">'+{lose:"Redukcja tluszczu",maintain:"Utrzymanie wagi",gain:"Masa miesniowa"}[userProfile.goal]+'</b> &bull; '
-    +userProfile.kcal+' kcal/dzien &bull; B:'+userProfile.prot+'g W:'+userProfile.carb+'g T:'+userProfile.fat+'g'
+    +'Cel: <b style="color:var(--green)">'+{lose:"Redukcja tkanki tłuszczowej",maintain:"Utrzymanie masy ciała",gain:"Budowa masy mięśniowej"}[userProfile.goal]+'</b> &bull; '
+    +userProfile.kcal+' kcal/dzień &bull; B:'+userProfile.prot+'g W:'+userProfile.carb+'g T:'+userProfile.fat+'g'
     +'</div>'
     +'<div class="spin" style="margin:0 auto 20px"></div>'
     +'<div id="diet-gen-step" style="font-size:13px;color:var(--amber);font-weight:700">Krok 1/2 &mdash; Menu 1...</div>'
     +'<div style="margin-top:20px;background:var(--bg3);border-radius:12px;padding:16px;text-align:left;border:1px solid var(--border)">'
-    +'<div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.8px">Co sie teraz dzieje?</div>'
+    +'<div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.8px">Co się teraz dzieje?</div>'
     +'<div style="font-size:12px;color:var(--text2);line-height:2">'
-    +'<div>&#9989; Analizuje Twoje parametry</div>'
+    +'<div>&#9989; Analizuję Twoje parametry</div>'
     +'<div>&#9989; Dobiera produkty z '+storeName+'</div>'
-    +'<div id="step-m1" style="color:var(--text3)">&#9203; Generuje Menu 1 (9 posilkow)...</div>'
-    +'<div id="step-m2" style="color:var(--text3)">&#9203; Generuje Menu 2 (9 posilkow)...</div>'
+    +'<div id="step-m1" style="color:var(--text3)">&#9203; Generuję Menu 1 (9 posiłków)...</div>'
+    +'<div id="step-m2" style="color:var(--text3)">&#9203; Generuję Menu 2 (9 posiłków)...</div>'
     +'<div id="step-done" style="color:var(--text3)">&#9203; Oblicza makro i kalorie</div>'
     +'</div></div>'
-    +'<div style="margin-top:16px;font-size:11px;color:var(--text3)">To moze zajac okolo 30-60 sekund...</div>'
+    +'<div style="margin-top:16px;font-size:11px;color:var(--text3)">To może zająć około 30–60 sekund...</div>'
     +'</div>';
   // Dodaj animację robota
   var style=document.createElement("style");
@@ -1488,18 +1488,18 @@ function updateDietStep(step){
   var done=document.getElementById("step-done");
   var genStep=document.getElementById("diet-gen-step");
   if(step===1){if(m1){m1.style.color="var(--amber)";m1.textContent="&#9203; Generuje Menu 1...";}if(genStep)genStep.textContent="Krok 1/2 — Menu 1...";}
-  else if(step===2){if(m1){m1.style.color="var(--green)";m1.innerHTML="&#9989; Menu 1 gotowe!";}if(m2){m2.style.color="var(--amber)";m2.textContent="&#9203; Generuje Menu 2...";}if(genStep)genStep.textContent="Krok 2/2 — Menu 2...";}
-  else if(step===3){if(m2){m2.style.color="var(--green)";m2.innerHTML="&#9989; Menu 2 gotowe!";}if(done){done.style.color="var(--amber)";done.textContent="&#9203; Finalizuje i zapisuje...";}if(genStep)genStep.textContent="Zapisuje dietę...";}
+  else if(step===2){if(m1){m1.style.color="var(--green)";m1.innerHTML="&#9989; Menu 1 — gotowe!";}if(m2){m2.style.color="var(--amber)";m2.textContent="&#9203; Generuje Menu 2...";}if(genStep)genStep.textContent="Krok 2/2 — Menu 2...";}
+  else if(step===3){if(m2){m2.style.color="var(--green)";m2.innerHTML="&#9989; Menu 2 — gotowe!";}if(done){done.style.color="var(--amber)";done.textContent="&#9203; Finalizuję i zapisuję...";}if(genStep)genStep.textContent="Zapisuje dietę...";}
 }
 
 function generateAIDiet(profile){
-  if(!apiKey){dlgAlert("X","Brak klucza API","Skonfiguruj klucz API.");return;}
-  if(!profile||!profile.kcal){dlgAlert("X","Brak profilu","Uzupelnij profil.");return;}
+  if(!apiKey){dlgAlert("X","Brak klucza API API","Skonfiguruj klucz API w ustawieniach.");return;}
+  if(!profile||!profile.kcal){dlgAlert("X","Brak profilu użytkownika","Uzupełnij profil.");return;}
   var storeName={biedronka:"Biedronka",lidl:"Lidl",both:"Biedronka i Lidl"}[profile.stores]||"Biedronka";
   var goalTxt={lose:"redukcja tluszczu",maintain:"utrzymanie wagi",gain:"masa miesniowa"}[profile.goal]||profile.goal;
   var mK=Math.round(profile.kcal/3),mP=Math.round(profile.prot/3),mC=Math.round(profile.carb/3),mF=Math.round(profile.fat/3);
   var likedStr=(profile.liked&&profile.liked.length)?" PRIORYTETUJ lubiane: "+profile.liked.join(", "):"";
-  var dislikedStr=(profile.disliked&&profile.disliked.length)?" WYKLUCZ nielubiane: "+profile.disliked.join(", "):"";  var base="Uzytkownik: "+goalTxt+", "+profile.kcal+" kcal/dzien, B:"+profile.prot+"g W:"+profile.carb+"g T:"+profile.fat+"g. Na posilek: "+mK+" kcal B:"+mP+"g W:"+mC+"g T:"+mF+"g (+/-5%). Sklep: "+storeName+"."+(profile.exclude?" Wykluczone: "+profile.exclude+".":"")+likedStr+dislikedStr+" Produkty: "+FULL_PRODUCTS+". Zasady: realne gramy (bialko 100-250g, weglowodany 60-200g), min 10g kazdego skladnika, policz makro dokladnie, max 30 min, proste dania. TYLKO JSON.";
+  var dislikedStr=(profile.disliked&&profile.disliked.length)?" WYKLUCZ nielubiane: "+profile.disliked.join(", "):"";  var base="Uzytkownik: "+goalTxt+", "+profile.kcal+" kcal/dzień, B:"+profile.prot+"g W:"+profile.carb+"g T:"+profile.fat+"g. Na posilek: "+mK+" kcal B:"+mP+"g W:"+mC+"g T:"+mF+"g (+/-5%). Sklep: "+storeName+"."+(profile.exclude?" Wykluczone: "+profile.exclude+".":"")+likedStr+dislikedStr+" Produkty: "+FULL_PRODUCTS+". Zasady: realne gramy (bialko 100-250g, weglowodany 60-200g), min 10g kazdego skladnika, policz makro dokladnie, max 30 min, proste dania. TYLKO JSON.";
   var fmt='{"sniadania":[{"nazwa":"...","czas":"15 min","kcal":0,"prot":0,"carb":0,"fat":0,"skladniki":[{"n":"Produkt","il":"150g"}],"przepis":"1. Krok."}],"obiady":[...],"kolacje":[...]}';
   var sys="Jestes dietetykiem. TYLKO JSON bez markdown. Nie pisz nic przed ani po JSON.";
   document.getElementById("diet-overlay").classList.add("show");
@@ -1521,11 +1521,11 @@ function generateAIDiet(profile){
 }
 function parseMenuJSON(raw){try{var clean=raw.replace(/```json/gi,"").replace(/```/g,"").trim();var s=clean.indexOf("{"),e=clean.lastIndexOf("}");if(s===-1||e===-1)return null;var p=JSON.parse(clean.slice(s,e+1).replace(/,\s*([}\]])/g,"$1"));return(p.sniadania&&p.obiady&&p.kolacje)?p:null;}catch(ex){return null;}}
 function getJSONError(raw){try{var c=raw.replace(/```json/gi,"").replace(/```/g,"").trim();JSON.parse(c.slice(c.indexOf("{"),c.lastIndexOf("}")+1));return"OK";}catch(ex){return ex.message.slice(0,80);}}
-function showDietError(msg){document.getElementById("diet-body").innerHTML='<div style="text-align:center;padding:40px"><div style="font-size:40px;margin-bottom:10px">X</div><div style="color:var(--red);font-weight:700;margin-bottom:8px">Blad generowania</div><div style="font-size:12px;color:var(--text3);margin-bottom:16px;word-break:break-all">'+msg+'</div><button onclick="generateAIDiet(userProfile)" style="background:var(--green);color:#000;border:none;border-radius:50px;padding:12px 24px;font-size:14px;font-weight:800;cursor:pointer">Sprobuj ponownie</button></div>';}
-function fixMenuMacros(menu,profile){var secs=["sniadania","obiady","kolacje"],mK=Math.round(profile.kcal/3),mP=Math.round(profile.prot/3),mC=Math.round(profile.carb/3),mF=Math.round(profile.fat/3);secs.forEach(function(sec){if(!menu[sec])menu[sec]=[];menu[sec].forEach(function(m){if(!m.kcal||m.kcal<100||m.kcal>2500)m.kcal=mK;if(!m.prot||m.prot<5)m.prot=mP;if(!m.carb||m.carb<5)m.carb=mC;if(!m.fat||m.fat<2)m.fat=mF;if(!m.skladniki||!m.skladniki.length)m.skladniki=[{n:"Brak danych",il:"?"}];if(!m.przepis)m.przepis="Przygotuj zgodnie z gramaturami.";if(!m.nazwa)m.nazwa="Posilek";if(!m.czas)m.czas="20 min";});});return menu;}
+function showDietError(msg){document.getElementById("diet-body").innerHTML='<div style="text-align:center;padding:40px"><div style="font-size:40px;margin-bottom:10px">X</div><div style="color:var(--red);font-weight:700;margin-bottom:8px">Błąd generowania diety</div><div style="font-size:12px;color:var(--text3);margin-bottom:16px;word-break:break-all">'+msg+'</div><button onclick="generateAIDiet(userProfile)" style="background:var(--green);color:#000;border:none;border-radius:50px;padding:12px 24px;font-size:14px;font-weight:800;cursor:pointer">Spróbuj ponownie</button></div>';}
+function fixMenuMacros(menu,profile){var secs=["sniadania","obiady","kolacje"],mK=Math.round(profile.kcal/3),mP=Math.round(profile.prot/3),mC=Math.round(profile.carb/3),mF=Math.round(profile.fat/3);secs.forEach(function(sec){if(!menu[sec])menu[sec]=[];menu[sec].forEach(function(m){if(!m.kcal||m.kcal<100||m.kcal>2500)m.kcal=mK;if(!m.prot||m.prot<5)m.prot=mP;if(!m.carb||m.carb<5)m.carb=mC;if(!m.fat||m.fat<2)m.fat=mF;if(!m.skladniki||!m.skladniki.length)m.skladniki=[{n:"Brak danych do wyświetlenia",il:"?"}];if(!m.przepis)m.przepis="Przygotuj zgodnie z gramaturami.";if(!m.nazwa)m.nazwa="Posilek";if(!m.czas)m.czas="20 min";});});return menu;}
 
 // ── EDIT MEAL ─────────────────────────────────────────────────────────────────
-function openEditMeal(section,idx){var d=getDietData(),menu=dietMenu===1?d.menu1:d.menu2,m=menu[section]&&menu[section][idx];if(!m){dlgAlert("X","Blad","Nie znaleziono posilku");return;}editMealCtx={section:section,idx:idx};document.getElementById("edit-meal-name").value=m.nazwa||"";document.getElementById("edit-meal-kcal").value=m.kcal||"";document.getElementById("edit-meal-prot").value=m.prot||"";document.getElementById("edit-meal-carb").value=m.carb||"";document.getElementById("edit-meal-fat").value=m.fat||"";document.getElementById("edit-meal-ingr").value=(m.skladniki||[]).map(function(sk){return sk.n+" - "+sk.il;}).join("\n");document.getElementById("edit-meal-recipe").value=m.przepis||"";document.getElementById("edit-meal-overlay").classList.add("show");}
+function openEditMeal(section,idx){var d=getDietData(),menu=dietMenu===1?d.menu1:d.menu2,m=menu[section]&&menu[section][idx];if(!m){dlgAlert("X","Błąd","Nie znaleziono posiłku");return;}editMealCtx={section:section,idx:idx};document.getElementById("edit-meal-name").value=m.nazwa||"";document.getElementById("edit-meal-kcal").value=m.kcal||"";document.getElementById("edit-meal-prot").value=m.prot||"";document.getElementById("edit-meal-carb").value=m.carb||"";document.getElementById("edit-meal-fat").value=m.fat||"";document.getElementById("edit-meal-ingr").value=(m.skladniki||[]).map(function(sk){return sk.n+" - "+sk.il;}).join("\n");document.getElementById("edit-meal-recipe").value=m.przepis||"";document.getElementById("edit-meal-overlay").classList.add("show");}
 function closeEditMeal(){document.getElementById("edit-meal-overlay").classList.remove("show");}
 function saveEditMeal(){var name=document.getElementById("edit-meal-name").value.trim();if(!name)return;var ingrRaw=document.getElementById("edit-meal-ingr").value.split("\n").filter(function(l){return l.trim();});var skladniki=ingrRaw.map(function(line){var parts=line.split(" - ");return{n:parts[0]||line.trim(),il:parts[1]||""};});var updated={nazwa:name,czas:"",kcal:parseInt(document.getElementById("edit-meal-kcal").value)||0,prot:parseInt(document.getElementById("edit-meal-prot").value)||0,carb:parseInt(document.getElementById("edit-meal-carb").value)||0,fat:parseInt(document.getElementById("edit-meal-fat").value)||0,skladniki:skladniki,przepis:document.getElementById("edit-meal-recipe").value.trim()};if(!userProfile.dietData)userProfile.dietData=JSON.parse(JSON.stringify(GRZES_DIET));var mk="menu"+dietMenu;if(!userProfile.dietData[mk])userProfile.dietData[mk]={};if(!userProfile.dietData[mk][editMealCtx.section])userProfile.dietData[mk][editMealCtx.section]=[];userProfile.dietData[mk][editMealCtx.section][editMealCtx.idx]=updated;saveUserProfile(userProfile);closeEditMeal();expandedMeal=null;renderDietBody();}
 
@@ -1538,7 +1538,7 @@ var GRZES_DIET={menu1:{
   ],
   obiady:[
     {nazwa:"Kurczak z Ryzem",czas:"25 min",kcal:750,prot:65,carb:80,fat:15,skladniki:[{n:"Piers z Kurczaka",il:"200g"},{n:"Ryz Basmati",il:"80g"},{n:"Szpinak",il:"100g"},{n:"Oliwa z Oliwek",il:"10g"}],przepis:"1. Ugotuj ryz.\n2. Usdrub kurczaka.\n3. Podaj z ryzem i szpinakiem."},
-    {nazwa:"Kasza z Wolowina",czas:"30 min",kcal:800,prot:60,carb:75,fat:20,skladniki:[{n:"Wolowina Mielona",il:"200g"},{n:"Kasza Gryczana",il:"80g"},{n:"Papryka",il:"100g"},{n:"Passata Pomidorowa",il:"150g"}],przepis:"1. Ugotuj kasza.\n2. Podsmaz wolowine z papryka.\n3. Polej passata."},
+    {nazwa:"Kasza z Wołowina",czas:"30 min",kcal:800,prot:60,carb:75,fat:20,skladniki:[{n:"Wołowina Mielona",il:"200g"},{n:"Kasza Gryczana",il:"80g"},{n:"Papryka",il:"100g"},{n:"Passata Pomidorowa",il:"150g"}],przepis:"1. Ugotuj kasza.\n2. Podsmaz wolowine z papryka.\n3. Polej passata."},
     {nazwa:"Losos z Ziemniakami",czas:"30 min",kcal:780,prot:55,carb:70,fat:25,skladniki:[{n:"Filet z Lososia",il:"200g"},{n:"Ziemniaki",il:"300g"},{n:"Cukinia",il:"150g"}],przepis:"1. Ugotuj ziemniaki.\n2. Upiecz lososia."}
   ],
   kolacje:[
@@ -1609,11 +1609,11 @@ function startApp(){
     },3000);
   }).catch(function(ex){
     var sl=document.getElementById("splash-lbl");
-    if(sl)sl.innerHTML="Blad polaczenia: "+ex.message+"<br><br><button onclick='startApp()' style='background:var(--green);color:#000;border:none;border-radius:50px;padding:12px 24px;font-size:14px;font-weight:800;cursor:pointer'>Sprobuj ponownie</button><br><br><button onclick='goOffline()' style='background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:50px;padding:10px 20px;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px'>Otworz bez sieci</button>";
+    if(sl)sl.innerHTML="Błąd połączenia: "+ex.message+"<br><br><button onclick='startApp()' style='background:var(--green);color:#000;border:none;border-radius:50px;padding:12px 24px;font-size:14px;font-weight:800;cursor:pointer'>Spróbuj ponownie</button><br><br><button onclick='goOffline()' style='background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:50px;padding:10px 20px;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px'>Otwórz bez sieci</button>";
   });
 }
 function goOffline(){state=mkState();document.getElementById("splash").style.display="none";document.getElementById("app").style.display="block";buildCatChips();setSyncUI("err");render();}
-function resetAll(){dlgConfirm("X","Reset lodowki","Zresetowac wszystkie stany do zera?",function(){state=mkState();render();fbPatch(RP,state).then(function(){addLog("RESET",0,0);});},"Resetuj","danger");}
+function resetAll(){dlgConfirm("X","Reset lodówki","Zresetować wszystkie stany do zera?",function(){state=mkState();render();fbPatch(RP,state).then(function(){addLog("RESET",0,0);});},"Resetuj","danger");}
 function loadUserProfile(name,cb){fbGet(FB+"/profiles/"+profileKey(name)).then(function(p){if(p&&p.kcal){userProfile=p;cb(true);}else{userProfile=null;cb(false);}}).catch(function(){userProfile=null;cb(false);});}
 function saveUserProfile(p){userProfile=p;if(RP)fbPut(FB+"/profiles/"+profileKey(userName),p);}
 
@@ -1666,10 +1666,10 @@ function openPurchaseHistory(){
     var body=document.getElementById("diet-body");
     if(!body)return;
     if(!purchaseHistory.length){
-      body.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px">&#129534;</div>Brak zeskanowanych paragonow.<br><br>Uzyj skanera paragonu w zakladce Zakupy.</div>';
+      body.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px">&#129534;</div>Brak zeskanowanych paragonów.<br><br>Uzyj skanera paragonu w zakladce Zakupy.</div>';
       return;
     }
-    var html='<div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px">'+purchaseHistory.length+' paragonow</div>';
+    var html='<div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px">'+purchaseHistory.length+' paragonów</div>';
     // Price analysis
     var priceMap={};
     purchaseHistory.forEach(function(p){
@@ -1729,10 +1729,10 @@ function openPurchaseHistory(){
 
 // ── SMART SHOPPING LIST — oparty na diecie + lodowce ─────────────────────────
 function generateSmartShopList(){
-  if(!apiKey){dlgAlert("X","Brak API","Skonfiguruj klucz API.");return;}
-  if(!userProfile||!userProfile.kcal){dlgAlert("X","Brak profilu","Uzupelnij profil.");return;}
+  if(!apiKey){dlgAlert("X","Brak API","Skonfiguruj klucz API w ustawieniach.");return;}
+  if(!userProfile||!userProfile.kcal){dlgAlert("X","Brak profilu użytkownika","Uzupełnij profil.");return;}
   var btn=document.getElementById("gen-btn"),spin=document.getElementById("gen-spin"),txt=document.getElementById("gen-btn-txt");
-  btn.disabled=true;spin.style.display="block";txt.textContent="Generuje inteligentna liste...";
+  btn.disabled=true;spin.style.display="block";txt.textContent="Generuję inteligentną listę...";
   var missing=[],expiring=[];
   CATS.forEach(function(cat){cat.items.forEach(function(it){
     var cur=state[fbk(cat.id,it.n)]||0;
@@ -1754,7 +1754,7 @@ function generateSmartShopList(){
     +" Zasady: priorytetuj lubiane, wyklucz nielubiane, uwzgledniaj stan lodowki."
     +' TYLKO JSON: {"komentarz":"","produkty":[{"nazwa":"","ilosc":"","jednostka":"","kategoria":"","priorytet":"wysoki/sredni/niski","powod":""}]}';
   callAPI([{role:"user",content:prompt}],SYS,function(res){
-    btn.disabled=false;spin.style.display="none";txt.textContent="Odswiez liste";
+    btn.disabled=false;spin.style.display="none";txt.textContent="Odśwież listę";
     var clean=res.replace(/```json/gi,"").replace(/```/g,"").trim();
     var s=clean.indexOf("{"),e=clean.lastIndexOf("}");
     try{renderShopList(JSON.parse(s!==-1&&e!==-1?clean.slice(s,e+1):clean));}
@@ -2101,7 +2101,7 @@ function renderWeekPlan(){
   // Przycisk listy zakupów na N dni
   h+='<div style="margin-top:14px;display:flex;gap:8px">';
   h+='<button onclick="generateDietShoppingList('+planDays+')" style="flex:2;background:linear-gradient(135deg,var(--purple),#4F46E5);color:#fff;border:none;border-radius:50px;padding:13px;font-size:13px;font-weight:800;cursor:pointer">📊 Lista zakupów na '+planDays+(planDays===1?" dzień":" dni")+'</button>';
-  h+='<button onclick="generateShopFromDiet()" style="flex:1;background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:50px;padding:13px;font-size:12px;font-weight:700;cursor:pointer">AI lista</button>';
+  h+='<button onclick="generateShopFromDiet()" style="flex:1;background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:50px;padding:13px;font-size:12px;font-weight:700;cursor:pointer">Lista AI</button>';
   h+='</div>';
   return h;
 }
@@ -2147,7 +2147,7 @@ function validateMeal(meal, profile){
 }
 
 function validateMenu(menu, profile){
-  if(!menu||!profile)return{ok:false,issues:["Brak danych"]};
+  if(!menu||!profile)return{ok:false,issues:["Brak danych do wyświetlenia"]};
   var totalK=0,totalP=0,totalC=0,totalF=0;
   ["sniadania","obiady","kolacje"].forEach(function(t){
     (menu[t]||[]).forEach(function(m){totalK+=m.kcal||0;totalP+=m.prot||0;totalC+=m.carb||0;totalF+=m.fat||0;});
@@ -2331,7 +2331,7 @@ function convertToPurchaseUnits(product, missingAmount){
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// CMS — Panel Administratora
+// CMS — Panel administratora
 // ══════════════════════════════════════════════════════════════════════════════
 var CMS_PASS = "spizarnia2025";
 var cmsTab = 0;
@@ -2347,7 +2347,7 @@ function openCMS() {
 
 function checkCMSPass() {
   var p = document.getElementById("cms-pass-inp").value;
-  if (p !== CMS_PASS) { dlgAlert("X", "Błędne hasło", ""); return; }
+  if (p !== CMS_PASS) { dlgAlert("X", "Nieprawidłowe hasło", ""); return; }
   document.getElementById("cms-pass-overlay").classList.remove("show");
   document.getElementById("cms-overlay").classList.add("show");
   loadCMSData();
@@ -2578,7 +2578,7 @@ function renderCMSStats() {
   html += '<div style="background:#111118;border-radius:12px;padding:14px;border:1px solid #2A2A3A;margin-bottom:12px">';
   html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Cele użytkowników</div>';
   html += bar("Redukcja tłuszczu", goals.lose || 0, totalUsers, "#FF4D4D");
-  html += bar("Utrzymanie wagi", goals.maintain || 0, totalUsers, "#F59E0B");
+  html += bar("Utrzymanie masy ciała", goals.maintain || 0, totalUsers, "#F59E0B");
   html += bar("Masa mięśniowa", goals.gain || 0, totalUsers, "#1ED760");
   html += '</div>';
   html += '<div style="background:#111118;border-radius:12px;padding:14px;border:1px solid #2A2A3A;margin-bottom:12px">';
@@ -2813,7 +2813,7 @@ function showUpdatePantryModal(){
   <div style="background:#0D0D15;border-bottom:1px solid #2A2A3A;padding:14px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0">
     <button onclick="closeCMS()" style="background:#1A1A24;border:none;color:#6B6B85;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer">&#8592;</button>
     <div>
-      <div style="font-size:17px;font-weight:900;color:#fff">Panel Administratora</div>
+      <div style="font-size:17px;font-weight:900;color:#fff">Panel administratora</div>
       <div style="font-size:11px;color:#6B6B85">Pełna Lodówka CMS</div>
     </div>
     <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
@@ -2846,9 +2846,9 @@ function showUpdatePantryModal(){
 <div class="dlg-overlay" id="cms-pass-overlay">
   <div class="dlg-box" style="max-width:340px">
     <div class="dlg-ico">&#128272;</div>
-    <div class="dlg-title">Panel Administratora</div>
+    <div class="dlg-title">Panel administratora</div>
     <div class="dlg-msg" style="margin-bottom:12px">Wpisz hasło administratora</div>
-    <input id="cms-pass-inp" type="password" class="modal-inp" placeholder="Hasło..." onkeydown="if(event.key==='Enter')checkCMSPass()" style="margin-bottom:14px">
+    <input id="cms-pass-inp" type="password" class="modal-inp" placeholder="Hasło administratora" onkeydown="if(event.key==='Enter')checkCMSPass()" style="margin-bottom:14px">
     <div class="dlg-btns">
       <button class="dlg-btn cancel" onclick="document.getElementById('cms-pass-overlay').classList.remove('show')">Anuluj</button>
       <button class="dlg-btn ok" onclick="checkCMSPass()">Wejdź</button>
