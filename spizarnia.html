@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-units-bilans-spelling-v2 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-parser-fix-units-pieces-v3 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1019,7 +1019,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-31-units-bilans-spelling-v2";
+var APP_VERSION="2026-05-31-parser-fix-units-pieces-v3";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -1942,8 +1942,85 @@ function setShopDays(days){
 function generateShopList(){if(!apiKey){dlgAlert("X","Niedostepne","Skonfiguruj klucz API");return;}var btn=document.getElementById("gen-btn"),spin=document.getElementById("gen-spin"),txt=document.getElementById("gen-btn-txt");btn.disabled=true;spin.style.display="block";txt.textContent="Generuje...";var missing=[],expiring=[];CATS.forEach(function(cat){cat.items.forEach(function(it){var cur=state[fbk(cat.id,it.n)]||0;if(cur<it.target)missing.push(it.n+"(mam:"+cur+",potrzeba:"+it.target+" "+it.unit+")");var d=getDaysLeft(it);if(d!==null&&d<=3&&cur>0)expiring.push(it.n+"("+d+"dni)");});});var storeName={biedronka:"Biedronka",lidl:"Lidl",both:"Biedronka i Lidl"}[shopStore]||"Biedronka";var prompt="Lista zakupow do "+storeName+". Braki w lodowce: "+missing.join("; ")+". Wygasaja wkrotce: "+(expiring.join("; ")||"nic")+". Jezeli uzytkownik ostatnio kupowal cos w Biedronce uwzgledniej te produkty przy priorytetach. TYLKO JSON: {\"komentarz\":\"\",\"produkty\":[{\"nazwa\":\"\",\"ilosc\":\"\",\"priorytet\":\"wysoki/sredni/niski\",\"powod\":\"\"}]}";callAPI([{role:"user",content:prompt}],SYS,function(res){btn.disabled=false;spin.style.display="none";txt.textContent="Odswiez liste";var clean=res.replace(/```json/gi,"").replace(/```/g,"").trim();var s=clean.indexOf("{"),e=clean.lastIndexOf("}");try{renderShopList(JSON.parse(s!==-1&&e!==-1?clean.slice(s,e+1):clean));}catch(ex){document.getElementById("shop-list-content").innerHTML='<div class="ai-note">'+res+'</div>';}},function(err){btn.disabled=false;spin.style.display="none";txt.textContent="Generuj liste AI";document.getElementById("shop-list-content").innerHTML='<div class="ai-note" style="color:var(--red)">Blad: '+err+'</div>';});}
 function renderShopList(data){shopChecked={};document.getElementById("copy-btn").classList.add("show");var high=[],med=[],low=[];(data.produkty||[]).forEach(function(p){if(p.priorytet==="wysoki"||p.priorytet==="high")high.push(p);else if(p.priorytet==="niski"||p.priorytet==="low")low.push(p);else med.push(p);});var html='<div class="ai-note">'+(data.komentarz||"")+'</div>';function sec(items,title,cls){if(!items.length)return"";var s='<div style="margin-bottom:14px"><div class="shop-sec-title">'+title+'</div>';items.forEach(function(p,i){var id="si-"+cls+i;s+='<div class="shop-item" id="'+id+'" onclick="toggleShopItem(this.id)"><div class="shop-item-check"></div><div class="shop-item-info"><div class="shop-item-name">'+p.nazwa+'</div><div class="shop-item-detail">'+p.ilosc+' - '+p.powod+'</div></div><span class="prio prio-'+cls+'">'+p.priorytet+'</span></div>';});return s+"</div>";}html+=sec(high,"Pilne","high")+sec(med,"Wazne","med")+sec(low,"Warto miec","low");document.getElementById("shop-list-content").innerHTML=html;}
 function toggleShopItem(id){var el=document.getElementById(id);if(!el)return;shopChecked[id]=!shopChecked[id];el.classList[shopChecked[id]?"add":"remove"]("checked");el.querySelector(".shop-item-check").textContent=shopChecked[id]?"v":"";}
-function copyShopList(silent){var items=[];document.querySelectorAll(".shop-item:not(.checked) .shop-item-name").forEach(function(el){items.push("- "+el.textContent);});if(!items.length){CATS.forEach(function(cat){cat.items.forEach(function(it){var cur=state[fbk(cat.id,it.n)]||0;if(cur<it.target)items.push("- "+it.n+" ("+Math.max(0,it.target-cur)+" "+it.unit+")");});});}if(!items.length){if(!silent)dlgAlert("?","Brak produktow","Wygeneruj najpierw liste AI");return false;}var text="PELNA LODOWKA - Lista zakupow\n"+new Date().toLocaleDateString("pl-PL")+"\n\n"+items.join("\n");navigator.clipboard.writeText(text).then(function(){if(!silent)dlgAlert("OK","Skopiowano!",items.length+" produktow.");}).catch(function(){var ta=document.createElement("textarea");ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand("copy");document.body.removeChild(ta);if(!silent)dlgAlert("OK","Skopiowano!","Lista skopiowana.");});return true;}
-function openStore(store){var urls={biedronka:"https://biedronkago.pl",frisco:"https://www.frisco.pl",glovo:"https://glovoapp.com/pl/pl/warszawa/",lisek:"https://lisek.app"};copyShopList(true);dlgConfirm("?","Lista skopiowana","Otworzyc "+store+"?",function(){window.open(urls[store],"_blank");},"Otworz");}
+// Buduje lekstową listę z aktualnie wygenerowanej listy zakupów (z buy/missing/unit info).
+function buildShopListText(){
+  var lines=[];
+  // Spróbuj zebrać z aktualnej smart-listy (zawiera gramaturę + opakowania)
+  try{
+    var days=window.shopDays||7;
+    var sl=calculateShoppingListFromDiet(days);
+    var toBuy=(sl||[]).filter(function(i){return i.status==="MISSING";});
+    toBuy.forEach(function(it){
+      var unit=it.product?it.product.unit:"g";
+      var pkgUnit=it.product?(it.product.pkgUnit||"opak."):"";
+      var pkgSize=it.product?(it.product.pkgSize||0):0;
+      var sw=it.product?Number(it.product.singleWeight||0):0;
+      var buy=it.buy||{};
+      var pcs=buy.pcs||1;
+      var byWeight=buy.byWeight||(it.product&&it.product.soldByWeight);
+      var line="- "+it.name+": ";
+      if(byWeight){
+        var g=Math.ceil(buy.total||it.missing);
+        line+=g+unit;
+        if(sw>0&&g>=sw)line+=" (~"+Math.round(g/sw)+" "+(pkgUnit||"szt")+")";
+      }else if(it.product&&it.product.unit==="szt"&&pkgSize>1){
+        line+=pcs+" "+pkgUnit+" × "+pkgSize+" szt = "+(pcs*pkgSize)+" szt";
+      }else if(pkgSize){
+        line+=pcs+" "+pkgUnit+" × "+pkgSize+unit+" = "+(pcs*pkgSize)+unit;
+      }else{
+        line+=Math.ceil(buy.total||it.missing)+" "+unit;
+      }
+      lines.push(line);
+    });
+  }catch(e){}
+  // Fallback: ze starych targetów CATS
+  if(!lines.length){
+    CATS.forEach(function(cat){cat.items.forEach(function(it){
+      var cur=state[fbk(cat.id,it.n)]||0;
+      if(cur<it.target)lines.push("- "+it.n+" ("+Math.max(0,it.target-cur)+" "+it.unit+")");
+    });});
+  }
+  return lines;
+}
+function copyShopList(silent){
+  var items=buildShopListText();
+  if(!items.length){if(!silent)dlgAlert("?","Brak produktow","Wygeneruj najpierw liste z diety");return false;}
+  var dt=new Date().toLocaleDateString("pl-PL");
+  var text="🛒 PELNA LODOWKA — Lista zakupow\n"+dt+"\n"+(window.shopDays?"Na "+window.shopDays+" dni\n":"")+"\n"+items.join("\n");
+  function doCopy(){
+    var ta=document.createElement("textarea");ta.value=text;ta.style.position="fixed";ta.style.left="-9999px";
+    document.body.appendChild(ta);ta.select();try{document.execCommand("copy");}catch(e){}document.body.removeChild(ta);
+  }
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){if(!silent)dlgAlert("OK","Skopiowano!",items.length+" produktow gotowych do wklejenia.");}).catch(function(){doCopy();if(!silent)dlgAlert("OK","Skopiowano!","Lista skopiowana.");});
+  }else{
+    doCopy();if(!silent)dlgAlert("OK","Skopiowano!","Lista skopiowana.");
+  }
+  return true;
+}
+// Deep-linki do sklepów online — gdzie się da otwórz wyszukiwarkę/zamówienie + skopiuj listę.
+function openStore(store){
+  var labels={biedronka:"Biedronka Go",frisco:"Frisco.pl",glovo:"Glovo",lisek:"Lisek"};
+  var items=buildShopListText();
+  if(!items.length){
+    dlgAlert("ℹ️","Brak listy","Najpierw wygeneruj listę z diety (zielony przycisk powyżej).");
+    return;
+  }
+  // Skopiuj listę do schowka
+  copyShopList(true);
+  // Buduj URL — dla Frisco/Lisek/Glovo nie ma publicznego API do wstrzykiwania koszyka,
+  // ale można otworzyć wyszukiwarkę z pierwszą pozycją.
+  var firstQuery=encodeURIComponent((items[0]||"").replace(/^-\s*/,"").split(":")[0].trim());
+  var urls={
+    biedronka:"https://www.biedronka.pl/pl/szukaj?q="+firstQuery,
+    frisco:"https://www.frisco.pl/search?query="+firstQuery,
+    glovo:"https://glovoapp.com/pl/pl/warszawa/zakupy/?q="+firstQuery,
+    lisek:"https://lisek.app/pl"
+  };
+  dlgConfirm("📋","Lista skopiowana — "+items.length+" pozycji","Otworzyć "+(labels[store]||store)+" i wkleić listę?",function(){
+    window.open(urls[store]||urls.frisco,"_blank","noopener");
+  },"Otwórz sklep");
+}
 
 // ── CHAT ──────────────────────────────────────────────────────────────────────
 function addWelcome(){addMsg("ai","Cześć "+userName.split(" ")[0]+"! Znam zawartość Twojej lodówki"+(userProfile?" i Twoją dietę "+userProfile.kcal+" kcal.":". Wpisz co chcesz ugotować!"));}
@@ -2946,7 +3023,7 @@ function toggleReceiptDetails(el){
 // ══════════════════════════════════════════════════════════════════════════════
 var PRODUCT_DB = [
   // MIĘSO
-  {id:"piers_kurczaka",name:"Pierś z Kurczaka",aliases:["piers z kurczaka","pierś kurczaka","kurczak","piers kurczaka","filet kurczaka"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:110,prot:23,carb:0,fat:1.7},unit:"g",pkgUnit:"g",pkgSize:500,soldByWeight:true,days:3,
+  {id:"piers_kurczaka",name:"Pierś z Kurczaka",aliases:["piers z kurczaka","pierś kurczaka","kurczak","piers kurczaka","filet kurczaka"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:110,prot:23,carb:0,fat:1.7},unit:"g",pkgUnit:"filet",pkgSize:500,soldByWeight:true,days:3,singleWeight:150,
     brands:[
       {brand:"Cedrob Filet z Kurczaka (Biedronka)",shop:"Biedronka",pkgSize:500,n100:{kcal:113,prot:22,carb:0,fat:2.5}},
       {brand:"Kraina Mięs Filet z Kurczaka (Biedronka)",shop:"Biedronka",pkgSize:500,n100:{kcal:108,prot:23.5,carb:0,fat:1.5}},
@@ -2955,9 +3032,8 @@ var PRODUCT_DB = [
     ]},
   {id:"udka_kurczaka",name:"Udka z Kurczaka",aliases:["udka kurczaka","udka z kurczaka"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:170,prot:18,carb:0,fat:11},unit:"g",pkgUnit:"g",pkgSize:1000,soldByWeight:true,days:3},
   {id:"wolowina_mielona",name:"Wołowina Mielona",aliases:["mielona wolowina","wołowina","wolowina"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:220,prot:18,carb:0,fat:16},unit:"g",pkgUnit:"g",pkgSize:400,soldByWeight:false,days:2},
-  {id:"losos_swiezy",name:"Łosoś Świeży",aliases:["losos swiezy","losos","łosoś"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:208,prot:20,carb:0,fat:13},unit:"g",pkgUnit:"g",pkgSize:300,soldByWeight:true,days:2},
-  {id:"dorsz",name:"Dorsz",aliases:["dorsz","filet z dorsza"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:82,prot:18,carb:0,fat:1},unit:"g",pkgUnit:"g",pkgSize:400,soldByWeight:true,days:2},
-  {id:"indyk_mielony",name:"Indyk Mielony",aliases:["indyk mielony","indyk"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:130,prot:20,carb:0,fat:5},unit:"g",pkgUnit:"g",pkgSize:400,soldByWeight:false,days:2},
+  {id:"losos_swiezy",name:"Łosoś Świeży",aliases:["losos swiezy","losos","łosoś","filet z lososia","filet z łososia"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:208,prot:20,carb:0,fat:13},unit:"g",pkgUnit:"filet",pkgSize:200,soldByWeight:true,days:2,singleWeight:200},
+  {id:"indyk_mielony",name:"Indyk Mielony",aliases:["indyk mielony","indyk"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:130,prot:20,carb:0,fat:5},unit:"g",pkgUnit:"opakowanie",pkgSize:400,soldByWeight:false,days:2,singleWeight:400},
   // WĘDLINY
   {id:"szynka_indyka",name:"Szynka z Indyka",aliases:["szynka z indyka","szynka indyka","polędwica z indyka","polędwica indyka","poledwica indyka"],cat:"wedliny",shops:["Biedronka","Lidl"],n100:{kcal:95,prot:20,carb:1,fat:1.8},unit:"g",pkgUnit:"opakowanie",pkgSize:150,soldByWeight:false,days:7,
     brands:[
@@ -3069,20 +3145,20 @@ var PRODUCT_DB = [
     ]},
   {id:"soczewica_czerwona",name:"Soczewica Czerwona",aliases:["soczewica czerwona","soczewica"],cat:"suche",shops:["Biedronka","Lidl"],n100:{kcal:353,prot:25,carb:60,fat:1},unit:"g",pkgUnit:"opakowanie",pkgSize:400,soldByWeight:false,days:365},
   // WARZYWA
-  {id:"pomidory",name:"Pomidory",aliases:["pomidory","pomidor"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:18,prot:1,carb:4,fat:0},unit:"g",pkgUnit:"szt",pkgSize:150,soldByWeight:true,days:5},
-  {id:"ogurek",name:"Ogórek",aliases:["ogurek","ogórek"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:15,prot:1,carb:3,fat:0},unit:"g",pkgUnit:"szt",pkgSize:200,soldByWeight:true,days:7},
-  {id:"papryka",name:"Papryka Czerwona",aliases:["papryka czerwona","papryka","papryka żółta"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:31,prot:1,carb:6,fat:0},unit:"g",pkgUnit:"szt",pkgSize:180,soldByWeight:true,days:7},
+  {id:"pomidory",name:"Pomidory",aliases:["pomidory","pomidor"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:18,prot:1,carb:4,fat:0},unit:"g",pkgUnit:"szt",pkgSize:150,soldByWeight:true,days:5,singleWeight:120},
+  {id:"ogurek",name:"Ogórek",aliases:["ogurek","ogórek"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:15,prot:1,carb:3,fat:0},unit:"g",pkgUnit:"szt",pkgSize:200,soldByWeight:true,days:7,singleWeight:200},
+  {id:"papryka",name:"Papryka Czerwona",aliases:["papryka czerwona","papryka","papryka żółta"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:31,prot:1,carb:6,fat:0},unit:"g",pkgUnit:"szt",pkgSize:180,soldByWeight:true,days:7,singleWeight:180},
   {id:"szpinak",name:"Szpinak",aliases:["szpinak","szpinak baby"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:23,prot:3,carb:2,fat:0},unit:"g",pkgUnit:"opakowanie",pkgSize:200,soldByWeight:false,days:3},
-  {id:"brokuł",name:"Brokuł",aliases:["brokul","brokuł"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:34,prot:3,carb:5,fat:0},unit:"g",pkgUnit:"szt",pkgSize:400,soldByWeight:true,days:5},
-  {id:"cukinia",name:"Cukinia",aliases:["cukinia"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:17,prot:1,carb:3,fat:0},unit:"g",pkgUnit:"szt",pkgSize:300,soldByWeight:true,days:7},
-  {id:"marchew",name:"Marchew",aliases:["marchew","marchewka"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:41,prot:1,carb:10,fat:0},unit:"g",pkgUnit:"kg",pkgSize:1000,soldByWeight:true,days:21},
-  {id:"bataty",name:"Bataty",aliases:["bataty","batata","słodki ziemniak"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:86,prot:2,carb:20,fat:0},unit:"g",pkgUnit:"szt",pkgSize:300,soldByWeight:true,days:14},
-  {id:"ziemniaki",name:"Ziemniaki",aliases:["ziemniaki","ziemniak"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:77,prot:2,carb:17,fat:0},unit:"g",pkgUnit:"kg",pkgSize:2000,soldByWeight:true,days:21},
+  {id:"brokuł",name:"Brokuł",aliases:["brokul","brokuł"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:34,prot:3,carb:5,fat:0},unit:"g",pkgUnit:"szt",pkgSize:400,soldByWeight:true,days:5,singleWeight:400},
+  {id:"cukinia",name:"Cukinia",aliases:["cukinia"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:17,prot:1,carb:3,fat:0},unit:"g",pkgUnit:"szt",pkgSize:300,soldByWeight:true,days:7,singleWeight:300},
+  {id:"marchew",name:"Marchew",aliases:["marchew","marchewka"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:41,prot:1,carb:10,fat:0},unit:"g",pkgUnit:"szt",pkgSize:1000,soldByWeight:true,days:21,singleWeight:80},
+  {id:"bataty",name:"Bataty",aliases:["bataty","batata","słodki ziemniak"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:86,prot:2,carb:20,fat:0},unit:"g",pkgUnit:"szt",pkgSize:300,soldByWeight:true,days:14,singleWeight:250},
+  {id:"ziemniaki",name:"Ziemniaki",aliases:["ziemniaki","ziemniak"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:77,prot:2,carb:17,fat:0},unit:"g",pkgUnit:"kg",pkgSize:2000,soldByWeight:true,days:21,singleWeight:150},
   // OWOCE
-  {id:"banany",name:"Banany",aliases:["banany","banan"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:89,prot:1,carb:23,fat:0},unit:"g",pkgUnit:"szt",pkgSize:120,soldByWeight:true,days:5},
-  {id:"jablka",name:"Jabłka",aliases:["jablka","jabłka","jabłko"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:52,prot:0,carb:14,fat:0},unit:"g",pkgUnit:"szt",pkgSize:180,soldByWeight:true,days:14},
+  {id:"banany",name:"Banany",aliases:["banany","banan"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:89,prot:1,carb:23,fat:0},unit:"g",pkgUnit:"szt",pkgSize:120,soldByWeight:true,days:5,singleWeight:120},
+  {id:"jablka",name:"Jabłka",aliases:["jablka","jabłka","jabłko"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:52,prot:0,carb:14,fat:0},unit:"g",pkgUnit:"szt",pkgSize:180,soldByWeight:true,days:14,singleWeight:180},
   {id:"truskawki_mrozone",name:"Truskawki Mrożone",aliases:["truskawki mrozone","truskawki mrożone","truskawki"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:32,prot:1,carb:8,fat:0},unit:"g",pkgUnit:"opakowanie",pkgSize:1000,soldByWeight:false,days:365},
-  {id:"awokado",name:"Awokado",aliases:["awokado"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:160,prot:2,carb:9,fat:15},unit:"g",pkgUnit:"szt",pkgSize:180,soldByWeight:true,days:5},
+  {id:"awokado",name:"Awokado",aliases:["awokado"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:160,prot:2,carb:9,fat:15},unit:"g",pkgUnit:"szt",pkgSize:180,soldByWeight:true,days:5,singleWeight:170},
   // TŁUSZCZE
   {id:"oliwa",name:"Oliwa z Oliwek",aliases:["oliwa z oliwek","oliwa","oliwa extra vergine"],cat:"tluszcze",shops:["Biedronka","Lidl"],n100:{kcal:822,prot:0,carb:0,fat:91},unit:"ml",pkgUnit:"butelka",pkgSize:500,soldByWeight:false,days:365,
     brands:[
@@ -3183,7 +3259,7 @@ var PRODUCT_DB = [
       {brand:"Pilos Hummus (Lidl)",shop:"Lidl",pkgSize:200,n100:{kcal:225,prot:7,carb:14,fat:16}},
       {brand:"Smaki Polski Hummus (Biedronka)",shop:"Biedronka",pkgSize:200,n100:{kcal:235,prot:7.5,carb:13,fat:17.5}}
     ]},
-  {id:"dorsz",name:"Dorsz Filet",aliases:["dorsz","filet z dorsza","dorsz filet","dorsz świeży","dorsz mrozony"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:82,prot:18,carb:0,fat:1},unit:"g",pkgUnit:"opakowanie",pkgSize:400,soldByWeight:true,days:2,
+  {id:"dorsz",name:"Dorsz Filet",aliases:["dorsz","filet z dorsza","dorsz filet","dorsz świeży","dorsz mrozony"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:82,prot:18,carb:0,fat:1},unit:"g",pkgUnit:"filet",pkgSize:400,soldByWeight:true,days:2,singleWeight:150,
     brands:[
       {brand:"Lisner Filet z Dorsza Mrożony (Biedronka)",shop:"Biedronka",pkgSize:400,n100:{kcal:82,prot:18,carb:0,fat:1}},
       {brand:"Nixe Filet z Dorsza (Lidl)",shop:"Lidl",pkgSize:400,n100:{kcal:85,prot:19,carb:0,fat:1}}
@@ -3337,18 +3413,34 @@ function getBrandsForProduct(prodId,shop){
   return p.brands.filter(function(b){return !b.shop||String(b.shop).toLowerCase().indexOf(sLow)!==-1;});
 }
 
-// ── Parse amount from strings like "150g", "2 szt.", "1 szklanka" ─────────────
+// ── Parse amount from strings like "150g", "2 szt.", "1 szklanka", "150g (3 szt)" ──
+// ZAWSZE patrzymy na PIERWSZĄ jednostkę przy liczbie, ignorujemy "(3 szt)" w nawiasie.
 function parseAmount(str,unit){
   if(!str)return 0;
-  var m=String(str).match(/([\d.]+)/);
+  var s=String(str).toLowerCase().replace(",",".");
+  // Capture: number + immediate following unit (skipping spaces/parens around the rest)
+  var m=s.match(/([\d.]+)\s*(kg|g|ml|l|szt|sztuk|kromk|łyżk|lyzk|łyżeczk|lyzeczk|szklan|opak|główk|glowk)?/);
   if(!m)return 0;
   var n=parseFloat(m[1]);
-  // Konwersja: szklanka ≈ 240ml, łyżka ≈ 15g, łyżeczka ≈ 5g
-  var s=String(str).toLowerCase();
-  if(s.indexOf("szklan")!==-1)return n*240;
-  if(s.indexOf("łyżka")!==-1||s.indexOf("lyzka")!==-1)return n*15;
-  if(s.indexOf("łyżeczk")!==-1||s.indexOf("lyzeczk")!==-1)return n*5;
+  var u=(m[2]||"").trim();
+  // Konwersje na gramy/ml
+  if(u==="kg")return n*1000;
+  if(u==="l")return n*1000;
+  if(u==="g"||u==="ml")return n;
+  if(u.indexOf("szklan")===0)return n*240;
+  if(u.indexOf("łyżeczk")===0||u.indexOf("lyzeczk")===0)return n*5;
+  if(u.indexOf("łyżk")===0||u.indexOf("lyzk")===0)return n*15;
+  // szt./sztuk/opak/kromk/główk - zwracamy surową liczbę (consumer przemnoży przez singleWeight)
   return n;
+}
+// ── Helper: czy pierwsza jednostka to gramy/ml (nie sztuki) ─────────────────
+function isGramAmount(str){
+  if(!str)return false;
+  var s=String(str).toLowerCase().replace(",",".");
+  var m=s.match(/([\d.]+)\s*(kg|g|ml|l|szt|sztuk|kromk|opak|główk|glowk)?/);
+  if(!m)return false;
+  var u=(m[2]||"").trim();
+  return u==="g"||u==="ml"||u==="kg"||u==="l";
 }
 
 // ── Realne makro z ingrediencji (n100 × gramatura) ──────────────────────
@@ -3369,12 +3461,9 @@ function calculateMealMacroFromIngredients(meal){
     }
     result.matchedCount++;
     var grams=parsed;
-    // Jeśli ilość w "szt." a produkt ma singleWeight - przelicz na gramy
-    var lc=amountText.toLowerCase();
-    var isPiece=/szt|sztuk/.test(lc);
-    if(isPiece&&prod.singleWeight){
-      grams=parsed*prod.singleWeight;
-    }else if(prod.unit==="szt"&&prod.singleWeight&&!/g\b|ml\b|kg\b|l\b/.test(lc)){
+    // Tylko gdy PIERWSZA jednostka NIE jest gramami/ml mnozymy przez singleWeight.
+    // To naprawia bug "150g (3 szt)" gdzie poprzednio wykrywało "szt" w nawiasie.
+    if(!isGramAmount(amountText)&&prod.singleWeight){
       grams=parsed*prod.singleWeight;
     }
     var f=grams/100;
@@ -3409,8 +3498,21 @@ function getDietIngredients(diet, menuKey, days){
     (menu[typ]||[]).forEach(function(meal){
       (meal.skladniki||[]).forEach(function(sk){
         var rawName=sk.n||sk.name||"";
-        var amt=parseAmount(sk.il||sk.amount||"0", sk.unit||"g");
+        var rawAmt=sk.il||sk.amount||"0";
+        var amt=parseAmount(rawAmt, sk.unit||"g");
+        var inGrams=isGramAmount(rawAmt);
         var prod=findProduct(rawName);
+        // Konwersja amt -> jednostka produktu (sztuki dla unit="szt", gramy dla unit="g"/"ml")
+        // To naprawia bug "150g (3 szt)" dla Jaja gdzie getDietIngredients zliczało 150 szt
+        if(prod&&prod.unit==="szt"&&prod.singleWeight){
+          if(inGrams){
+            amt=Math.max(1,Math.ceil(amt/prod.singleWeight));
+          }
+        }else if(prod&&(prod.unit==="g"||prod.unit==="ml")){
+          if(!inGrams&&prod.singleWeight){
+            amt=amt*prod.singleWeight;
+          }
+        }
         // Jeśli znaleziono produkt w bazie - pid = prod.id (deterministyczne)
         // Inaczej - dedupKey z normalizacji PL (żeby "brokul" i "Brokuł" miały TEN SAM pid)
         var pid=prod?prod.id:("unknown_"+(dedupKey(rawName)||Math.random().toString(36).slice(2)));
@@ -3644,16 +3746,26 @@ function renderSmartShoppingList(list){
           var color=sh.toLowerCase().indexOf("biedronka")!==-1?"#DC2626":sh.toLowerCase().indexOf("lidl")!==-1?"#1D4ED8":"#7C3AED";
           shopBadge='<span style="background:'+color+'22;border:1px solid '+color+'66;color:'+color+';border-radius:50px;padding:2px 8px;font-size:10px;font-weight:800;flex-shrink:0">'+sh.substring(0,3)+'</span>';
         }
-        // Pakowanie (krótka linia w wierszu)
+        // Pakowanie (krótka linia w wierszu) - pokazuj GRAMY oraz szac. SZTUKI gdzie sensowne
         var quickLine="";
+        var sw=prod?Number(prod.singleWeight||0):0;
         if(byWeight){
-          quickLine=Math.ceil(totalAmount)+' '+unit;
+          var gAmt=Math.ceil(totalAmount);
+          quickLine=gAmt+' '+unit;
+          // Łosoś 1710g -> dodaj "(~9 filetów)" jeśli znamy wagę pojedynczego
+          if(sw>0&&gAmt>=sw){
+            var approxPcs=Math.round(gAmt/sw);
+            var label=(prod.pkgUnit&&prod.pkgUnit!=="g"&&prod.pkgUnit!=="kg")?prod.pkgUnit:"szt";
+            quickLine+=' (~'+approxPcs+' '+label+')';
+          }
         }else if(prod&&prod.unit==="szt"&&pkgSize>1){
-          quickLine=pcs+'×'+pkgUnit+' ('+pkgSize+' szt)';
+          var totalPcs=pcs*pkgSize;
+          quickLine=pcs+' '+pkgUnit+' × '+pkgSize+' szt = '+totalPcs+' szt';
         }else if(prod&&prod.unit==="szt"){
           quickLine=pcs+' '+pkgUnit;
+          if(sw>0&&pcs>0)quickLine+=' (~'+(pcs*sw)+' g)';
         }else if(pkgSize){
-          quickLine=pcs+'×'+pkgSize+unit;
+          quickLine=pcs+' '+pkgUnit+' × '+pkgSize+unit+' = '+(pcs*pkgSize)+unit;
         }else{
           quickLine=Math.ceil(totalAmount)+' '+unit;
         }
