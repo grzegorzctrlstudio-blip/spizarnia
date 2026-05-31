@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-05-30-final-recovery-design-modules-v1 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-units-bilans-spelling-v2 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1019,7 +1019,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-30-final-recovery-design-modules-v1";
+var APP_VERSION="2026-05-31-units-bilans-spelling-v2";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -1048,65 +1048,65 @@ var SYS="Jestes agentem kulinarnym. Odpowiadaj po polsku.";
 var CATS=[
 {id:"warzywa",label:"Warzywa i Owoce",ic:"V",color:"#16A34A",items:[
   {n:"Papryka",target:2,unit:"szt.",days:5},{n:"Pomidory",target:3,unit:"szt.",days:4},
-  {n:"Ogurek",target:3,unit:"szt.",days:4},{n:"Cukinia",target:2,unit:"szt.",days:5},
+  {n:"Ogórek",target:3,unit:"szt.",days:4},{n:"Cukinia",target:2,unit:"szt.",days:5},
   {n:"Pieczarki",target:1,unit:"opak.",days:4},{n:"Marchew",target:4,unit:"szt.",days:21},
-  {n:"Cebula Biala",target:2,unit:"szt.",days:30},{n:"Czosnek",target:1,unit:"glowka",days:60},
-  {n:"Salata Rukola",target:1,unit:"opak.",days:3},{n:"Jablka",target:4,unit:"szt.",days:21},
-  {n:"Banany",target:4,unit:"szt.",days:4},{n:"Truskawki Maliny",target:1,unit:"opak.",days:2},
+  {n:"Cebula Biała",target:2,unit:"szt.",days:30},{n:"Czosnek",target:1,unit:"główka",days:60},
+  {n:"Sałata Rukola",target:1,unit:"opak.",days:3},{n:"Jabłka",target:4,unit:"szt.",days:21},
+  {n:"Banany",target:4,unit:"szt.",days:4},{n:"Truskawki / Maliny",target:1,unit:"opak.",days:2},
   {n:"Awokado",target:2,unit:"szt.",days:4},{n:"Cytryna",target:1,unit:"szt.",days:14},
   {n:"Bataty",target:4,unit:"szt.",days:30},{n:"Brokuł",target:2,unit:"szt.",days:5},
   {n:"Szpinak",target:1,unit:"opak.",days:4}
 ]},
 {id:"piekarnia",label:"Piekarnia",ic:"B",color:"#D97706",scan:true,items:[
-  {n:"Chleb Pelnoziarnisty",target:2,unit:"bochenek",days:5}
+  {n:"Chleb Pełnoziarnisty",target:2,unit:"bochenek",days:5}
 ]},
-{id:"suche",label:"Platki Kasze Ryze",ic:"P",color:"#B45309",scan:true,items:[
-  {n:"Platki Owsiane Blyskawiczne",target:3,unit:"opak. 500g",days:180},
-  {n:"Platki Jaglane",target:1,unit:"opak.",days:180},
-  {n:"Ryz Basmati",target:1,unit:"opak. 1kg",days:365},
+{id:"suche",label:"Płatki, Kasze, Ryże",ic:"P",color:"#B45309",scan:true,items:[
+  {n:"Płatki Owsiane Błyskawiczne",target:3,unit:"opak. 500g",days:180},
+  {n:"Płatki Jaglane",target:1,unit:"opak.",days:180},
+  {n:"Ryż Basmati",target:1,unit:"opak. 1kg",days:365},
   {n:"Kasza Gryczana",target:1,unit:"opak. 500g",days:365},
   {n:"Kasza Jaglana",target:1,unit:"opak. 500g",days:365},
-  {n:"Makaron Pelnoziarnisty",target:2,unit:"opak.",days:365}
+  {n:"Makaron Pełnoziarnisty",target:2,unit:"opak.",days:365}
 ]},
 {id:"puszki",label:"Puszki i Sosy",ic:"C",color:"#0891B2",scan:true,items:[
   {n:"Ciecierzyca Puszka",target:2,unit:"puszka",days:730},
   {n:"Passata Pomidorowa",target:1,unit:"opak.",days:365},
   {n:"Ketchup Bez Cukru",target:1,unit:"butelka",days:180},
-  {n:"Musztarda",target:1,unit:"sloik",days:365},
+  {n:"Musztarda",target:1,unit:"słoik",days:365},
   {n:"Soczewica Czerwona",target:1,unit:"opak.",days:365}
 ]},
-{id:"tluszcze",label:"Orzechy i Tluszcze",ic:"O",color:"#7C3AED",scan:true,items:[
+{id:"tluszcze",label:"Orzechy i Tłuszcze",ic:"O",color:"#7C3AED",scan:true,items:[
   {n:"Oliwa z Oliwek",target:1,unit:"butelka 500ml",days:365},
-  {n:"Maslo Orzechowe Vitanella",target:2,unit:"opak. 350g",days:180},
-  {n:"Platki Migdalow",target:1,unit:"opak. 200g",days:180},
-  {n:"Orzechy Wloskie",target:1,unit:"opak. 200g",days:180},
+  {n:"Masło Orzechowe Vitanella",target:2,unit:"opak. 350g",days:180},
+  {n:"Płatki Migdałów",target:1,unit:"opak. 200g",days:180},
+  {n:"Orzechy Włoskie",target:1,unit:"opak. 200g",days:180},
   {n:"Kakao 100%",target:1,unit:"opak.",days:365}
 ]},
-{id:"maki",label:"Maki",ic:"M",color:"#9333EA",scan:true,items:[
-  {n:"Maka Ryzowa",target:1,unit:"opak. 400g",days:365},
-  {n:"Maka Jaglana",target:1,unit:"opak. 400g",days:365}
+{id:"maki",label:"Mąki",ic:"M",color:"#9333EA",scan:true,items:[
+  {n:"Mąka Ryżowa",target:1,unit:"opak. 400g",days:365},
+  {n:"Mąka Jaglana",target:1,unit:"opak. 400g",days:365}
 ]},
-{id:"mieso",label:"Mieso Swieze",ic:"Mi",color:"#DC2626",scan:true,items:[
-  {n:"Piers z Kurczaka",target:3,unit:"szt.",days:3},
-  {n:"Wolowina Mielona",target:1,unit:"opak. 400g",days:2},
-  {n:"Filet z Lososia",target:1,unit:"szt.",days:2},
+{id:"mieso",label:"Mięso Świeże",ic:"Mi",color:"#DC2626",scan:true,items:[
+  {n:"Pierś z Kurczaka",target:3,unit:"szt.",days:3},
+  {n:"Wołowina Mielona",target:1,unit:"opak. 400g",days:2},
+  {n:"Filet z Łososia",target:1,unit:"szt.",days:2},
   {n:"Polędwica z Indyka",target:2,unit:"opak.",days:5}
 ]},
-{id:"nabial",label:"Nabial",ic:"N",color:"#2563EB",scan:true,items:[
+{id:"nabial",label:"Nabiał",ic:"N",color:"#2563EB",scan:true,items:[
   {n:"Skyr Naturalny",target:4,unit:"opak. 350g",days:10},
   {n:"Ser Twarogowy Chudy",target:3,unit:"opak. 400g",days:7},
   {n:"Serek Wiejski Light",target:3,unit:"opak. 400g",days:7},
   {n:"Mozzarella Light",target:2,unit:"opak.",days:5},
-  {n:"Jogurt Naturalny 2%",target:1,unit:"opak. duzy",days:7},
-  {n:"Mleko 0.5%",target:4,unit:"litr",days:5}
+  {n:"Jogurt Naturalny 2%",target:1,unit:"opak. duży",days:7},
+  {n:"Mleko 0,5%",target:4,unit:"litr",days:5}
 ]},
 {id:"jaja",label:"Jaja",ic:"J",color:"#CA8A04",scan:true,items:[
   {n:"Jaja L",target:2,unit:"opak. 10 szt.",days:28}
 ]},
-{id:"wedliny",label:"Wedliny i Ryby",ic:"W",color:"#E11D48",scan:true,items:[
-  {n:"Polędwica z Indyka Kraina Mies",target:3,unit:"opak.",days:7},
-  {n:"Szynka z Indyka Kraina Wedlin",target:2,unit:"opak.",days:7},
-  {n:"Losos Wedzony",target:2,unit:"opak.",days:14}
+{id:"wedliny",label:"Wędliny i Ryby",ic:"W",color:"#E11D48",scan:true,items:[
+  {n:"Polędwica z Indyka",target:3,unit:"opak.",days:7},
+  {n:"Szynka z Indyka",target:2,unit:"opak.",days:7},
+  {n:"Łosoś Wędzony",target:2,unit:"opak.",days:14}
 ]}
 ];
 
@@ -1249,7 +1249,10 @@ function productTsKey(it){
   }
   return null;
 }
-function fHtml(it){
+function fHtml(it,cur){
+  // Świeżość pokazujemy TYLKO gdy produkt jest w lodówce (cur > 0).
+  // Jeśli nie ma produktu — nie liczymy żadnej daty.
+  if(cur!==undefined&&Number(cur)<=0)return "";
   // Najpierw sprawdź explicit datę (ustawioną przez użytkownika lub AI scanner)
   var d=getExplicitExpiryDaysLeft(it);
   var isExplicit=d!==null;
@@ -1262,7 +1265,8 @@ function fHtml(it){
       if(refTs){
         d=Math.floor(it.days-(Date.now()-refTs)/86400000);
       }else{
-        d=it.days;
+        // Brak referencyjnej daty (świeży użytkownik bez aktualizacji) — nie pokazuj orient.
+        return "";
       }
     }else{
       return "";
@@ -2002,7 +2006,7 @@ function render(){
       var photoHtml=hasPhoto
         ? '<img class="item-photo-thumb" src="'+photos[pkey]+'" onclick="openPhoto(\''+ne+'\')" title="Zmień zdjęcie">'
         : '<div class="item-photo-empty" onclick="openPhoto(\''+ne+'\')" title="Dodaj zdjęcie">📷</div>';
-      var dateHtml=fHtml(it);
+      var dateHtml=fHtml(it,cur);
       var borderColor=isExpiredProduct(it)?"var(--red)":isExpiringSoonProduct(it)?"var(--amber)":cc==="grn"?"var(--green)":cc==="low"?"var(--amber)":"var(--red)";
       var dKey=fbk("e",it.n);
       var hasDate=!!expiry[dKey];
@@ -2029,7 +2033,7 @@ function render(){
       html+='</div>';
       // Progress bar + ile brakuje
       html+='<div style="display:flex;align-items:center;gap:8px;margin-top:4px">';
-      html+='<div style="flex:1;height:5px;background:var(--bg4);border-radius:4px"><div style="height:100%;width:'+pct+'%;background:'+borderColor+';border-radius:4px"></div></div>';
+      html+='<div style="flex:1;height:8px;background:var(--bg4);border-radius:6px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+borderColor+';border-radius:6px;transition:width .3s"></div></div>';
       html+=ql;
       html+='</div>';
       html+='</div>';
@@ -2447,26 +2451,57 @@ function renderRecipes(){
     h+='</div>';
   });
   if(userProfile&&userProfile.kcal){
-    var totalCalc={kcal:0,prot:0,carb:0,fat:0};
-    var totalAI={kcal:0,prot:0,carb:0,fat:0};
-    secs.forEach(function(sec){(menu[sec.k]||[]).forEach(function(m){
-      var c=calculateMealMacroFromIngredients(m);
-      totalCalc.kcal+=c.kcal;totalCalc.prot+=c.prot;totalCalc.carb+=c.carb;totalCalc.fat+=c.fat;
-      totalAI.kcal+=m.kcal||0;totalAI.prot+=m.prot||0;totalAI.carb+=m.carb||0;totalAI.fat+=m.fat||0;
-    });});
-    var diffOk=Math.abs(totalCalc.kcal-userProfile.kcal)<userProfile.kcal*0.07;
-    var color=diffOk?"var(--green)":"var(--red)";
-    h+='<div style="background:'+(diffOk?"rgba(30,215,96,.08)":"rgba(255,77,77,.08)")+';border:1px solid '+color+';border-radius:var(--radius);padding:14px 16px;margin-bottom:12px">';
-    h+='<div style="font-size:10px;font-weight:800;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.6px">Bilans Menu '+dietMenu+' — realne ze składników</div>';
+    // BILANS = średnia kcal/makro z każdej sekcji (sniadania, obiady, kolacje)
+    // bo użytkownik wybiera 1 posiłek z każdej sekcji dziennie, nie wszystkie 9.
+    var dayTotal={kcal:0,prot:0,carb:0,fat:0};
+    var dayAI={kcal:0,prot:0,carb:0,fat:0};
+    var perSection=[];
+    secs.forEach(function(sec){
+      var meals=menu[sec.k]||[];
+      if(!meals.length)return;
+      var sumCalc={kcal:0,prot:0,carb:0,fat:0};
+      var sumAI={kcal:0,prot:0,carb:0,fat:0};
+      var validCnt=0;
+      meals.forEach(function(m){
+        var c=calculateMealMacroFromIngredients(m);
+        // Sanity check: jeśli posiłek ma >2500 kcal, prawdopodobnie błąd w gramaturach
+        if(c.kcal>0&&c.kcal<2500){
+          sumCalc.kcal+=c.kcal;sumCalc.prot+=c.prot;sumCalc.carb+=c.carb;sumCalc.fat+=c.fat;
+          validCnt++;
+        }
+        sumAI.kcal+=m.kcal||0;sumAI.prot+=m.prot||0;sumAI.carb+=m.carb||0;sumAI.fat+=m.fat||0;
+      });
+      if(validCnt>0){
+        dayTotal.kcal+=Math.round(sumCalc.kcal/validCnt);
+        dayTotal.prot+=Math.round(sumCalc.prot/validCnt);
+        dayTotal.carb+=Math.round(sumCalc.carb/validCnt);
+        dayTotal.fat+=Math.round(sumCalc.fat/validCnt);
+      }
+      if(meals.length>0){
+        dayAI.kcal+=Math.round(sumAI.kcal/meals.length);
+        dayAI.prot+=Math.round(sumAI.prot/meals.length);
+        dayAI.carb+=Math.round(sumAI.carb/meals.length);
+        dayAI.fat+=Math.round(sumAI.fat/meals.length);
+      }
+      perSection.push({sec:sec.l,count:meals.length,validCnt:validCnt,avgKcal:validCnt?Math.round(sumCalc.kcal/validCnt):0});
+    });
+    var diffOk=Math.abs(dayTotal.kcal-userProfile.kcal)<userProfile.kcal*0.1;
+    var color=diffOk?"var(--green)":"var(--amber)";
+    h+='<div style="background:'+(diffOk?"rgba(30,215,96,.08)":"rgba(245,158,11,.08)")+';border:1px solid '+color+';border-radius:var(--radius);padding:14px 16px;margin-bottom:12px">';
+    h+='<div style="font-size:10px;font-weight:800;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.6px">Bilans Menu '+dietMenu+' — średnia dnia (1 z każdej sekcji)</div>';
     h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:8px">';
-    h+='<div style="text-align:center"><div style="font-size:18px;font-weight:900;color:'+color+'">'+totalCalc.kcal+'</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">kcal</div></div>';
-    h+='<div style="text-align:center"><div style="font-size:18px;font-weight:900;color:#60A5FA">'+totalCalc.prot+'g</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Białko</div></div>';
-    h+='<div style="text-align:center"><div style="font-size:18px;font-weight:900;color:var(--green)">'+totalCalc.carb+'g</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Węgle</div></div>';
-    h+='<div style="text-align:center"><div style="font-size:18px;font-weight:900;color:#F9A8D4">'+totalCalc.fat+'g</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Tłuszcze</div></div>';
+    h+='<div style="text-align:center"><div style="font-size:20px;font-weight:900;color:'+color+'">'+dayTotal.kcal+'</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">kcal</div></div>';
+    h+='<div style="text-align:center"><div style="font-size:20px;font-weight:900;color:#60A5FA">'+dayTotal.prot+'g</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Białko</div></div>';
+    h+='<div style="text-align:center"><div style="font-size:20px;font-weight:900;color:var(--green)">'+dayTotal.carb+'g</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Węgle</div></div>';
+    h+='<div style="text-align:center"><div style="font-size:20px;font-weight:900;color:#F9A8D4">'+dayTotal.fat+'g</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Tłuszcze</div></div>';
     h+='</div>';
-    h+='<div style="font-size:11px;color:var(--text3);font-weight:600">Cel: '+userProfile.kcal+' kcal &bull; B:'+userProfile.prot+'g W:'+userProfile.carb+'g T:'+userProfile.fat+'g</div>';
-    if(Math.abs(totalCalc.kcal-totalAI.kcal)>50){
-      h+='<div style="font-size:10px;color:var(--text3);margin-top:6px;font-style:italic">AI założenie: '+totalAI.kcal+' kcal — faktyczne składniki dają '+totalCalc.kcal+' kcal.</div>';
+    h+='<div style="font-size:11px;color:var(--text3);font-weight:600">Cel: <b style="color:var(--text)">'+userProfile.kcal+' kcal</b> &bull; B:'+userProfile.prot+'g W:'+userProfile.carb+'g T:'+userProfile.fat+'g</div>';
+    var badCount=perSection.filter(function(s){return s.count>0&&s.validCnt<s.count;}).reduce(function(a,s){return a+(s.count-s.validCnt);},0);
+    if(badCount>0){
+      h+='<div style="font-size:10px;color:var(--amber);margin-top:6px">⚠️ '+badCount+' posiłek/-ów z błędnymi gramaturami (kcal &gt;2500). Edytuj posiłek, aby naprawić ilości składników.</div>';
+    }
+    if(Math.abs(dayTotal.kcal-userProfile.kcal)>userProfile.kcal*0.1){
+      h+='<div style="font-size:10px;color:var(--amber);margin-top:6px">⚠️ Średnia odbiega od celu o '+Math.round(Math.abs(dayTotal.kcal-userProfile.kcal))+' kcal. Edytuj posiłki lub wygeneruj dietę na nowo.</div>';
     }
     h+='</div>';
   }
@@ -2489,7 +2524,16 @@ function generateSingleMeal(menuNum,section,replaceIdx){
   var storeName={biedronka:"Biedronka",lidl:"Lidl",both:"Biedronka i Lidl"}[userProfile.stores]||"Biedronka";
   var userLiked2=(userProfile.liked&&userProfile.liked.length)?"Lubie: "+userProfile.liked.join(", ")+". ":"";  var userDisliked2=(userProfile.disliked&&userProfile.disliked.length)?"NIE lubie: "+userProfile.disliked.join(", ")+". ":"";  var prompt="Wygeneruj 1 posilek ("+mealName+"). Cel: "+mK+" kcal B:"+mP+"g W:"+mC+"g T:"+mF+"g (+/-5%). Sklep: "+storeName+". "+(userProfile.exclude?"Wykluczone: "+userProfile.exclude+". ":"")+userLiked2+userDisliked2+
     (existing?"NIE POWTARZAJ: "+existing+". ":"Cos nowego. ")+
-    "Produkty: "+FULL_PRODUCTS+". Realne gramy (bialko 100-250g, weglowodany 60-200g). TYLKO JSON: {\"nazwa\":\"...\",\"czas\":\"15 min\",\"kcal\":LICZBA,\"prot\":LICZBA,\"carb\":LICZBA,\"fat\":LICZBA,\"skladniki\":[{\"n\":\"Produkt\",\"il\":\"150g\"}],\"przepis\":\"1. Krok.\"}";
+    "Produkty: "+FULL_PRODUCTS+". ZASADY JEDNOSTEK SKŁADNIKÓW:\n"
+    +"- jaja: zawsze SZTUKI (np. '3 szt.'), NIGDY w gramach\n"
+    +"- chleb: kromki lub gramy (np. '2 kromki' lub '60g')\n"
+    +"- mleko/jogurt/kefir/oliwa: ml lub szklanki (np. '200ml', '1 szklanka')\n"
+    +"- mięso/ryba/twaróg/skyr/ser/kasza/ryż/makaron: GRAMY (np. '150g')\n"
+    +"- warzywa małe (cebula, ząbek czosnku): SZTUKI; duże (brokuł, kalafior): SZTUKI; liściaste i drobne (szpinak, papryka): GRAMY\n"
+    +"- owoce: SZTUKI dla bananów/jabłek/cytryny; GRAMY dla truskawek/borówek\n"
+    +"- pasta/masło orzechowe: gramy lub łyżki (np. '20g' lub '2 łyżki')\n"
+    +"Realne porcje (białko 100-250g, węglowodany 60-200g). Nie wymyślaj absurdalnych ilości.\n"
+    +"TYLKO JSON: {\"nazwa\":\"...\",\"czas\":\"15 min\",\"kcal\":LICZBA,\"prot\":LICZBA,\"carb\":LICZBA,\"fat\":LICZBA,\"skladniki\":[{\"n\":\"Produkt\",\"il\":\"150g lub 3 szt.\"}],\"przepis\":\"1. Krok.\"}";
   var body=document.getElementById("diet-body");
   body.innerHTML='<div style="text-align:center;padding:40px"><div style="font-size:36px;margin-bottom:10px">AI</div><div style="color:var(--text2);margin-bottom:8px">Generuje nowe '+mealName+'...</div><div class="spin" style="margin:0 auto"></div></div>';
   callAPI([{role:"user",content:prompt}],"Jestes dietetykiem. TYLKO JSON bez markdown.",function(res){
@@ -2572,7 +2616,17 @@ function generateAIDiet(profile){
   var goalTxt={lose:"redukcja tluszczu",maintain:"utrzymanie wagi",gain:"masa miesniowa"}[profile.goal]||profile.goal;
   var mK=Math.round(profile.kcal/3),mP=Math.round(profile.prot/3),mC=Math.round(profile.carb/3),mF=Math.round(profile.fat/3);
   var likedStr=(profile.liked&&profile.liked.length)?" PRIORYTETUJ lubiane: "+profile.liked.join(", "):"";
-  var dislikedStr=(profile.disliked&&profile.disliked.length)?" WYKLUCZ nielubiane: "+profile.disliked.join(", "):"";  var base="Uzytkownik: "+goalTxt+", "+profile.kcal+" kcal/dzien, B:"+profile.prot+"g W:"+profile.carb+"g T:"+profile.fat+"g. Na posilek: "+mK+" kcal B:"+mP+"g W:"+mC+"g T:"+mF+"g (+/-5%). Sklep: "+storeName+"."+(profile.exclude?" Wykluczone: "+profile.exclude+".":"")+likedStr+dislikedStr+" Produkty: "+FULL_PRODUCTS+". Zasady: realne gramy (bialko 100-250g, weglowodany 60-200g), min 10g kazdego skladnika, policz makro dokladnie, max 30 min, proste dania. TYLKO JSON.";
+  var dislikedStr=(profile.disliked&&profile.disliked.length)?" WYKLUCZ nielubiane: "+profile.disliked.join(", "):"";
+  var base="Użytkownik: "+goalTxt+", "+profile.kcal+" kcal/dzień, B:"+profile.prot+"g W:"+profile.carb+"g T:"+profile.fat+"g. Na posiłek: "+mK+" kcal B:"+mP+"g W:"+mC+"g T:"+mF+"g (+/-5%). Sklep: "+storeName+"."+(profile.exclude?" Wykluczone: "+profile.exclude+".":"")+likedStr+dislikedStr+" Produkty: "+FULL_PRODUCTS+".\n"
+    +"ZASADY JEDNOSTEK SKŁADNIKÓW (BARDZO WAŻNE):\n"
+    +"- jaja: ZAWSZE SZTUKI (np. '3 szt.'), NIGDY w gramach\n"
+    +"- chleb: kromki lub gramy (np. '2 kromki' lub '60g')\n"
+    +"- mleko/jogurt/kefir/oliwa: ml (np. '200ml')\n"
+    +"- mięso/ryba/twaróg/skyr/ser/kasza/ryż/makaron: GRAMY suchego/surowego (np. '150g')\n"
+    +"- cebula/czosnek/banany/jabłka/cytryna: SZTUKI; brokuł/kalafior: SZTUKI lub gramy główki\n"
+    +"- szpinak/papryka/pomidory/ogórek: GRAMY lub sztuki\n"
+    +"- masło orzechowe/dżem: gramy lub łyżki (np. '20g' lub '1 łyżka')\n"
+    +"Realne porcje: białko 100-250g/posiłek, węglowodany 60-200g/posiłek, tłuszcze 5-30g/posiłek. Min 10g każdego suchego składnika. NIE wymyślaj absurdalnych ilości (nie 10kg ryżu, nie 200g jajek). Max 30 min czas. Proste polskie dania. Policz makro dokładnie. TYLKO JSON.";
   var fmt='{"sniadania":[{"nazwa":"...","czas":"15 min","kcal":0,"prot":0,"carb":0,"fat":0,"skladniki":[{"n":"Produkt","il":"150g"}],"przepis":"1. Krok."}],"obiady":[...],"kolacje":[...]}';
   var sys="Jestes dietetykiem. TYLKO JSON bez markdown. Nie pisz nic przed ani po JSON.";
   document.getElementById("diet-overlay").classList.add("show");
@@ -2605,35 +2659,35 @@ function saveEditMeal(){var name=document.getElementById("edit-meal-name").value
 // ── GRZES DIET ────────────────────────────────────────────────────────────────
 var GRZES_DIET={menu1:{
   sniadania:[
-    {nazwa:"Jajka Nadziewane",czas:"25 min",kcal:1033,prot:97,carb:96,fat:32,skladniki:[{n:"Jaja",il:"3 szt."},{n:"Ser Twarogowy Chudy",il:"235g"},{n:"Skyr Naturalny",il:"150g"},{n:"Chleb Pelnoziarnisty",il:"150g"},{n:"Awokado",il:"50g"}],przepis:"1. Ugotuj jajka na twardo.\n2. Wymieszaj zoltka z twarogiem.\n3. Nadziaj jajka."},
-    {nazwa:"Salatka z Tunczykiem",czas:"15 min",kcal:1043,prot:96,carb:100,fat:30,skladniki:[{n:"Tunczyk w wodzie",il:"160g"},{n:"Jaja",il:"4 szt."},{n:"Skyr Naturalny",il:"150g"},{n:"Chleb Pelnoziarnisty",il:"150g"}],przepis:"1. Wymieszaj tunczyka z warzywami.\n2. Dodaj pokrojone jajka."},
-    {nazwa:"Platki z Bananem",czas:"10 min",kcal:950,prot:45,carb:130,fat:25,skladniki:[{n:"Platki Owsiane",il:"100g"},{n:"Mleko 0.5%",il:"200ml"},{n:"Banany",il:"1 szt."},{n:"Maslo Orzechowe",il:"30g"}],przepis:"1. Zalej platki mlekiem.\n2. Podgrzej 3 minuty.\n3. Dodaj banana."}
+    {nazwa:"Jajka Nadziewane",czas:"25 min",kcal:780,prot:55,carb:60,fat:32,skladniki:[{n:"Jaja",il:"3 szt."},{n:"Ser Twarogowy Chudy",il:"150g"},{n:"Chleb Pełnoziarnisty",il:"80g"},{n:"Awokado",il:"50g"}],przepis:"1. Ugotuj jajka na twardo.\n2. Wymieszaj żółtka z twarogiem.\n3. Nadziej jajka i podaj z chlebem."},
+    {nazwa:"Sałatka z Tuńczykiem",czas:"15 min",kcal:720,prot:55,carb:55,fat:28,skladniki:[{n:"Tuńczyk w wodzie",il:"160g"},{n:"Jaja",il:"2 szt."},{n:"Skyr Naturalny",il:"150g"},{n:"Chleb Pełnoziarnisty",il:"80g"}],przepis:"1. Wymieszaj tuńczyka ze skyrem.\n2. Dodaj pokrojone jajka.\n3. Podaj z chlebem."},
+    {nazwa:"Płatki z Bananem",czas:"10 min",kcal:620,prot:25,carb:90,fat:18,skladniki:[{n:"Płatki Owsiane",il:"80g"},{n:"Mleko 0,5%",il:"250ml"},{n:"Banany",il:"1 szt."},{n:"Masło Orzechowe Vitanella",il:"20g"}],przepis:"1. Zalej płatki mlekiem.\n2. Podgrzej 3 minuty.\n3. Dodaj banana i masło orzechowe."}
   ],
   obiady:[
-    {nazwa:"Kurczak z Ryzem",czas:"25 min",kcal:750,prot:65,carb:80,fat:15,skladniki:[{n:"Piers z Kurczaka",il:"200g"},{n:"Ryz Basmati",il:"80g"},{n:"Szpinak",il:"100g"},{n:"Oliwa z Oliwek",il:"10g"}],przepis:"1. Ugotuj ryz.\n2. Usdrub kurczaka.\n3. Podaj z ryzem i szpinakiem."},
-    {nazwa:"Kasza z Wolowina",czas:"30 min",kcal:800,prot:60,carb:75,fat:20,skladniki:[{n:"Wolowina Mielona",il:"200g"},{n:"Kasza Gryczana",il:"80g"},{n:"Papryka",il:"100g"},{n:"Passata Pomidorowa",il:"150g"}],przepis:"1. Ugotuj kasza.\n2. Podsmaz wolowine z papryka.\n3. Polej passata."},
-    {nazwa:"Losos z Ziemniakami",czas:"30 min",kcal:780,prot:55,carb:70,fat:25,skladniki:[{n:"Filet z Lososia",il:"200g"},{n:"Ziemniaki",il:"300g"},{n:"Cukinia",il:"150g"}],przepis:"1. Ugotuj ziemniaki.\n2. Upiecz lososia."}
+    {nazwa:"Kurczak z Ryżem",czas:"25 min",kcal:720,prot:55,carb:85,fat:18,skladniki:[{n:"Pierś z Kurczaka",il:"200g"},{n:"Ryż Basmati",il:"80g"},{n:"Szpinak",il:"100g"},{n:"Oliwa z Oliwek",il:"10g"}],przepis:"1. Ugotuj ryż.\n2. Usmaż kurczaka.\n3. Podaj z ryżem i szpinakiem."},
+    {nazwa:"Kasza z Wołowiną",czas:"30 min",kcal:780,prot:50,carb:75,fat:22,skladniki:[{n:"Wołowina Mielona",il:"200g"},{n:"Kasza Gryczana",il:"80g"},{n:"Papryka",il:"100g"},{n:"Passata Pomidorowa",il:"150g"}],przepis:"1. Ugotuj kaszę.\n2. Podsmaż wołowinę z papryką.\n3. Polej passatą."},
+    {nazwa:"Łosoś z Ziemniakami",czas:"30 min",kcal:760,prot:50,carb:70,fat:25,skladniki:[{n:"Filet z Łososia",il:"200g"},{n:"Ziemniaki",il:"300g"},{n:"Cukinia",il:"150g"}],przepis:"1. Ugotuj ziemniaki.\n2. Upiecz łososia z cukinią."}
   ],
   kolacje:[
-    {nazwa:"Omlet z Warzywami",czas:"15 min",kcal:600,prot:45,carb:30,fat:30,skladniki:[{n:"Jaja",il:"4 szt."},{n:"Szpinak",il:"100g"},{n:"Mozzarella Light",il:"60g"}],przepis:"1. Ubij jajka.\n2. Wlej na patelnie.\n3. Dodaj szpinak i ser."},
-    {nazwa:"Serek z Pieczywem",czas:"5 min",kcal:650,prot:55,carb:60,fat:15,skladniki:[{n:"Serek Wiejski Light",il:"250g"},{n:"Chleb Pelnoziarnisty",il:"100g"},{n:"Ogurek",il:"1 szt."}],przepis:"1. Pokroj warzywa.\n2. Podaj z serkiem."},
-    {nazwa:"Salatka z Lososiem",czas:"10 min",kcal:700,prot:55,carb:50,fat:28,skladniki:[{n:"Losos Wedzony",il:"150g"},{n:"Ogurek",il:"1 szt."},{n:"Pomidory",il:"2 szt."},{n:"Awokado",il:"100g"}],przepis:"1. Pokroj warzywa.\n2. Dodaj lososia."}
+    {nazwa:"Omlet z Warzywami",czas:"15 min",kcal:520,prot:35,carb:18,fat:32,skladniki:[{n:"Jaja",il:"4 szt."},{n:"Szpinak",il:"100g"},{n:"Mozzarella Light",il:"60g"}],przepis:"1. Ubij jajka.\n2. Wlej na patelnię.\n3. Dodaj szpinak i ser."},
+    {nazwa:"Serek z Pieczywem",czas:"5 min",kcal:560,prot:35,carb:65,fat:14,skladniki:[{n:"Serek Wiejski Light",il:"200g"},{n:"Chleb Pełnoziarnisty",il:"80g"},{n:"Ogórek",il:"1 szt."}],przepis:"1. Pokrój ogórek.\n2. Podaj z serkiem i chlebem."},
+    {nazwa:"Sałatka z Łososiem",czas:"10 min",kcal:650,prot:40,carb:25,fat:38,skladniki:[{n:"Łosoś Wędzony",il:"120g"},{n:"Ogórek",il:"1 szt."},{n:"Pomidory",il:"2 szt."},{n:"Awokado",il:"100g"}],przepis:"1. Pokrój warzywa.\n2. Dodaj łososia.\n3. Skrop oliwą."}
   ]
 },menu2:{
   sniadania:[
-    {nazwa:"Kanapki z Indykiem",czas:"10 min",kcal:950,prot:80,carb:100,fat:20,skladniki:[{n:"Chleb Pelnoziarnisty",il:"150g"},{n:"Polędwica z Indyka",il:"100g"},{n:"Pomidory",il:"100g"},{n:"Skyr Naturalny",il:"100g"}],przepis:"1. Przygotuj kanapki.\n2. Dodaj indyka i warzywa."},
-    {nazwa:"Jogurt z Platkami",czas:"5 min",kcal:900,prot:50,carb:110,fat:20,skladniki:[{n:"Jogurt Naturalny 2%",il:"300g"},{n:"Platki Owsiane",il:"80g"},{n:"Jablka",il:"1 szt."},{n:"Platki Migdalow",il:"20g"}],przepis:"1. Wymieszaj jogurt z platkami.\n2. Dodaj jablko i migdaly."},
-    {nazwa:"Jajecznica z Pieczywem",czas:"10 min",kcal:920,prot:60,carb:90,fat:30,skladniki:[{n:"Jaja",il:"4 szt."},{n:"Chleb Pelnoziarnisty",il:"120g"},{n:"Szpinak",il:"100g"}],przepis:"1. Usdrub jajecznice.\n2. Dodaj szpinak.\n3. Podaj z pieczywem."}
+    {nazwa:"Kanapki z Indykiem",czas:"10 min",kcal:600,prot:45,carb:75,fat:14,skladniki:[{n:"Chleb Pełnoziarnisty",il:"100g"},{n:"Polędwica z Indyka",il:"100g"},{n:"Pomidory",il:"100g"},{n:"Skyr Naturalny",il:"100g"}],przepis:"1. Przygotuj kanapki.\n2. Dodaj indyka, pomidory i skyr."},
+    {nazwa:"Jogurt z Płatkami",czas:"5 min",kcal:580,prot:30,carb:80,fat:14,skladniki:[{n:"Jogurt Naturalny 2%",il:"250ml"},{n:"Płatki Owsiane",il:"60g"},{n:"Jabłka",il:"1 szt."},{n:"Płatki Migdałów",il:"15g"}],przepis:"1. Wymieszaj jogurt z płatkami.\n2. Dodaj jabłko i migdały."},
+    {nazwa:"Jajecznica z Pieczywem",czas:"10 min",kcal:680,prot:40,carb:55,fat:30,skladniki:[{n:"Jaja",il:"4 szt."},{n:"Chleb Pełnoziarnisty",il:"80g"},{n:"Szpinak",il:"100g"}],przepis:"1. Usmaż jajecznicę.\n2. Dodaj szpinak.\n3. Podaj z pieczywem."}
   ],
   obiady:[
-    {nazwa:"Dorsz z Batatem",czas:"30 min",kcal:750,prot:60,carb:75,fat:18,skladniki:[{n:"Filet z Lososia",il:"250g"},{n:"Bataty",il:"250g"},{n:"Brokul",il:"150g"}],przepis:"1. Upiecz bataty.\n2. Ugrilluj dorsza."},
-    {nazwa:"Makaron z Kurczakiem",czas:"25 min",kcal:800,prot:65,carb:85,fat:18,skladniki:[{n:"Piers z Kurczaka",il:"200g"},{n:"Makaron Pelnoziarnisty",il:"80g"},{n:"Passata Pomidorowa",il:"150g"}],przepis:"1. Ugotuj makaron.\n2. Usdrub kurczaka.\n3. Polej passata."},
-    {nazwa:"Ciecierzyca z Warzywami",czas:"20 min",kcal:720,prot:45,carb:90,fat:20,skladniki:[{n:"Ciecierzyca Puszka",il:"200g"},{n:"Szpinak",il:"150g"},{n:"Cukinia",il:"150g"},{n:"Oliwa z Oliwek",il:"20g"}],przepis:"1. Podsmaz warzywa.\n2. Dodaj ciecierzyca.\n3. Dopraw."}
+    {nazwa:"Łosoś z Batatem",czas:"30 min",kcal:780,prot:55,carb:75,fat:25,skladniki:[{n:"Filet z Łososia",il:"200g"},{n:"Bataty",il:"250g"},{n:"Brokuł",il:"150g"}],przepis:"1. Upiecz bataty.\n2. Ugrilluj łososia.\n3. Podaj z brokułem."},
+    {nazwa:"Makaron z Kurczakiem",czas:"25 min",kcal:750,prot:55,carb:90,fat:18,skladniki:[{n:"Pierś z Kurczaka",il:"200g"},{n:"Makaron Pełnoziarnisty",il:"80g"},{n:"Passata Pomidorowa",il:"150g"}],przepis:"1. Ugotuj makaron.\n2. Usmaż kurczaka.\n3. Polej passatą."},
+    {nazwa:"Ciecierzyca z Warzywami",czas:"20 min",kcal:680,prot:30,carb:85,fat:22,skladniki:[{n:"Ciecierzyca Puszka",il:"200g"},{n:"Szpinak",il:"150g"},{n:"Cukinia",il:"150g"},{n:"Oliwa z Oliwek",il:"20g"}],przepis:"1. Podsmaż warzywa.\n2. Dodaj ciecierzycę.\n3. Dopraw."}
   ],
   kolacje:[
-    {nazwa:"Twarog z Owocami",czas:"5 min",kcal:620,prot:50,carb:60,fat:15,skladniki:[{n:"Ser Twarogowy Chudy",il:"300g"},{n:"Truskawki Maliny",il:"150g"},{n:"Platki Owsiane",il:"50g"}],przepis:"1. Wymieszaj twarog z platkami.\n2. Dodaj owoce."},
-    {nazwa:"Salatka Pelna Bialek",czas:"10 min",kcal:700,prot:60,carb:50,fat:25,skladniki:[{n:"Skyr Naturalny",il:"200g"},{n:"Serek Wiejski Light",il:"200g"},{n:"Ogurek",il:"1 szt."},{n:"Pomidory",il:"2 szt."}],przepis:"1. Pokroj warzywa.\n2. Wymieszaj z nabiałem."},
-    {nazwa:"Omlet Bananowy",czas:"15 min",kcal:680,prot:42,carb:70,fat:22,skladniki:[{n:"Jaja",il:"3 szt."},{n:"Banany",il:"1 szt."},{n:"Maslo Orzechowe",il:"30g"}],przepis:"1. Rozgniez banan.\n2. Wymieszaj z jajkami.\n3. Usdrub na patelni."}
+    {nazwa:"Twaróg z Owocami",czas:"5 min",kcal:550,prot:45,carb:55,fat:14,skladniki:[{n:"Ser Twarogowy Chudy",il:"250g"},{n:"Truskawki",il:"150g"},{n:"Płatki Owsiane",il:"40g"}],przepis:"1. Wymieszaj twaróg z płatkami.\n2. Dodaj truskawki."},
+    {nazwa:"Sałatka Pełna Białek",czas:"10 min",kcal:620,prot:55,carb:30,fat:30,skladniki:[{n:"Skyr Naturalny",il:"200g"},{n:"Serek Wiejski Light",il:"200g"},{n:"Ogórek",il:"1 szt."},{n:"Pomidory",il:"2 szt."}],przepis:"1. Pokrój warzywa.\n2. Wymieszaj z nabiałem."},
+    {nazwa:"Omlet Bananowy",czas:"15 min",kcal:540,prot:28,carb:50,fat:24,skladniki:[{n:"Jaja",il:"3 szt."},{n:"Banany",il:"1 szt."},{n:"Masło Orzechowe Vitanella",il:"20g"}],przepis:"1. Rozgnieć banana.\n2. Wymieszaj z jajkami.\n3. Usmaż na patelni z masłem orzechowym."}
   ]
 }};
 
