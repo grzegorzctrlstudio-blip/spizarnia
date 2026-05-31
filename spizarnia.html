@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-meal-autoscale-v26 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-interchangeable-meals-v27 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1088,7 +1088,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-31-meal-autoscale-v26";
+var APP_VERSION="2026-05-31-interchangeable-meals-v27";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -3030,7 +3030,10 @@ function renderRecipes(){
     var diffOk=Math.abs(dayTotal.kcal-userProfile.kcal)<userProfile.kcal*0.1;
     var color=diffOk?"var(--green)":"var(--amber)";
     h+='<div style="background:'+(diffOk?"rgba(30,215,96,.08)":"rgba(245,158,11,.08)")+';border:1px solid '+color+';border-radius:var(--radius);padding:14px 16px;margin-bottom:12px">';
-    h+='<div style="font-size:10px;font-weight:500;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.6px">Bilans Menu '+dietMenu+' — średnia dnia (1 z każdej sekcji)</div>';
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px">';
+    h+='<div style="font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px">Menu '+dietMenu+' — bilans dnia</div>';
+    h+='<span title="Wszystkie 9 posiłków ma identyczne makro — możesz losowo wybrać 1 śniadanie + 1 obiad + 1 kolację i zawsze trafisz w cel dnia." style="background:rgba(6,182,212,.15);border:1px solid var(--brand);color:var(--brand);border-radius:6px;padding:2px 7px;font-size:9px;font-weight:600;letter-spacing:.3px">🎲 WYBIERZ DOWOLNE</span>';
+    h+='</div>';
     h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:8px">';
     h+='<div style="text-align:center"><div style="font-size:20px;font-weight:600;color:'+color+'">'+dayTotal.kcal+'</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">kcal</div></div>';
     h+='<div style="text-align:center"><div style="font-size:20px;font-weight:600;color:#60A5FA">'+dayTotal.prot+'g</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Białko</div></div>';
@@ -3241,7 +3244,8 @@ function generateAIDiet(profile){
     +"- Dodaj przyprawy w OSOBNYM polu 'przyprawy': ['sól','pieprz','papryka słodka',...].\n"
     +"- Oliwy, masła orzechowego, miodu, tahini NIE traktuj jako przyprawy — one mają kalorie, idą do 'skladniki'.\n"
     +"Realne porcje: białko 100-250g/posiłek, węglowodany 60-200g/posiłek, tłuszcze 5-30g/posiłek. Min 10g każdego suchego składnika. NIE wymyślaj absurdalnych ilości (nie 10kg ryżu, nie 200g jajek). Max 30 min czas. Proste polskie dania.\n"
-    +"⚠️ PRECYZJA MAKRO: aiTarget MUSI być realnie do osiągnięcia ze składników. PRZED zapisaniem przelicz w głowie: suma kcal/B/W/T ze składników (kcal100×g/100) MUSI być w granicach ±5% od aiTarget. Dobierz GRAMATURY składników tak żeby SUMA się ZGADZAŁA. Jeśli wyliczasz 600 kcal a target 720 — zwiększ porcje białka/węgli. Aplikacja policzy realne i pokaże różnicę — minimalizuj ją.\n"
+    +"⚠️ PRECYZJA MAKRO: aiTarget MUSI być realnie do osiągnięcia ze składników. PRZED zapisaniem przelicz w głowie: suma kcal/B/W/T ze składników (kcal100×g/100) MUSI być w granicach ±5% od aiTarget. Dobierz GRAMATURY składników tak żeby SUMA się ZGADZAŁA.\n"
+    +"🎲 INTERCHANGEABLE: WSZYSTKIE 9 posiłków (3 śniadania + 3 obiady + 3 kolacje) muszą mieć IDENTYCZNE makro (kcal/B/W/T) z dokładnością ±10%. User będzie LOSOWO wybierał 1 śniadanie + 1 obiad + 1 kolacja i MUSI trafić w cel dnia. Każde danie = "+mK+" kcal / B"+mP+"g / W"+mC+"g / T"+mF+"g. To NIE jest sugestia tylko WYMÓG.\n"
     +"TYLKO JSON.";
   // Nowy format: skladniki z state/amountBasis (AI samo określa), przyprawy w osobnym polu
   // aiTarget - tylko założenie AI, NIE realne makro (realne policzy aplikacja ze składników)
@@ -3266,10 +3270,15 @@ function generateAIDiet(profile){
     var m1=parseMenuJSON(r1);
     if(!m1){showDietError("Menu 1: "+getJSONError(r1));forceHideAILoading();return;}
     m1=fixMenuMacros(m1,profile);
+    // KLUCZOWE: wszystkie 9 posiłków = profile.kcal/3 (wymienne losowo)
+    if(typeof unifyMealTargets==="function")unifyMealTargets(m1,profile);
+    if(typeof scaleAllMealsToTargets==="function"){scaleAllMealsToTargets(m1);scaleAllMealsToTargets(m1);}
     if(typeof updateDietStep==="function")updateDietStep(2);
     var m2=parseMenuJSON(r2);
     if(!m2){showDietError("Menu 2: "+getJSONError(r2));forceHideAILoading();return;}
     m2=fixMenuMacros(m2,profile);
+    if(typeof unifyMealTargets==="function")unifyMealTargets(m2,profile);
+    if(typeof scaleAllMealsToTargets==="function"){scaleAllMealsToTargets(m2);scaleAllMealsToTargets(m2);}
     if(typeof updateDietStep==="function")updateDietStep(3);
     if(!userProfile)userProfile=profile;
     userProfile.dietData={menu1:m1,menu2:m2};
@@ -3339,43 +3348,73 @@ function repairTruncatedJSON(jsonStr){
   }
   return s;
 }
+// ── UNIFIKACJA aiTarget — wszystkie 9 posiłków w menu = profile.kcal/3 ───────
+// Cel: KAŻDY z 9 posiłków ma IDENTYCZNY target makro, dzięki czemu losowo
+// wybierając 1 śn + 1 ob + 1 kol zawsze trafiamy w dzień (3× target).
+// User: "moge wybierac losowo posilek na sniadanie/obiad/kolacje i zawsze
+// trafic dzien".
+function unifyMealTargets(menu,profile){
+  if(!menu||!profile||!profile.kcal)return menu;
+  var t={kcal:Math.round(profile.kcal/3),protein:Math.round(profile.prot/3),carbs:Math.round(profile.carb/3),fat:Math.round(profile.fat/3)};
+  ["sniadania","obiady","kolacje"].forEach(function(typ){
+    (menu[typ]||[]).forEach(function(meal){
+      if(!meal)return;
+      meal.aiTarget={kcal:t.kcal,protein:t.protein,carbs:t.carbs,fat:t.fat};
+    });
+  });
+  return menu;
+}
+
 // ── AUTO-SKALOWANIE POSIŁKÓW DO aiTarget ────────────────────────────────────
 // Cel: realne computed.kcal trafi w aiTarget.kcal z dokładnością ±5%.
 // Strategia: jeśli AI dał posiłek z 600 kcal a target = 720, mnożymy WSZYSTKIE
-// gramatury × 1.2 (pomijając jaja/szt, które nie skalują się dobrze).
-// Mnożymy też cap'ujemy do zakresu [0.5, 1.5] żeby nie absurdalnie zmieniać porcje.
+// gramatury × 1.2 + sztuki zaokrąglone do całych (4 jaja × 0.85 = 3 jaja).
+// Cap factor do [0.5, 1.5] żeby nie absurdalnie zmieniać porcji.
 function scaleMealToTarget(meal){
   if(!meal||!meal.aiTarget||!meal.computed)return meal;
   var targetKcal=Number(meal.aiTarget.kcal||0);
   var realKcal=Number(meal.computed.kcal||0);
   if(!targetKcal||!realKcal)return meal;
   var diff=Math.abs(realKcal-targetKcal)/targetKcal;
-  if(diff<=0.05)return meal; // już mieści się w ±5%, nic nie robimy
+  if(diff<=0.05)return meal;
   var factor=targetKcal/realKcal;
-  // Cap: nie skalować absurdalnie (np. AI dał 100 kcal a target 800 = factor 8x)
   if(factor<0.5)factor=0.5;
   if(factor>1.5)factor=1.5;
   if(!meal.skladniki||!meal.skladniki.length)return meal;
-  // Mnóż gramatury (tylko składniki w g/ml — nie szt/kromki/łyżki bo nie mają sensu przy ułamkach)
   meal.skladniki=meal.skladniki.map(function(sk){
     var name=sk.n||sk.name||"";
     var amountText=String(sk.il||sk.amount||"");
-    // Pomiń przyprawy
     if(typeof isNonMacroSeasoning==="function"&&isNonMacroSeasoning(name))return sk;
-    // Skaluj tylko gramy/ml (nie szt., bo "3 jaja × 1.2 = 3.6 jaja" jest dziwne)
-    var m=amountText.toLowerCase().replace(",",".").match(/^([\d.]+)\s*(g|kg|ml|l)\b/);
-    if(!m)return sk;
-    var n=parseFloat(m[1]);
-    var unit=m[2];
-    var scaled=n*factor;
-    // Zaokrąglij do sensownych wartości
-    if(unit==="g"||unit==="ml")scaled=Math.round(scaled/5)*5; // co 5g/ml
-    else scaled=Math.round(scaled*10)/10; // kg/l co 0.1
-    if(scaled<1)scaled=1; // minimum
-    sk.il=scaled+unit;
+    var lower=amountText.toLowerCase().replace(",",".");
+    // PRIORYTET 1: g/kg/ml/l — skaluj precyzyjnie (zaokrąglij do 5g)
+    var mGram=lower.match(/^([\d.]+)\s*(g|kg|ml|l)\b/);
+    if(mGram){
+      var n=parseFloat(mGram[1]);
+      var unit=mGram[2];
+      var scaled=n*factor;
+      if(unit==="g"||unit==="ml")scaled=Math.round(scaled/5)*5;
+      else scaled=Math.round(scaled*10)/10;
+      if(scaled<1)scaled=1;
+      sk.il=scaled+unit;
+      return sk;
+    }
+    // PRIORYTET 2: szt./sztuk/kromka — skaluj do całych (min 1)
+    // 4 jaja × 0.85 = 3.4 → round → 3 jaja (zmiana o całą jednostkę)
+    var mPiece=lower.match(/^([\d.]+)\s*(szt|sztuk|kromk)/);
+    if(mPiece){
+      var n2=parseFloat(mPiece[1]);
+      var unit2=mPiece[2];
+      var scaled2=Math.round(n2*factor);
+      if(scaled2<1)scaled2=1;
+      // Tylko jeśli rzeczywiście zmieniono (round mógł nic nie zmienić)
+      if(scaled2!==n2){
+        var unitFull=unit2.indexOf("kromk")===0?"kromki":"szt.";
+        sk.il=scaled2+" "+unitFull;
+      }
+      return sk;
+    }
     return sk;
   });
-  // Przelicz computed po skalowaniu
   meal.computed=calculateMealMacros(meal);
   meal._scaled={factor:Math.round(factor*100)/100,originalKcal:realKcal,targetKcal:targetKcal,newKcal:meal.computed.kcal};
   return meal;
