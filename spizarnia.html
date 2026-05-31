@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-more-products-v29 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-scaling-stronger-v30 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1088,7 +1088,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-31-more-products-v29";
+var APP_VERSION="2026-05-31-scaling-stronger-v30";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -3272,13 +3272,16 @@ function generateAIDiet(profile){
     m1=fixMenuMacros(m1,profile);
     // KLUCZOWE: wszystkie 9 posiłków = profile.kcal/3 (wymienne losowo)
     if(typeof unifyMealTargets==="function")unifyMealTargets(m1,profile);
-    if(typeof scaleAllMealsToTargets==="function"){scaleAllMealsToTargets(m1);scaleAllMealsToTargets(m1);}
+    if(typeof scaleAllMealsToTargets==="function"){scaleAllMealsToTargets(m1);scaleAllMealsToTargets(m1);scaleAllMealsToTargets(m1);}
+    // Po skalowaniu sync meal.kcal/prot z meal.computed (kompatybilność)
+    syncMealKcalFromComputed(m1);
     if(typeof updateDietStep==="function")updateDietStep(2);
     var m2=parseMenuJSON(r2);
     if(!m2){showDietError("Menu 2: "+getJSONError(r2));forceHideAILoading();return;}
     m2=fixMenuMacros(m2,profile);
     if(typeof unifyMealTargets==="function")unifyMealTargets(m2,profile);
-    if(typeof scaleAllMealsToTargets==="function"){scaleAllMealsToTargets(m2);scaleAllMealsToTargets(m2);}
+    if(typeof scaleAllMealsToTargets==="function"){scaleAllMealsToTargets(m2);scaleAllMealsToTargets(m2);scaleAllMealsToTargets(m2);}
+    syncMealKcalFromComputed(m2);
     if(typeof updateDietStep==="function")updateDietStep(3);
     if(!userProfile)userProfile=profile;
     userProfile.dietData={menu1:m1,menu2:m2};
@@ -3367,9 +3370,8 @@ function unifyMealTargets(menu,profile){
 
 // ── AUTO-SKALOWANIE POSIŁKÓW DO aiTarget ────────────────────────────────────
 // Cel: realne computed.kcal trafi w aiTarget.kcal z dokładnością ±5%.
-// Strategia: jeśli AI dał posiłek z 600 kcal a target = 720, mnożymy WSZYSTKIE
-// gramatury × 1.2 + sztuki zaokrąglone do całych (4 jaja × 0.85 = 3 jaja).
-// Cap factor do [0.5, 1.5] żeby nie absurdalnie zmieniać porcji.
+// Strategia: mnożymy gramatury g/ml × factor + opakowania × pkgSize + sztuki round.
+// Cap factor [0.4, 1.6] (rozszerzone z [0.5, 1.5] żeby ogarnąć większe rozjazdy).
 function scaleMealToTarget(meal){
   if(!meal||!meal.aiTarget||!meal.computed)return meal;
   var targetKcal=Number(meal.aiTarget.kcal||0);
@@ -3378,8 +3380,8 @@ function scaleMealToTarget(meal){
   var diff=Math.abs(realKcal-targetKcal)/targetKcal;
   if(diff<=0.05)return meal;
   var factor=targetKcal/realKcal;
-  if(factor<0.5)factor=0.5;
-  if(factor>1.5)factor=1.5;
+  if(factor<0.4)factor=0.4;
+  if(factor>1.6)factor=1.6;
   if(!meal.skladniki||!meal.skladniki.length)return meal;
   meal.skladniki=meal.skladniki.map(function(sk){
     var name=sk.n||sk.name||"";
@@ -3398,15 +3400,26 @@ function scaleMealToTarget(meal){
       sk.il=scaled+unit;
       return sk;
     }
-    // PRIORYTET 2: szt./sztuk/kromka — skaluj do całych (min 1)
-    // 4 jaja × 0.85 = 3.4 → round → 3 jaja (zmiana o całą jednostkę)
+    // PRIORYTET 2: opakowanie/opak — przelicz na gramy i skaluj
+    // "1 opakowanie" + product.pkgSize=250 → 250g × factor → np. 175g
+    var mOpak=lower.match(/^([\d.]+)\s*(opak|opakowanie)/);
+    if(mOpak){
+      var nO=parseFloat(mOpak[1]);
+      var prod=typeof findProduct==="function"?findProduct(name):null;
+      var ps=prod&&prod.pkgSize?prod.pkgSize:200;
+      var totalG=nO*ps;
+      var scaledG=Math.round(totalG*factor/5)*5;
+      if(scaledG<1)scaledG=1;
+      sk.il=scaledG+"g";
+      return sk;
+    }
+    // PRIORYTET 3: szt./sztuk/kromka — skaluj do całych (min 1)
     var mPiece=lower.match(/^([\d.]+)\s*(szt|sztuk|kromk)/);
     if(mPiece){
       var n2=parseFloat(mPiece[1]);
       var unit2=mPiece[2];
       var scaled2=Math.round(n2*factor);
       if(scaled2<1)scaled2=1;
-      // Tylko jeśli rzeczywiście zmieniono (round mógł nic nie zmienić)
       if(scaled2!==n2){
         var unitFull=unit2.indexOf("kromk")===0?"kromki":"szt.";
         sk.il=scaled2+" "+unitFull;
@@ -3419,20 +3432,42 @@ function scaleMealToTarget(meal){
   meal._scaled={factor:Math.round(factor*100)/100,originalKcal:realKcal,targetKcal:targetKcal,newKcal:meal.computed.kcal};
   return meal;
 }
-// Skaluje WSZYSTKIE posiłki w menu do swoich aiTarget
+// Po skalowaniu sync meal.kcal/prot/carb/fat z meal.computed (kompatybilność wstecz)
+function syncMealKcalFromComputed(menu){
+  if(!menu)return menu;
+  ["sniadania","obiady","kolacje"].forEach(function(typ){
+    (menu[typ]||[]).forEach(function(meal){
+      if(meal&&meal.computed&&meal.computed.isComplete&&meal.computed.kcal>0){
+        meal.kcal=meal.computed.kcal;
+        meal.prot=meal.computed.protein;
+        meal.carb=meal.computed.carbs;
+        meal.fat=meal.computed.fat;
+      }
+    });
+  });
+  return menu;
+}
+// Skaluje WSZYSTKIE posiłki w menu do swoich aiTarget — 3 iteracje
 function scaleAllMealsToTargets(menu){
   if(!menu)return menu;
   ["sniadania","obiady","kolacje"].forEach(function(typ){
     (menu[typ]||[]).forEach(function(meal){
       if(!meal||!meal.aiTarget||!meal.computed)return;
-      // Max 2 iteracje skalowania (po pierwszym mnożeniu zaokrąglenia mogą trochę odbić)
-      for(var i=0;i<2;i++){
+      // 3 iteracje (zaokrąglenia odbijają, więcej prób = lepiej trafia)
+      for(var i=0;i<3;i++){
         var before=meal.computed&&meal.computed.kcal;
         scaleMealToTarget(meal);
         if(!meal.computed)break;
         var diff=Math.abs(meal.computed.kcal-meal.aiTarget.kcal)/meal.aiTarget.kcal;
-        if(diff<=0.05)break; // już mieści się
-        if(meal.computed.kcal===before)break; // nie zmienia się
+        if(diff<=0.05)break;
+        if(meal.computed.kcal===before)break;
+      }
+      // Log diagnostyczny gdy dalej za duzy rozjazd
+      if(meal.computed){
+        var finalDiff=Math.abs(meal.computed.kcal-meal.aiTarget.kcal)/meal.aiTarget.kcal;
+        if(finalDiff>0.10){
+          try{console.warn("⚠️ Skalowanie nie trafiło:",meal.nazwa,"computed:",meal.computed.kcal,"target:",meal.aiTarget.kcal,"diff:",Math.round(finalDiff*100)+"%");}catch(e){}
+        }
       }
     });
   });
@@ -3492,22 +3527,9 @@ function parseMenuJSON(raw){
         }
       });
     });
-    // AUTO-SKALOWANIE: po wyliczeniu computed, dopasuj gramatury do aiTarget (±5%)
-    // Dzięki temu realne makro zawsze odpowiada założeniom AI.
-    if(typeof scaleAllMealsToTargets==="function"){
-      scaleAllMealsToTargets(p);
-      // Po skalowaniu zaktualizuj kompatybilne pola meal.kcal/prot/carb/fat
-      ["sniadania","obiady","kolacje"].forEach(function(typ){
-        (p[typ]||[]).forEach(function(meal){
-          if(meal&&meal.computed&&meal.computed.isComplete&&meal.computed.kcal>0){
-            meal.kcal=meal.computed.kcal;
-            meal.prot=meal.computed.protein;
-            meal.carb=meal.computed.carbs;
-            meal.fat=meal.computed.fat;
-          }
-        });
-      });
-    }
+    // UWAGA: NIE skalujemy tutaj. Skalowanie odbywa się w generateAIDiet PO
+    // unifyMealTargets (wszystkie posiłki = profile/3). Robienie tutaj byłoby
+    // marnotrawne (skalujemy do AI-targetu który zaraz zostanie nadpisany).
     return p;
   }catch(ex){return null;}
 }
