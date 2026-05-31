@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-interchangeable-meals-v27 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-fallback-units-szparagi-v28 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1088,7 +1088,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-31-interchangeable-meals-v27";
+var APP_VERSION="2026-05-31-fallback-units-szparagi-v28";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -4217,6 +4217,22 @@ var LOCAL_NUTRITION_FALLBACK=[
   {id:"f_czosnek",canonicalName:"czosnek",aliases:["czosnek","ząbek czosnku","garlic"],kcal100:149,protein100:6.4,carbs100:33,fat100:0.5,state:"raw",singleWeight:30,sourceNote:"USDA: Garlic, raw",confidenceBase:0.95,verified:true},
   {id:"f_cukinia",canonicalName:"cukinia",aliases:["cukinia","zucchini"],kcal100:17,protein100:1.2,carbs100:3.1,fat100:0.3,state:"raw",singleWeight:300,sourceNote:"USDA: Squash, zucchini, raw",confidenceBase:0.95,verified:true},
   {id:"f_fasolka_szparagowa",canonicalName:"fasolka szparagowa",aliases:["fasolka szparagowa","szparagowa","green beans"],kcal100:31,protein100:1.8,carbs100:7,fat100:0.2,state:"raw",sourceNote:"USDA: Green beans, raw",confidenceBase:0.9,verified:true},
+  {id:"f_szparagi",canonicalName:"szparagi",aliases:["szparagi","szparag","asparagus"],kcal100:20,protein100:2.2,carbs100:3.9,fat100:0.1,state:"raw",sourceNote:"USDA: Asparagus, raw",confidenceBase:0.95,verified:true},
+  {id:"f_kalafior",canonicalName:"kalafior",aliases:["kalafior","cauliflower"],kcal100:25,protein100:1.9,carbs100:5,fat100:0.3,state:"raw",singleWeight:400,sourceNote:"USDA: Cauliflower, raw",confidenceBase:0.95,verified:true},
+  {id:"f_kapusta_pekinska",canonicalName:"kapusta pekińska",aliases:["kapusta pekińska","kapusta pekinska","chinese cabbage"],kcal100:13,protein100:1.2,carbs100:2.2,fat100:0.2,state:"raw",sourceNote:"USDA: Cabbage, chinese (napa), raw",confidenceBase:0.9,verified:true},
+  {id:"f_salata_lodowa",canonicalName:"sałata lodowa",aliases:["sałata lodowa","salata lodowa","sałata","salata","lettuce"],kcal100:14,protein100:0.9,carbs100:3,fat100:0.1,state:"raw",sourceNote:"USDA: Lettuce, iceberg, raw",confidenceBase:0.9,verified:true},
+  {id:"f_rukola",canonicalName:"rukola",aliases:["rukola","arugula"],kcal100:25,protein100:2.6,carbs100:3.7,fat100:0.7,state:"raw",sourceNote:"USDA: Arugula, raw",confidenceBase:0.95,verified:true},
+  {id:"f_kefir",canonicalName:"kefir",aliases:["kefir"],kcal100:41,protein100:3.3,carbs100:4,fat100:1,state:"prepared",densityGPerMl:1.03,sourceNote:"USDA: Kefir, plain, lowfat",confidenceBase:0.9,verified:true},
+  {id:"f_maslanka",canonicalName:"maślanka",aliases:["maślanka","maslanka","buttermilk"],kcal100:40,protein100:3.3,carbs100:4.8,fat100:0.9,state:"prepared",densityGPerMl:1.03,sourceNote:"USDA: Buttermilk, low fat",confidenceBase:0.9,verified:true},
+  {id:"f_kiwi",canonicalName:"kiwi",aliases:["kiwi","kiwifruit"],kcal100:61,protein100:1.1,carbs100:15,fat100:0.5,state:"raw",singleWeight:75,sourceNote:"USDA: Kiwifruit, raw",confidenceBase:0.95,verified:true},
+  {id:"f_gruszka",canonicalName:"gruszka",aliases:["gruszka","gruszki","pear"],kcal100:57,protein100:0.4,carbs100:15,fat100:0.1,state:"raw",singleWeight:180,sourceNote:"USDA: Pears, raw",confidenceBase:0.95,verified:true},
+  {id:"f_borowki",canonicalName:"borówki",aliases:["borówki","borowki","jagody","blueberries"],kcal100:57,protein100:0.7,carbs100:14,fat100:0.3,state:"raw",sourceNote:"USDA: Blueberries, raw",confidenceBase:0.9,verified:true},
+  {id:"f_pomarancza",canonicalName:"pomarańcza",aliases:["pomarańcza","pomarancza","pomarańcze","orange"],kcal100:47,protein100:0.9,carbs100:12,fat100:0.1,state:"raw",singleWeight:200,sourceNote:"USDA: Oranges, raw",confidenceBase:0.95,verified:true},
+  {id:"f_passata",canonicalName:"passata pomidorowa",aliases:["passata","passata pomidorowa","passata pomidor","tomato passata","sos pomidorowy"],kcal100:35,protein100:1.5,carbs100:7,fat100:0.5,state:"prepared",sourceNote:"Polish typical passata (Combino/Pudliszki)",confidenceBase:0.85,verified:true},
+  {id:"f_pestki_dyni",canonicalName:"pestki dyni",aliases:["pestki dyni","pumpkin seeds"],kcal100:559,protein100:30,carbs100:11,fat100:49,state:"raw",sourceNote:"USDA: Seeds, pumpkin",confidenceBase:0.95,verified:true},
+  {id:"f_slonecznik",canonicalName:"słonecznik",aliases:["słonecznik","slonecznik","pestki słonecznika","sunflower seeds"],kcal100:584,protein100:21,carbs100:20,fat100:51,state:"raw",sourceNote:"USDA: Seeds, sunflower",confidenceBase:0.95,verified:true},
+  {id:"f_oliwki",canonicalName:"oliwki",aliases:["oliwki","oliwki czarne","oliwki zielone","olives"],kcal100:115,protein100:0.8,carbs100:6,fat100:11,state:"prepared",sourceNote:"USDA: Olives, ripe, canned",confidenceBase:0.9,verified:true},
+  {id:"f_pieczarki",canonicalName:"pieczarki",aliases:["pieczarki","champignons","grzyby"],kcal100:22,protein100:3.1,carbs100:3.3,fat100:0.3,state:"raw",sourceNote:"USDA: Mushrooms, white, raw",confidenceBase:0.95,verified:true},
   {id:"f_awokado",canonicalName:"awokado",aliases:["awokado","avocado"],kcal100:160,protein100:2,carbs100:8.5,fat100:14.7,state:"raw",singleWeight:170,sourceNote:"USDA: Avocados, raw, all commercial varieties",confidenceBase:0.95,verified:true},
   // === OWOCE ===
   {id:"f_banan",canonicalName:"banan",aliases:["banan","banany","banana"],kcal100:89,protein100:1.1,carbs100:23,fat100:0.3,state:"raw",singleWeight:120,sourceNote:"USDA: Bananas, raw",confidenceBase:0.95,verified:true},
@@ -4238,8 +4254,8 @@ var LOCAL_NUTRITION_FALLBACK=[
   {id:"f_orzechy_wloskie",canonicalName:"orzechy włoskie",aliases:["orzechy włoskie","orzechy wloskie","walnuts"],kcal100:654,protein100:15,carbs100:14,fat100:65,state:"raw",sourceNote:"USDA: Nuts, walnuts, English",confidenceBase:0.95,verified:true},
   {id:"f_maslo_orzechowe",canonicalName:"masło orzechowe",aliases:["masło orzechowe","maslo orzechowe","masło orzechowe vitanella","peanut butter"],kcal100:588,protein100:25,carbs100:20,fat100:50,state:"prepared",sourceNote:"USDA: Peanut butter, smooth style, no salt",confidenceBase:0.9,verified:true},
   // === PIECZYWO ===
-  {id:"f_chleb_pelnoziarnisty",canonicalName:"chleb pełnoziarnisty",aliases:["chleb pełnoziarnisty","chleb pelnoziarnisty","whole grain bread","chleb razowy"],kcal100:247,protein100:13,carbs100:41,fat100:3.4,state:"prepared",sourceNote:"USDA: Bread, whole-wheat, commercially prepared",confidenceBase:0.9,verified:true},
-  {id:"f_chleb_zytni",canonicalName:"chleb żytni",aliases:["chleb żytni","chleb zytni","rye bread"],kcal100:259,protein100:8.5,carbs100:48,fat100:3.3,state:"prepared",sourceNote:"USDA: Bread, rye",confidenceBase:0.9,verified:true},
+  {id:"f_chleb_pelnoziarnisty",canonicalName:"chleb pełnoziarnisty",aliases:["chleb pełnoziarnisty","chleb pelnoziarnisty","whole grain bread","chleb razowy"],kcal100:247,protein100:13,carbs100:41,fat100:3.4,state:"prepared",gramsPerPiece:30,sourceNote:"USDA: Bread, whole-wheat (kromka ~30g)",confidenceBase:0.9,verified:true},
+  {id:"f_chleb_zytni",canonicalName:"chleb żytni",aliases:["chleb żytni","chleb zytni","rye bread"],kcal100:259,protein100:8.5,carbs100:48,fat100:3.3,state:"prepared",gramsPerPiece:30,sourceNote:"USDA: Bread, rye (kromka ~30g)",confidenceBase:0.9,verified:true},
   {id:"f_tortilla",canonicalName:"tortilla pszenna",aliases:["tortilla","tortille","tortilla pszenna","tortille pełnoziarniste","tortille pelnoziarniste","wrap"],kcal100:300,protein100:9,carbs100:55,fat100:6,state:"prepared",singleWeight:60,sourceNote:"USDA: Tortillas, ready-to-bake or -fry, flour",confidenceBase:0.85,verified:true},
   // === STRĄCZKI ===
   {id:"f_ciecierzyca_puszka",canonicalName:"ciecierzyca z puszki",aliases:["ciecierzyca","ciecierzyca puszka","chickpeas canned"],kcal100:139,protein100:7.3,carbs100:23,fat100:2,state:"prepared",sourceNote:"USDA: Chickpeas, canned, drained",confidenceBase:0.9,verified:true},
@@ -4521,7 +4537,7 @@ function ingredientToGramsResolver(ingredient,product){
   var amt=Number(ingredient.amount||0);
   var unit=String(ingredient.unit||"g").toLowerCase().trim();
   if(!amt)return{grams:0,ok:false};
-  // Bezpośrednie jednostki
+  // === Bezpośrednie jednostki gramowe/objętościowe ===
   if(unit==="g")return{grams:amt,ok:true};
   if(unit==="kg")return{grams:amt*1000,ok:true};
   if(unit==="ml"){
@@ -4532,11 +4548,25 @@ function ingredientToGramsResolver(ingredient,product){
     var dens2=product&&product.densityGPerMl||1;
     return{grams:amt*1000*dens2,ok:true};
   }
-  if(unit==="szt"||unit==="sztuk"||unit==="szt."){
+  // === Sztuki: szt./sztuk + KROMKI (typowo 30g) + GŁÓWKI (typowo 30g dla czosnku) ===
+  if(unit==="szt"||unit==="sztuk"||unit==="szt."||unit.indexOf("kromk")===0||unit.indexOf("główk")===0||unit.indexOf("glowk")===0){
     var gpp=product&&(product.gramsPerPiece||product.singleWeight);
     if(gpp)return{grams:amt*gpp,ok:true};
+    // FALLBACK dla kromek: typowa kromka chleba = 30g
+    if(unit.indexOf("kromk")===0)return{grams:amt*30,ok:true,estimated:true};
+    // FALLBACK dla główki czosnku (typowa = 30g)
+    if(unit.indexOf("główk")===0||unit.indexOf("glowk")===0)return{grams:amt*30,ok:true,estimated:true};
+    // FALLBACK ogólny szt.: użyj pkgSize jeśli istnieje
+    if(product&&product.pkgSize&&product.pkgSize>0&&product.pkgSize<2000)return{grams:amt*product.pkgSize,ok:true,estimated:true};
     return{grams:0,ok:false,reason:"brak gramsPerPiece dla produktu"};
   }
+  // === Opakowanie - użyj pkgSize ===
+  if(unit.indexOf("opak")===0){
+    var ps=product&&product.pkgSize;
+    if(ps)return{grams:amt*ps,ok:true};
+    return{grams:0,ok:false,reason:"brak pkgSize"};
+  }
+  // === Łyżka / łyżeczka ===
   if(unit==="łyżka"||unit==="lyzka"||unit==="łyżki"||unit==="lyzki"){
     var gpt=product&&product.gramsPerTbsp||15;
     return{grams:amt*gpt,ok:true};
@@ -4548,8 +4578,11 @@ function ingredientToGramsResolver(ingredient,product){
   if(unit==="porcja"){
     var ss=product&&product.servingSize;
     if(ss)return{grams:amt*ss,ok:true};
-    return{grams:0,ok:false,reason:"brak servingSize"};
+    // Fallback: typowa porcja = 100g
+    return{grams:amt*100,ok:true,estimated:true};
   }
+  // === Ostatni fallback: jeśli amt wygląda jak gramy (≥10) i mamy produkt - załóż gramy ===
+  if(amt>=10&&product)return{grams:amt,ok:true,estimated:true};
   return{grams:0,ok:false,reason:"nieznana jednostka: "+unit};
 }
 
