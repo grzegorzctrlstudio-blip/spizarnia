@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-spreads-pack-v33 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-06-01-diet-wishes-auto-fetch-v34 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1088,7 +1088,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-31-spreads-pack-v33";
+var APP_VERSION="2026-06-01-diet-wishes-auto-fetch-v34";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -2568,7 +2568,46 @@ function userPanelGenerateDiet(){
     dlgAlert("ℹ️","Brak profilu","Najpierw uzupełnij swój profil (Edytuj profil), aby AI wygenerował dietę.");
     return;
   }
-  if(typeof generateAIDiet==="function")generateAIDiet(userProfile);
+  openDietWishesModal();
+}
+// Modal z polem dodatkowych życzeń przed generowaniem diety
+function openDietWishesModal(){
+  var ol=document.getElementById("diet-wishes-overlay");
+  if(!ol){
+    ol=document.createElement("div");
+    ol.id="diet-wishes-overlay";
+    ol.style.cssText="display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px";
+    ol.onclick=function(e){if(e.target===ol)closeDietWishesModal();};
+    document.body.appendChild(ol);
+  }
+  var lastWishes=(typeof localStorage!=="undefined")?(localStorage.getItem("dietWishes")||""):"";
+  ol.innerHTML='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:22px;max-width:440px;width:100%;box-shadow:0 20px 60px rgba(6,182,212,.3)">'
+    +'<div style="font-size:30px;margin-bottom:10px;text-align:center">🍽️</div>'
+    +'<div style="font-size:17px;font-weight:600;color:var(--text);text-align:center;margin-bottom:6px">Wygeneruj dietę AI</div>'
+    +'<div style="font-size:12px;color:var(--text3);text-align:center;margin-bottom:16px;line-height:1.5">AI stworzy 2 menu po 9 posiłków, dopasowane do Twojego profilu.<br>Możesz dopisać dodatkowe życzenia poniżej:</div>'
+    +'<div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">💭 Twoje życzenia (opcjonalne)</div>'
+    +'<textarea id="diet-wishes-input" placeholder="np. Mam smaka na serek wiejski. Chcę dużo dań z łososia. Bez quinoa, mam jej dość. Częściej tortille pełnoziarniste." style="width:100%;background:var(--bg3);border:1.5px solid var(--border);border-radius:12px;padding:12px;font-size:13px;color:var(--text);outline:none;min-height:100px;font-family:inherit;resize:vertical;margin-bottom:8px">'+lastWishes+'</textarea>'
+    +'<div style="font-size:10px;color:var(--text3);margin-bottom:14px;font-style:italic">💡 Wpisz w wolnej formie co chcesz dodać lub wykluczyć. AI wkomponuje to w dietę.</div>'
+    +'<div style="display:flex;gap:8px">'
+    +'<button onclick="closeDietWishesModal()" style="flex:1;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:12px;font-size:14px;font-weight:500;cursor:pointer">Anuluj</button>'
+    +'<button onclick="submitDietWishes()" style="flex:2;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#000;border:none;border-radius:12px;padding:12px;font-size:14px;font-weight:600;cursor:pointer">🚀 Generuj dietę</button>'
+    +'</div>'
+    +'</div>';
+  ol.style.display="flex";
+  setTimeout(function(){var i=document.getElementById("diet-wishes-input");if(i)i.focus();},50);
+}
+function closeDietWishesModal(){
+  var el=document.getElementById("diet-wishes-overlay");
+  if(el)el.style.display="none";
+}
+function submitDietWishes(){
+  var i=document.getElementById("diet-wishes-input");
+  var wishes=i?String(i.value||"").trim():"";
+  closeDietWishesModal();
+  // Zapisz dla następnego razu
+  try{if(typeof localStorage!=="undefined")localStorage.setItem("dietWishes",wishes);}catch(e){}
+  // Przekaż wishes do generateAIDiet
+  if(typeof generateAIDiet==="function")generateAIDiet(userProfile,wishes);
 }
 function openUserPurchaseHistory(){
   if(typeof openDiet==="function"){openDiet();if(typeof switchDietTab==="function")switchDietTab(3);}
@@ -3202,7 +3241,7 @@ function updateDietStep(step){
   else if(step===3){if(m2){m2.style.color="var(--green)";m2.innerHTML="&#9989; Menu 2 gotowe!";}if(done){done.style.color="var(--amber)";done.textContent="&#9203; Finalizuje i zapisuje...";}if(genStep)genStep.textContent="Zapisuje dietę...";}
 }
 
-function generateAIDiet(profile){
+function generateAIDiet(profile,customWishes){
   if(!apiKey){dlgAlert("X","Brak klucza API","Skonfiguruj klucz API.");return;}
   if(!profile||!profile.kcal){dlgAlert("X","Brak profilu","Uzupelnij profil.");return;}
   // NIE wywołujemy showAILoading() bo Promise.all([callAPI, callAPI]) sam to zrobi 2x.
@@ -3212,7 +3251,9 @@ function generateAIDiet(profile){
   var mK=Math.round(profile.kcal/3),mP=Math.round(profile.prot/3),mC=Math.round(profile.carb/3),mF=Math.round(profile.fat/3);
   var likedStr=(profile.liked&&profile.liked.length)?" PRIORYTETUJ lubiane: "+profile.liked.join(", "):"";
   var dislikedStr=(profile.disliked&&profile.disliked.length)?" WYKLUCZ nielubiane: "+profile.disliked.join(", "):"";
-  var base="Użytkownik: "+goalTxt+", "+profile.kcal+" kcal/dzień, B:"+profile.prot+"g W:"+profile.carb+"g T:"+profile.fat+"g. Na posiłek: "+mK+" kcal B:"+mP+"g W:"+mC+"g T:"+mF+"g (+/-5%). Sklep: "+storeName+"."+(profile.exclude?" Wykluczone: "+profile.exclude+".":"")+likedStr+dislikedStr+" Produkty: "+FULL_PRODUCTS+".\n"
+  // Dodatkowe życzenia użytkownika (z modala)
+  var wishesStr=(customWishes&&String(customWishes).trim())?"\n🎯 DODATKOWE ŻYCZENIA UŻYTKOWNIKA (priorytetowo wkomponuj w dietę): \""+String(customWishes).trim()+"\"\n":"";
+  var base="Użytkownik: "+goalTxt+", "+profile.kcal+" kcal/dzień, B:"+profile.prot+"g W:"+profile.carb+"g T:"+profile.fat+"g. Na posiłek: "+mK+" kcal B:"+mP+"g W:"+mC+"g T:"+mF+"g (+/-5%). Sklep: "+storeName+"."+(profile.exclude?" Wykluczone: "+profile.exclude+".":"")+likedStr+dislikedStr+" Produkty: "+FULL_PRODUCTS+"."+wishesStr+"\n"
     +"ZASADY JEDNOSTEK SKŁADNIKÓW (BARDZO WAŻNE):\n"
     +"- jaja: ZAWSZE SZTUKI (np. '3 szt.'), NIGDY w gramach\n"
     +"- chleb: kromki lub gramy (np. '2 kromki' lub '60g')\n"
@@ -3282,6 +3323,19 @@ function generateAIDiet(profile){
     if(typeof unifyMealTargets==="function")unifyMealTargets(m2,profile);
     if(typeof scaleAllMealsToTargets==="function"){scaleAllMealsToTargets(m2);scaleAllMealsToTargets(m2);scaleAllMealsToTargets(m2);}
     syncMealKcalFromComputed(m2);
+    // AUTO-FETCH brakujących produktów z Open Food Facts (async)
+    // User: 'jesli nie ma produktu w bazie danych to niech sie doda z internetu'
+    if(typeof autoFetchMissingProducts==="function"){
+      setAILoadingText("🌐 Pobieram brakujące dane z internetu...","Open Food Facts — dodaję produkty których nie ma w lokalnej bazie");
+      autoFetchMissingProducts(m1).then(function(){
+        return autoFetchMissingProducts(m2);
+      }).then(function(){
+        // Po pobraniu - przelicz computed jeszcze raz
+        if(typeof scaleAllMealsToTargets==="function"){scaleAllMealsToTargets(m1);scaleAllMealsToTargets(m2);}
+        syncMealKcalFromComputed(m1);syncMealKcalFromComputed(m2);
+        renderDietBody();
+      }).catch(function(){/* OFF może nie odpowiedzieć - kontynuuj */});
+    }
     if(typeof updateDietStep==="function")updateDietStep(3);
     if(!userProfile)userProfile=profile;
     userProfile.dietData={menu1:m1,menu2:m2};
@@ -3351,6 +3405,64 @@ function repairTruncatedJSON(jsonStr){
   }
   return s;
 }
+// ── AUTO-FETCH BRAKUJĄCYCH PRODUKTÓW Z OPEN FOOD FACTS ──────────────────────
+// Po wygenerowaniu diety: dla składników unresolved/missingMacros pobierz dane
+// z OFF i zapisz do nutCache. Następnie przelicz computed.
+function autoFetchMissingProducts(menu){
+  if(!menu)return Promise.resolve(0);
+  var missingNames={};
+  ["sniadania","obiady","kolacje"].forEach(function(typ){
+    (menu[typ]||[]).forEach(function(meal){
+      if(!meal||!meal.computed||!meal.computed.rows)return;
+      meal.computed.rows.forEach(function(r){
+        if(r.resolutionStatus==="unresolved"||r.resolutionStatus==="missingMacros"){
+          var name=r.name||"";
+          if(name&&typeof isNonMacroSeasoning==="function"&&isNonMacroSeasoning(name))return;
+          // Pomijaj jeśli już pobrane w tej sesji (cache)
+          var key="prod:"+normalizeFallbackKey(name);
+          if(nutCacheGet(key))return;
+          missingNames[name]=true;
+        }
+      });
+    });
+  });
+  var list=Object.keys(missingNames);
+  if(!list.length)return Promise.resolve(0);
+  try{console.info("🌐 Auto-fetch z Open Food Facts:",list.length,"produktów:",list.join(", "));}catch(e){}
+  // Pobierz każdy produkt sekwencyjnie (nie równoległo - OFF może rate-limitować)
+  var promises=list.map(function(name){
+    return searchOpenFoodFacts(name).then(function(results){
+      if(!results||!results.length)return null;
+      // Wybierz najlepszy match (najwyższy confidence)
+      var best=results[0];
+      if(typeof calculateProductMatchConfidence==="function"){
+        var scored=results.map(function(p){
+          return{p:p,c:calculateProductMatchConfidence({name:name},p)*p.confidenceBase};
+        });
+        scored.sort(function(a,b){return b.c-a.c;});
+        best=scored[0]&&scored[0].c>=0.5?scored[0].p:results[0];
+      }
+      if(!best)return null;
+      // Zapisz do cache pod nazwą szukaną
+      nutCacheSet("prod:"+normalizeFallbackKey(name),best);
+      return{name:name,product:best};
+    }).catch(function(){return null;});
+  });
+  return Promise.all(promises).then(function(results){
+    var added=results.filter(Boolean).length;
+    try{console.info("✓ Pobrano z OFF:",added,"/",list.length);}catch(e){}
+    // Po pobraniu - przelicz computed dla wszystkich posiłków
+    ["sniadania","obiady","kolacje"].forEach(function(typ){
+      (menu[typ]||[]).forEach(function(meal){
+        if(meal&&typeof calculateMealMacros==="function"){
+          meal.computed=calculateMealMacros(meal);
+        }
+      });
+    });
+    return added;
+  });
+}
+
 // ── UNIFIKACJA aiTarget — wszystkie 9 posiłków w menu = profile.kcal/3 ───────
 // Cel: KAŻDY z 9 posiłków ma IDENTYCZNY target makro, dzięki czemu losowo
 // wybierając 1 śn + 1 ob + 1 kol zawsze trafiamy w dzień (3× target).
