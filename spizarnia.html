@@ -873,6 +873,43 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
   </div>
 </div>
 
+<!-- ══ LABEL SCANNER REVIEW MODAL ════════════════════════════════════════ -->
+<input type="file" id="label-scan-file" accept="image/*" capture="environment" style="display:none" onchange="handleLabelScan(this)">
+<div id="label-review-overlay" class="dlg-overlay" onclick="if(event.target===this)closeLabelReview()">
+  <div class="dlg-box" style="max-width:440px;text-align:left">
+    <div style="text-align:center;margin-bottom:14px">
+      <div style="font-size:32px">🏷️</div>
+      <div style="font-size:18px;font-weight:900;color:var(--text);margin-top:4px">Makro z etykiety</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:4px">Sprawdź dane odczytane przez AI i popraw jeśli trzeba.</div>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:700">Nazwa produktu</div>
+    <input id="lbl-rev-name" class="modal-inp" style="width:100%;margin-bottom:8px" placeholder="np. Skyr Pyszny Duet 2,8%">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:700">Marka</div>
+        <input id="lbl-rev-brand" class="modal-inp" placeholder="Pyszny Duet"></div>
+      <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:700">Sklep</div>
+        <input id="lbl-rev-shop" class="modal-inp" placeholder="Biedronka / Lidl"></div>
+    </div>
+    <div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-top:8px;margin-bottom:6px">Wartości / 100g</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:10px">
+      <div><div style="font-size:10px;color:var(--amber);margin-bottom:3px;font-weight:700">kcal</div>
+        <input id="lbl-rev-kcal" type="number" class="modal-inp" style="padding:10px"></div>
+      <div><div style="font-size:10px;color:#60A5FA;margin-bottom:3px;font-weight:700">B (g)</div>
+        <input id="lbl-rev-prot" type="number" step="0.1" class="modal-inp" style="padding:10px"></div>
+      <div><div style="font-size:10px;color:var(--green);margin-bottom:3px;font-weight:700">W (g)</div>
+        <input id="lbl-rev-carb" type="number" step="0.1" class="modal-inp" style="padding:10px"></div>
+      <div><div style="font-size:10px;color:#F9A8D4;margin-bottom:3px;font-weight:700">T (g)</div>
+        <input id="lbl-rev-fat" type="number" step="0.1" class="modal-inp" style="padding:10px"></div>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:700">Wielkość opakowania (g/ml)</div>
+    <input id="lbl-rev-pkg" type="number" class="modal-inp" style="width:100%;margin-bottom:14px" placeholder="np. 350">
+    <div class="dlg-btns">
+      <button class="dlg-btn cancel" onclick="closeLabelReview()">Anuluj</button>
+      <button class="dlg-btn ok" onclick="saveLabelOverride()">Zapisz makro</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ GENERIC PROMPT MODAL (zastąpienie window.prompt) ════════════════ -->
 <div id="prompt-overlay" class="dlg-overlay">
   <div class="dlg-box">
@@ -1360,6 +1397,90 @@ function applyScan(){
     }
     scanSavesPhoto=false;
   }
+}
+
+// ── SKANER ETYKIET — odczyt makro z tabeli wartości odżywczych ──────────────
+var labelScanCallback=null;
+function openLabelScanner(cb){
+  if(!apiKey){dlgAlert("X","Niedostępne","Skonfiguruj klucz API w panelu administratora.");return;}
+  labelScanCallback=cb||null;
+  var fi=document.getElementById("label-scan-file");
+  if(fi){fi.value="";fi.click();}
+}
+function handleLabelScan(input){
+  if(!input.files||!input.files[0])return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var b64=e.target.result.split(",")[1],mime=input.files[0].type||"image/jpeg";
+    dlgAlert("⏳","Analizuję etykietę","Czytam wartości odżywcze z tabeli, chwilę...");
+    var prompt="Z etykiety produktu spożywczego (tabela wartości odżywczych) odczytaj wartości na 100g. Jeśli na opakowaniu są wartości na porcję, też je podaj. TYLKO JSON bez markdown:\n"
+      +'{"nazwa":"pełna nazwa produktu z opakowania","marka":"marka","sklep":"Biedronka/Lidl/inne","kcal":0,"prot":0,"carb":0,"fat":0,"per_serving":{"kcal":0,"prot":0,"carb":0,"fat":0,"size_g":0},"pkg_size_g":0,"uwaga":""}';
+    callAPI([{role:"user",content:[
+      {type:"image",source:{type:"base64",media_type:mime,data:b64}},
+      {type:"text",text:prompt}
+    ]}],"Jesteś ekspertem żywieniowym. Czytasz tabele wartości odżywczych z opakowań. TYLKO JSON.",
+    function(txt){
+      try{
+        var clean=txt.replace(/```json|```/g,"").trim();
+        var s=clean.indexOf("{"),e=clean.lastIndexOf("}");
+        var parsed=JSON.parse(clean.slice(s,e+1));
+        document.getElementById("dlg").classList.remove("show");
+        // Otwórz potwierdzenie/edycję
+        showLabelScanReview(parsed);
+      }catch(err){
+        document.getElementById("dlg").classList.remove("show");
+        dlgAlert("X","Błąd odczytu","Nie udało się odczytać etykiety. Spróbuj zrobić ostrzejsze zdjęcie tabeli wartości odżywczych.");
+      }
+    },function(err){
+      document.getElementById("dlg").classList.remove("show");
+      dlgAlert("X","Błąd API","Nie udało się przeanalizować zdjęcia: "+err);
+    },1200);
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+var _pendingLabelData=null;
+function showLabelScanReview(d){
+  _pendingLabelData=d;
+  var el=document.getElementById("label-review-overlay");if(!el)return;
+  document.getElementById("lbl-rev-name").value=d.nazwa||"";
+  document.getElementById("lbl-rev-brand").value=d.marka||"";
+  document.getElementById("lbl-rev-shop").value=d.sklep||"";
+  document.getElementById("lbl-rev-kcal").value=d.kcal||0;
+  document.getElementById("lbl-rev-prot").value=d.prot||0;
+  document.getElementById("lbl-rev-carb").value=d.carb||0;
+  document.getElementById("lbl-rev-fat").value=d.fat||0;
+  document.getElementById("lbl-rev-pkg").value=d.pkg_size_g||0;
+  el.classList.add("show");
+}
+function closeLabelReview(){
+  document.getElementById("label-review-overlay").classList.remove("show");
+  _pendingLabelData=null;
+}
+function saveLabelOverride(){
+  var name=document.getElementById("lbl-rev-name").value.trim();
+  if(!name){dlgAlert("ℹ️","Brak nazwy","Wpisz nazwę produktu.");return;}
+  // Spróbuj dopasować do istniejącego produktu z bazy
+  var match=findProduct(name);
+  var pid=match?match.id:"custom_"+normalizeRawName(name);
+  var override={
+    name:name,
+    brand:document.getElementById("lbl-rev-brand").value.trim(),
+    shop:document.getElementById("lbl-rev-shop").value.trim(),
+    n100:{
+      kcal:Number(document.getElementById("lbl-rev-kcal").value)||0,
+      prot:Number(document.getElementById("lbl-rev-prot").value)||0,
+      carb:Number(document.getElementById("lbl-rev-carb").value)||0,
+      fat:Number(document.getElementById("lbl-rev-fat").value)||0
+    },
+    pkgSize:Number(document.getElementById("lbl-rev-pkg").value)||0,
+    ts:Date.now()
+  };
+  userProductOverrides[pid]=override;
+  if(userName){
+    fbPatch(FB+"/productOverrides/"+profileKey(userName),Object.fromEntries([[pid,override]])).catch(function(){});
+  }
+  closeLabelReview();
+  dlgAlert("✅","Zapisano",'Makro produktu "'+name+'" zapisane z etykiety.\nKcal: '+override.n100.kcal+' / 100g, B:'+override.n100.prot+'g W:'+override.n100.carb+'g T:'+override.n100.fat+'g');
 }
 
 // ── RECEIPT ───────────────────────────────────────────────────────────────────
@@ -2579,6 +2700,10 @@ function startApp(){
       else{var preset=applyPresetProfile(userName);if(preset){saveUserProfile(preset);updateAISys();}else{setTimeout(showOb,600);}}
     });
     fbGet(FB+"/profiles/"+profileKey(userName)+"/weekplan").then(function(wp){if(wp)weekPlan=wp;}).catch(function(){});
+    // Załaduj user product overrides (z etykiet)
+    fbGet(FB+"/productOverrides/"+profileKey(userName)).then(function(ov){
+      if(ov)userProductOverrides=ov;
+    }).catch(function(){userProductOverrides={};});
     setInterval(function(){
       Promise.all([fbGet(RP),fbGet(EP),fbGet(CP),fbGet(PP)]).then(function(res){
         var r=res[0],e=res[1],k=res[2],p=res[3],ch=false;
@@ -2767,34 +2892,127 @@ function toggleReceiptDetails(el){
 // ══════════════════════════════════════════════════════════════════════════════
 var PRODUCT_DB = [
   // MIĘSO
-  {id:"piers_kurczaka",name:"Pierś z Kurczaka",aliases:["piers z kurczaka","pierś kurczaka","kurczak"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:110,prot:23,carb:0,fat:2},unit:"g",pkgUnit:"g",pkgSize:500,soldByWeight:true,days:3},
+  {id:"piers_kurczaka",name:"Pierś z Kurczaka",aliases:["piers z kurczaka","pierś kurczaka","kurczak","piers kurczaka","filet kurczaka"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:110,prot:23,carb:0,fat:1.7},unit:"g",pkgUnit:"g",pkgSize:500,soldByWeight:true,days:3,
+    brands:[
+      {brand:"Cedrob Filet z Kurczaka (Biedronka)",shop:"Biedronka",pkgSize:500,n100:{kcal:113,prot:22,carb:0,fat:2.5}},
+      {brand:"Kraina Mięs Filet z Kurczaka (Biedronka)",shop:"Biedronka",pkgSize:500,n100:{kcal:108,prot:23.5,carb:0,fat:1.5}},
+      {brand:"Maitre Coq Filet (Lidl)",shop:"Lidl",pkgSize:500,n100:{kcal:105,prot:23.5,carb:0,fat:1.5}},
+      {brand:"Konspol Pierś Kurczaka (Biedronka)",shop:"Biedronka",pkgSize:500,n100:{kcal:110,prot:23,carb:0,fat:2}}
+    ]},
   {id:"udka_kurczaka",name:"Udka z Kurczaka",aliases:["udka kurczaka","udka z kurczaka"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:170,prot:18,carb:0,fat:11},unit:"g",pkgUnit:"g",pkgSize:1000,soldByWeight:true,days:3},
   {id:"wolowina_mielona",name:"Wołowina Mielona",aliases:["mielona wolowina","wołowina","wolowina"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:220,prot:18,carb:0,fat:16},unit:"g",pkgUnit:"g",pkgSize:400,soldByWeight:false,days:2},
   {id:"losos_swiezy",name:"Łosoś Świeży",aliases:["losos swiezy","losos","łosoś"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:208,prot:20,carb:0,fat:13},unit:"g",pkgUnit:"g",pkgSize:300,soldByWeight:true,days:2},
   {id:"dorsz",name:"Dorsz",aliases:["dorsz","filet z dorsza"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:82,prot:18,carb:0,fat:1},unit:"g",pkgUnit:"g",pkgSize:400,soldByWeight:true,days:2},
   {id:"indyk_mielony",name:"Indyk Mielony",aliases:["indyk mielony","indyk"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:130,prot:20,carb:0,fat:5},unit:"g",pkgUnit:"g",pkgSize:400,soldByWeight:false,days:2},
   // WĘDLINY
-  {id:"szynka_indyka",name:"Szynka z Indyka",aliases:["szynka z indyka","szynka indyka","polędwica indyka"],cat:"wedliny",shops:["Biedronka"],n100:{kcal:95,prot:20,carb:1,fat:2},unit:"g",pkgUnit:"opakowanie",pkgSize:150,soldByWeight:false,days:7},
-  {id:"losos_wedzony",name:"Łosoś Wędzony",aliases:["losos wedzony","łosoś wędzony"],cat:"wedliny",shops:["Biedronka","Lidl"],n100:{kcal:172,prot:25,carb:0,fat:8},unit:"g",pkgUnit:"opakowanie",pkgSize:150,soldByWeight:false,days:14},
+  {id:"szynka_indyka",name:"Szynka z Indyka",aliases:["szynka z indyka","szynka indyka","polędwica z indyka","polędwica indyka","poledwica indyka"],cat:"wedliny",shops:["Biedronka","Lidl"],n100:{kcal:95,prot:20,carb:1,fat:1.8},unit:"g",pkgUnit:"opakowanie",pkgSize:150,soldByWeight:false,days:7,
+    brands:[
+      {brand:"Kraina Wędlin Polędwica Indyka (Biedronka)",shop:"Biedronka",pkgSize:150,n100:{kcal:95,prot:21,carb:0,fat:1}},
+      {brand:"Kraina Wędlin Szynka z Indyka (Biedronka)",shop:"Biedronka",pkgSize:150,n100:{kcal:95,prot:20,carb:1,fat:2}},
+      {brand:"Pikok Polędwica z Indyka (Lidl)",shop:"Lidl",pkgSize:120,n100:{kcal:92,prot:20.5,carb:0.8,fat:1}},
+      {brand:"Pikok Szynka z Indyka (Lidl)",shop:"Lidl",pkgSize:120,n100:{kcal:95,prot:20,carb:1.5,fat:2}},
+      {brand:"Konspol Polędwica Indyka (Biedronka)",shop:"Biedronka",pkgSize:150,n100:{kcal:100,prot:21,carb:1,fat:1.5}}
+    ]},
+  {id:"losos_wedzony",name:"Łosoś Wędzony",aliases:["losos wedzony","łosoś wędzony","losos","łosoś"],cat:"wedliny",shops:["Biedronka","Lidl"],n100:{kcal:190,prot:23,carb:0,fat:11},unit:"g",pkgUnit:"opakowanie",pkgSize:100,soldByWeight:false,days:14,
+    brands:[
+      {brand:"Suempol Łosoś Wędzony (Biedronka)",shop:"Biedronka",pkgSize:100,n100:{kcal:192,prot:23,carb:0,fat:11}},
+      {brand:"Lisner Łosoś Wędzony (Biedronka)",shop:"Biedronka",pkgSize:100,n100:{kcal:195,prot:22,carb:0.5,fat:12}},
+      {brand:"Pilos Łosoś Wędzony (Lidl)",shop:"Lidl",pkgSize:100,n100:{kcal:180,prot:23.5,carb:0,fat:10}}
+    ]},
   // NABIAŁ
-  {id:"skyr",name:"Skyr Naturalny",aliases:["skyr naturalny","skyr","skyr 0%"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:58,prot:10,carb:4,fat:0},unit:"g",pkgUnit:"opakowanie",pkgSize:350,soldByWeight:false,days:14},
-  {id:"jogurt_naturalny",name:"Jogurt Naturalny 2%",aliases:["jogurt naturalny","jogurt 2%","jogurt"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:50,prot:4,carb:5,fat:2},unit:"g",pkgUnit:"opakowanie",pkgSize:400,soldByWeight:false,days:14},
-  {id:"ser_twarogowy",name:"Ser Twarogowy Chudy",aliases:["ser twarogowy","twaróg","twarog chudy","twarog"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:86,prot:18,carb:3,fat:1},unit:"g",pkgUnit:"opakowanie",pkgSize:400,soldByWeight:false,days:7},
-  {id:"serek_wiejski",name:"Serek Wiejski Light",aliases:["serek wiejski","serek wiejski light","cottage"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:72,prot:11,carb:4,fat:2},unit:"g",pkgUnit:"opakowanie",pkgSize:200,soldByWeight:false,days:7},
-  {id:"mozzarella_light",name:"Mozzarella Light",aliases:["mozzarella light","mozzarella"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:167,prot:20,carb:2,fat:9},unit:"g",pkgUnit:"opakowanie",pkgSize:125,soldByWeight:false,days:14},
-  {id:"mleko",name:"Mleko 0,5%",aliases:["mleko 0.5%","mleko 0,5%","mleko"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:35,prot:3,carb:5,fat:0},unit:"ml",pkgUnit:"litr",pkgSize:1000,soldByWeight:false,days:7},
+  {id:"skyr",name:"Skyr Naturalny",aliases:["skyr naturalny","skyr","skyr 0%"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:62,prot:11,carb:4,fat:0.5},unit:"g",pkgUnit:"opakowanie",pkgSize:350,soldByWeight:false,days:14,
+    brands:[
+      {brand:"Pyszny Duet Skyr 2,8% (Biedronka)",shop:"Biedronka",pkgSize:350,n100:{kcal:74,prot:11.5,carb:3.6,fat:1.4}},
+      {brand:"Mleczna Dolina Skyr (Biedronka)",shop:"Biedronka",pkgSize:400,n100:{kcal:60,prot:10.5,carb:4,fat:0.2}},
+      {brand:"Pilos Skyr Naturalny (Lidl)",shop:"Lidl",pkgSize:450,n100:{kcal:62,prot:10.4,carb:3.5,fat:0.5}},
+      {brand:"Pilos Skyr Wysokobiałkowy (Lidl)",shop:"Lidl",pkgSize:400,n100:{kcal:65,prot:13,carb:3.5,fat:0.2}}
+    ]},
+  {id:"jogurt_naturalny",name:"Jogurt Naturalny 2%",aliases:["jogurt naturalny","jogurt 2%","jogurt"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:55,prot:4.5,carb:5.2,fat:1.7},unit:"g",pkgUnit:"opakowanie",pkgSize:400,soldByWeight:false,days:14,
+    brands:[
+      {brand:"Łaciate Jogurt Naturalny 2% (Biedronka)",shop:"Biedronka",pkgSize:400,n100:{kcal:56,prot:4.5,carb:5.5,fat:1.6}},
+      {brand:"Bakoma Jogurt Naturalny 2% (Biedronka)",shop:"Biedronka",pkgSize:400,n100:{kcal:55,prot:4.5,carb:5.2,fat:1.5}},
+      {brand:"Pilos Jogurt Naturalny (Lidl)",shop:"Lidl",pkgSize:1000,n100:{kcal:50,prot:3.5,carb:5,fat:1.5}},
+      {brand:"Pilos Jogurt Grecki (Lidl)",shop:"Lidl",pkgSize:400,n100:{kcal:99,prot:8.5,carb:4,fat:5}}
+    ]},
+  {id:"ser_twarogowy",name:"Ser Twarogowy Chudy",aliases:["ser twarogowy","twaróg","twarog chudy","twarog","ser bialy","ser twarogowy chudy"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:88,prot:19,carb:3.6,fat:0.7},unit:"g",pkgUnit:"opakowanie",pkgSize:400,soldByWeight:false,days:7,
+    brands:[
+      {brand:"Krasnystaw Twaróg Chudy (Biedronka)",shop:"Biedronka",pkgSize:250,n100:{kcal:89,prot:19.8,carb:3.6,fat:0.6}},
+      {brand:"Piątnica Twaróg Chudy (Biedronka)",shop:"Biedronka",pkgSize:250,n100:{kcal:86,prot:17,carb:4,fat:1}},
+      {brand:"Mleczna Dolina Twaróg Chudy (Biedronka)",shop:"Biedronka",pkgSize:250,n100:{kcal:88,prot:18,carb:4,fat:1}},
+      {brand:"Pilos Twaróg Chudy (Lidl)",shop:"Lidl",pkgSize:250,n100:{kcal:90,prot:19,carb:3.8,fat:0.8}}
+    ]},
+  {id:"serek_wiejski",name:"Serek Wiejski Light",aliases:["serek wiejski","serek wiejski light","cottage","serek lekki"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:75,prot:12,carb:3,fat:1.7},unit:"g",pkgUnit:"opakowanie",pkgSize:200,soldByWeight:false,days:7,
+    brands:[
+      {brand:"Łowicki Lekki Serek Wiejski (Biedronka)",shop:"Biedronka",pkgSize:200,n100:{kcal:72,prot:12,carb:3,fat:1.5}},
+      {brand:"Pilos Serek Wiejski (Lidl)",shop:"Lidl",pkgSize:200,n100:{kcal:78,prot:12,carb:3.5,fat:1.8}},
+      {brand:"Piątnica Serek Wiejski (Biedronka)",shop:"Biedronka",pkgSize:200,n100:{kcal:80,prot:11.5,carb:3.4,fat:2.4}}
+    ]},
+  {id:"mozzarella_light",name:"Mozzarella Light",aliases:["mozzarella light","mozzarella"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:168,prot:19,carb:1.5,fat:9.5},unit:"g",pkgUnit:"opakowanie",pkgSize:125,soldByWeight:false,days:14,
+    brands:[
+      {brand:"Galbani Mozzarella Light (Biedronka/Lidl)",shop:"Biedronka",pkgSize:125,n100:{kcal:168,prot:19,carb:1.5,fat:9.5}},
+      {brand:"Mleczna Dolina Mozzarella Light (Biedronka)",shop:"Biedronka",pkgSize:125,n100:{kcal:170,prot:19,carb:1.5,fat:10}},
+      {brand:"Pilos Mozzarella (Lidl)",shop:"Lidl",pkgSize:125,n100:{kcal:240,prot:18,carb:1,fat:18}},
+      {brand:"Pilos Mozzarella Light (Lidl)",shop:"Lidl",pkgSize:125,n100:{kcal:166,prot:19,carb:1.5,fat:9}}
+    ]},
+  {id:"mleko",name:"Mleko 0,5%",aliases:["mleko 0.5%","mleko 0,5%","mleko","mleko chude","mleko UHT"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:35,prot:3.4,carb:4.9,fat:0.5},unit:"ml",pkgUnit:"litr",pkgSize:1000,soldByWeight:false,days:7,
+    brands:[
+      {brand:"Łaciate UHT 0,5% (Biedronka/Lidl)",shop:"Biedronka",pkgSize:1000,n100:{kcal:35,prot:3.4,carb:4.9,fat:0.5}},
+      {brand:"Mleczna Dolina UHT 0,5% (Biedronka)",shop:"Biedronka",pkgSize:1000,n100:{kcal:35,prot:3.4,carb:4.9,fat:0.5}},
+      {brand:"Pilos UHT 0,5% (Lidl)",shop:"Lidl",pkgSize:1000,n100:{kcal:35,prot:3.4,carb:4.9,fat:0.5}},
+      {brand:"Łaciate 1,5% (Biedronka/Lidl)",shop:"Biedronka",pkgSize:1000,n100:{kcal:46,prot:3.4,carb:4.9,fat:1.5}},
+      {brand:"Łaciate 3,2% (Biedronka/Lidl)",shop:"Biedronka",pkgSize:1000,n100:{kcal:62,prot:3.3,carb:4.7,fat:3.2}}
+    ]},
   // JAJA
   {id:"jaja",name:"Jaja L",aliases:["jaja","jajka","jaja l","jaja kurze"],cat:"jaja",shops:["Biedronka","Lidl"],n100:{kcal:155,prot:13,carb:1,fat:11},unit:"szt",pkgUnit:"opakowanie",pkgSize:10,soldByWeight:false,days:28,singleWeight:60},
   // ZBOŻA
-  {id:"ryz_basmati",name:"Ryż Basmati",aliases:["ryz basmati","ryż basmati","ryz"],cat:"suche",shops:["Biedronka","Lidl"],n100:{kcal:356,prot:7,carb:79,fat:1},unit:"g",pkgUnit:"opakowanie",pkgSize:1000,soldByWeight:false,days:365},
-  {id:"kasza_gryczana",name:"Kasza Gryczana",aliases:["kasza gryczana","kasza"],cat:"suche",shops:["Biedronka","Lidl"],n100:{kcal:343,prot:13,carb:65,fat:3},unit:"g",pkgUnit:"opakowanie",pkgSize:500,soldByWeight:false,days:365},
-  {id:"kasza_jaglana",name:"Kasza Jaglana",aliases:["kasza jaglana"],cat:"suche",shops:["Biedronka","Lidl"],n100:{kcal:378,prot:11,carb:73,fat:4},unit:"g",pkgUnit:"opakowanie",pkgSize:500,soldByWeight:false,days:365},
-  {id:"platki_owsiane",name:"Płatki Owsiane",aliases:["platki owsiane","płatki owsiane","platki"],cat:"suche",shops:["Biedronka","Lidl"],n100:{kcal:372,prot:13,carb:63,fat:7},unit:"g",pkgUnit:"opakowanie",pkgSize:500,soldByWeight:false,days:180},
-  {id:"makaron_pelnoziarnisty",name:"Makaron Pełnoziarnisty",aliases:["makaron pelnoziarnisty","makaron"],cat:"suche",shops:["Biedronka","Lidl"],n100:{kcal:350,prot:13,carb:68,fat:2},unit:"g",pkgUnit:"opakowanie",pkgSize:500,soldByWeight:false,days:365},
-  {id:"chleb_pelnoziarnisty",name:"Chleb Pełnoziarnisty",aliases:["chleb pelnoziarnisty","chleb","pieczywo"],cat:"piekarnia",shops:["Biedronka","Lidl"],n100:{kcal:240,prot:9,carb:43,fat:3},unit:"g",pkgUnit:"bochenek",pkgSize:500,soldByWeight:false,days:5},
+  {id:"ryz_basmati",name:"Ryż Basmati",aliases:["ryz basmati","ryż basmati","ryz","ryż"],cat:"suche",shops:["Biedronka","Lidl"],n100:{kcal:352,prot:7,carb:78,fat:0.8},unit:"g",pkgUnit:"opakowanie",pkgSize:1000,soldByWeight:false,days:365,
+    brands:[
+      {brand:"Sonko Ryż Basmati (Biedronka)",shop:"Biedronka",pkgSize:1000,n100:{kcal:356,prot:7.2,carb:79,fat:1}},
+      {brand:"Vasco Ryż Basmati (Biedronka)",shop:"Biedronka",pkgSize:1000,n100:{kcal:348,prot:7,carb:77,fat:0.7}},
+      {brand:"Combino Ryż Basmati (Lidl)",shop:"Lidl",pkgSize:1000,n100:{kcal:350,prot:7,carb:78,fat:0.7}},
+      {brand:"Britta Ryż Basmati (Biedronka)",shop:"Biedronka",pkgSize:1000,n100:{kcal:354,prot:7.5,carb:78,fat:1}}
+    ]},
+  {id:"kasza_gryczana",name:"Kasza Gryczana",aliases:["kasza gryczana","kasza"],cat:"suche",shops:["Biedronka","Lidl"],n100:{kcal:342,prot:12.5,carb:65,fat:3},unit:"g",pkgUnit:"opakowanie",pkgSize:500,soldByWeight:false,days:365,
+    brands:[
+      {brand:"Sonko Kasza Gryczana (Biedronka)",shop:"Biedronka",pkgSize:500,n100:{kcal:343,prot:12.5,carb:65,fat:3}},
+      {brand:"Britta Kasza Gryczana (Biedronka)",shop:"Biedronka",pkgSize:500,n100:{kcal:340,prot:12,carb:65,fat:3}},
+      {brand:"Combino Kasza Gryczana (Lidl)",shop:"Lidl",pkgSize:500,n100:{kcal:340,prot:12,carb:65,fat:3}}
+    ]},
+  {id:"kasza_jaglana",name:"Kasza Jaglana",aliases:["kasza jaglana","jaglanka"],cat:"suche",shops:["Biedronka","Lidl"],n100:{kcal:378,prot:11,carb:73,fat:4},unit:"g",pkgUnit:"opakowanie",pkgSize:500,soldByWeight:false,days:365,
+    brands:[
+      {brand:"Sonko Kasza Jaglana (Biedronka)",shop:"Biedronka",pkgSize:500,n100:{kcal:378,prot:11,carb:73,fat:4}},
+      {brand:"Combino Proso (Lidl)",shop:"Lidl",pkgSize:500,n100:{kcal:380,prot:11,carb:73,fat:4}}
+    ]},
+  {id:"platki_owsiane",name:"Płatki Owsiane",aliases:["platki owsiane","płatki owsiane","platki","płatki","oatmeal"],cat:"suche",shops:["Biedronka","Lidl"],n100:{kcal:372,prot:13.5,carb:60,fat:7},unit:"g",pkgUnit:"opakowanie",pkgSize:500,soldByWeight:false,days:180,
+    brands:[
+      {brand:"Sonko Płatki Owsiane (Biedronka)",shop:"Biedronka",pkgSize:500,n100:{kcal:372,prot:13.5,carb:60,fat:7}},
+      {brand:"Crownfield Płatki Owsiane (Lidl)",shop:"Lidl",pkgSize:500,n100:{kcal:378,prot:13.5,carb:62,fat:7}},
+      {brand:"Crownfield Płatki Górskie (Lidl)",shop:"Lidl",pkgSize:500,n100:{kcal:380,prot:14,carb:62,fat:7}},
+      {brand:"Pilos Płatki Owsiane (Lidl)",shop:"Lidl",pkgSize:500,n100:{kcal:372,prot:13.5,carb:60,fat:7}},
+      {brand:"Bruggen Płatki Owsiane (Biedronka)",shop:"Biedronka",pkgSize:500,n100:{kcal:370,prot:13,carb:60,fat:7}}
+    ]},
+  {id:"makaron_pelnoziarnisty",name:"Makaron Pełnoziarnisty",aliases:["makaron pelnoziarnisty","makaron pełnoziarnisty","makaron","pasta"],cat:"suche",shops:["Biedronka","Lidl"],n100:{kcal:348,prot:13,carb:67,fat:2.3},unit:"g",pkgUnit:"opakowanie",pkgSize:500,soldByWeight:false,days:365,
+    brands:[
+      {brand:"Lubella Pełnoziarnisty (Biedronka)",shop:"Biedronka",pkgSize:500,n100:{kcal:350,prot:13,carb:68,fat:2}},
+      {brand:"Combino Integrale (Lidl)",shop:"Lidl",pkgSize:500,n100:{kcal:345,prot:13.5,carb:67,fat:2.5}},
+      {brand:"Sonko Makaron Pełnoziarnisty (Biedronka)",shop:"Biedronka",pkgSize:400,n100:{kcal:352,prot:14,carb:67,fat:2.5}},
+      {brand:"Lubella Spaghetti (Biedronka)",shop:"Biedronka",pkgSize:500,n100:{kcal:355,prot:11,carb:71,fat:1.5}}
+    ]},
+  {id:"chleb_pelnoziarnisty",name:"Chleb Pełnoziarnisty",aliases:["chleb pelnoziarnisty","chleb pełnoziarnisty","chleb","pieczywo","chleb razowy"],cat:"piekarnia",shops:["Biedronka","Lidl"],n100:{kcal:240,prot:9,carb:43,fat:2.5},unit:"g",pkgUnit:"bochenek",pkgSize:500,soldByWeight:false,days:5,
+    brands:[
+      {brand:"Putka Chleb Razowy (Biedronka)",shop:"Biedronka",pkgSize:500,n100:{kcal:234,prot:8,carb:44,fat:1.5}},
+      {brand:"Lidl Chleb Pełnoziarnisty",shop:"Lidl",pkgSize:500,n100:{kcal:240,prot:9,carb:43,fat:3}},
+      {brand:"Sonko Chleb Pełnoziarnisty (Biedronka)",shop:"Biedronka",pkgSize:500,n100:{kcal:250,prot:9,carb:45,fat:3}}
+    ]},
   {id:"wafle_ryzowe",name:"Wafle Ryżowe",aliases:["wafle ryzowe","wafle ryżowe"],cat:"suche",shops:["Biedronka","Lidl"],n100:{kcal:392,prot:7,carb:83,fat:2},unit:"g",pkgUnit:"opakowanie",pkgSize:130,soldByWeight:false,days:365},
   // STRĄCZKI
-  {id:"ciecierzyca",name:"Ciecierzyca (Puszka)",aliases:["ciecierzyca","ciecierzyca z puszki","cieciorka"],cat:"puszki",shops:["Biedronka","Lidl"],n100:{kcal:164,prot:9,carb:27,fat:3},unit:"g",pkgUnit:"puszka",pkgSize:400,soldByWeight:false,days:730},
+  {id:"ciecierzyca",name:"Ciecierzyca (Puszka)",aliases:["ciecierzyca","ciecierzyca z puszki","cieciorka","ciecierzyca puszka"],cat:"puszki",shops:["Biedronka","Lidl"],n100:{kcal:165,prot:9,carb:27,fat:3},unit:"g",pkgUnit:"puszka",pkgSize:400,soldByWeight:false,days:730,
+    brands:[
+      {brand:"Pudliszki Ciecierzyca (Biedronka)",shop:"Biedronka",pkgSize:400,n100:{kcal:165,prot:9,carb:27,fat:3}},
+      {brand:"Łowicz Ciecierzyca (Biedronka)",shop:"Biedronka",pkgSize:400,n100:{kcal:160,prot:8.5,carb:26,fat:3}},
+      {brand:"Combino Ciecierzyca (Lidl)",shop:"Lidl",pkgSize:400,n100:{kcal:160,prot:8,carb:26,fat:3}},
+      {brand:"K-Classic Ciecierzyca (Lidl)",shop:"Lidl",pkgSize:400,n100:{kcal:163,prot:9,carb:27,fat:3}}
+    ]},
   {id:"soczewica_czerwona",name:"Soczewica Czerwona",aliases:["soczewica czerwona","soczewica"],cat:"suche",shops:["Biedronka","Lidl"],n100:{kcal:353,prot:25,carb:60,fat:1},unit:"g",pkgUnit:"opakowanie",pkgSize:400,soldByWeight:false,days:365},
   // WARZYWA
   {id:"pomidory",name:"Pomidory",aliases:["pomidory","pomidor"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:18,prot:1,carb:4,fat:0},unit:"g",pkgUnit:"szt",pkgSize:150,soldByWeight:true,days:5},
@@ -2812,12 +3030,28 @@ var PRODUCT_DB = [
   {id:"truskawki_mrozone",name:"Truskawki Mrożone",aliases:["truskawki mrozone","truskawki mrożone","truskawki"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:32,prot:1,carb:8,fat:0},unit:"g",pkgUnit:"opakowanie",pkgSize:1000,soldByWeight:false,days:365},
   {id:"awokado",name:"Awokado",aliases:["awokado"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:160,prot:2,carb:9,fat:15},unit:"g",pkgUnit:"szt",pkgSize:180,soldByWeight:true,days:5},
   // TŁUSZCZE
-  {id:"oliwa",name:"Oliwa z Oliwek",aliases:["oliwa z oliwek","oliwa"],cat:"tluszcze",shops:["Biedronka","Lidl"],n100:{kcal:899,prot:0,carb:0,fat:100},unit:"ml",pkgUnit:"butelka",pkgSize:500,soldByWeight:false,days:365},
-  {id:"maslo_orzechowe",name:"Masło Orzechowe",aliases:["maslo orzechowe","masło orzechowe","maslo orzechowe vitanella"],cat:"tluszcze",shops:["Biedronka","Lidl"],n100:{kcal:598,prot:26,carb:14,fat:51},unit:"g",pkgUnit:"opakowanie",pkgSize:350,soldByWeight:false,days:180},
+  {id:"oliwa",name:"Oliwa z Oliwek",aliases:["oliwa z oliwek","oliwa","oliwa extra vergine"],cat:"tluszcze",shops:["Biedronka","Lidl"],n100:{kcal:822,prot:0,carb:0,fat:91},unit:"ml",pkgUnit:"butelka",pkgSize:500,soldByWeight:false,days:365,
+    brands:[
+      {brand:"Costa d'Oro Extra Vergine (Biedronka)",shop:"Biedronka",pkgSize:500,n100:{kcal:822,prot:0,carb:0,fat:91}},
+      {brand:"Primadonna Extra Vergine (Lidl)",shop:"Lidl",pkgSize:500,n100:{kcal:822,prot:0,carb:0,fat:91}},
+      {brand:"Olitalia Extra Vergine (Biedronka)",shop:"Biedronka",pkgSize:500,n100:{kcal:824,prot:0,carb:0,fat:91.5}},
+      {brand:"Smaki Polski Oliwa (Biedronka)",shop:"Biedronka",pkgSize:500,n100:{kcal:822,prot:0,carb:0,fat:91}}
+    ]},
+  {id:"maslo_orzechowe",name:"Masło Orzechowe",aliases:["maslo orzechowe","masło orzechowe","maslo orzechowe vitanella","peanut butter"],cat:"tluszcze",shops:["Biedronka","Lidl"],n100:{kcal:600,prot:25,carb:13,fat:50},unit:"g",pkgUnit:"opakowanie",pkgSize:350,soldByWeight:false,days:180,
+    brands:[
+      {brand:"Vitanella Masło Orzechowe (Biedronka)",shop:"Biedronka",pkgSize:350,n100:{kcal:600,prot:24,carb:14,fat:51}},
+      {brand:"Naturella Masło Orzechowe (Biedronka)",shop:"Biedronka",pkgSize:300,n100:{kcal:588,prot:25,carb:12,fat:50}},
+      {brand:"Bunko Masło Orzechowe (Lidl)",shop:"Lidl",pkgSize:350,n100:{kcal:612,prot:23,carb:14,fat:52}}
+    ]},
   {id:"platki_migdalow",name:"Płatki Migdałów",aliases:["platki migdalow","płatki migdałów","migdaly","migdały"],cat:"tluszcze",shops:["Biedronka","Lidl"],n100:{kcal:580,prot:20,carb:20,fat:50},unit:"g",pkgUnit:"opakowanie",pkgSize:100,soldByWeight:false,days:180},
   {id:"orzechy_wloskie",name:"Orzechy Włoskie",aliases:["orzechy wloskie","orzechy włoskie"],cat:"tluszcze",shops:["Biedronka","Lidl"],n100:{kcal:654,prot:15,carb:14,fat:65},unit:"g",pkgUnit:"opakowanie",pkgSize:200,soldByWeight:false,days:180},
   // SOSY I INNE
-  {id:"passata",name:"Passata Pomidorowa",aliases:["passata pomidorowa","passata"],cat:"puszki",shops:["Biedronka","Lidl"],n100:{kcal:35,prot:2,carb:7,fat:0},unit:"g",pkgUnit:"opakowanie",pkgSize:700,soldByWeight:false,days:365},
+  {id:"passata",name:"Passata Pomidorowa",aliases:["passata pomidorowa","passata","przecier pomidorowy"],cat:"puszki",shops:["Biedronka","Lidl"],n100:{kcal:33,prot:1.6,carb:6.5,fat:0.4},unit:"g",pkgUnit:"opakowanie",pkgSize:700,soldByWeight:false,days:365,
+    brands:[
+      {brand:"Pudliszki Passata (Biedronka)",shop:"Biedronka",pkgSize:700,n100:{kcal:35,prot:2,carb:7,fat:0.5}},
+      {brand:"Łowicz Passata (Biedronka)",shop:"Biedronka",pkgSize:700,n100:{kcal:32,prot:1.5,carb:6.5,fat:0.3}},
+      {brand:"Combino Passata (Lidl)",shop:"Lidl",pkgSize:700,n100:{kcal:33,prot:1.6,carb:6.5,fat:0.5}}
+    ]},
   {id:"musztarda",name:"Musztarda",aliases:["musztarda","musztarda dijon"],cat:"puszki",shops:["Biedronka","Lidl"],n100:{kcal:66,prot:4,carb:6,fat:4},unit:"g",pkgUnit:"słoik",pkgSize:190,soldByWeight:false,days:365},
   {id:"ketchup",name:"Ketchup bez Cukru",aliases:["ketchup bez cukru","ketchup"],cat:"puszki",shops:["Biedronka","Lidl"],n100:{kcal:60,prot:2,carb:14,fat:0},unit:"g",pkgUnit:"butelka",pkgSize:450,soldByWeight:false,days:365},
   // Dodatkowe warzywa sprzedawane na sztuki
@@ -2830,12 +3064,27 @@ var PRODUCT_DB = [
   {id:"kapusta",name:"Kapusta",aliases:["kapusta","kapusta biala","kapusta pekińska","kapusta pekinska"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:25,prot:1,carb:5,fat:0},unit:"szt",pkgUnit:"szt",pkgSize:1,soldByWeight:true,days:21,singleWeight:800},
   {id:"salata",name:"Sałata",aliases:["salata","sałata","salata lodowa","salata rukola","rukola","mix sałat"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:15,prot:1,carb:3,fat:0},unit:"g",pkgUnit:"opakowanie",pkgSize:100,soldByWeight:false,days:5},
   // Mrożonki / dodatkowe owoce
-  {id:"borowki_mrozone",name:"Borówki Mrożone",aliases:["borowki","borówki","borówki mrożone","borowki mrozone"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:57,prot:1,carb:14,fat:0},unit:"g",pkgUnit:"opakowanie",pkgSize:300,soldByWeight:false,days:365},
-  {id:"maliny_mrozone",name:"Maliny Mrożone",aliases:["maliny mrozone","maliny mrożone","maliny"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:52,prot:1,carb:12,fat:0},unit:"g",pkgUnit:"opakowanie",pkgSize:300,soldByWeight:false,days:365},
-  {id:"truskawki_maliny",name:"Truskawki / Maliny (mix)",aliases:["truskawki maliny","truskawki/maliny","truskawki i maliny"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:35,prot:1,carb:8,fat:0},unit:"g",pkgUnit:"opakowanie",pkgSize:400,soldByWeight:false,days:5},
-  {id:"truskawki_swieze",name:"Truskawki Świeże",aliases:["truskawki","truskawki świeże","truskawki swieze"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:32,prot:1,carb:8,fat:0},unit:"g",pkgUnit:"opakowanie",pkgSize:500,soldByWeight:false,days:3},
+  {id:"borowki_mrozone",name:"Borówki Mrożone",aliases:["borowki","borówki","borówki mrożone","borowki mrozone"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:55,prot:0.7,carb:12,fat:0.3},unit:"g",pkgUnit:"opakowanie",pkgSize:300,soldByWeight:false,days:365,
+    brands:[
+      {brand:"Hortex Borówki Mrożone (Biedronka)",shop:"Biedronka",pkgSize:300,n100:{kcal:57,prot:0.5,carb:12,fat:0.3}},
+      {brand:"Pilos Borówki Mrożone (Lidl)",shop:"Lidl",pkgSize:300,n100:{kcal:50,prot:0.5,carb:11,fat:0.3}},
+      {brand:"Biedronka Mrożone Borówki",shop:"Biedronka",pkgSize:300,n100:{kcal:55,prot:0.5,carb:12,fat:0.3}}
+    ]},
+  {id:"maliny_mrozone",name:"Maliny Mrożone",aliases:["maliny mrozone","maliny mrożone","maliny"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:52,prot:1,carb:12,fat:0.6},unit:"g",pkgUnit:"opakowanie",pkgSize:300,soldByWeight:false,days:365,
+    brands:[
+      {brand:"Hortex Maliny Mrożone (Biedronka)",shop:"Biedronka",pkgSize:300,n100:{kcal:52,prot:1,carb:12,fat:0.6}},
+      {brand:"Pilos Maliny Mrożone (Lidl)",shop:"Lidl",pkgSize:300,n100:{kcal:50,prot:1,carb:11,fat:0.5}}
+    ]},
+  {id:"truskawki_maliny",name:"Truskawki / Maliny (mix)",aliases:["truskawki maliny","truskawki/maliny","truskawki i maliny"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:35,prot:1,carb:8,fat:0.3},unit:"g",pkgUnit:"opakowanie",pkgSize:400,soldByWeight:false,days:5},
+  {id:"truskawki_swieze",name:"Truskawki Świeże",aliases:["truskawki","truskawki świeże","truskawki swieze"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:32,prot:0.7,carb:7.7,fat:0.3},unit:"g",pkgUnit:"opakowanie",pkgSize:500,soldByWeight:false,days:3},
   // Tuńczyk / ryby w puszce
-  {id:"tunczyk_w_wodzie",name:"Tuńczyk w wodzie",aliases:["tunczyk","tuńczyk","tunczyk w wodzie","tuńczyk w wodzie"],cat:"puszki",shops:["Biedronka","Lidl"],n100:{kcal:108,prot:23,carb:0,fat:1},unit:"g",pkgUnit:"puszka",pkgSize:185,soldByWeight:false,days:730},
+  {id:"tunczyk_w_wodzie",name:"Tuńczyk w wodzie",aliases:["tunczyk","tuńczyk","tunczyk w wodzie","tuńczyk w wodzie","tunczyk w sosie wlasnym"],cat:"puszki",shops:["Biedronka","Lidl"],n100:{kcal:108,prot:23,carb:0,fat:1},unit:"g",pkgUnit:"puszka",pkgSize:185,soldByWeight:false,days:730,
+    brands:[
+      {brand:"Rio Mare Tuńczyk w sosie wł. (Biedronka)",shop:"Biedronka",pkgSize:160,n100:{kcal:116,prot:25,carb:0,fat:1.5}},
+      {brand:"Lisner Tuńczyk w wodzie (Biedronka)",shop:"Biedronka",pkgSize:170,n100:{kcal:105,prot:23,carb:0,fat:1}},
+      {brand:"Nixe Tuńczyk w sosie wł. (Lidl)",shop:"Lidl",pkgSize:160,n100:{kcal:120,prot:25,carb:0,fat:2}},
+      {brand:"Nixe Tuńczyk w wodzie (Lidl)",shop:"Lidl",pkgSize:170,n100:{kcal:108,prot:23.5,carb:0,fat:1}}
+    ]},
   {id:"makrela_wedzona",name:"Makrela Wędzona",aliases:["makrela","makrela wedziona","makrela wędzona"],cat:"wedliny",shops:["Biedronka","Lidl"],n100:{kcal:262,prot:21,carb:0,fat:20},unit:"g",pkgUnit:"opakowanie",pkgSize:250,soldByWeight:false,days:7},
   // Dodatkowe nabiał / ser
   {id:"parmezan",name:"Parmezan",aliases:["parmezan","parmigiano"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:392,prot:36,carb:0,fat:29},unit:"g",pkgUnit:"opakowanie",pkgSize:100,soldByWeight:false,days:60},
@@ -2849,19 +3098,158 @@ var PRODUCT_DB = [
   {id:"fasola_szparagowa",name:"Fasola Szparagowa",aliases:["fasola szparagowa"],cat:"warzywa",shops:["Biedronka","Lidl"],n100:{kcal:31,prot:2,carb:7,fat:0},unit:"g",pkgUnit:"opakowanie",pkgSize:400,soldByWeight:false,days:5},
   // Tortille / chleb żytni
   {id:"chleb_zytni",name:"Chleb Żytni",aliases:["chleb zytni","chleb żytni"],cat:"piekarnia",shops:["Biedronka","Lidl"],n100:{kcal:230,prot:8,carb:45,fat:2},unit:"g",pkgUnit:"bochenek",pkgSize:500,soldByWeight:false,days:5},
-  {id:"tortille",name:"Tortille Pełnoziarniste",aliases:["tortille","tortille pelnoziarniste","tortille pełnoziarniste"],cat:"piekarnia",shops:["Biedronka","Lidl"],n100:{kcal:300,prot:9,carb:55,fat:6},unit:"szt",pkgUnit:"opakowanie",pkgSize:6,soldByWeight:false,days:30},
+  {id:"tortille",name:"Tortille Pełnoziarniste",aliases:["tortille","tortille pelnoziarniste","tortille pełnoziarniste","wrap"],cat:"piekarnia",shops:["Biedronka","Lidl"],n100:{kcal:300,prot:9,carb:55,fat:6},unit:"szt",pkgUnit:"opakowanie",pkgSize:6,soldByWeight:false,days:30,
+    brands:[
+      {brand:"Mission Tortille Pełnoziarniste (Biedronka)",shop:"Biedronka",pkgSize:6,n100:{kcal:300,prot:9,carb:55,fat:6}},
+      {brand:"Pilos Tortille Pełnoziarniste (Lidl)",shop:"Lidl",pkgSize:6,n100:{kcal:305,prot:9.5,carb:54,fat:6.5}},
+      {brand:"K-Classic Tortille (Lidl)",shop:"Lidl",pkgSize:6,n100:{kcal:300,prot:9,carb:55,fat:6}}
+    ]},
+  // ── Dodatkowe popularne produkty z Biedronki i Lidla ───────────────
+  {id:"jogurt_grecki",name:"Jogurt Grecki",aliases:["jogurt grecki","greek yogurt","jogurt typu greckiego"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:115,prot:9,carb:4,fat:6},unit:"g",pkgUnit:"opakowanie",pkgSize:400,soldByWeight:false,days:21,
+    brands:[
+      {brand:"Pilos Jogurt Grecki 10% (Lidl)",shop:"Lidl",pkgSize:400,n100:{kcal:115,prot:6.5,carb:3.5,fat:10}},
+      {brand:"Pilos Jogurt Grecki Light 2% (Lidl)",shop:"Lidl",pkgSize:400,n100:{kcal:67,prot:8.5,carb:4.5,fat:2}},
+      {brand:"Bakoma Grecki Typ (Biedronka)",shop:"Biedronka",pkgSize:400,n100:{kcal:118,prot:7,carb:4,fat:8}}
+    ]},
+  {id:"feta",name:"Ser Feta",aliases:["feta","ser feta","ser typu greckiego"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:264,prot:14,carb:4,fat:21},unit:"g",pkgUnit:"opakowanie",pkgSize:200,soldByWeight:false,days:30,
+    brands:[
+      {brand:"Krasnystaw Feta (Biedronka)",shop:"Biedronka",pkgSize:200,n100:{kcal:264,prot:14,carb:4,fat:21}},
+      {brand:"Eridanous Feta (Lidl)",shop:"Lidl",pkgSize:200,n100:{kcal:260,prot:14,carb:3.5,fat:21}}
+    ]},
+  {id:"smietana_12",name:"Śmietana 12%",aliases:["smietana","śmietana","śmietana 12%","smietana 12"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:120,prot:3,carb:4,fat:12},unit:"ml",pkgUnit:"opakowanie",pkgSize:200,soldByWeight:false,days:14,
+    brands:[
+      {brand:"Łaciate Śmietana 12% (Biedronka)",shop:"Biedronka",pkgSize:200,n100:{kcal:120,prot:3,carb:4,fat:12}},
+      {brand:"Pilos Śmietana 12% (Lidl)",shop:"Lidl",pkgSize:200,n100:{kcal:120,prot:3,carb:4,fat:12}},
+      {brand:"Łaciate Śmietana 18% (Biedronka)",shop:"Biedronka",pkgSize:200,n100:{kcal:172,prot:2.7,carb:3.5,fat:18}},
+      {brand:"Łaciate Śmietana 30% (Biedronka)",shop:"Biedronka",pkgSize:200,n100:{kcal:285,prot:2.4,carb:3,fat:30}}
+    ]},
+  {id:"hummus",name:"Hummus",aliases:["hummus","humus"],cat:"puszki",shops:["Biedronka","Lidl"],n100:{kcal:230,prot:7,carb:14,fat:17},unit:"g",pkgUnit:"opakowanie",pkgSize:200,soldByWeight:false,days:14,
+    brands:[
+      {brand:"Cudo Hummus (Biedronka)",shop:"Biedronka",pkgSize:200,n100:{kcal:230,prot:7,carb:14,fat:17}},
+      {brand:"Pilos Hummus (Lidl)",shop:"Lidl",pkgSize:200,n100:{kcal:225,prot:7,carb:14,fat:16}},
+      {brand:"Smaki Polski Hummus (Biedronka)",shop:"Biedronka",pkgSize:200,n100:{kcal:235,prot:7.5,carb:13,fat:17.5}}
+    ]},
+  {id:"dorsz",name:"Dorsz Filet",aliases:["dorsz","filet z dorsza","dorsz filet","dorsz świeży","dorsz mrozony"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:82,prot:18,carb:0,fat:1},unit:"g",pkgUnit:"opakowanie",pkgSize:400,soldByWeight:true,days:2,
+    brands:[
+      {brand:"Lisner Filet z Dorsza Mrożony (Biedronka)",shop:"Biedronka",pkgSize:400,n100:{kcal:82,prot:18,carb:0,fat:1}},
+      {brand:"Nixe Filet z Dorsza (Lidl)",shop:"Lidl",pkgSize:400,n100:{kcal:85,prot:19,carb:0,fat:1}}
+    ]},
+  {id:"makrela_swieza",name:"Makrela Świeża",aliases:["makrela","makrela swieza","makrela świeża"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:205,prot:19,carb:0,fat:14},unit:"g",pkgUnit:"opakowanie",pkgSize:300,soldByWeight:true,days:2},
+  {id:"polędwica_woł",name:"Polędwica Wołowa",aliases:["polędwica wołowa","poledwica wolowa","wołowina polędwica"],cat:"mieso",shops:["Biedronka","Lidl"],n100:{kcal:140,prot:21,carb:0,fat:6},unit:"g",pkgUnit:"opakowanie",pkgSize:500,soldByWeight:true,days:2,
+    brands:[
+      {brand:"Kraina Mięs Polędwica Wołowa (Biedronka)",shop:"Biedronka",pkgSize:500,n100:{kcal:140,prot:21,carb:0,fat:6}}
+    ]},
+  {id:"orzechy_nerkowca",name:"Orzechy Nerkowca",aliases:["nerkowca","orzechy nerkowca","cashew"],cat:"tluszcze",shops:["Biedronka","Lidl"],n100:{kcal:553,prot:18,carb:30,fat:44},unit:"g",pkgUnit:"opakowanie",pkgSize:200,soldByWeight:false,days:180,
+    brands:[
+      {brand:"Bakalland Nerkowce (Biedronka)",shop:"Biedronka",pkgSize:200,n100:{kcal:553,prot:18,carb:30,fat:44}},
+      {brand:"Alesto Nerkowce (Lidl)",shop:"Lidl",pkgSize:200,n100:{kcal:559,prot:18,carb:30,fat:44}}
+    ]},
+  {id:"migdaly",name:"Migdały",aliases:["migdały","migdaly","migdal","almond"],cat:"tluszcze",shops:["Biedronka","Lidl"],n100:{kcal:579,prot:21,carb:22,fat:50},unit:"g",pkgUnit:"opakowanie",pkgSize:200,soldByWeight:false,days:180,
+    brands:[
+      {brand:"Bakalland Migdały (Biedronka)",shop:"Biedronka",pkgSize:200,n100:{kcal:579,prot:21,carb:22,fat:50}},
+      {brand:"Alesto Migdały (Lidl)",shop:"Lidl",pkgSize:200,n100:{kcal:580,prot:21,carb:22,fat:50}}
+    ]},
+  {id:"orzechy_wloskie_2",name:"Orzechy Włoskie",aliases:["orzechy wloskie","orzechy włoskie","wloskie","walnut"],cat:"tluszcze",shops:["Biedronka","Lidl"],n100:{kcal:654,prot:15,carb:14,fat:65},unit:"g",pkgUnit:"opakowanie",pkgSize:200,soldByWeight:false,days:180},
+  {id:"chia",name:"Nasiona Chia",aliases:["chia","nasiona chia","ziarno chia"],cat:"tluszcze",shops:["Biedronka","Lidl"],n100:{kcal:486,prot:17,carb:42,fat:31},unit:"g",pkgUnit:"opakowanie",pkgSize:200,soldByWeight:false,days:365,
+    brands:[
+      {brand:"Bakalland Chia (Biedronka)",shop:"Biedronka",pkgSize:200,n100:{kcal:486,prot:17,carb:42,fat:31}},
+      {brand:"Alesto Chia (Lidl)",shop:"Lidl",pkgSize:200,n100:{kcal:480,prot:17,carb:42,fat:31}}
+    ]},
+  {id:"siemie_lniane",name:"Siemię Lniane",aliases:["siemie lniane","siemię lniane","len","flax"],cat:"tluszcze",shops:["Biedronka","Lidl"],n100:{kcal:534,prot:18,carb:29,fat:42},unit:"g",pkgUnit:"opakowanie",pkgSize:200,soldByWeight:false,days:365},
+  {id:"sok_jablkowy",name:"Sok Jabłkowy",aliases:["sok jablkowy","sok jabłkowy","sok 100%"],cat:"puszki",shops:["Biedronka","Lidl"],n100:{kcal:45,prot:0.1,carb:11,fat:0.1},unit:"ml",pkgUnit:"butelka",pkgSize:1000,soldByWeight:false,days:180,
+    brands:[
+      {brand:"Tymbark Sok Jabłkowy (Biedronka)",shop:"Biedronka",pkgSize:1000,n100:{kcal:45,prot:0.1,carb:11,fat:0.1}},
+      {brand:"Solevita Sok Jabłkowy (Lidl)",shop:"Lidl",pkgSize:1000,n100:{kcal:45,prot:0.1,carb:11,fat:0.1}}
+    ]},
+  {id:"woda_mineralna",name:"Woda Mineralna",aliases:["woda","woda mineralna","woda gazowana","woda niegazowana"],cat:"puszki",shops:["Biedronka","Lidl"],n100:{kcal:0,prot:0,carb:0,fat:0},unit:"ml",pkgUnit:"butelka",pkgSize:1500,soldByWeight:false,days:365,
+    brands:[
+      {brand:"Cisowianka (Biedronka)",shop:"Biedronka",pkgSize:1500,n100:{kcal:0,prot:0,carb:0,fat:0}},
+      {brand:"Saskia (Lidl)",shop:"Lidl",pkgSize:1500,n100:{kcal:0,prot:0,carb:0,fat:0}}
+    ]},
+  {id:"tofu",name:"Tofu Naturalne",aliases:["tofu","tofu naturalne"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:115,prot:12,carb:1,fat:7},unit:"g",pkgUnit:"opakowanie",pkgSize:200,soldByWeight:false,days:30,
+    brands:[
+      {brand:"Polsoja Tofu (Biedronka)",shop:"Biedronka",pkgSize:200,n100:{kcal:115,prot:12,carb:1,fat:7}},
+      {brand:"Vemondo Tofu (Lidl)",shop:"Lidl",pkgSize:200,n100:{kcal:120,prot:13,carb:1,fat:7}}
+    ]},
+  {id:"mak_napój_owsiany",name:"Napój Owsiany",aliases:["napój owsiany","napoj owsiany","mleko owsiane","oat milk"],cat:"nabial",shops:["Biedronka","Lidl"],n100:{kcal:45,prot:1,carb:7,fat:1.5},unit:"ml",pkgUnit:"litr",pkgSize:1000,soldByWeight:false,days:180,
+    brands:[
+      {brand:"OatlyClean Napój Owsiany (Biedronka)",shop:"Biedronka",pkgSize:1000,n100:{kcal:45,prot:1,carb:7,fat:1.5}},
+      {brand:"Vemondo Napój Owsiany (Lidl)",shop:"Lidl",pkgSize:1000,n100:{kcal:46,prot:0.5,carb:7,fat:1.5}}
+    ]},
+  // Słodycze "dietetyczne" / przekąski
+  {id:"wafle_kukurydziane",name:"Wafle Kukurydziane",aliases:["wafle kukurydziane","wafle"],cat:"suche",shops:["Biedronka","Lidl"],n100:{kcal:385,prot:8,carb:80,fat:3},unit:"g",pkgUnit:"opakowanie",pkgSize:100,soldByWeight:false,days:365,
+    brands:[
+      {brand:"Sonko Wafle Kukurydziane (Biedronka)",shop:"Biedronka",pkgSize:100,n100:{kcal:385,prot:8,carb:80,fat:3}},
+      {brand:"Crownfield Wafle (Lidl)",shop:"Lidl",pkgSize:100,n100:{kcal:380,prot:8,carb:80,fat:3}}
+    ]},
 ];
 
 // ── Helper: znajdź produkt po nazwie ─────────────────────────────────────────
-function findProduct(name){
+// userProductOverrides: per-user n100 overrides (e.g. od skanera etykiety)
+// klucze = product.id, wartości = {n100, pkgSize, brand, shop}
+var userProductOverrides={};
+
+function findProduct(name,opts){
   if(!name)return null;
-  var n=name.toLowerCase().trim();
+  var n=String(name).toLowerCase().trim();
+  opts=opts||{};
+  // 1) Najpierw sprawdź czy nazwa zawiera nazwę MARKI (np. "Skyr Pyszny Duet" / "Pilos jogurt")
   for(var i=0;i<PRODUCT_DB.length;i++){
     var p=PRODUCT_DB[i];
-    if(p.name.toLowerCase()===n)return p;
-    if(p.aliases){for(var j=0;j<p.aliases.length;j++){if(p.aliases[j]===n||n.indexOf(p.aliases[j])!==-1||p.aliases[j].indexOf(n)!==-1)return p;}}
+    if(p.brands){
+      for(var k=0;k<p.brands.length;k++){
+        var br=p.brands[k];
+        var bn=String(br.brand||"").toLowerCase();
+        if(!bn)continue;
+        if(n===bn||n.indexOf(bn)!==-1||bn.indexOf(n)!==-1){
+          // Zwróć produkt z nadpisanymi n100/pkgSize z konkretnej marki
+          return Object.assign({},p,{
+            _matchedBrand:br.brand,
+            _brandShop:br.shop||null,
+            n100:br.n100||p.n100,
+            pkgSize:br.pkgSize||p.pkgSize,
+            _isBrand:true
+          });
+        }
+      }
+    }
+  }
+  // 2) Sprawdź user override (per-product n100)
+  // 3) Klasyczne dopasowanie po nazwie/aliasie
+  for(var i2=0;i2<PRODUCT_DB.length;i2++){
+    var p2=PRODUCT_DB[i2];
+    var matched=false;
+    if(p2.name.toLowerCase()===n){matched=true;}
+    else if(p2.aliases){
+      for(var j=0;j<p2.aliases.length;j++){
+        if(p2.aliases[j]===n||n.indexOf(p2.aliases[j])!==-1||p2.aliases[j].indexOf(n)!==-1){matched=true;break;}
+      }
+    }
+    if(matched){
+      // Czy mamy user override dla tego produktu?
+      var ov=userProductOverrides[p2.id];
+      if(ov){
+        return Object.assign({},p2,{
+          _matchedBrand:ov.brand||"(własna marka)",
+          _brandShop:ov.shop||null,
+          n100:ov.n100||p2.n100,
+          pkgSize:ov.pkgSize||p2.pkgSize,
+          _isUserOverride:true
+        });
+      }
+      return p2;
+    }
   }
   return null;
+}
+
+// Helper: dla danego produktu, zwróć listę dostępnych marek dla aktualnego sklepu
+function getBrandsForProduct(prodId,shop){
+  var p=PRODUCT_DB.filter(function(x){return x.id===prodId;})[0];
+  if(!p||!p.brands)return [];
+  if(!shop||shop==="both")return p.brands.slice();
+  var sLow=String(shop).toLowerCase();
+  return p.brands.filter(function(b){return !b.shop||String(b.shop).toLowerCase().indexOf(sLow)!==-1;});
 }
 
 // ── Parse amount from strings like "150g", "2 szt.", "1 szklanka" ─────────────
@@ -3603,7 +3991,7 @@ var adminUsersData = {};
 
 function switchAdminTab(n) {
   adminCurrentTab = n;
-  for (var i = 0; i < 5; i++) {
+  for (var i = 0; i < 6; i++) {
     var t = document.getElementById("admtab-" + i);
     if (t) {
       t.classList.remove("act");
@@ -3618,6 +4006,80 @@ function switchAdminTab(n) {
   else if (n === 2) loadAdminReceipts();
   else if (n === 3) loadAdminStats();
   else if (n === 4) renderAdminApi();
+  else if (n === 5) renderAdminProducts();
+}
+
+// ── ADMIN — TAB PRODUKTY (edycja n100 + skaner etykiet) ─────────────────────
+var adminProductsSearch="";
+var adminProductsExpanded=null;
+function renderAdminProducts(){
+  var body=document.getElementById("admin-body");
+  if(!body)return;
+  // Połącz PRODUCT_DB + user overrides
+  var query=String(adminProductsSearch||"").toLowerCase().trim();
+  var html='';
+  html+='<div style="background:linear-gradient(135deg,rgba(139,92,246,.15),rgba(61,139,255,.08));border:1px solid rgba(139,92,246,.35);border-radius:14px;padding:14px;margin-bottom:14px">';
+  html+='<div style="font-size:13px;font-weight:800;color:var(--purple);margin-bottom:4px">🏷️ Baza produktów</div>';
+  html+='<div style="font-size:12px;color:var(--text2);margin-bottom:10px">'+PRODUCT_DB.length+' produktów &bull; '+Object.keys(userProductOverrides).length+' własnych override\'ów. Możesz zeskanować etykietę aby dodać konkretną markę.</div>';
+  html+='<button onclick="openLabelScanner()" style="width:100%;background:linear-gradient(135deg,var(--purple),#4F46E5);color:#fff;border:none;border-radius:50px;padding:13px;font-size:14px;font-weight:800;cursor:pointer">📸 Zeskanuj etykietę produktu</button>';
+  html+='</div>';
+
+  html+='<input type="text" placeholder="🔍 Szukaj produktu lub marki..." value="'+query.replace(/"/g,"&quot;")+'" oninput="adminProductsSearch=this.value;renderAdminProducts()" style="width:100%;background:#1A1A24;border:1.5px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 14px;font-size:13px;color:#fff;outline:none;margin-bottom:14px;color-scheme:dark">';
+
+  // Sortuj i filtruj
+  var items=PRODUCT_DB.slice();
+  if(query){
+    items=items.filter(function(p){
+      if(p.name.toLowerCase().indexOf(query)!==-1)return true;
+      if((p.aliases||[]).some(function(a){return a.toLowerCase().indexOf(query)!==-1;}))return true;
+      if((p.brands||[]).some(function(b){return String(b.brand).toLowerCase().indexOf(query)!==-1;}))return true;
+      return false;
+    });
+  }
+  items=sortByNamePL(items,function(p){return p.name;});
+
+  if(!items.length){
+    html+='<div style="text-align:center;padding:30px;color:#6B6B85">Brak produktów pasujących do wyszukiwania.</div>';
+    body.innerHTML=html;
+    return;
+  }
+
+  items.forEach(function(p){
+    var expanded=adminProductsExpanded===p.id;
+    var hasBrands=p.brands&&p.brands.length>0;
+    var ov=userProductOverrides[p.id];
+    html+='<div style="background:#111118;border-radius:14px;padding:12px 14px;margin-bottom:8px;border:1px solid rgba(255,255,255,.06)">';
+    // Nagłówek
+    html+='<div onclick="adminProductsExpanded=adminProductsExpanded===\''+p.id+'\'?null:\''+p.id+'\';renderAdminProducts()" style="cursor:pointer;display:flex;align-items:center;gap:10px">';
+    html+='<div style="flex:1;min-width:0">';
+    html+='<div style="font-size:13px;font-weight:800;color:#fff">'+p.name+'</div>';
+    html+='<div style="font-size:11px;color:#6B6B85;margin-top:2px">'+p.n100.kcal+' kcal &bull; B:'+p.n100.prot+'g W:'+p.n100.carb+'g T:'+p.n100.fat+'g'+(hasBrands?" &bull; "+p.brands.length+" marek":"")+'</div>';
+    html+='</div>';
+    if(ov)html+='<span style="background:rgba(245,158,11,.15);border:1px solid var(--amber);color:var(--amber);border-radius:50px;padding:3px 8px;font-size:10px;font-weight:700">override</span>';
+    html+='<span style="color:#6B6B85;font-size:14px;flex-shrink:0;transition:transform .2s;transform:rotate('+(expanded?'90deg':'0deg')+')">›</span>';
+    html+='</div>';
+    if(expanded){
+      html+='<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06)">';
+      if(hasBrands){
+        html+='<div style="font-size:11px;font-weight:800;color:#8B5CF6;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Marki ('+p.brands.length+')</div>';
+        p.brands.forEach(function(b){
+          var shopColor=String(b.shop||"").toLowerCase().indexOf("biedronka")!==-1?"#DC2626":String(b.shop||"").toLowerCase().indexOf("lidl")!==-1?"#1D4ED8":"#7C3AED";
+          html+='<div style="background:#0D0D15;border-radius:10px;padding:10px 12px;margin-bottom:6px;border-left:3px solid '+shopColor+'">';
+          html+='<div style="font-size:12px;font-weight:700;color:#fff;margin-bottom:3px">'+b.brand+'</div>';
+          html+='<div style="font-size:11px;color:#6B6B85">'+(b.n100.kcal||0)+' kcal &bull; B:'+(b.n100.prot||0)+'g W:'+(b.n100.carb||0)+'g T:'+(b.n100.fat||0)+'g'+(b.pkgSize?" &bull; opak. "+b.pkgSize+"g":"")+'</div>';
+          html+='</div>';
+        });
+      }else{
+        html+='<div style="font-size:11px;color:#6B6B85;text-align:center;padding:10px;background:#0D0D15;border-radius:8px;margin-bottom:8px">Brak konkretnych marek w bazie. Dodaj zdjęciem etykiety.</div>';
+      }
+      if(p.aliases){
+        html+='<div style="font-size:11px;color:#6B6B85;margin-top:8px">Aliasy: <i>'+p.aliases.join(", ")+'</i></div>';
+      }
+      html+='</div>';
+    }
+    html+='</div>';
+  });
+  body.innerHTML=html;
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -4803,6 +5265,7 @@ function closeAdminPanel(){
     <button id="admtab-2" onclick="switchAdminTab(2)" class="admtab">Paragony</button>
     <button id="admtab-3" onclick="switchAdminTab(3)" class="admtab">Statystyki</button>
     <button id="admtab-4" onclick="switchAdminTab(4)" class="admtab">API</button>
+    <button id="admtab-5" onclick="switchAdminTab(5)" class="admtab">Produkty</button>
   </div>
   <div id="admin-body" style="padding:16px;flex:1"></div>
 </div>
