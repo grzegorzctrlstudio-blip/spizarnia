@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-06-01-diet-wishes-auto-fetch-v34 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-06-01-timeout-retry-v35 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1088,7 +1088,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-06-01-diet-wishes-auto-fetch-v34";
+var APP_VERSION="2026-06-01-timeout-retry-v35";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -1278,10 +1278,10 @@ var _aiLoadingWatchdogId=null;
 var _aiLoadingKillswitchId=null;
 var _aiLoadingStartTs=0;
 var _aiAbortControllers=[]; // wszystkie aktywne AbortControllery (dla anulowania)
-var AI_TIMEOUT_MS=90000; // 90 sekund per fetch
-var AI_CANCEL_BTN_AFTER_MS=5000; // pokaż "Anuluj" po 5s
-var AI_WATCHDOG_MS=120000; // 120s - komunikat "trwa za długo"
-var AI_KILLSWITCH_MS=150000; // 150s - force unblock
+var AI_TIMEOUT_MS=180000; // 180 sekund per fetch (Sonnet+8000tok ~ 100s, +bufor)
+var AI_CANCEL_BTN_AFTER_MS=10000; // pokaż "Anuluj" po 10s
+var AI_WATCHDOG_MS=150000; // 150s - komunikat "trwa za długo"
+var AI_KILLSWITCH_MS=210000; // 210s - force unblock (po timeout 180s + bufor)
 function showAILoading(msg,sub){
   _aiLoadingDepth++;
   var ol=document.getElementById("ai-loading-overlay");
@@ -1401,6 +1401,19 @@ function callAPI(messages,system,onOk,onErr,maxTok,modelOverride){
   },AI_TIMEOUT_MS);
   var fetchOpts={method:"POST",headers:{"Content-Type":"application/json","x-api-key":apiKey,"anthropic-version":"2023-06-01"},body:JSON.stringify(body)};
   if(ac)fetchOpts.signal=ac.signal;
+  // Flaga: czy user kliknął Anuluj (vs timeout/network)
+  var userCancelled=false;
+  if(ac){
+    var origAbort=ac.abort.bind(ac);
+    ac.abort=function(reason){userCancelled=(reason!=="timeout");return origAbort();};
+  }
+  // Timeout marker
+  var timedOut=false;
+  clearTimeout(timeoutId);
+  timeoutId=setTimeout(function(){
+    timedOut=true;
+    if(ac)try{ac.abort("timeout");}catch(e){}
+  },AI_TIMEOUT_MS);
   fetch(PROXY,fetchOpts)
   .then(function(r){return r.text();})
   .then(function(raw){
@@ -1413,8 +1426,12 @@ function callAPI(messages,system,onOk,onErr,maxTok,modelOverride){
     clearTimeout(timeoutId);
     if(ac){var idx=_aiAbortControllers.indexOf(ac);if(idx>=0)_aiAbortControllers.splice(idx,1);}
     hideAILoading();
-    // Rozróżnij timeout/abort od innych błędów
-    var msg=e.name==="AbortError"?"Przerwano (timeout 90s lub anulowane przez Ciebie)":e.message;
+    // Rozróżnij timeout vs cancel vs network
+    var msg;
+    if(timedOut)msg="Timeout — AI nie odpowiedział w "+(AI_TIMEOUT_MS/1000)+"s. Spróbuj ponownie (kolejka może być przeciążona).";
+    else if(userCancelled)msg="Anulowane przez Ciebie";
+    else if(e.name==="AbortError")msg="Połączenie przerwane";
+    else msg=e.message;
     if(onErr)onErr(msg);
   });
 }
@@ -3296,12 +3313,25 @@ function generateAIDiet(profile,customWishes){
   var body=document.getElementById("diet-body");
   body.innerHTML='<div style="text-align:center;padding:60px 20px"><div style="font-size:50px;margin-bottom:16px">AI</div><div id="diet-gen-step" style="font-size:14px;color:var(--text2);margin-bottom:20px">Generuje Menu 1...</div><div class="spin" style="margin:0 auto"></div></div>';
   // RÓWNOLEGLE Menu 1 + Menu 2. callAPI sam zarządza showAILoading - my tylko ustawiamy tekst.
-  setAILoadingText("🍱 Generuję Menu 1 i Menu 2 równolegle...","To trwa ~20-30s. Każdy call ma osobny timeout 90s.");
+  setAILoadingText("🍱 Generuję Menu 1 i Menu 2 równolegle...","To może potrwać ~30-90s. Timeout 3 min + auto-retry.");
   if(typeof updateDietStep==="function")updateDietStep(1);
-  function callMenu(label,content){
+  function callMenu(label,content,retry){
+    retry=retry||0;
     return new Promise(function(resolve,reject){
       // 8000 tokenów = ~6000 słów - wystarczy dla 9 dań z makro, składnikami, przepisem
-      callAPI([{role:"user",content:content}],sys,function(raw){resolve({label:label,raw:raw});},function(err){reject(new Error(label+": "+err));},8000);
+      callAPI([{role:"user",content:content}],sys,function(raw){resolve({label:label,raw:raw});},function(err){
+        // Auto-retry przy timeout (max 1 raz)
+        var isTimeout=String(err||"").indexOf("Timeout")===0;
+        if(isTimeout&&retry<1){
+          try{console.warn("⚠️ "+label+" timeout - retry 1/1");}catch(e){}
+          setAILoadingText("🔄 "+label+" - ponawiam próbę...","Pierwsze podejście zajęło >3 min. Pokoj kolejce AI.");
+          setTimeout(function(){
+            callMenu(label,content,retry+1).then(resolve).catch(reject);
+          },1500);
+        }else{
+          reject(new Error(label+": "+err));
+        }
+      },8000);
     });
   }
   var p1=callMenu("Menu 1",base+" MENU 1 - 3 sniadania+3 obiady+3 kolacje: "+fmt);
