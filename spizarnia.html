@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-shopping-route-brands-v13 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-diet-cta-brand-rotation-v14 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -24,6 +24,11 @@
   --amber:#F59E0B;
   --blue:#3D8BFF;
   --purple:#8B5CF6;
+  /* --brand to KOLOR MARKI aplikacji - używamy dla głównych akcji (CTA, top-nav active, generate).
+     Wybrany cyan-500 (#06B6D4) - odróżnia się od zielonego warzywa (#16A34A) i innych kategorii.
+     Semantyczny --green zostaje dla statusów "OK/Mam/Wystarczy". */
+  --brand:#06B6D4;
+  --brand2:#0891B2;
   --radius:16px;
   --radius-sm:10px;
 }
@@ -45,18 +50,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .login-sub{font-size:13px;color:var(--text3);text-align:center;max-width:300px;line-height:1.55;margin-bottom:12px}
 .login-mode-tabs{display:flex;width:100%;max-width:340px;background:var(--bg3);border-radius:50px;padding:4px;border:1px solid var(--border);margin-bottom:6px}
 .login-mode-btn{flex:1;background:transparent;border:none;color:var(--text3);font-size:13px;font-weight:800;padding:10px 14px;border-radius:50px;cursor:pointer;transition:all .2s}
-.login-mode-btn.act{background:var(--green);color:#000}
+.login-mode-btn.act{background:var(--brand);color:#000}
 .name-inp{width:100%;max-width:340px;background:var(--bg3);border:1.5px solid var(--border2);border-radius:14px;padding:15px 18px;font-size:16px;color:var(--text);outline:none;text-align:center;font-weight:700;transition:border .2s}
 .name-inp:focus{border-color:var(--green)}
 .name-inp::placeholder{color:var(--text3);font-weight:400}
-.login-btn{width:100%;max-width:340px;background:var(--green);color:#000;border:none;border-radius:50px;padding:15px;font-size:15px;font-weight:900;cursor:pointer;letter-spacing:.3px;transition:transform .15s,filter .15s;margin-top:4px}
+.login-btn{width:100%;max-width:340px;background:var(--brand);color:#000;border:none;border-radius:50px;padding:15px;font-size:15px;font-weight:900;cursor:pointer;letter-spacing:.3px;transition:transform .15s,filter .15s;margin-top:4px}
 .login-btn:active{transform:scale(.97);filter:brightness(.9)}
 .login-tip{font-size:11px;color:var(--text3);text-align:center;margin-top:8px;line-height:1.55;max-width:300px}
 
 /* ── TOP NAV (segmented control) — single instance inside #app-hdr ── */
 .top-nav{display:flex;background:var(--bg3);border:1px solid var(--border);border-radius:50px;padding:4px;gap:4px;margin:0 0 12px}
 .tnav-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:transparent;border:none;color:var(--text3);font-size:13px;font-weight:700;padding:10px 8px;border-radius:50px;cursor:pointer;transition:background .2s,color .2s;white-space:nowrap}
-.tnav-btn.act{background:var(--green);color:#000;font-weight:800}
+.tnav-btn.act{background:var(--brand);color:#000;font-weight:800}
 .tnav-ico{font-size:16px;line-height:1}
 .tnav-lbl{font-size:12px;font-weight:800;letter-spacing:.2px}
 @media (max-width:380px){.tnav-lbl{font-size:11px}}
@@ -107,7 +112,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .cat-chips::-webkit-scrollbar{display:none}
 .cat-chip{display:flex;align-items:center;gap:7px;padding:11px 18px;border-radius:50px;border:2px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;font-weight:800;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0;min-height:44px}
 .cat-chip:hover{border-color:var(--border2);background:var(--bg4)}
-.cat-chip.act{background:var(--green);border-color:var(--green);color:#000;box-shadow:0 4px 12px rgba(22,163,74,.35)}
+.cat-chip.act{background:var(--brand);border-color:var(--brand);color:#000;box-shadow:0 4px 12px rgba(6,182,212,.35)}
 .cat-chip-ico{font-size:16px;line-height:1}
 @media (max-width:380px){.cat-chip{padding:10px 14px;font-size:13px}}
 
@@ -657,6 +662,12 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
         <button class="pantry-card-btn" onclick="showUpdatePantryModal()">Zaktualizuj stan</button>
       </div>
 
+      <!-- MOJA DIETA CTA - duży button na głównej stronie -->
+      <button class="diet-cta-btn" onclick="openDiet()" style="width:100%;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#000;border:none;border-radius:14px;padding:16px 18px;font-size:15px;font-weight:900;cursor:pointer;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 4px 16px rgba(6,182,212,.25);transition:filter .15s,transform .1s">
+        <span style="display:flex;align-items:center;gap:10px"><span style="font-size:24px">🍱</span><span>Moja Dieta</span></span>
+        <span style="font-size:11px;font-weight:700;opacity:.7">PRZEPISY · PLAN · ZAKUPY →</span>
+      </button>
+
       <!-- SEARCH -->
       <div class="search-wrap">
         <span class="search-ico">🔍</span>
@@ -1053,7 +1064,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-31-shopping-route-brands-v13";
+var APP_VERSION="2026-05-31-diet-cta-brand-rotation-v14";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -1959,7 +1970,7 @@ window.addEventListener("load",function(){
   setTimeout(updateHdrHeight,800);
 });
 window.addEventListener("resize",updateHdrHeight);
-function setCatFilter(id){catFilter=id;document.querySelectorAll(".cat-chip").forEach(function(el){el.classList.remove("act");});var el=document.getElementById("chip-"+(id==="all"?"all":id));if(el){el.classList.add("act");if(CATS.find(function(c){return c.id===id;})){var cat=CATS.find(function(c){return c.id===id;});el.style.background=cat.color||"var(--green)";el.style.borderColor=cat.color||"var(--green)";el.style.color="#000";}}render();}
+function setCatFilter(id){catFilter=id;document.querySelectorAll(".cat-chip").forEach(function(el){el.classList.remove("act");el.removeAttribute("style");});var el=document.getElementById("chip-"+(id==="all"?"all":id));if(el){el.classList.add("act");if(CATS.find(function(c){return c.id===id;})){var cat=CATS.find(function(c){return c.id===id;});el.style.background=cat.color||"var(--brand)";el.style.borderColor=cat.color||"var(--brand)";el.style.color="#000";}}render();}
 function setFilter(f){
   filter=f;
   // Podświetl kafle dashboardu (act = aktywny filtr)
@@ -4528,15 +4539,22 @@ function getDietIngredients(diet, menuKey, days){
   var ingredients={};// {productId: {name, totalAmount, unit, product, meals[]}}
   var menu=diet[menuKey||"menu1"]||{};
   ["sniadania","obiady","kolacje"].forEach(function(typ){
-    (menu[typ]||[]).forEach(function(meal){
+    var meals=menu[typ]||[];
+    if(!meals.length)return;
+    // KLUCZOWE: user zje TYLKO JEDNĄ propozycję na dzień z danej sekcji (rotacja propozycji).
+    // Jeśli 3 propozycje śniadań i 7 dni → każda używana 7/3 = 2.33 razy (nie 7).
+    // To naprawia bug "jajka z 2 propozycji śniadań = lista zakupów 2x za dużo".
+    var perMealDays=days/meals.length;
+    meals.forEach(function(meal){
       (meal.skladniki||[]).forEach(function(sk){
         var rawName=sk.n||sk.name||"";
+        // Pomijaj przyprawy (sól/pieprz/itp.) - nie idą na listę zakupów
+        if(typeof isNonMacroSeasoning==="function"&&isNonMacroSeasoning(rawName))return;
         var rawAmt=sk.il||sk.amount||"0";
         var amt=parseAmount(rawAmt, sk.unit||"g");
         var inGrams=isGramAmount(rawAmt);
         var prod=findProduct(rawName);
         // Konwersja amt -> jednostka produktu (sztuki dla unit="szt", gramy dla unit="g"/"ml")
-        // To naprawia bug "150g (3 szt)" dla Jaja gdzie getDietIngredients zliczało 150 szt
         if(prod&&prod.unit==="szt"&&prod.singleWeight){
           if(inGrams){
             amt=Math.max(1,Math.ceil(amt/prod.singleWeight));
@@ -4546,8 +4564,6 @@ function getDietIngredients(diet, menuKey, days){
             amt=amt*prod.singleWeight;
           }
         }
-        // Jeśli znaleziono produkt w bazie - pid = prod.id (deterministyczne)
-        // Inaczej - dedupKey z normalizacji PL (żeby "brokul" i "Brokuł" miały TEN SAM pid)
         var pid=prod?prod.id:("unknown_"+(dedupKey(rawName)||Math.random().toString(36).slice(2)));
         if(!ingredients[pid]){
           ingredients[pid]={
@@ -4558,7 +4574,8 @@ function getDietIngredients(diet, menuKey, days){
             meals:[]
           };
         }
-        ingredients[pid].totalAmount+=amt*days;
+        // ROTACJA: amt × (days / liczba propozycji) zamiast amt × days
+        ingredients[pid].totalAmount+=amt*perMealDays;
         var ml=meal.nazwa+" ("+typ+")";
         if(ingredients[pid].meals.indexOf(ml)===-1)ingredients[pid].meals.push(ml);
       });
