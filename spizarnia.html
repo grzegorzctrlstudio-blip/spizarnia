@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-sticky-bigger-chips-v7 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-card-layout-mobile-v8 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -143,10 +143,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .item-photo-empty{width:48px;height:48px;border-radius:10px;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;flex-shrink:0;color:var(--text3);transition:border .2s}
 .item-photo-empty:active{border-color:var(--text3)}
 .item-info{flex:1;min-width:0}
-.item-name{font-size:14px;font-weight:700;color:var(--text);line-height:1.35;margin-bottom:3px}
-.fresh-ok{font-size:11px;color:var(--green);font-weight:600;display:flex;align-items:center;gap:3px}
-.fresh-warn{font-size:11px;color:var(--amber);font-weight:600;display:flex;align-items:center;gap:3px}
-.fresh-bad{font-size:11px;color:var(--red);font-weight:700;display:flex;align-items:center;gap:3px}
+.item-name{font-size:18px;font-weight:800;color:var(--text);line-height:1.25;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fresh-ok,.fresh-warn,.fresh-bad{font-size:13px;font-weight:700;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.fresh-ok{color:var(--green)}
+.fresh-warn{color:var(--amber)}
+.fresh-bad{color:var(--red)}
+/* Button "Skanuj" pod świeżością */
+.scan-date-btn{margin-top:6px;display:inline-flex;align-items:center;gap:6px;background:var(--bg4);border:1.5px solid var(--border);color:var(--text2);border-radius:50px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.scan-date-btn:hover{border-color:var(--blue);color:var(--blue)}
+.scan-date-btn.has-date{border-color:var(--amber);color:var(--amber);background:rgba(245,158,11,.1)}
 .item-badge{flex-shrink:0;border-radius:10px;padding:8px 12px;font-size:13px;font-weight:900;text-align:center;min-width:68px}
 .item.red .item-badge{background:var(--red);color:#fff}
 .item.low .item-badge{background:var(--amber);color:#000}
@@ -171,6 +176,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .qty-num{min-width:44px;text-align:center;padding:0 2px}
 .qty-val{font-size:18px;font-weight:800;line-height:1.1;color:var(--text)}
 .qty-unit{font-size:9px;color:var(--text3);font-weight:600}
+/* Kolumna +/- na karcie produktu (po prawej stronie) */
+.qty-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;justify-self:end}
+/* Mobile responsiveness — na małych ekranach: zdjęcie + info w jednym wierszu, +/- pod spodem */
+@media (max-width:480px){
+  .item{padding:12px !important}
+  .item-name{font-size:17px}
+  .item > div:first-child{grid-template-columns:auto 1fr !important;grid-template-rows:auto auto;gap:10px !important}
+  .item .qty-col{flex-direction:row;grid-column:1 / -1;justify-content:space-between;width:100%;justify-self:stretch;margin-top:8px;padding-top:10px;border-top:1px solid var(--border)}
+  .item .qty-col > div{flex:1;text-align:center}
+}
+@media (max-width:360px){
+  .item-name{font-size:16px}
+  .fresh-ok,.fresh-warn,.fresh-bad{font-size:12px}
+  .scan-date-btn{font-size:11px;padding:6px 12px}
+}
 
 .exp-chip{margin-top:8px;display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border);color:var(--text3);transition:all .2s}
 .exp-chip.ok{border-color:var(--green);color:var(--green)}
@@ -1032,7 +1052,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-31-sticky-bigger-chips-v7";
+var APP_VERSION="2026-05-31-card-layout-mobile-v8";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -1287,15 +1307,15 @@ function fHtml(it,cur){
     }
   }
   if(d===null)return "";
-  var suffix=isExplicit?"":" <span style=\"opacity:.6;font-size:9px\">orient.</span>";
+  // Świeżość w jednej linii - bez "orient." (user wymaganie 2026-05-31)
   if(d<0)return isExplicit
     ? '<div class="fresh-bad">Przeterminowane</div>'
-    : '<div class="fresh-warn">Czas mija — sprawdź'+suffix+'</div>';
-  if(d===0)return '<div class="fresh-warn">Ważne do dzisiaj'+suffix+'</div>';
-  if(d===1)return '<div class="fresh-warn">Wygasa jutro'+suffix+'</div>';
-  if(d<=3)return '<div class="fresh-warn">Wygasa za '+d+' dni'+suffix+'</div>';
-  if(d<=14)return '<div class="fresh-ok">Świeże — '+d+' dni'+suffix+'</div>';
-  return '<div class="fresh-ok">Świeże — ponad '+Math.min(30,d)+' dni'+suffix+'</div>';
+    : '<div class="fresh-warn">Czas mija — sprawdź</div>';
+  if(d===0)return '<div class="fresh-warn">Ważne do dzisiaj</div>';
+  if(d===1)return '<div class="fresh-warn">Wygasa jutro</div>';
+  if(d<=3)return '<div class="fresh-warn">Wygasa za '+d+' dni</div>';
+  if(d<=14)return '<div class="fresh-ok">Świeże — '+d+' dni</div>';
+  return '<div class="fresh-ok">Świeże — ponad '+Math.min(30,d)+' dni</div>';
 }
 function expiringSoon(it){var d=getDaysLeft(it);return d!==null&&d<=3;}
 
@@ -2146,36 +2166,38 @@ function render(){
       // Tło karty w kolorze kategorii (subtelny gradient)
       var catTint=catColor+'14';
       var catTintStrong=catColor+'22';
-      html+='<div class="item" style="background:linear-gradient(135deg,'+catTint+' 0%,'+catTintStrong+' 100%);border-left:5px solid '+borderColor+';border-color:'+catColor+'33">';
-      html+='<div style="display:flex;align-items:flex-start;gap:10px">';
+      // Button "Skanuj" / "Edytuj datę" pod nazwą (zamiast osobnego "Dodaj datę")
+      var dateLabel=hasDate?"📅 Edytuj datę":"📷 Skanuj datę";
+      var dateBtnCls=hasDate?"scan-date-btn has-date":"scan-date-btn";
+      html+='<div class="item" style="background:linear-gradient(135deg,'+catTint+' 0%,'+catTintStrong+' 100%);border-left:5px solid '+borderColor+';border-color:'+catColor+'33;padding:14px">';
+      // GŁÓWNY GRID: [zdjęcie] [info column] [+/-]
+      html+='<div style="display:grid;grid-template-columns:auto 1fr auto;align-items:flex-start;gap:12px">';
       html+=photoHtml;
-      html+='<div style="flex:1;min-width:0">';
-      // Górny wiersz: nazwa + (po prawej) status uzupełnienia (Wystarczy/Brakuje N)
-      html+='<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:4px">';
-      html+='<div style="font-size:15px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+it.n+'</div>';
-      html+='</div>';
-      // Status świeżości pod nazwą + 1 chip "Edytuj/Dodaj datę"
-      var dateLabel=hasDate?"Edytuj datę":"Dodaj datę";
-      var dateBtnColor=hasDate?"var(--amber)":"var(--text3)";
-      var dateBtnBg=hasDate?"rgba(245,158,11,.15)":"var(--bg4)";
-      var dateBtnBorder=hasDate?"var(--amber)":"var(--border)";
-      html+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">';
-      if(dateHtml)html+='<div style="flex:1;min-width:0">'+dateHtml+'</div>';
-      else html+='<div style="flex:1;font-size:11px;color:var(--text3)">Brak daty</div>';
-      html+='<button onclick="openExpiry(\''+ne+'\')" style="background:'+dateBtnBg+';border:1px solid '+dateBtnBorder+';color:'+dateBtnColor+';border-radius:50px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;flex-shrink:0">📅 '+dateLabel+'</button>';
-      html+='</div>';
-      // Progress bar + ile brakuje
+      // Środkowa kolumna - wszystko pod sobą
+      html+='<div style="min-width:0;display:flex;flex-direction:column;gap:6px">';
+      // 1. NAZWA produktu (większy font - z .item-name CSS = 18px)
+      html+='<div class="item-name">'+it.n+'</div>';
+      // 2. ŚWIEŻOŚĆ w jednej linii (no-wrap, ellipsis)
+      if(dateHtml){
+        html+=dateHtml;
+      }else{
+        html+='<div style="font-size:13px;color:var(--text3);font-weight:600">Brak daty</div>';
+      }
+      // 3. BUTTON Skanuj / Edytuj datę
+      html+='<button class="'+dateBtnCls+'" onclick="openExpiry(\''+ne+'\')">'+dateLabel+'</button>';
+      // 4. PASEK STATUSU (progress + opis)
       html+='<div style="display:flex;align-items:center;gap:8px;margin-top:4px">';
       html+='<div style="flex:1;height:8px;background:var(--bg4);border-radius:6px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+borderColor+';border-radius:6px;transition:width .3s"></div></div>';
       html+=ql;
       html+='</div>';
       html+='</div>';
-      // +/- po prawej stronie karty
-      html+='<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;align-self:center">';
+      // Prawa kolumna: +/-
+      html+='<div class="qty-col">';
       html+='<button class="qty-btn" style="background:var(--bg3);color:var(--text)" onclick="adj(\''+id+'\',\''+cat.id+'\',\''+ne+'\',-1)">−</button>';
       html+='<div style="min-width:44px;text-align:center;font-weight:800;color:var(--text)"><span style="font-size:20px;line-height:1.1">'+cur+'</span><span style="font-size:10px;color:var(--text3);display:block;margin-top:2px">'+it.unit+'</span></div>';
       html+='<button class="qty-btn" style="background:var(--green);color:#000" onclick="adj(\''+id+'\',\''+cat.id+'\',\''+ne+'\',1)">+</button>';
-      html+='</div></div></div>';
+      html+='</div>';
+      html+='</div></div>';
     });
     html+='</div>';
   });
