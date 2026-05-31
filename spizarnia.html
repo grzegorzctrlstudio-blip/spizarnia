@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-card-layout-mobile-v8 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-clean-chips-v9 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -657,9 +657,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
       <!-- CATEGORY CHIPS (sticky podczas scrollu) -->
       <div class="cat-chips-wrap">
         <div class="cat-chips" id="cat-chips">
-          <button class="cat-chip act" id="chip-all" onclick="setCatFilter('all')">
-            <span class="cat-chip-ico">📋</span>Wszystko
-          </button>
+          <button class="cat-chip act" id="chip-all" onclick="setCatFilter('all')">Wszystko</button>
         </div>
       </div>
 
@@ -1052,7 +1050,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-31-card-layout-mobile-v8";
+var APP_VERSION="2026-05-31-clean-chips-v9";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -1931,7 +1929,7 @@ function closeLog(){document.getElementById("log-overlay").classList.remove("sho
 function renderLog(){var b=document.getElementById("log-body");b.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3)">Ladowanie...</div>';fbGet(LP).then(function(data){if(!data){b.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3)">Brak zmian</div>';return;}var en=Object.values(data).sort(function(a,b){return b.ts-a.ts;}).slice(0,200);b.innerHTML=en.map(function(e){var d=new Date(e.ts),g=d.toLocaleDateString("pl-PL",{day:"2-digit",month:"2-digit"})+" "+d.toLocaleTimeString("pl-PL",{hour:"2-digit",minute:"2-digit"});var delta=e.delta||0,badge=delta>0?'<span class="lbadge up">+'+delta+'</span>':'<span class="lbadge dn">'+delta+'</span>';return'<div class="log-entry"><div class="log-av" style="background:'+nc(e.who||"?")+'">'+ni(e.who||"?")+'</div><div class="log-info"><div class="log-who">'+(e.who||"?")+'</div><div class="log-what">'+(delta>0?"dodal":"zabral")+" "+Math.abs(delta)+" x "+(e.what||"?")+'</div><div class="log-when">'+g+'</div></div>'+badge+'</div>';}).join("");}).catch(function(){b.innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">Blad</div>';});}
 
 // ── CAT CHIPS ─────────────────────────────────────────────────────────────────
-function buildCatChips(){var wrap=document.getElementById("cat-chips");if(!wrap)return;wrap.innerHTML='<button class="cat-chip act" id="chip-all" onclick="setCatFilter(\'all\')"><span class="cat-chip-ico">📋</span>Wszystko</button>';CATS.forEach(function(cat){var btn=document.createElement("button");btn.className="cat-chip";btn.id="chip-"+cat.id;btn.innerHTML='<span class="cat-chip-ico">'+(cat.ic||"")+'</span>'+cat.label;btn.onclick=(function(id){return function(){setCatFilter(id);};})(cat.id);wrap.appendChild(btn);});}
+function buildCatChips(){var wrap=document.getElementById("cat-chips");if(!wrap)return;wrap.innerHTML='<button class="cat-chip act" id="chip-all" onclick="setCatFilter(\'all\')">Wszystko</button>';CATS.forEach(function(cat){var btn=document.createElement("button");btn.className="cat-chip";btn.id="chip-"+cat.id;btn.textContent=cat.label;btn.onclick=(function(id){return function(){setCatFilter(id);};})(cat.id);wrap.appendChild(btn);});}
 // Dynamicznie mierz wysokość #app-hdr (header + top-nav) i ustaw CSS variable --hdr-h
 // dla sticky cat-chips-wrap żeby kleił się POD headerem.
 function updateHdrHeight(){
