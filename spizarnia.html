@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-kill-dead-shop-ai-v23 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-fix-shopfromdiet-v24 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1088,7 +1088,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-31-kill-dead-shop-ai-v23";
+var APP_VERSION="2026-05-31-fix-shopfromdiet-v24";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -3035,7 +3035,14 @@ function renderRecipes(){
 
 function renderUploadDiet(){return'<button onclick="generateAIDiet(userProfile)" style="width:100%;background:linear-gradient(135deg,var(--green2),var(--green));color:#000;border:none;border-radius:50px;padding:14px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:16px">Generuj diete AI na nowo</button><div style="font-size:13px;font-weight:400;color:var(--text3);margin-bottom:8px">lub wklej tekst planu:</div><textarea id="diet-upload-text" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px;font-size:13px;color:var(--text);outline:none;min-height:100px;font-family:inherit;resize:vertical;margin-bottom:10px" placeholder="Wklej tekst planu zywieniowego..."></textarea><button onclick="parseDietText()" style="width:100%;background:linear-gradient(135deg,var(--purple),#4F46E5);color:#fff;border:none;border-radius:50px;padding:13px;font-size:14px;font-weight:500;cursor:pointer">Analizuj z AI</button>';}
 function parseDietText(){var txt=document.getElementById("diet-upload-text");if(!txt||!txt.value.trim())return;if(!apiKey)return;var body=document.getElementById("diet-body");body.innerHTML='<div style="text-align:center;padding:40px"><div class="spin" style="margin:0 auto"></div></div>';callAPI([{role:"user",content:'Przeanalizuj plan diety. TYLKO JSON: {"menu1":{"sniadania":[{"nazwa":"","czas":"","kcal":0,"prot":0,"carb":0,"fat":0,"skladniki":[{"n":"","il":""}],"przepis":""}],"obiady":[...],"kolacje":[...]},"menu2":{...}}. Plan: '+txt.value}],"Jestes dietetykiem. TYLKO JSON bez markdown.",function(res){try{var clean=res.replace(/```json/gi,"").replace(/```/g,"").trim();var p=JSON.parse(clean.slice(clean.indexOf("{"),clean.lastIndexOf("}")+1));if(!userProfile)userProfile={};userProfile.dietData=p;saveUserProfile(userProfile);switchDietTab(0);}catch(e){renderDietBody();}},function(){renderDietBody();},3500);}
-function generateShopFromDiet(){var d=getDietData(),menu=dietMenu===1?d.menu1:d.menu2;var allIngr=[];["sniadania","obiady","kolacje"].forEach(function(t){(menu[t]||[]).forEach(function(m){(m.skladniki||[]).forEach(function(s){allIngr.push(s.n+" "+s.il);});});});var inStock=[];CATS.forEach(function(cat){cat.items.forEach(function(it){if((state[fbk(cat.id,it.n)]||0)>=it.target)inStock.push(it.n);});});closeDiet();showPage("shop");callAPI([{role:"user",content:"Skladniki z diety: "+allIngr.join(", ")+". Mam juz: "+inStock.join(", ")+". Lista zakupow. TYLKO JSON: {\"komentarz\":\"\",\"produkty\":[{\"nazwa\":\"\",\"ilosc\":\"\",\"priorytet\":\"wysoki\",\"powod\":\"\"}]}"}],SYS,function(res){var clean=res.replace(/```json/gi,"").replace(/```/g,"").trim();try{renderShopList(JSON.parse(clean.slice(clean.indexOf("{"),clean.lastIndexOf("}")+1)));}catch(e){document.getElementById("shop-list-content").innerHTML='<div class="ai-note">'+res+'</div>';}},function(err){dlgAlert("X","Blad",err);});}
+// PRZEKIEROWANIE: stary generateShopFromDiet używał AI i wstawiał raw markdown
+// gdy parse failowal. Teraz przekierowanie do generateDietShoppingList (lokalna
+// kalkulacja, deterministyczna, bez AI).
+function generateShopFromDiet(){
+  closeDiet();
+  showPage("shop");
+  generateDietShoppingList(window.shopDays||7);
+}
 
 // ── SINGLE MEAL GENERATION ────────────────────────────────────────────────────
 function generateSingleMeal(menuNum,section,replaceIdx){
