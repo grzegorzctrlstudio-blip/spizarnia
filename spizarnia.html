@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-json-repair-tokens-v22 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-kill-dead-shop-ai-v23 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1088,7 +1088,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-31-json-repair-tokens-v22";
+var APP_VERSION="2026-05-31-kill-dead-shop-ai-v23";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -2195,8 +2195,15 @@ function applyShopPreset(store,days){
   setShopDays(days);
   if(typeof generateDietShoppingList==="function")generateDietShoppingList(days);
 }
-function generateShopList(){if(!apiKey){dlgAlert("X","Niedostepne","Skonfiguruj klucz API");return;}var btn=document.getElementById("gen-btn"),spin=document.getElementById("gen-spin"),txt=document.getElementById("gen-btn-txt");btn.disabled=true;spin.style.display="block";txt.textContent="Generuje...";var missing=[],expiring=[];CATS.forEach(function(cat){cat.items.forEach(function(it){var cur=state[fbk(cat.id,it.n)]||0;if(cur<it.target)missing.push(it.n+"(mam:"+cur+",potrzeba:"+it.target+" "+it.unit+")");var d=getDaysLeft(it);if(d!==null&&d<=3&&cur>0)expiring.push(it.n+"("+d+"dni)");});});var storeName={biedronka:"Biedronka",lidl:"Lidl",both:"Biedronka i Lidl"}[shopStore]||"Biedronka";var prompt="Lista zakupow do "+storeName+". Braki w lodowce: "+missing.join("; ")+". Wygasaja wkrotce: "+(expiring.join("; ")||"nic")+". Jezeli uzytkownik ostatnio kupowal cos w Biedronce uwzgledniej te produkty przy priorytetach. TYLKO JSON: {\"komentarz\":\"\",\"produkty\":[{\"nazwa\":\"\",\"ilosc\":\"\",\"priorytet\":\"wysoki/sredni/niski\",\"powod\":\"\"}]}";callAPI([{role:"user",content:prompt}],SYS,function(res){btn.disabled=false;spin.style.display="none";txt.textContent="Odswiez liste";var clean=res.replace(/```json/gi,"").replace(/```/g,"").trim();var s=clean.indexOf("{"),e=clean.lastIndexOf("}");try{renderShopList(JSON.parse(s!==-1&&e!==-1?clean.slice(s,e+1):clean));}catch(ex){document.getElementById("shop-list-content").innerHTML='<div class="ai-note">'+res+'</div>';}},function(err){btn.disabled=false;spin.style.display="none";txt.textContent="Generuj liste AI";document.getElementById("shop-list-content").innerHTML='<div class="ai-note" style="color:var(--red)">Blad: '+err+'</div>';});}
-function renderShopList(data){shopChecked={};document.getElementById("copy-btn").classList.add("show");var high=[],med=[],low=[];(data.produkty||[]).forEach(function(p){if(p.priorytet==="wysoki"||p.priorytet==="high")high.push(p);else if(p.priorytet==="niski"||p.priorytet==="low")low.push(p);else med.push(p);});var html='<div class="ai-note">'+(data.komentarz||"")+'</div>';function sec(items,title,cls){if(!items.length)return"";var s='<div style="margin-bottom:14px"><div class="shop-sec-title">'+title+'</div>';items.forEach(function(p,i){var id="si-"+cls+i;s+='<div class="shop-item" id="'+id+'" onclick="toggleShopItem(this.id)"><div class="shop-item-check"></div><div class="shop-item-info"><div class="shop-item-name">'+p.nazwa+'</div><div class="shop-item-detail">'+p.ilosc+' - '+p.powod+'</div></div><span class="prio prio-'+cls+'">'+p.priorytet+'</span></div>';});return s+"</div>";}html+=sec(high,"Pilne","high")+sec(med,"Wazne","med")+sec(low,"Warto miec","low");document.getElementById("shop-list-content").innerHTML=html;}
+// USUNIETO: stare generateShopList + renderShopList + generateSmartShopList.
+// Wstawialy raw markdown z odpowiedzi AI do innerHTML gdy parse JSON failowal -
+// user widzial surowy ```json {...} ``` zamiast czytelnej listy.
+// Nowy mechanizm = generateDietShoppingList (lokalna kalkulacja z diety).
+// Globalne stuby zostawiamy aby ewentualne stare wywolania (cache GitHub Pages,
+// stara wersja w przegladarce) nie crashowaly i zamiast tego pokazywaly info.
+function generateShopList(){generateDietShoppingList(window.shopDays||7);}
+function generateSmartShopList(){generateDietShoppingList(window.shopDays||7);}
+function renderShopList(){generateDietShoppingList(window.shopDays||7);}
 function toggleShopItem(id){var el=document.getElementById(id);if(!el)return;shopChecked[id]=!shopChecked[id];el.classList[shopChecked[id]?"add":"remove"]("checked");el.querySelector(".shop-item-check").textContent=shopChecked[id]?"v":"";}
 // Buduje lekstową listę z aktualnie wygenerowanej listy zakupów (z buy/missing/unit info).
 function buildShopListText(){
@@ -3588,43 +3595,11 @@ function openPurchaseHistory(){
   });
 }
 
-// ── SMART SHOPPING LIST — oparty na diecie + lodowce ─────────────────────────
-function generateSmartShopList(){
-  if(!apiKey){dlgAlert("X","Brak API","Skonfiguruj klucz API.");return;}
-  if(!userProfile||!userProfile.kcal){dlgAlert("X","Brak profilu","Uzupelnij profil.");return;}
-  var btn=document.getElementById("gen-btn"),spin=document.getElementById("gen-spin"),txt=document.getElementById("gen-btn-txt");
-  btn.disabled=true;spin.style.display="block";txt.textContent="Generuje inteligentna liste...";
-  var missing=[],expiring=[];
-  CATS.forEach(function(cat){cat.items.forEach(function(it){
-    var cur=state[fbk(cat.id,it.n)]||0;
-    if(cur<it.target)missing.push(it.n+"(mam:"+cur+",cel:"+it.target+" "+it.unit+")");
-    var d=getDaysLeft(it);if(d!==null&&d<=3&&cur>0)expiring.push(it.n+"("+d+"dni)");
-  });});
-  var storeName={biedronka:"Biedronka",lidl:"Lidl",both:"Biedronka i Lidl"}[shopStore]||"Biedronka";
-  var liked=(userProfile.liked||[]).join(", ");
-  var disliked=(userProfile.disliked||[]).join(", ");
-  var recentProducts=[];
-  purchaseHistory.slice(0,3).forEach(function(p){(p.produkty||[]).forEach(function(pr){if(pr.nazwa)recentProducts.push(pr.nazwa);});});
-  var prompt="Lista zakupow dla "+storeName+". Profil: "+userProfile.kcal+"kcal B:"+userProfile.prot+"g W:"+userProfile.carb+"g T:"+userProfile.fat+"g. Cel: "+({lose:"redukcja",maintain:"utrzymanie wagi",gain:"masa miesniowa"}[userProfile.goal]||"")+"."
-    +(liked?" Lubi: "+liked+".":"")
-    +(disliked?" Nie lubi: "+disliked+".":"")
-    +(userProfile.exclude?" Wykluczone: "+userProfile.exclude+".":"")
-    +" Braki w lodowce: "+missing.join("; ")+"."
-    +(expiring.length?" Wygasaja: "+expiring.join("; ")+".":"")
-    +(recentProducts.length?" Ostatnio kupione: "+recentProducts.slice(0,8).join(", ")+".":"")
-    +" Zasady: priorytetuj lubiane, wyklucz nielubiane, uwzgledniaj stan lodowki."
-    +' TYLKO JSON: {"komentarz":"","produkty":[{"nazwa":"","ilosc":"","jednostka":"","kategoria":"","priorytet":"wysoki/sredni/niski","powod":""}]}';
-  callAPI([{role:"user",content:prompt}],SYS,function(res){
-    btn.disabled=false;spin.style.display="none";txt.textContent="Odswiez liste";
-    var clean=res.replace(/```json/gi,"").replace(/```/g,"").trim();
-    var s=clean.indexOf("{"),e=clean.lastIndexOf("}");
-    try{renderShopList(JSON.parse(s!==-1&&e!==-1?clean.slice(s,e+1):clean));}
-    catch(ex){document.getElementById("shop-list-content").innerHTML='<div class="ai-note">'+res+'</div>';}
-  },function(err){
-    btn.disabled=false;spin.style.display="none";txt.textContent="Generuj liste AI";
-    document.getElementById("shop-list-content").innerHTML='<div class="ai-note" style="color:var(--red)">Blad: '+err+'</div>';
-  });
-}
+// USUNIETO: generateSmartShopList (stary mechanizm AI). Powod: wstawial raw
+// markdown odpowiedzi AI do innerHTML gdy parse fail. Uzytkownik widzial
+// ```json {...} ``` jako tekst zamiast listy. Zastapione przez
+// generateDietShoppingList (lokalna kalkulacja z diety, bez AI).
+// Stub zostawiony aby stare wywolania nie crashowaly.
 function toggleReceiptDetails(el){
   var next=el.nextElementSibling;
   if(next)next.style.display=next.style.display==="none"?"block":"none";
