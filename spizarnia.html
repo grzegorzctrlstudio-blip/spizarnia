@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-chips-inside-hdr-v10 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-nutrition-resolver-v11 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1053,7 +1053,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-31-chips-inside-hdr-v10";
+var APP_VERSION="2026-05-31-nutrition-resolver-v11";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -2511,7 +2511,7 @@ function closeDiet(){document.getElementById("diet-overlay").classList.remove("s
 function switchDietTab(n){dietTab=n;for(var i=0;i<5;i++){var t=document.getElementById("dtab-"+i);if(t){t.style.borderBottom=i===n?"3px solid var(--green)":"3px solid transparent";t.style.color=i===n?"var(--green)":"var(--text3)";}}renderDietBody();}
 function getDietData(){
   var d=(userProfile&&userProfile.dietData)?userProfile.dietData:GRZES_DIET;
-  // Sanityzacja w locie (działa też na starych zapisanych dietach z "lub")
+  // Sanityzacja + migracja do meal.computed (zgodnie ze specyfikacją Nutrition Data Resolver)
   try{
     ["menu1","menu2"].forEach(function(mk){
       if(!d[mk])return;
@@ -2523,6 +2523,11 @@ function getDietData(){
         });
       });
     });
+    // Migracja: stare meal.kcal/prot/carb/fat → aiTarget + meal.computed
+    if(typeof migrateOldMealsToComputedMacros==="function"&&
+       d.migrationVersion!=="2026-05-31-nutrition-resolver-v1"){
+      migrateOldMealsToComputedMacros(d);
+    }
   }catch(e){}
   return d;
 }
@@ -2543,17 +2548,36 @@ function renderRecipes(){
     h+='</div>';
     secMeals.forEach(function(m,mIdx){
       var uid=sec.k+"_"+mIdx+"_m"+dietMenu,open=expandedMeal===uid;
-      // Liczymy makro WPROST ze składników (zamiast docelowych m.kcal/m.prot itd.)
-      var calc=calculateMealMacroFromIngredients(m);
-      var hasCalc=calc.matchedCount>0;
-      // Jeżeli mamy dane z bazy — pokaż wyliczone; inaczej fallback do zapisanych
-      var dispKcal=hasCalc?calc.kcal:(m.kcal||0);
-      var dispProt=hasCalc?calc.prot:(m.prot||0);
-      var dispCarb=hasCalc?calc.carb:(m.carb||0);
-      var dispFat=hasCalc?calc.fat:(m.fat||0);
-      // Czy AI target i wyliczone się rozjeżdżają? (różnica >5%)
-      var diffPct=hasCalc&&m.kcal?Math.round(Math.abs(calc.kcal-m.kcal)/m.kcal*100):0;
-      var showDiff=hasCalc&&m.kcal&&diffPct>5;
+      // NUTRITION DATA RESOLVER: główne źródło prawdy to meal.computed.
+      // AI target jest tylko porównaniem. Nigdy nie pokazujemy AI jako "prawdy".
+      if(!m.computed&&typeof calculateMealMacros==="function"){
+        m.computed=calculateMealMacros(m);
+      }
+      var calc=m.computed||{kcal:0,protein:0,carbs:0,fat:0,rows:[],missing:[],isComplete:false,isSuspicious:false};
+      // Adapter pole names: rows używa protein/carbs, stara wersja prot/carb
+      var hasCalc=calc.rows&&calc.rows.length&&calc.kcal>0;
+      var aiTarget=m.aiTarget||{kcal:m.kcal,protein:m.prot,carbs:m.carb,fat:m.fat};
+      // GŁÓWNE WARTOŚCI = z computed. NIGDY z AI.
+      var dispKcal=hasCalc?calc.kcal:0;
+      var dispProt=hasCalc?calc.protein:0;
+      var dispCarb=hasCalc?calc.carbs:0;
+      var dispFat=hasCalc?calc.fat:0;
+      // Status badge
+      var statusBadge="";
+      if(hasCalc&&calc.isComplete&&!calc.isSuspicious){
+        statusBadge='<span title="Makro policzone z produktów (USDA/Open Food Facts/lokalna baza)" style="background:rgba(30,215,96,.15);border:1px solid rgba(30,215,96,.4);border-radius:6px;padding:2px 6px;font-size:10px;font-weight:700;color:var(--green)">✓ z produktów</span>';
+      }else if(hasCalc&&!calc.isComplete){
+        statusBadge='<span title="'+calc.missing.length+' składników bez danych" style="background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);border-radius:6px;padding:2px 6px;font-size:10px;font-weight:700;color:var(--amber)">⚠ brakuje danych ('+calc.missing.length+')</span>';
+      }else if(!hasCalc){
+        statusBadge='<span title="Brak rozpoznanych składników" style="background:rgba(255,77,77,.15);border:1px solid rgba(255,77,77,.4);border-radius:6px;padding:2px 6px;font-size:10px;font-weight:700;color:var(--red)">⚠ brak danych</span>';
+      }
+      if(calc.isSuspicious){
+        statusBadge+='<span title="Kalorie nie zgadzają się z makro (B*4+W*4+T*9='+calc.kcalFromMacros+')" style="background:rgba(255,77,77,.12);border:1px solid rgba(255,77,77,.35);border-radius:6px;padding:2px 6px;font-size:10px;font-weight:700;color:var(--red);margin-left:4px">⚠ podejrzane</span>';
+      }
+      // Porównanie z AI target
+      var aiKcal=Number(aiTarget&&aiTarget.kcal||0);
+      var diffPct=hasCalc&&aiKcal?Math.round(Math.abs(calc.kcal-aiKcal)/aiKcal*100):0;
+      var showDiff=hasCalc&&aiKcal&&diffPct>5;
       h+='<div style="background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:8px;overflow:hidden">';
       h+='<div style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between">';
       h+='<div style="flex:1;cursor:pointer" onclick="expandedMeal=expandedMeal===\''+uid+'\'?null:\''+uid+'\';renderDietBody()">';
@@ -2563,8 +2587,8 @@ function renderRecipes(){
       h+='<span style="background:rgba(96,165,250,.15);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;color:#60A5FA">B '+dispProt+'g</span>';
       h+='<span style="background:rgba(30,215,96,.12);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;color:var(--green)">W '+dispCarb+'g</span>';
       h+='<span style="background:rgba(249,168,212,.15);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;color:#F9A8D4">T '+dispFat+'g</span>';
-      if(hasCalc)h+='<span title="Wyliczone ze składników z bazy produktów" style="background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.4);border-radius:6px;padding:2px 6px;font-size:10px;font-weight:700;color:var(--purple)">✓ realne</span>';
-      if(showDiff)h+='<span title="AI założył '+m.kcal+' kcal, faktyczne składniki dają '+calc.kcal+' kcal" style="background:rgba(255,77,77,.12);border:1px solid rgba(255,77,77,.35);border-radius:6px;padding:2px 6px;font-size:10px;font-weight:700;color:var(--red)">AI '+m.kcal+' / Δ'+diffPct+'%</span>';
+      h+=statusBadge;
+      if(showDiff)h+='<span title="AI target: '+aiKcal+' kcal. Realne ze składników: '+calc.kcal+' kcal" style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.35);border-radius:6px;padding:2px 6px;font-size:10px;font-weight:700;color:var(--purple)">AI '+aiKcal+' / Δ'+diffPct+'%</span>';
       h+='</div></div>';
       h+='<div style="display:flex;gap:5px;align-items:center;flex-shrink:0;margin-left:8px">';
       h+='<button class="meal-gen-btn" onclick="event.stopPropagation();generateSingleMeal('+dietMenu+',\''+sec.k+'\','+mIdx+')">Inna</button>';
@@ -2573,49 +2597,74 @@ function renderRecipes(){
       h+='</div></div>';
       if(open){
         h+='<div style="padding:0 14px 14px">';
-        // Tabela składników z per-row macro
-        h+='<div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Składniki i makro</div>';
+        // Tabela składników z per-row macro + ŹRÓDŁA DANYCH
+        h+='<div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Składniki, makro i źródła</div>';
         h+='<table style="width:100%;border-collapse:collapse;margin-bottom:10px;font-size:12px;background:var(--bg3);border-radius:10px;overflow:hidden">';
         h+='<thead><tr style="background:var(--bg4)">';
-        h+='<th style="text-align:left;color:var(--text3);padding:8px 10px;font-weight:700">Składnik</th>';
+        h+='<th style="text-align:left;color:var(--text3);padding:8px 10px;font-weight:700">Składnik / Źródło</th>';
         h+='<th style="text-align:right;color:var(--text3);padding:8px 6px;font-weight:700">Ilość</th>';
         h+='<th style="text-align:right;color:var(--amber);padding:8px 6px;font-weight:700">kcal</th>';
         h+='<th style="text-align:right;color:#60A5FA;padding:8px 6px;font-weight:700">B</th>';
         h+='<th style="text-align:right;color:var(--green);padding:8px 6px;font-weight:700">W</th>';
         h+='<th style="text-align:right;color:#F9A8D4;padding:8px 10px;font-weight:700">T</th>';
         h+='</tr></thead><tbody>';
-        calc.rows.forEach(function(r){
-          var nameStyle=r.matched?"color:var(--text2)":"color:var(--text3);font-style:italic";
+        (calc.rows||[]).forEach(function(r){
+          var isOk=r.resolutionStatus==="resolved";
+          var nameStyle=isOk?"color:var(--text2)":"color:var(--text3);font-style:italic";
+          var srcLabel={localFallback:"Lokalna baza",openFoodFacts:"OpenFoodFacts",usda:"USDA",cache:"Cache",manualAdmin:"Ręczne"}[r.source]||"";
+          var srcColor={localFallback:"var(--purple)",openFoodFacts:"#60A5FA",usda:"var(--green)",cache:"var(--text3)",manualAdmin:"var(--amber)"}[r.source]||"var(--text3)";
           h+='<tr>';
-          h+='<td style="padding:6px 10px;'+nameStyle+';border-bottom:1px solid var(--bg2)">'+r.name+(r.matched?"":" <span title=\"Brak w bazie produktów\" style=\"font-size:9px;color:var(--red)\">?</span>")+'</td>';
-          h+='<td style="text-align:right;padding:6px 6px;color:var(--text3);border-bottom:1px solid var(--bg2)">'+r.amountText+'</td>';
-          h+='<td style="text-align:right;padding:6px 6px;color:'+(r.matched?"var(--amber)":"var(--text3)")+';border-bottom:1px solid var(--bg2)">'+(r.matched?r.kcal:"—")+'</td>';
-          h+='<td style="text-align:right;padding:6px 6px;color:'+(r.matched?"#60A5FA":"var(--text3)")+';border-bottom:1px solid var(--bg2)">'+(r.matched?r.prot:"—")+'</td>';
-          h+='<td style="text-align:right;padding:6px 6px;color:'+(r.matched?"var(--green)":"var(--text3)")+';border-bottom:1px solid var(--bg2)">'+(r.matched?r.carb:"—")+'</td>';
-          h+='<td style="text-align:right;padding:6px 10px;color:'+(r.matched?"#F9A8D4":"var(--text3)")+';border-bottom:1px solid var(--bg2)">'+(r.matched?r.fat:"—")+'</td>';
+          h+='<td style="padding:6px 10px;'+nameStyle+';border-bottom:1px solid var(--bg2)">';
+          h+='<div style="font-weight:700">'+r.name+(isOk?"":' <span title="'+(r.warning||"Brak danych")+'" style="font-size:10px;color:var(--red)">⚠</span>')+'</div>';
+          if(srcLabel){
+            h+='<div style="font-size:10px;color:'+srcColor+';margin-top:2px"><b>'+srcLabel+'</b>';
+            if(r.confidence)h+=' &middot; '+r.confidence+'%';
+            if(r.productName&&r.productName!==r.name)h+=' &middot; '+r.productName;
+            h+='</div>';
+            if(r.warning)h+='<div style="font-size:10px;color:var(--amber);margin-top:2px">⚠ '+r.warning+'</div>';
+          }
+          h+='</td>';
+          h+='<td style="text-align:right;padding:6px 6px;color:var(--text3);border-bottom:1px solid var(--bg2);white-space:nowrap">'+(r.amountText||"")+'<br><span style="font-size:10px;opacity:.6">'+(r.grams||0)+'g</span></td>';
+          h+='<td style="text-align:right;padding:6px 6px;color:'+(isOk?"var(--amber)":"var(--text3)")+';border-bottom:1px solid var(--bg2)">'+(r.kcal!=null?r.kcal:"—")+'</td>';
+          h+='<td style="text-align:right;padding:6px 6px;color:'+(isOk?"#60A5FA":"var(--text3)")+';border-bottom:1px solid var(--bg2)">'+(r.protein!=null?r.protein:"—")+'</td>';
+          h+='<td style="text-align:right;padding:6px 6px;color:'+(isOk?"var(--green)":"var(--text3)")+';border-bottom:1px solid var(--bg2)">'+(r.carbs!=null?r.carbs:"—")+'</td>';
+          h+='<td style="text-align:right;padding:6px 10px;color:'+(isOk?"#F9A8D4":"var(--text3)")+';border-bottom:1px solid var(--bg2)">'+(r.fat!=null?r.fat:"—")+'</td>';
           h+='</tr>';
         });
-        // Wiersz SUMA
+        // Wiersz SUMA (REALNA)
         h+='<tr style="background:rgba(30,215,96,.06);font-weight:900">';
-        h+='<td style="padding:8px 10px;color:var(--green)" colspan="2">SUMA ze składników</td>';
+        h+='<td style="padding:8px 10px;color:var(--green)" colspan="2">SUMA z produktów (realne)</td>';
         h+='<td style="text-align:right;padding:8px 6px;color:var(--amber)">'+calc.kcal+'</td>';
-        h+='<td style="text-align:right;padding:8px 6px;color:#60A5FA">'+calc.prot+'</td>';
-        h+='<td style="text-align:right;padding:8px 6px;color:var(--green)">'+calc.carb+'</td>';
+        h+='<td style="text-align:right;padding:8px 6px;color:#60A5FA">'+calc.protein+'</td>';
+        h+='<td style="text-align:right;padding:8px 6px;color:var(--green)">'+calc.carbs+'</td>';
         h+='<td style="text-align:right;padding:8px 10px;color:#F9A8D4">'+calc.fat+'</td>';
         h+='</tr>';
         // Wiersz porównawczy AI target
-        if(m.kcal){
+        if(aiTarget&&aiTarget.kcal){
           h+='<tr style="background:rgba(139,92,246,.06);font-size:11px">';
-          h+='<td style="padding:6px 10px;color:var(--text3);font-style:italic" colspan="2">AI target (założenie)</td>';
-          h+='<td style="text-align:right;padding:6px 6px;color:var(--text3)">'+m.kcal+'</td>';
-          h+='<td style="text-align:right;padding:6px 6px;color:var(--text3)">'+(m.prot||0)+'</td>';
-          h+='<td style="text-align:right;padding:6px 6px;color:var(--text3)">'+(m.carb||0)+'</td>';
-          h+='<td style="text-align:right;padding:6px 10px;color:var(--text3)">'+(m.fat||0)+'</td>';
+          h+='<td style="padding:6px 10px;color:var(--text3);font-style:italic" colspan="2">AI target (założenie, nie spożycie)</td>';
+          h+='<td style="text-align:right;padding:6px 6px;color:var(--text3)">'+aiTarget.kcal+'</td>';
+          h+='<td style="text-align:right;padding:6px 6px;color:var(--text3)">'+(aiTarget.protein||0)+'</td>';
+          h+='<td style="text-align:right;padding:6px 6px;color:var(--text3)">'+(aiTarget.carbs||0)+'</td>';
+          h+='<td style="text-align:right;padding:6px 10px;color:var(--text3)">'+(aiTarget.fat||0)+'</td>';
           h+='</tr>';
+          // Różnice
+          if(showDiff){
+            h+='<tr style="background:rgba(255,77,77,.04);font-size:11px;color:var(--red)">';
+            h+='<td style="padding:6px 10px;font-style:italic" colspan="2">Różnica (realne − AI)</td>';
+            h+='<td style="text-align:right;padding:6px 6px">'+(calc.kcal-aiTarget.kcal>0?"+":"")+(calc.kcal-aiTarget.kcal)+'</td>';
+            h+='<td style="text-align:right;padding:6px 6px">'+((calc.protein-(aiTarget.protein||0))>0?"+":"")+Math.round(calc.protein-(aiTarget.protein||0))+'</td>';
+            h+='<td style="text-align:right;padding:6px 6px">'+((calc.carbs-(aiTarget.carbs||0))>0?"+":"")+Math.round(calc.carbs-(aiTarget.carbs||0))+'</td>';
+            h+='<td style="text-align:right;padding:6px 10px">'+((calc.fat-(aiTarget.fat||0))>0?"+":"")+Math.round(calc.fat-(aiTarget.fat||0))+'</td>';
+            h+='</tr>';
+          }
         }
         h+='</tbody></table>';
-        if(calc.matchedCount<calc.totalCount){
-          h+='<div style="font-size:11px;color:var(--text3);background:rgba(255,77,77,.06);border:1px solid rgba(255,77,77,.2);border-radius:8px;padding:8px 10px;margin-bottom:10px">⚠️ '+(calc.totalCount-calc.matchedCount)+' z '+calc.totalCount+' składników nie ma w bazie produktów — wartości makro mogą być niepełne. Edytuj posiłek aby dopasować nazwy do bazy.</div>';
+        if(!calc.isComplete&&calc.missing&&calc.missing.length){
+          h+='<div style="font-size:11px;color:var(--amber);background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:8px 10px;margin-bottom:10px">⚠️ Brakuje danych dla: <b>'+calc.missing.slice(0,5).join(", ")+'</b> — wartości makro są niepełne. Posiłek oznaczony jako niekompletny.</div>';
+        }
+        if(calc.isSuspicious){
+          h+='<div style="font-size:11px;color:var(--red);background:rgba(255,77,77,.06);border:1px solid rgba(255,77,77,.3);border-radius:8px;padding:8px 10px;margin-bottom:10px">⚠️ Podejrzane dane: kcal ('+calc.kcal+') nie zgadzają się z B*4+W*4+T*9 = '+calc.kcalFromMacros+' (różnica '+Math.round(calc.diffKcal)+').</div>';
         }
         // Przepis
         h+='<div style="background:var(--bg3);border-radius:10px;padding:12px;font-size:12px;color:var(--text2);line-height:1.8"><b style="color:var(--text);display:block;margin-bottom:6px">Przygotowanie:</b>'+(m.przepis||"").replace(/\n/g,"<br>")+'</div>';
@@ -2636,15 +2685,19 @@ function renderRecipes(){
       if(!meals.length)return;
       var sumCalc={kcal:0,prot:0,carb:0,fat:0};
       var sumAI={kcal:0,prot:0,carb:0,fat:0};
-      var validCnt=0;
+      var validCnt=0,incompleteCnt=0;
       meals.forEach(function(m){
-        var c=calculateMealMacroFromIngredients(m);
-        // Sanity check: jeśli posiłek ma >2500 kcal, prawdopodobnie błąd w gramaturach
+        // NUTRITION RESOLVER: zawsze użyj meal.computed (realne ze składników)
+        if(!m.computed&&typeof calculateMealMacros==="function")m.computed=calculateMealMacros(m);
+        var c=m.computed||{kcal:0,protein:0,carbs:0,fat:0,isComplete:false};
+        // Sanity: jesli >2500 kcal prawdopodobnie blad gramatur
         if(c.kcal>0&&c.kcal<2500){
-          sumCalc.kcal+=c.kcal;sumCalc.prot+=c.prot;sumCalc.carb+=c.carb;sumCalc.fat+=c.fat;
+          sumCalc.kcal+=c.kcal;sumCalc.prot+=c.protein||0;sumCalc.carb+=c.carbs||0;sumCalc.fat+=c.fat||0;
           validCnt++;
+          if(!c.isComplete)incompleteCnt++;
         }
-        sumAI.kcal+=m.kcal||0;sumAI.prot+=m.prot||0;sumAI.carb+=m.carb||0;sumAI.fat+=m.fat||0;
+        var aiT=m.aiTarget||{kcal:m.kcal,protein:m.prot,carbs:m.carb,fat:m.fat};
+        sumAI.kcal+=aiT.kcal||0;sumAI.prot+=aiT.protein||0;sumAI.carb+=aiT.carbs||0;sumAI.fat+=aiT.fat||0;
       });
       if(validCnt>0){
         dayTotal.kcal+=Math.round(sumCalc.kcal/validCnt);
@@ -2658,7 +2711,7 @@ function renderRecipes(){
         dayAI.carb+=Math.round(sumAI.carb/meals.length);
         dayAI.fat+=Math.round(sumAI.fat/meals.length);
       }
-      perSection.push({sec:sec.l,count:meals.length,validCnt:validCnt,avgKcal:validCnt?Math.round(sumCalc.kcal/validCnt):0});
+      perSection.push({sec:sec.l,count:meals.length,validCnt:validCnt,incomplete:incompleteCnt,avgKcal:validCnt?Math.round(sumCalc.kcal/validCnt):0});
     });
     var diffOk=Math.abs(dayTotal.kcal-userProfile.kcal)<userProfile.kcal*0.1;
     var color=diffOk?"var(--green)":"var(--amber)";
@@ -2840,11 +2893,34 @@ function parseMenuJSON(raw){
     if(s===-1||e===-1)return null;
     var p=JSON.parse(clean.slice(s,e+1).replace(/,\s*([}\]])/g,"$1"));
     if(!(p.sniadania&&p.obiady&&p.kolacje))return null;
-    // Sanityzacja: rozdziel "lub", dedup duplikatów w każdym posiłku
+    // Sanityzacja + Nutrition Resolver: AI makro -> aiTarget, computed liczy się ze składników
     ["sniadania","obiady","kolacje"].forEach(function(typ){
       (p[typ]||[]).forEach(function(meal){
-        if(meal&&meal.skladniki){
+        if(!meal)return;
+        if(meal.skladniki){
           meal.skladniki=sanitizeMealIngredients(meal.skladniki);
+        }
+        // Przenieś AI makro do aiTarget (NIE są to realne wartości, tylko target)
+        if(!meal.aiTarget&&(meal.kcal||meal.prot||meal.carb||meal.fat)){
+          meal.aiTarget={
+            kcal:Number(meal.kcal||0),
+            protein:Number(meal.prot||0),
+            carbs:Number(meal.carb||0),
+            fat:Number(meal.fat||0)
+          };
+        }
+        // Policz REALNE makro ze składników
+        if(typeof calculateMealMacros==="function"){
+          meal.computed=calculateMealMacros(meal);
+          meal.macroSource="products";
+          meal.macroCalculatedAt=meal.computed.calculatedAt;
+          // Nadpisz wyświetlane wartości (zachowując kompatybilność)
+          if(meal.computed.isComplete&&meal.computed.kcal>0){
+            meal.kcal=meal.computed.kcal;
+            meal.prot=meal.computed.protein;
+            meal.carb=meal.computed.carbs;
+            meal.fat=meal.computed.fat;
+          }
         }
       });
     });
@@ -3440,6 +3516,574 @@ var PRODUCT_DB = [
       {brand:"Crownfield Wafle (Lidl)",shop:"Lidl",pkgSize:100,n100:{kcal:380,prot:8,carb:80,fat:3}}
     ]},
 ];
+
+// ══════════════════════════════════════════════════════════════════════════════
+// NUTRITION DATA RESOLVER — system rzetelnego liczenia makro
+// Źródła w kolejności: cache → localFallback (PRODUCT_DB) → Open Food Facts → USDA (proxy)
+// AI NIGDY nie jest źródłem realnych makro — tylko zaproponowane składniki + aiTarget.
+// ══════════════════════════════════════════════════════════════════════════════
+var NUTRITION_API_MODE="frontendOnly"; // "frontendOnly" | "proxy"
+var NUTRITION_CACHE_TTL_MS=30*24*60*60*1000; // 30 dni
+var NUTRITION_CACHE_PREFIX="nut:";
+
+// ── LOKALNY FALLBACK — generyczne produkty z weryfikowalnymi wartościami z USDA ──
+// Te wartości są CIENKO zweryfikowane z USDA FoodData Central / standardowych tabel.
+// Mogą uzupełniać/przesłaniać dane z PRODUCT_DB gdy AI poda generyczną nazwę.
+var LOCAL_NUTRITION_FALLBACK=[
+  // === JAJA ===
+  {id:"f_jaja_raw",canonicalName:"jaja",aliases:["jaja","jajka","jaja l","jaja kurze","jajko","whole egg","jajka surowe"],kcal100:155,protein100:13,carbs100:1.1,fat100:11,state:"raw",gramsPerPiece:50,sourceNote:"USDA Foundation: Egg, whole, raw, fresh",confidenceBase:0.95,verified:true},
+  {id:"f_bialka_raw",canonicalName:"białka jaj",aliases:["białka jaj","bialka jaj","białka jajek","bialka jajek","egg whites","białko jaja"],kcal100:52,protein100:11,carbs100:0.7,fat100:0.2,state:"raw",gramsPerPiece:33,sourceNote:"USDA: Egg, white, raw",confidenceBase:0.95,verified:true},
+  {id:"f_jajo_gotowane",canonicalName:"jajo gotowane",aliases:["jajko gotowane","jajka gotowane","jaja gotowane","hard boiled egg"],kcal100:155,protein100:12.6,carbs100:1.1,fat100:10.6,state:"cooked",gramsPerPiece:50,sourceNote:"USDA: Egg, whole, hard-boiled",confidenceBase:0.95,verified:true},
+  // === MIĘSO MIELONE (warianty tłuszczowe) ===
+  {id:"f_wolowina_mielona_5",canonicalName:"wołowina mielona 5%",aliases:["wołowina mielona 5%","wolowina mielona 5","beef 5%","mielona wołowina 5%"],kcal100:137,protein100:21.4,carbs100:0,fat100:5,state:"raw",sourceNote:"USDA: Beef, ground, 95% lean / 5% fat, raw",confidenceBase:0.95,verified:true},
+  {id:"f_wolowina_mielona_10",canonicalName:"wołowina mielona 10%",aliases:["wołowina mielona 10%","wolowina mielona 10","beef 10%","mielona wołowina 10%"],kcal100:176,protein100:20,carbs100:0,fat100:10,state:"raw",sourceNote:"USDA: Beef, ground, 90% lean / 10% fat, raw",confidenceBase:0.95,verified:true},
+  {id:"f_wolowina_mielona_15",canonicalName:"wołowina mielona 15%",aliases:["wołowina mielona 15%","wolowina mielona 15","beef 15%","mielona wołowina 15%"],kcal100:215,protein100:18.6,carbs100:0,fat100:15,state:"raw",sourceNote:"USDA: Beef, ground, 85% lean / 15% fat, raw",confidenceBase:0.95,verified:true},
+  {id:"f_wolowina_mielona_20",canonicalName:"wołowina mielona 20%",aliases:["wołowina mielona 20%","wolowina mielona 20","beef 20%","mielona wołowina 20%"],kcal100:254,protein100:17.2,carbs100:0,fat100:20,state:"raw",sourceNote:"USDA: Beef, ground, 80% lean / 20% fat, raw",confidenceBase:0.95,verified:true},
+  {id:"f_wolowina_mielona_default",canonicalName:"wołowina mielona",aliases:["wołowina mielona","wolowina mielona","mielona wołowina","mielona wolowina","wołowina"],kcal100:220,protein100:18,carbs100:0,fat100:16,state:"raw",sourceNote:"Domyślnie wariant 15% (sklep) - oznacz preparationState dla precyzji",confidenceBase:0.7,verified:false},
+  // === DRÓB ===
+  {id:"f_kurczak_raw",canonicalName:"pierś z kurczaka surowa",aliases:["pierś z kurczaka","piers z kurczaka","kurczak","filet kurczaka","piers kurczaka","chicken breast raw"],kcal100:120,protein100:23,carbs100:0,fat100:2.6,state:"raw",singleWeight:150,sourceNote:"USDA: Chicken, broiler, breast, raw",confidenceBase:0.95,verified:true},
+  {id:"f_kurczak_cooked",canonicalName:"pierś z kurczaka gotowana",aliases:["pierś z kurczaka gotowana","kurczak gotowany","kurczak grillowany","kurczak pieczony","grilled chicken breast"],kcal100:165,protein100:31,carbs100:0,fat100:3.6,state:"cooked",sourceNote:"USDA: Chicken, broiler, breast, cooked",confidenceBase:0.95,verified:true},
+  {id:"f_indyk_raw",canonicalName:"pierś z indyka surowa",aliases:["pierś z indyka","piers indyka","indyk pierś","turkey breast raw"],kcal100:114,protein100:24,carbs100:0,fat100:1.5,state:"raw",sourceNote:"USDA: Turkey breast, raw",confidenceBase:0.95,verified:true},
+  {id:"f_indyk_mielony",canonicalName:"indyk mielony",aliases:["indyk mielony","mielony indyk","ground turkey"],kcal100:148,protein100:20,carbs100:0,fat100:7,state:"raw",sourceNote:"USDA: Turkey, ground, 93% lean",confidenceBase:0.9,verified:true},
+  // === RYBY ===
+  {id:"f_losos_raw",canonicalName:"łosoś surowy",aliases:["łosoś","losos","filet z łososia","filet z lososia","łosoś świeży","salmon raw"],kcal100:208,protein100:20,carbs100:0,fat100:13,state:"raw",singleWeight:200,sourceNote:"USDA: Salmon, Atlantic, farmed, raw",confidenceBase:0.95,verified:true},
+  {id:"f_losos_wedzony",canonicalName:"łosoś wędzony",aliases:["łosoś wędzony","losos wedzony","smoked salmon"],kcal100:190,protein100:23,carbs100:0,fat100:11,state:"prepared",sourceNote:"USDA: Salmon, smoked",confidenceBase:0.9,verified:true},
+  {id:"f_dorsz_raw",canonicalName:"dorsz surowy",aliases:["dorsz","filet z dorsza","cod raw"],kcal100:82,protein100:18,carbs100:0,fat100:0.7,state:"raw",sourceNote:"USDA: Fish, cod, Atlantic, raw",confidenceBase:0.95,verified:true},
+  {id:"f_tunczyk_w_wodzie",canonicalName:"tuńczyk w wodzie",aliases:["tuńczyk w wodzie","tunczyk w wodzie","tuna in water"],kcal100:116,protein100:25.5,carbs100:0,fat100:1,state:"prepared",sourceNote:"USDA: Tuna, light, canned in water, drained",confidenceBase:0.9,verified:true},
+  // === ZBOŻA (suche vs ugotowane!) ===
+  {id:"f_ryz_bialy_suchy",canonicalName:"ryż biały suchy",aliases:["ryż","ryz","ryż biały","ryż suchy","white rice dry","ryz basmati","ryż basmati","ryż basmati suchy"],kcal100:365,protein100:7,carbs100:80,fat100:0.7,state:"dry",sourceNote:"USDA: Rice, white, long-grain, raw",confidenceBase:0.95,verified:true},
+  {id:"f_ryz_bialy_gotowany",canonicalName:"ryż biały ugotowany",aliases:["ryż ugotowany","ryż gotowany","ryz ugotowany","white rice cooked","ryż basmati ugotowany"],kcal100:130,protein100:2.7,carbs100:28,fat100:0.3,state:"cooked",sourceNote:"USDA: Rice, white, cooked",confidenceBase:0.95,verified:true},
+  {id:"f_kasza_gryczana_sucha",canonicalName:"kasza gryczana sucha",aliases:["kasza gryczana","kasza gryczana sucha","buckwheat dry"],kcal100:343,protein100:13,carbs100:71,fat100:3.4,state:"dry",sourceNote:"USDA: Buckwheat, raw",confidenceBase:0.9,verified:true},
+  {id:"f_platki_owsiane",canonicalName:"płatki owsiane",aliases:["płatki owsiane","platki owsiane","oatmeal dry","owsianka"],kcal100:389,protein100:16.9,carbs100:66,fat100:6.9,state:"dry",sourceNote:"USDA: Oats, raw",confidenceBase:0.95,verified:true},
+  {id:"f_makaron_pelnoziarnisty_suchy",canonicalName:"makaron pełnoziarnisty suchy",aliases:["makaron pełnoziarnisty","makaron pelnoziarnisty","makaron","whole wheat pasta dry"],kcal100:348,protein100:14.6,carbs100:69,fat100:2.5,state:"dry",sourceNote:"USDA: Pasta, whole-wheat, dry",confidenceBase:0.9,verified:true},
+  // === ZIEMNIAKI / BATATY (raw vs cooked) ===
+  {id:"f_ziemniaki_raw",canonicalName:"ziemniaki surowe",aliases:["ziemniaki","ziemniak","ziemniaki surowe","potato raw"],kcal100:77,protein100:2,carbs100:17,fat100:0.1,state:"raw",singleWeight:150,sourceNote:"USDA: Potato, raw, flesh and skin",confidenceBase:0.95,verified:true},
+  {id:"f_bataty_raw",canonicalName:"bataty surowe",aliases:["bataty","batat","słodki ziemniak","bataty surowe","sweet potato raw"],kcal100:86,protein100:1.6,carbs100:20,fat100:0.05,state:"raw",singleWeight:250,sourceNote:"USDA: Sweet potato, raw",confidenceBase:0.95,verified:true},
+  {id:"f_bataty_pieczone",canonicalName:"bataty pieczone",aliases:["bataty pieczone","bataty gotowane","bataty upieczone","sweet potato baked"],kcal100:90,protein100:2,carbs100:21,fat100:0.15,state:"cooked",sourceNote:"USDA: Sweet potato, cooked, baked",confidenceBase:0.95,verified:true},
+  // === WARZYWA ===
+  {id:"f_szpinak",canonicalName:"szpinak",aliases:["szpinak","spinach"],kcal100:23,protein100:2.9,carbs100:3.6,fat100:0.4,state:"raw",sourceNote:"USDA: Spinach, raw",confidenceBase:0.95,verified:true},
+  {id:"f_brokul",canonicalName:"brokuł",aliases:["brokuł","brokul","broccoli"],kcal100:34,protein100:2.8,carbs100:7,fat100:0.4,state:"raw",singleWeight:400,sourceNote:"USDA: Broccoli, raw",confidenceBase:0.95,verified:true},
+  {id:"f_marchew",canonicalName:"marchew",aliases:["marchew","marchewka","carrot"],kcal100:41,protein100:0.9,carbs100:10,fat100:0.2,state:"raw",singleWeight:80,sourceNote:"USDA: Carrots, raw",confidenceBase:0.95,verified:true},
+  {id:"f_pomidor",canonicalName:"pomidor",aliases:["pomidor","pomidory","tomato"],kcal100:18,protein100:0.9,carbs100:3.9,fat100:0.2,state:"raw",singleWeight:120,sourceNote:"USDA: Tomatoes, red, ripe, raw",confidenceBase:0.95,verified:true},
+  {id:"f_ogorek",canonicalName:"ogórek",aliases:["ogórek","ogurek","cucumber"],kcal100:15,protein100:0.7,carbs100:3.6,fat100:0.1,state:"raw",singleWeight:200,sourceNote:"USDA: Cucumber, with peel, raw",confidenceBase:0.95,verified:true},
+  {id:"f_papryka",canonicalName:"papryka",aliases:["papryka","papryka czerwona","papryka żółta","red pepper"],kcal100:31,protein100:1,carbs100:6,fat100:0.3,state:"raw",singleWeight:180,sourceNote:"USDA: Peppers, sweet, red, raw",confidenceBase:0.95,verified:true},
+  {id:"f_cebula",canonicalName:"cebula",aliases:["cebula","cebula biała","cebula czerwona","onion"],kcal100:40,protein100:1.1,carbs100:9.3,fat100:0.1,state:"raw",singleWeight:150,sourceNote:"USDA: Onions, raw",confidenceBase:0.95,verified:true},
+  {id:"f_czosnek",canonicalName:"czosnek",aliases:["czosnek","ząbek czosnku","garlic"],kcal100:149,protein100:6.4,carbs100:33,fat100:0.5,state:"raw",singleWeight:30,sourceNote:"USDA: Garlic, raw",confidenceBase:0.95,verified:true},
+  {id:"f_cukinia",canonicalName:"cukinia",aliases:["cukinia","zucchini"],kcal100:17,protein100:1.2,carbs100:3.1,fat100:0.3,state:"raw",singleWeight:300,sourceNote:"USDA: Squash, zucchini, raw",confidenceBase:0.95,verified:true},
+  {id:"f_fasolka_szparagowa",canonicalName:"fasolka szparagowa",aliases:["fasolka szparagowa","szparagowa","green beans"],kcal100:31,protein100:1.8,carbs100:7,fat100:0.2,state:"raw",sourceNote:"USDA: Green beans, raw",confidenceBase:0.9,verified:true},
+  {id:"f_awokado",canonicalName:"awokado",aliases:["awokado","avocado"],kcal100:160,protein100:2,carbs100:8.5,fat100:14.7,state:"raw",singleWeight:170,sourceNote:"USDA: Avocados, raw, all commercial varieties",confidenceBase:0.95,verified:true},
+  // === OWOCE ===
+  {id:"f_banan",canonicalName:"banan",aliases:["banan","banany","banana"],kcal100:89,protein100:1.1,carbs100:23,fat100:0.3,state:"raw",singleWeight:120,sourceNote:"USDA: Bananas, raw",confidenceBase:0.95,verified:true},
+  {id:"f_jablko",canonicalName:"jabłko",aliases:["jabłko","jabłka","jablko","jablka","apple"],kcal100:52,protein100:0.3,carbs100:14,fat100:0.2,state:"raw",singleWeight:180,sourceNote:"USDA: Apples, raw, with skin",confidenceBase:0.95,verified:true},
+  {id:"f_truskawki",canonicalName:"truskawki",aliases:["truskawki","strawberries"],kcal100:32,protein100:0.7,carbs100:7.7,fat100:0.3,state:"raw",sourceNote:"USDA: Strawberries, raw",confidenceBase:0.9,verified:true},
+  {id:"f_maliny",canonicalName:"maliny",aliases:["maliny","raspberries"],kcal100:52,protein100:1.2,carbs100:12,fat100:0.7,state:"raw",sourceNote:"USDA: Raspberries, raw",confidenceBase:0.9,verified:true},
+  // === NABIAŁ ===
+  {id:"f_jogurt_naturalny_2",canonicalName:"jogurt naturalny 2%",aliases:["jogurt naturalny","jogurt 2%","jogurt naturalny 2%"],kcal100:61,protein100:3.5,carbs100:4.7,fat100:3.3,state:"prepared",densityGPerMl:1.03,sourceNote:"USDA: Yogurt, plain, whole milk",confidenceBase:0.9,verified:true},
+  {id:"f_jogurt_grecki",canonicalName:"jogurt grecki",aliases:["jogurt grecki","greek yogurt"],kcal100:97,protein100:9,carbs100:3.9,fat100:5,state:"prepared",sourceNote:"USDA: Yogurt, Greek, whole milk, plain",confidenceBase:0.9,verified:true},
+  {id:"f_skyr",canonicalName:"skyr naturalny",aliases:["skyr","skyr naturalny"],kcal100:60,protein100:11,carbs100:4,fat100:0.2,state:"prepared",sourceNote:"Skyr typical: Pyszny Duet/Pilos brands ~60kcal/11g protein/100g",confidenceBase:0.9,verified:true},
+  {id:"f_twarog_chudy",canonicalName:"twaróg chudy",aliases:["twaróg chudy","twarog chudy","ser twarogowy chudy"],kcal100:99,protein100:19.8,carbs100:3.5,fat100:0.5,state:"prepared",sourceNote:"USDA: Cheese, cottage, lowfat, 1% milkfat",confidenceBase:0.9,verified:true},
+  {id:"f_twarog_polztl",canonicalName:"twaróg półtłusty",aliases:["twaróg półtłusty","twarog poltlusty","ser twarogowy półtłusty"],kcal100:130,protein100:18,carbs100:2.5,fat100:5.5,state:"prepared",sourceNote:"Polish typical: twaróg półtłusty (Mleczna Dolina/Piątnica)",confidenceBase:0.85,verified:true},
+  {id:"f_mleko_05",canonicalName:"mleko 0,5%",aliases:["mleko 0,5%","mleko 0.5%","mleko chude","skimmed milk"],kcal100:36,protein100:3.4,carbs100:5,fat100:0.5,state:"prepared",densityGPerMl:1.03,sourceNote:"USDA: Milk, nonfat",confidenceBase:0.95,verified:true},
+  {id:"f_serek_wiejski",canonicalName:"serek wiejski",aliases:["serek wiejski","serek wiejski light","cottage cheese"],kcal100:82,protein100:11,carbs100:3,fat100:3,state:"prepared",sourceNote:"USDA: Cheese, cottage, lowfat",confidenceBase:0.9,verified:true},
+  {id:"f_mozzarella_light",canonicalName:"mozzarella light",aliases:["mozzarella light","mozzarella"],kcal100:168,protein100:19,carbs100:1.5,fat100:9.5,state:"prepared",sourceNote:"USDA: Cheese, mozzarella, part skim",confidenceBase:0.9,verified:true},
+  // === TŁUSZCZE / ORZECHY ===
+  {id:"f_oliwa",canonicalName:"oliwa z oliwek",aliases:["oliwa","oliwa z oliwek","olive oil"],kcal100:884,protein100:0,carbs100:0,fat100:100,state:"prepared",densityGPerMl:0.915,sourceNote:"USDA: Oil, olive, salad or cooking",confidenceBase:0.99,verified:true},
+  {id:"f_migdaly",canonicalName:"migdały",aliases:["migdały","migdaly","almonds","platki migdalow","płatki migdałów"],kcal100:579,protein100:21,carbs100:22,fat100:50,state:"raw",sourceNote:"USDA: Nuts, almonds",confidenceBase:0.95,verified:true},
+  {id:"f_orzechy_wloskie",canonicalName:"orzechy włoskie",aliases:["orzechy włoskie","orzechy wloskie","walnuts"],kcal100:654,protein100:15,carbs100:14,fat100:65,state:"raw",sourceNote:"USDA: Nuts, walnuts, English",confidenceBase:0.95,verified:true},
+  {id:"f_maslo_orzechowe",canonicalName:"masło orzechowe",aliases:["masło orzechowe","maslo orzechowe","masło orzechowe vitanella","peanut butter"],kcal100:588,protein100:25,carbs100:20,fat100:50,state:"prepared",sourceNote:"USDA: Peanut butter, smooth style, no salt",confidenceBase:0.9,verified:true},
+  // === PIECZYWO ===
+  {id:"f_chleb_pelnoziarnisty",canonicalName:"chleb pełnoziarnisty",aliases:["chleb pełnoziarnisty","chleb pelnoziarnisty","whole grain bread","chleb razowy"],kcal100:247,protein100:13,carbs100:41,fat100:3.4,state:"prepared",sourceNote:"USDA: Bread, whole-wheat, commercially prepared",confidenceBase:0.9,verified:true},
+  {id:"f_chleb_zytni",canonicalName:"chleb żytni",aliases:["chleb żytni","chleb zytni","rye bread"],kcal100:259,protein100:8.5,carbs100:48,fat100:3.3,state:"prepared",sourceNote:"USDA: Bread, rye",confidenceBase:0.9,verified:true},
+  {id:"f_tortilla",canonicalName:"tortilla pszenna",aliases:["tortilla","tortille","tortilla pszenna","tortille pełnoziarniste","tortille pelnoziarniste","wrap"],kcal100:300,protein100:9,carbs100:55,fat100:6,state:"prepared",singleWeight:60,sourceNote:"USDA: Tortillas, ready-to-bake or -fry, flour",confidenceBase:0.85,verified:true},
+  // === STRĄCZKI ===
+  {id:"f_ciecierzyca_puszka",canonicalName:"ciecierzyca z puszki",aliases:["ciecierzyca","ciecierzyca puszka","chickpeas canned"],kcal100:139,protein100:7.3,carbs100:23,fat100:2,state:"prepared",sourceNote:"USDA: Chickpeas, canned, drained",confidenceBase:0.9,verified:true},
+  {id:"f_fasola_puszka",canonicalName:"fasola z puszki",aliases:["fasola","fasola puszka","beans canned"],kcal100:127,protein100:8,carbs100:23,fat100:0.5,state:"prepared",sourceNote:"USDA: Beans, kidney, canned",confidenceBase:0.9,verified:true}
+];
+
+// Pomocnik: budujemy index aliasów do szybkiego lookup
+var LOCAL_FALLBACK_INDEX={};
+LOCAL_NUTRITION_FALLBACK.forEach(function(p){
+  // Wypełnij meta source dla każdego produktu fallback
+  p.source="localFallback";
+  p.displayName=p.displayName||p.canonicalName.charAt(0).toUpperCase()+p.canonicalName.slice(1);
+  p.fetchedAt=p.fetchedAt||"static";
+  (p.aliases||[]).concat([p.canonicalName,p.displayName]).forEach(function(a){
+    var k=normalizeFallbackKey(a);
+    if(k&&!LOCAL_FALLBACK_INDEX[k])LOCAL_FALLBACK_INDEX[k]=p;
+  });
+});
+function normalizeFallbackKey(s){
+  return String(s||"").toLowerCase().trim()
+    .replace(/ą/g,"a").replace(/ć/g,"c").replace(/ę/g,"e")
+    .replace(/ł/g,"l").replace(/ń/g,"n").replace(/ó/g,"o")
+    .replace(/ś/g,"s").replace(/ź/g,"z").replace(/ż/g,"z")
+    .replace(/[^a-z0-9 ]+/g," ").replace(/\s+/g," ").trim();
+}
+
+// ── NUTRITION CACHE (localStorage z TTL) ────────────────────────────────────
+function nutCacheGet(key){
+  try{
+    var raw=localStorage.getItem(NUTRITION_CACHE_PREFIX+key);
+    if(!raw)return null;
+    var p=JSON.parse(raw);
+    if(!p||!p.expires||p.expires<Date.now()){
+      localStorage.removeItem(NUTRITION_CACHE_PREFIX+key);
+      return null;
+    }
+    return p.data;
+  }catch(e){return null;}
+}
+function nutCacheSet(key,data,ttlMs){
+  try{
+    localStorage.setItem(NUTRITION_CACHE_PREFIX+key,JSON.stringify({data:data,expires:Date.now()+(ttlMs||NUTRITION_CACHE_TTL_MS)}));
+  }catch(e){/* quota exceeded - ignore */}
+}
+
+// ── OPEN FOOD FACTS API (publiczne, bez klucza, CORS-friendly) ──────────────
+function searchOpenFoodFacts(query){
+  if(!query||!query.trim())return Promise.resolve(null);
+  var ck="off:q:"+normalizeFallbackKey(query);
+  var cached=nutCacheGet(ck);
+  if(cached!==null)return Promise.resolve(cached);
+  var url="https://world.openfoodfacts.org/api/v2/search?search_terms="+encodeURIComponent(query)
+    +"&fields=code,product_name,brands,nutriments,nutrition_grade,nutriscore_grade,states_tags&page_size=5";
+  return fetch(url).then(function(r){return r.json();}).then(function(j){
+    if(!j||!j.products||!j.products.length){nutCacheSet(ck,null,7*24*60*60*1000);return null;}
+    // Filtruj produkty z kompletnymi danymi makro
+    var withMacros=j.products.filter(function(p){
+      var n=p.nutriments||{};
+      return n["energy-kcal_100g"]!=null&&n.proteins_100g!=null&&n.carbohydrates_100g!=null&&n.fat_100g!=null;
+    });
+    if(!withMacros.length){nutCacheSet(ck,null,7*24*60*60*1000);return null;}
+    var mapped=withMacros.map(mapOpenFoodFactsProduct).filter(Boolean);
+    nutCacheSet(ck,mapped);
+    return mapped;
+  }).catch(function(){return null;});
+}
+function getOpenFoodFactsByBarcode(barcode){
+  if(!barcode)return Promise.resolve(null);
+  var ck="off:bc:"+barcode;
+  var cached=nutCacheGet(ck);
+  if(cached!==null)return Promise.resolve(cached);
+  var url="https://world.openfoodfacts.org/api/v2/product/"+encodeURIComponent(barcode)
+    +"?fields=code,product_name,brands,nutriments";
+  return fetch(url).then(function(r){return r.json();}).then(function(j){
+    if(!j||j.status!==1||!j.product){nutCacheSet(ck,null);return null;}
+    var mapped=mapOpenFoodFactsProduct(j.product);
+    nutCacheSet(ck,mapped);
+    return mapped;
+  }).catch(function(){return null;});
+}
+function mapOpenFoodFactsProduct(raw){
+  if(!raw||!raw.nutriments)return null;
+  var n=raw.nutriments;
+  // kcal: preferuj energy-kcal_100g, fallback z kJ
+  var kcal100=Number(n["energy-kcal_100g"]||0);
+  if(!kcal100&&n.energy_100g){
+    kcal100=Number(n.energy_100g)/4.184;
+  }
+  var p100=Number(n.proteins_100g||0);
+  var c100=Number(n.carbohydrates_100g||0);
+  var f100=Number(n.fat_100g||0);
+  if(!kcal100||(p100==null&&c100==null&&f100==null))return null;
+  // Sanity: makro > 100 / 100g są podejrzane
+  if(p100>100||c100>100||f100>100)return null;
+  if(p100+c100+f100>110)return null;
+  return{
+    id:"off_"+(raw.code||raw._id||Math.random().toString(36).slice(2)),
+    source:"openFoodFacts",
+    sourceId:raw.code||null,
+    canonicalName:(raw.product_name||"").toLowerCase().trim(),
+    displayName:raw.product_name||"(bez nazwy)",
+    brand:raw.brands||null,
+    barcode:raw.code||null,
+    aliases:[],
+    state:"unknown",
+    kcal100:Math.round(kcal100*10)/10,
+    protein100:Math.round(p100*10)/10,
+    carbs100:Math.round(c100*10)/10,
+    fat100:Math.round(f100*10)/10,
+    fiber100:n.fiber_100g!=null?Number(n.fiber_100g):undefined,
+    sugar100:n.sugars_100g!=null?Number(n.sugars_100g):undefined,
+    saturatedFat100:n["saturated-fat_100g"]!=null?Number(n["saturated-fat_100g"]):undefined,
+    confidenceBase:0.75, // niższy niż localFallback bo społecznościowa baza
+    verified:false,
+    sourceUrl:raw.code?"https://world.openfoodfacts.org/product/"+raw.code:undefined,
+    sourceNote:"Open Food Facts (dane społecznościowe, weryfikuj)",
+    fetchedAt:(new Date()).toISOString()
+  };
+}
+
+// ── USDA FoodData Central (wymaga backend/proxy, w trybie frontendOnly DISABLED) ──
+function searchUSDAFoodData(query){
+  if(NUTRITION_API_MODE!=="proxy")return Promise.resolve(null);
+  // Backend proxy: /api/nutrition/search?q=...
+  var ck="usda:"+normalizeFallbackKey(query);
+  var cached=nutCacheGet(ck);
+  if(cached!==null)return Promise.resolve(cached);
+  return fetch("/api/nutrition/search?q="+encodeURIComponent(query))
+    .then(function(r){return r.json();}).then(function(j){
+      if(!j||!j.foods||!j.foods.length){nutCacheSet(ck,null);return null;}
+      var mapped=j.foods.map(mapUSDAFoodProduct).filter(Boolean);
+      nutCacheSet(ck,mapped);
+      return mapped;
+    }).catch(function(){return null;});
+}
+function mapUSDAFoodProduct(raw){
+  if(!raw||!raw.foodNutrients)return null;
+  function getN(numId){
+    var f=raw.foodNutrients.find(function(n){return n.nutrientNumber==numId||n.number==numId;});
+    return f?Number(f.value||f.amount||0):0;
+  }
+  var kcal=getN(208), p=getN(203), c=getN(205), f=getN(204);
+  if(!kcal||(p==0&&c==0&&f==0))return null;
+  return{
+    id:"usda_"+(raw.fdcId||""),
+    source:"usda",
+    sourceId:raw.fdcId,
+    canonicalName:(raw.description||"").toLowerCase(),
+    displayName:raw.description,
+    brand:raw.brandOwner||null,
+    barcode:raw.gtinUpc||null,
+    aliases:[],
+    state:"unknown",
+    kcal100:kcal,
+    protein100:p,
+    carbs100:c,
+    fat100:f,
+    confidenceBase:0.97,
+    verified:true,
+    sourceUrl:"https://fdc.nal.usda.gov/fdc-app.html#/food-details/"+raw.fdcId,
+    sourceNote:"USDA FoodData Central ("+(raw.dataType||"")+")",
+    fetchedAt:(new Date()).toISOString()
+  };
+}
+
+// ── DETEKCJA STANU PRZYGOTOWANIA ────────────────────────────────────────────
+function detectPreparationState(name){
+  var n=normalizeFallbackKey(name);
+  if(/(surow|raw|swiez)/.test(n))return "raw";
+  if(/(gotowan|ugotow|cooked|grillowan|pieczon|smażon|smazon|usmaz|prepared)/.test(n))return "cooked";
+  if(/(such|dry)/.test(n))return "dry";
+  if(/(puszka|wedzon|smoked|w wodzie|w sosie)/.test(n))return "prepared";
+  return "unknown";
+}
+
+// ── CONFIDENCE SCORING ───────────────────────────────────────────────────────
+function calculateProductMatchConfidence(ingredient,product){
+  if(!ingredient||!product)return 0;
+  var nName=normalizeFallbackKey(ingredient.name||"");
+  var pCanon=normalizeFallbackKey(product.canonicalName||"");
+  var aliases=(product.aliases||[]).map(normalizeFallbackKey);
+  // Barcode match: 1.0
+  if(ingredient.barcode&&product.barcode&&ingredient.barcode===product.barcode)return 1.0;
+  // Exact normalized name match: 1.0
+  if(nName===pCanon)return 1.0;
+  // Exact alias match: 0.95
+  if(aliases.indexOf(nName)!==-1)return 0.95;
+  // Word-set match using existing namesMatch (z stem PL)
+  if(typeof namesMatch==="function"&&namesMatch(ingredient.name,product.canonicalName))return 0.88;
+  for(var i=0;i<(product.aliases||[]).length;i++){
+    if(typeof namesMatch==="function"&&namesMatch(ingredient.name,product.aliases[i]))return 0.85;
+  }
+  // Substring match: 0.72
+  if(pCanon.indexOf(nName)!==-1||nName.indexOf(pCanon)!==-1)return 0.72;
+  return 0;
+}
+
+// ── RESOLVE: główny orchestrator ────────────────────────────────────────────
+// Synchroniczny path: cache + localFallback + PRODUCT_DB (działa natychmiast)
+// Async (returns Promise): + Open Food Facts (sieć)
+function resolveProductSync(ingredient){
+  if(!ingredient||!ingredient.name)return null;
+  var nKey=normalizeFallbackKey(ingredient.name);
+  // 1. Cache
+  var cached=nutCacheGet("prod:"+nKey);
+  if(cached){cached._matchSource="cache";return cached;}
+  // 2. Local fallback (priorytet dla generycznych produktów)
+  var fb=LOCAL_FALLBACK_INDEX[nKey];
+  if(fb){return fb;}
+  // 2a. Try stem-matched aliases in fallback
+  for(var i=0;i<LOCAL_NUTRITION_FALLBACK.length;i++){
+    var p=LOCAL_NUTRITION_FALLBACK[i];
+    var c=calculateProductMatchConfidence(ingredient,p);
+    if(c>=0.85)return p;
+  }
+  // 3. PRODUCT_DB (markowe / sklepowe) — adapter
+  if(typeof findProduct==="function"){
+    var legacy=findProduct(ingredient.name);
+    if(legacy&&legacy.n100){
+      return adaptLegacyProduct(legacy);
+    }
+  }
+  return null;
+}
+function adaptLegacyProduct(legacy){
+  if(!legacy)return null;
+  var n100=legacy.n100||{};
+  return{
+    id:legacy.id,
+    source:"localFallback", // PRODUCT_DB ma własne dane Biedronka/Lidl
+    sourceId:legacy.id,
+    canonicalName:(legacy.name||"").toLowerCase(),
+    displayName:legacy.name||legacy.id,
+    brand:legacy._matchedBrand||null,
+    barcode:null,
+    aliases:legacy.aliases||[],
+    state:"unknown",
+    kcal100:Number(n100.kcal||0),
+    protein100:Number(n100.prot||0),
+    carbs100:Number(n100.carb||0),
+    fat100:Number(n100.fat||0),
+    gramsPerPiece:legacy.singleWeight||legacy.pkgSize,
+    confidenceBase:0.85,
+    verified:false,
+    sourceNote:"PRODUCT_DB lokalna (Biedronka/Lidl)",
+    fetchedAt:"static"
+  };
+}
+// Async resolution with Open Food Facts fallback
+function resolveProductAsync(ingredient){
+  var sync=resolveProductSync(ingredient);
+  if(sync)return Promise.resolve(sync);
+  // Spróbuj Open Food Facts (jeśli online)
+  if(ingredient.barcode){
+    return getOpenFoodFactsByBarcode(ingredient.barcode).then(function(p){
+      if(p){nutCacheSet("prod:"+normalizeFallbackKey(ingredient.name),p);return p;}
+      return searchOpenFoodFacts(ingredient.name).then(function(results){
+        if(results&&results.length)return results[0];
+        return null;
+      });
+    });
+  }
+  return searchOpenFoodFacts(ingredient.name).then(function(results){
+    if(!results||!results.length)return null;
+    // Pick best match by confidence
+    var ranked=results.map(function(p){return{p:p,c:calculateProductMatchConfidence(ingredient,p)*p.confidenceBase};});
+    ranked.sort(function(a,b){return b.c-a.c;});
+    if(ranked[0].c>=0.6){
+      nutCacheSet("prod:"+normalizeFallbackKey(ingredient.name),ranked[0].p);
+      return ranked[0].p;
+    }
+    return null;
+  });
+}
+
+// ── UNIT CONVERSION ─────────────────────────────────────────────────────────
+function ingredientToGramsResolver(ingredient,product){
+  if(!ingredient)return{grams:0,ok:false};
+  var amt=Number(ingredient.amount||0);
+  var unit=String(ingredient.unit||"g").toLowerCase().trim();
+  if(!amt)return{grams:0,ok:false};
+  // Bezpośrednie jednostki
+  if(unit==="g")return{grams:amt,ok:true};
+  if(unit==="kg")return{grams:amt*1000,ok:true};
+  if(unit==="ml"){
+    var dens=product&&product.densityGPerMl||1;
+    return{grams:amt*dens,ok:true};
+  }
+  if(unit==="l"){
+    var dens2=product&&product.densityGPerMl||1;
+    return{grams:amt*1000*dens2,ok:true};
+  }
+  if(unit==="szt"||unit==="sztuk"||unit==="szt."){
+    var gpp=product&&(product.gramsPerPiece||product.singleWeight);
+    if(gpp)return{grams:amt*gpp,ok:true};
+    return{grams:0,ok:false,reason:"brak gramsPerPiece dla produktu"};
+  }
+  if(unit==="łyżka"||unit==="lyzka"||unit==="łyżki"||unit==="lyzki"){
+    var gpt=product&&product.gramsPerTbsp||15;
+    return{grams:amt*gpt,ok:true};
+  }
+  if(unit==="łyżeczka"||unit==="lyzeczka"||unit==="łyżeczki"||unit==="lyzeczki"){
+    var gptsp=product&&product.gramsPerTsp||5;
+    return{grams:amt*gptsp,ok:true};
+  }
+  if(unit==="porcja"){
+    var ss=product&&product.servingSize;
+    if(ss)return{grams:amt*ss,ok:true};
+    return{grams:0,ok:false,reason:"brak servingSize"};
+  }
+  return{grams:0,ok:false,reason:"nieznana jednostka: "+unit};
+}
+
+// ── PARSE: tekst "150g" → {amount, unit} ─────────────────────────────────────
+function parseIngredientAmount(rawText){
+  if(!rawText)return{amount:0,unit:"g"};
+  var s=String(rawText).toLowerCase().replace(",",".");
+  var m=s.match(/([\d.]+)\s*(kg|g|ml|l|szt|sztuk|kromk|łyżk|lyzk|łyżeczk|lyzeczk|szklan|opak|główk|glowk|porcj)?/);
+  if(!m)return{amount:0,unit:"g"};
+  var n=parseFloat(m[1]);
+  var u=(m[2]||"").trim();
+  if(!u||u==="g")return{amount:n,unit:"g"};
+  if(u==="kg")return{amount:n,unit:"kg"};
+  if(u==="ml")return{amount:n,unit:"ml"};
+  if(u==="l")return{amount:n,unit:"l"};
+  if(u==="szt"||u==="sztuk"||u==="kromk")return{amount:n,unit:"szt"};
+  if(u.indexOf("szklan")===0)return{amount:n*240,unit:"ml"};
+  if(u.indexOf("łyżeczk")===0||u.indexOf("lyzeczk")===0)return{amount:n,unit:"łyżeczka"};
+  if(u.indexOf("łyżk")===0||u.indexOf("lyzk")===0)return{amount:n,unit:"łyżka"};
+  if(u.indexOf("porcj")===0)return{amount:n,unit:"porcja"};
+  return{amount:n,unit:"g"};
+}
+
+// ── PER-INGREDIENT MACRO ────────────────────────────────────────────────────
+function calculateIngredientMacrosNew(ingredient){
+  var prod=ingredient.resolvedProduct;
+  if(!prod)return null;
+  if(prod.kcal100==null||prod.protein100==null||prod.carbs100==null||prod.fat100==null)return null;
+  var conv=ingredientToGramsResolver(ingredient,prod);
+  if(!conv.ok||!conv.grams)return null;
+  var g=conv.grams;
+  return{
+    grams:Math.round(g),
+    kcal:Math.round(prod.kcal100*g/100),
+    protein:Math.round(prod.protein100*g/10)/10,
+    carbs:Math.round(prod.carbs100*g/10)/10,
+    fat:Math.round(prod.fat100*g/10)/10,
+    source:prod.source,
+    sourceUrl:prod.sourceUrl,
+    sourceNote:prod.sourceNote,
+    confidence:ingredient.confidence||0
+  };
+}
+
+// ── MEAL MACRO: nowy główny entry-point ─────────────────────────────────────
+function calculateMealMacros(meal){
+  var skladniki=meal&&meal.skladniki||meal&&meal.ingredients||[];
+  var computed={kcal:0,protein:0,carbs:0,fat:0,kcalFromMacros:0,diffKcal:0,
+                rows:[],missing:[],isComplete:true,isSuspicious:false,
+                calculatedAt:(new Date()).toISOString()};
+  skladniki.forEach(function(sk){
+    var name=sk.n||sk.name||"";
+    var amountText=sk.il||sk.amount||"";
+    var parsed=typeof amountText==="number"?{amount:amountText,unit:sk.unit||"g"}:parseIngredientAmount(amountText);
+    var preparationState=sk.preparationState||detectPreparationState(name);
+    var ingredient={
+      name:name,
+      amount:parsed.amount,
+      unit:parsed.unit,
+      preparationState:preparationState,
+      barcode:sk.barcode||null
+    };
+    // Resolve product synchronously
+    var prod=resolveProductSync(ingredient);
+    var confidence=prod?calculateProductMatchConfidence(ingredient,prod)*(prod.confidenceBase||0.7):0;
+    ingredient.resolvedProduct=prod;
+    ingredient.confidence=confidence;
+    if(!prod){
+      ingredient.resolutionStatus="unresolved";
+      ingredient.resolutionWarning="Brak produktu w bazie";
+      computed.missing.push(name);
+      computed.isComplete=false;
+      computed.rows.push({name:name,amountText:amountText,grams:0,kcal:null,protein:null,carbs:null,fat:null,
+                          source:"none",resolutionStatus:"unresolved",warning:"Brak produktu w bazie"});
+      return;
+    }
+    if(confidence<0.7){
+      ingredient.resolutionStatus="ambiguous";
+      ingredient.resolutionWarning="Niepewne dopasowanie ("+Math.round(confidence*100)+"%)";
+    }else{
+      ingredient.resolutionStatus="resolved";
+    }
+    // State ambiguity warning (raw vs cooked dla zbóż/mięsa)
+    var stateWarning="";
+    if(prod.state!=="unknown"&&preparationState==="unknown"){
+      var sensitiveCats=/(ryż|ryz|makaron|kasza|mięso|mieso|ziemniak|batat|fasol|ciecierzy)/.test(normalizeFallbackKey(name));
+      if(sensitiveCats)stateWarning="Doprecyzuj stan: "+prod.state;
+    }
+    var macros=calculateIngredientMacrosNew(ingredient);
+    if(!macros){
+      computed.missing.push(name+" (jednostka nieprzeliczalna)");
+      computed.isComplete=false;
+      computed.rows.push({name:name,amountText:amountText,grams:0,kcal:null,protein:null,carbs:null,fat:null,
+                          source:prod.source,resolutionStatus:"missingMacros",
+                          warning:"Brak konwersji jednostki na gramy",
+                          productName:prod.displayName});
+      return;
+    }
+    computed.kcal+=macros.kcal;
+    computed.protein+=macros.protein;
+    computed.carbs+=macros.carbs;
+    computed.fat+=macros.fat;
+    computed.rows.push({
+      name:name,
+      amountText:amountText,
+      grams:macros.grams,
+      kcal:macros.kcal,
+      protein:macros.protein,
+      carbs:macros.carbs,
+      fat:macros.fat,
+      source:prod.source,
+      sourceUrl:prod.sourceUrl,
+      sourceNote:prod.sourceNote,
+      productName:prod.displayName,
+      confidence:Math.round(confidence*100),
+      resolutionStatus:ingredient.resolutionStatus,
+      warning:stateWarning||ingredient.resolutionWarning||""
+    });
+  });
+  computed.kcal=Math.round(computed.kcal);
+  computed.protein=Math.round(computed.protein*10)/10;
+  computed.carbs=Math.round(computed.carbs*10)/10;
+  computed.fat=Math.round(computed.fat*10)/10;
+  // Sanity: kcalFromMacros
+  computed.kcalFromMacros=Math.round(computed.protein*4+computed.carbs*4+computed.fat*9);
+  computed.diffKcal=Math.abs(computed.kcal-computed.kcalFromMacros);
+  computed.isSuspicious=computed.kcal>0&&(computed.diffKcal>80||computed.diffKcal/Math.max(1,computed.kcal)>0.15);
+  return computed;
+}
+
+// ── VALIDATE: makro vs kcal ─────────────────────────────────────────────────
+function validateMacroCalories(computed){
+  if(!computed)return{valid:true,warning:null};
+  var kcalCalc=computed.protein*4+computed.carbs*4+computed.fat*9;
+  var diff=Math.abs(computed.kcal-kcalCalc);
+  var pct=computed.kcal>0?diff/computed.kcal:0;
+  if(diff>80||pct>0.15){
+    return{valid:false,warning:"Kalorie ("+computed.kcal+") nie zgadzają się z makro ("+Math.round(kcalCalc)+" kcal z B/W/T)"};
+  }
+  return{valid:true,warning:null};
+}
+
+// ── MIGRACJA STARYCH DIET ───────────────────────────────────────────────────
+function migrateOldMealsToComputedMacros(diet){
+  if(!diet)return diet;
+  ["menu1","menu2"].forEach(function(mk){
+    if(!diet[mk])return;
+    ["sniadania","obiady","kolacje"].forEach(function(typ){
+      (diet[mk][typ]||[]).forEach(function(meal){
+        if(!meal)return;
+        // 1. Stare meal.kcal/prot/carb/fat → aiTarget (jeśli aiTarget jeszcze nie istnieje)
+        if(!meal.aiTarget&&(meal.kcal||meal.prot||meal.carb||meal.fat)){
+          meal.aiTarget={
+            kcal:Number(meal.kcal||0),
+            protein:Number(meal.prot||0),
+            carbs:Number(meal.carb||0),
+            fat:Number(meal.fat||0)
+          };
+        }
+        // 2. Policz computed ze składników
+        meal.computed=calculateMealMacros(meal);
+        meal.macroSource="products";
+        meal.macroCalculatedAt=meal.computed.calculatedAt;
+        // 3. Nadpisz stare wartości realnymi (gdy isComplete)
+        if(meal.computed.isComplete&&meal.computed.kcal>0){
+          meal.kcal=meal.computed.kcal;
+          meal.prot=meal.computed.protein;
+          meal.carb=meal.computed.carbs;
+          meal.fat=meal.computed.fat;
+        }
+      });
+    });
+  });
+  diet.migrationVersion="2026-05-31-nutrition-resolver-v1";
+  return diet;
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// END NUTRITION DATA RESOLVER
+// ──────────────────────────────────────────────────────────────────────────
 
 // ── Helper: znajdź produkt po nazwie ─────────────────────────────────────────
 // userProductOverrides: per-user n100 overrides (e.g. od skanera etykiety)
