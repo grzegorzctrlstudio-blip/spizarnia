@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-seasonings-states-pl-v12 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-shopping-route-brands-v13 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1053,7 +1053,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-31-seasonings-states-pl-v12";
+var APP_VERSION="2026-05-31-shopping-route-brands-v13";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -4733,6 +4733,65 @@ function shopItemPackType(item){
   return {key:"opakowania",label:"Opakowania",ico:"📦",order:4};
 }
 
+// ── ŚCIEŻKA ZAKUPÓW (SLALOM) — typowy układ alejek Biedronka/Lidl ──────────
+// Zaczynamy od wejścia (warzywa/owoce), kończymy na chemii przed kasą.
+// Niższy order = wcześniej w trasie zakupowej.
+var SHOP_AISLES={
+  biedronka:[
+    {key:"warzywa",label:"1. Warzywa i Owoce",ico:"🥦",order:1,match:["warzywa","owoce","fresh"]},
+    {key:"pieczywo",label:"2. Pieczywo",ico:"🍞",order:2,match:["piekarnia","pieczyw","chleb","tortill","bochenk","bulk","kromk"]},
+    {key:"nabial",label:"3. Nabiał i Jaja",ico:"🥛",order:3,match:["nabial","nabiał","jogurt","skyr","twaróg","twarog","serek","kefir","mleko","mozzarell","jaja","jajk","ser "]},
+    {key:"mieso",label:"4. Mięso Świeże",ico:"🥩",order:4,match:["mieso","mięso","kurczak","wołowin","wolowin","indyk","schab","łosoś","losos","dorsz","ryb","filet"]},
+    {key:"wedliny",label:"5. Wędliny",ico:"🍖",order:5,match:["wedlin","wędlin","szynka","kielbas","kiełbas","polędwica","poledwic","salami","kabanos"]},
+    {key:"mrozonki",label:"6. Mrożonki",ico:"🧊",order:6,match:["mrozon","mrożon","frozen","lod","lód","mróz"]},
+    {key:"suche",label:"7. Suche produkty (kasze, ryż, makaron)",ico:"🌾",order:7,match:["ryż","ryz","kasza","makaron","płatki","platki","muesli","mąka","maka","cukier","sol kuch"]},
+    {key:"konserwy",label:"8. Konserwy, oleje, sosy",ico:"🥫",order:8,match:["puszka","puszki","konserw","passata","ketchup","majonez","oliw","olej","ocet","sos","strączk","strazczk","fasol","ciecierzy"]},
+    {key:"przekaski",label:"9. Słodycze i przekąski",ico:"🍫",order:9,match:["czekolad","slodyc","słodyc","cukier","ciastka","baton","chips","krakers","orzech","migdal","migdał","pestki","masło orzechowe","maslo orzechowe"]},
+    {key:"napoje",label:"10. Napoje",ico:"🥤",order:10,match:["napoj","napój","sok","woda","kawa","herbata","cola","mineraln"]},
+    {key:"inne",label:"11. Pozostałe",ico:"🛒",order:99,match:[]}
+  ],
+  lidl:[
+    {key:"warzywa",label:"1. Warzywa i Owoce",ico:"🥦",order:1,match:["warzywa","owoce","fresh"]},
+    {key:"pieczywo",label:"2. Pieczywo (świeże + tradycyjne)",ico:"🍞",order:2,match:["piekarnia","pieczyw","chleb","tortill","bochenk","bulk","kromk"]},
+    {key:"nabial",label:"3. Nabiał i Jaja",ico:"🥛",order:3,match:["nabial","nabiał","jogurt","skyr","twaróg","twarog","serek","kefir","mleko","mozzarell","jaja","jajk","ser "]},
+    {key:"mieso",label:"4. Mięso Świeże",ico:"🥩",order:4,match:["mieso","mięso","kurczak","wołowin","wolowin","indyk","schab","łosoś","losos","dorsz","ryb","filet"]},
+    {key:"wedliny",label:"5. Wędliny",ico:"🍖",order:5,match:["wedlin","wędlin","szynka","kielbas","kiełbas","polędwica","poledwic","salami","kabanos"]},
+    {key:"mrozonki",label:"6. Mrożonki",ico:"🧊",order:6,match:["mrozon","mrożon","frozen","lod","lód","mróz"]},
+    {key:"suche",label:"7. Suche produkty",ico:"🌾",order:7,match:["ryż","ryz","kasza","makaron","płatki","platki","muesli","mąka","maka","cukier","sol kuch"]},
+    {key:"konserwy",label:"8. Konserwy, oleje, sosy",ico:"🥫",order:8,match:["puszka","puszki","konserw","passata","ketchup","majonez","oliw","olej","ocet","sos","strączk","strazczk","fasol","ciecierzy"]},
+    {key:"przekaski",label:"9. Słodycze i przekąski",ico:"🍫",order:9,match:["czekolad","slodyc","słodyc","cukier","ciastka","baton","chips","krakers","orzech","migdal","migdał","pestki","masło orzechowe","maslo orzechowe"]},
+    {key:"napoje",label:"10. Napoje",ico:"🥤",order:10,match:["napoj","napój","sok","woda","kawa","herbata","cola","mineraln"]},
+    {key:"inne",label:"11. Pozostałe",ico:"🛒",order:99,match:[]}
+  ]
+};
+// Klasyfikuje item do alejki zgodnie z trasą sklepu (slalom)
+function getStoreAisle(item,shop){
+  var aisles=SHOP_AISLES[shop]||SHOP_AISLES.biedronka;
+  var name=String(item.name||"").toLowerCase();
+  var cat=String(item.product&&item.product.cat||"").toLowerCase();
+  var searchText=name+" "+cat;
+  for(var i=0;i<aisles.length;i++){
+    var a=aisles[i];
+    if(!a.match||!a.match.length)continue;
+    for(var j=0;j<a.match.length;j++){
+      if(searchText.indexOf(a.match[j])!==-1)return a;
+    }
+  }
+  return aisles[aisles.length-1]; // "Pozostałe"
+}
+// Wybierz konkretny brand z brands[] dla aktualnie wybranego sklepu
+function pickBrandForShop(product,shop){
+  if(!product||!product.brands||!product.brands.length)return null;
+  if(shop==="both"){
+    // wybierz pierwszy z lepszym confidence/n100
+    return product.brands[0];
+  }
+  var shopLabel=shop==="biedronka"?"biedronka":shop==="lidl"?"lidl":"";
+  return product.brands.find(function(b){
+    return String(b.shop||"").toLowerCase().indexOf(shopLabel)!==-1;
+  })||product.brands[0];
+}
+
 function renderSmartShoppingList(list){
   // Filtruj wg wybranego sklepu (jeśli "both" → zostaw wszystkie)
   function shopMatch(prod){
@@ -4747,10 +4806,21 @@ function renderSmartShoppingList(list){
   if(!tooBuy.length&&!have.length){
     return'<div style="text-align:center;padding:30px;color:var(--text3)"><div style="font-size:40px;margin-bottom:10px">🍽️</div>Brak składników do obliczenia.<br><br>Wygeneruj najpierw dietę w sekcji <b>Moja dieta</b>.</div>';
   }
-  // Grupuj DO KUPIENIA wg typu opakowania
+  // Wzbogać każdy item o konkretną markę dla wybranego sklepu (z PRODUCT_DB.brands[])
+  var shopForBrand=(shopStore==="both")?"biedronka":shopStore;
+  tooBuy.forEach(function(it){
+    if(it.product&&it.product.brands&&it.product.brands.length){
+      var brand=pickBrandForShop(it.product,shopForBrand);
+      if(brand){
+        it._brand=brand;
+        it._displayName=brand.brand||brand.productName||it.name;
+      }
+    }
+  });
+  // GRUPUJ wg ŚCIEŻKI SKLEPU (slalom przez alejki Biedronka/Lidl)
   var groups={};
   tooBuy.forEach(function(it){
-    var g=shopItemPackType(it);
+    var g=getStoreAisle(it,shopForBrand);
     if(!groups[g.key])groups[g.key]={meta:g,items:[]};
     groups[g.key].items.push(it);
   });
@@ -4759,10 +4829,10 @@ function renderSmartShoppingList(list){
   var html="";
   var storeLabel={biedronka:"🐝 Biedronka",lidl:"🏪 Lidl",both:"🐝🏪 Biedronka + Lidl"}[shopStore]||"Biedronka";
   html+='<div style="background:linear-gradient(135deg,rgba(139,92,246,.12),rgba(61,139,255,.08));border:1px solid rgba(139,92,246,.3);border-radius:14px;padding:14px 16px;margin-bottom:14px">';
-  html+='<div style="font-size:13px;font-weight:800;color:var(--purple);margin-bottom:6px">📊 Lista z diety</div>';
+  html+='<div style="font-size:13px;font-weight:800;color:var(--purple);margin-bottom:6px">🗺️ Trasa zakupowa — '+storeLabel+'</div>';
   html+='<div style="font-size:12px;color:var(--text2);line-height:1.6">';
   html+='<b style="color:var(--text)">'+tooBuy.length+'</b> produktów do kupienia &bull; <b style="color:var(--text)">'+have.length+'</b> już masz';
-  html+='<br>Sklep: <b style="color:var(--text)">'+storeLabel+'</b> &bull; Na <b style="color:var(--text)">'+(shopDays||7)+' dni</b>';
+  html+='<br>Posortowane wg <b style="color:var(--text)">trasy slalomem przez alejki</b> &bull; Na <b style="color:var(--text)">'+(shopDays||7)+' dni</b>';
   html+='</div></div>';
 
   if(tooBuy.length){
@@ -4796,12 +4866,14 @@ function renderSmartShoppingList(list){
           packLine='<span style="font-size:22px;font-weight:900;color:var(--green)">'+pcs+' '+pkgUnit+'</span>'
             +(pkgSize?'<span style="font-size:13px;color:var(--text3);font-weight:600"> × '+pkgSize+unit+' = '+totalAmount+unit+'</span>':'');
         }
-        // Sklep badge (mini)
+        // Sklep badge (mini) — preferuj wybrany sklep (shopStore)
         var shopBadge="";
-        if(prod&&prod.shops&&prod.shops.length){
-          var sh=prod.shops[0];
-          var color=sh.toLowerCase().indexOf("biedronka")!==-1?"#DC2626":sh.toLowerCase().indexOf("lidl")!==-1?"#1D4ED8":"#7C3AED";
-          shopBadge='<span style="background:'+color+'22;border:1px solid '+color+'66;color:'+color+';border-radius:50px;padding:2px 8px;font-size:10px;font-weight:800;flex-shrink:0">'+sh.substring(0,3)+'</span>';
+        var brand=item._brand;
+        var shopName=brand&&brand.shop||(prod&&prod.shops&&prod.shops[0])||"";
+        if(shopName){
+          var color=shopName.toLowerCase().indexOf("biedronka")!==-1?"#DC2626":shopName.toLowerCase().indexOf("lidl")!==-1?"#1D4ED8":"#7C3AED";
+          var shortLabel=shopName.toLowerCase().indexOf("biedronka")!==-1?"Bie":shopName.toLowerCase().indexOf("lidl")!==-1?"Lidl":shopName.substring(0,3);
+          shopBadge='<span style="background:'+color+'22;border:1px solid '+color+'66;color:'+color+';border-radius:50px;padding:2px 8px;font-size:10px;font-weight:800;flex-shrink:0">'+shortLabel+'</span>';
         }
         // Pakowanie (krótka linia w wierszu) - pokazuj GRAMY oraz szac. SZTUKI gdzie sensowne
         var quickLine="";
@@ -4826,12 +4898,18 @@ function renderSmartShoppingList(list){
         }else{
           quickLine=Math.ceil(totalAmount)+' '+unit;
         }
-        // KOMPAKTOWY WIERSZ
+        // KOMPAKTOWY WIERSZ — pokaż konkretną markę (np. "Pilos Jogurt Naturalny 2%, Lidl") jeśli mamy
+        var displayName=item._displayName||item.name;
+        var subTitle=brand?(brand.brand||brand.productName||""):"";
+        // Jeśli displayName === item.name a mamy brand z osobną nazwą, pokaż brand jako sub
         html+='<div style="background:var(--bg2);border-radius:12px;border:1px solid var(--border);border-left:4px solid var(--red);margin-bottom:6px;overflow:hidden">';
         html+='<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer" onclick="toggleShopRow(this)">';
         html+='<input type="checkbox" id="shop-cb-'+idx+'" data-shop-cb style="width:22px;height:22px;accent-color:var(--green);cursor:pointer;flex-shrink:0" onclick="event.stopPropagation();toggleShopItemChecked(this,'+idx+')">';
         html+='<div style="flex:1;min-width:0">';
-        html+='<div style="font-size:14px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+item.name+'</div>';
+        html+='<div style="font-size:14px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+displayName+'</div>';
+        if(subTitle&&subTitle!==displayName){
+          html+='<div style="font-size:11px;color:var(--text2);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+subTitle+'</div>';
+        }
         html+='<div style="font-size:12px;color:var(--green);font-weight:700;margin-top:2px">'+quickLine+'</div>';
         html+='</div>';
         html+=shopBadge;
