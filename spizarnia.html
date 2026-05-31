@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-sonnet-parallel-v20 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-fix-overlay-depth-v21 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1088,7 +1088,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-31-sonnet-parallel-v20";
+var APP_VERSION="2026-05-31-fix-overlay-depth-v21";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -1270,13 +1270,18 @@ function showPage(p){
 // ── API ───────────────────────────────────────────────────────────────────────
 // ── GLOBALNY AI LOADING OVERLAY ─────────────────────────────────────────────
 // Blokuje UI podczas wywołania AI. Timeout 90s, AbortController + przycisk Anuluj.
+// + watchdog 120s (komunikat) + killswitch 150s (auto-unblock).
 var _aiLoadingDepth=0;
 var _aiLoadingBackBlocker=null;
 var _aiLoadingTimerId=null;
+var _aiLoadingWatchdogId=null;
+var _aiLoadingKillswitchId=null;
 var _aiLoadingStartTs=0;
 var _aiAbortControllers=[]; // wszystkie aktywne AbortControllery (dla anulowania)
-var AI_TIMEOUT_MS=90000; // 90 sekund
+var AI_TIMEOUT_MS=90000; // 90 sekund per fetch
 var AI_CANCEL_BTN_AFTER_MS=5000; // pokaż "Anuluj" po 5s
+var AI_WATCHDOG_MS=120000; // 120s - komunikat "trwa za długo"
+var AI_KILLSWITCH_MS=150000; // 150s - force unblock
 function showAILoading(msg,sub){
   _aiLoadingDepth++;
   var ol=document.getElementById("ai-loading-overlay");
@@ -1294,11 +1299,9 @@ function showAILoading(msg,sub){
     _aiLoadingTimerId=setInterval(function(){
       var elapsed=(Date.now()-_aiLoadingStartTs)/1000;
       if(timerEl)timerEl.textContent=Math.floor(elapsed)+"s";
-      // Po 5s pokaż przycisk Anuluj
       if(cancelBtn&&elapsed>=AI_CANCEL_BTN_AFTER_MS/1000&&cancelBtn.style.display==="none"){
         cancelBtn.style.display="block";
       }
-      // Po >30s zmień message na pocieszający
       if(elapsed>30){
         var s=document.getElementById("ai-loading-sub");
         if(s&&s.textContent.indexOf("dłużej")===-1){
@@ -1306,6 +1309,18 @@ function showAILoading(msg,sub){
         }
       }
     },250);
+    // WATCHDOG po 120s: komunikat "trwa za długo"
+    _aiLoadingWatchdogId=setTimeout(function(){
+      var s=document.getElementById("ai-loading-sub");
+      if(s)s.textContent="⚠️ Generowanie trwa za długo. Możesz anulować i spróbować ponownie.";
+      var btn=document.getElementById("ai-loading-cancel");
+      if(btn){btn.style.display="block";btn.style.background="rgba(255,77,77,.25)";}
+    },AI_WATCHDOG_MS);
+    // KILLSWITCH po 150s: force unblock + alert
+    _aiLoadingKillswitchId=setTimeout(function(){
+      forceHideAILoading();
+      if(typeof dlgAlert==="function")dlgAlert("⚠️","Timeout","Generowanie trwało zbyt długo (>150s) — UI odblokowane. Spróbuj ponownie.");
+    },AI_KILLSWITCH_MS);
     // Blokada cofania (history.back)
     if(!_aiLoadingBackBlocker){
       try{
@@ -1325,20 +1340,39 @@ function showAILoading(msg,sub){
 function hideAILoading(){
   _aiLoadingDepth=Math.max(0,_aiLoadingDepth-1);
   if(_aiLoadingDepth>0)return; // jeszcze inne calls w toku
+  doHideAIOverlay();
+}
+// Wewnętrzny helper - faktycznie ukrywa overlay (używany przez hideAILoading + forceHideAILoading)
+function doHideAIOverlay(){
   var ol=document.getElementById("ai-loading-overlay");
   if(ol)ol.style.display="none";
-  // Zatrzymaj licznik
   if(_aiLoadingTimerId){clearInterval(_aiLoadingTimerId);_aiLoadingTimerId=null;}
+  if(_aiLoadingWatchdogId){clearTimeout(_aiLoadingWatchdogId);_aiLoadingWatchdogId=null;}
+  if(_aiLoadingKillswitchId){clearTimeout(_aiLoadingKillswitchId);_aiLoadingKillswitchId=null;}
   var cancelBtn=document.getElementById("ai-loading-cancel");
   if(cancelBtn)cancelBtn.style.display="none";
-  // Reset msg/sub do defaultu
   var m=document.getElementById("ai-loading-msg");if(m)m.textContent="Generuję odpowiedź — to potrwa kilka sekund";
   var s=document.getElementById("ai-loading-sub");if(s)s.textContent="Nie zamykaj okna ani nie odświeżaj strony";
-  // Zwolnij blokadę cofania
   if(_aiLoadingBackBlocker){
     try{window.removeEventListener("popstate",_aiLoadingBackBlocker);}catch(e){}
     _aiLoadingBackBlocker=null;
   }
+}
+// AWARYJNE force-hide - reset _aiLoadingDepth do 0, bezwarunkowo ukrywa overlay
+// Używać gdy showAILoading/hideAILoading nie są zbalansowane (np. unhandled error)
+function forceHideAILoading(){
+  _aiLoadingDepth=0;
+  doHideAIOverlay();
+  // Anuluj pending aborty
+  _aiAbortControllers.forEach(function(ac){try{ac.abort();}catch(e){}});
+  _aiAbortControllers=[];
+}
+// Tylko aktualizuje TEKST overlay, BEZ inkrementacji _aiLoadingDepth.
+// Funkcje wyższego poziomu (generateAIDiet) używają tego zamiast showAILoading
+// żeby nie zwiększać licznika gdy callAPI i tak go zwiększy.
+function setAILoadingText(msg,sub){
+  if(msg){var m=document.getElementById("ai-loading-msg");if(m)m.textContent=msg;}
+  if(sub){var s=document.getElementById("ai-loading-sub");if(s)s.textContent=sub;}
 }
 // Anulowanie wszystkich aktywnych wywołań AI
 function cancelAILoading(){
@@ -3003,7 +3037,8 @@ function generateSingleMeal(menuNum,section,replaceIdx){
   var d=getDietData(),menuKey="menu"+menuNum,menu=d[menuKey]||{};
   var existing=(menu[section]||[]).filter(function(m,i){return i!==replaceIdx;}).map(function(m){return m.nazwa;}).join(", ");
   var mealName={sniadania:"sniadanie",obiady:"obiad",kolacje:"kolacja"}[section]||section;
-  showAILoading("🍽️ Generuję nowe "+mealName+"...","Dopasowuję do Twojego profilu i sklepu");
+  // setAILoadingText (NIE showAILoading) - callAPI sam zarządza overlayem
+  setAILoadingText("🍽️ Generuję nowe "+mealName+"...","Dopasowuję do Twojego profilu i sklepu");
   var mK=Math.round(userProfile.kcal/3),mP=Math.round(userProfile.prot/3),mC=Math.round(userProfile.carb/3),mF=Math.round(userProfile.fat/3);
   var storeName={biedronka:"Biedronka",lidl:"Lidl",both:"Biedronka i Lidl"}[userProfile.stores]||"Biedronka";
   var userLiked2=(userProfile.liked&&userProfile.liked.length)?"Lubie: "+userProfile.liked.join(", ")+". ":"";  var userDisliked2=(userProfile.disliked&&userProfile.disliked.length)?"NIE lubie: "+userProfile.disliked.join(", ")+". ":"";  var prompt="Wygeneruj 1 posilek ("+mealName+"). Cel: "+mK+" kcal B:"+mP+"g W:"+mC+"g T:"+mF+"g (+/-5%). Sklep: "+storeName+". "+(userProfile.exclude?"Wykluczone: "+userProfile.exclude+". ":"")+userLiked2+userDisliked2+
@@ -3110,7 +3145,8 @@ function updateDietStep(step){
 function generateAIDiet(profile){
   if(!apiKey){dlgAlert("X","Brak klucza API","Skonfiguruj klucz API.");return;}
   if(!profile||!profile.kcal){dlgAlert("X","Brak profilu","Uzupelnij profil.");return;}
-  showAILoading("🍱 Generuję Twoją dietę...","To może potrwać 30-60 sekund. Nie zamykaj okna ani nie cofaj.");
+  // NIE wywołujemy showAILoading() bo Promise.all([callAPI, callAPI]) sam to zrobi 2x.
+  // Tylko aktualizujemy TEKST overlay (setAILoadingText nie zwiększa _aiLoadingDepth).
   var storeName={biedronka:"Biedronka",lidl:"Lidl",both:"Biedronka i Lidl"}[profile.stores]||"Biedronka";
   var goalTxt={lose:"redukcja tluszczu",maintain:"utrzymanie wagi",gain:"masa miesniowa"}[profile.goal]||profile.goal;
   var mK=Math.round(profile.kcal/3),mP=Math.round(profile.prot/3),mC=Math.round(profile.carb/3),mF=Math.round(profile.fat/3);
@@ -3155,8 +3191,8 @@ function generateAIDiet(profile){
   document.getElementById("diet-overlay").classList.add("show");
   var body=document.getElementById("diet-body");
   body.innerHTML='<div style="text-align:center;padding:60px 20px"><div style="font-size:50px;margin-bottom:16px">AI</div><div id="diet-gen-step" style="font-size:14px;color:var(--text2);margin-bottom:20px">Generuje Menu 1...</div><div class="spin" style="margin:0 auto"></div></div>';
-  // RÓWNOLEGLE Menu 1 + Menu 2 (zamiast sekwencyjnie) — czas o połowę krótszy
-  showAILoading("🍱 Generuję Menu 1 i Menu 2 równolegle...","To trwa ~20-30s. Sonnet zamiast Opusa = ~3x szybciej.");
+  // RÓWNOLEGLE Menu 1 + Menu 2. callAPI sam zarządza showAILoading - my tylko ustawiamy tekst.
+  setAILoadingText("🍱 Generuję Menu 1 i Menu 2 równolegle...","To trwa ~20-30s. Każdy call ma osobny timeout 90s.");
   if(typeof updateDietStep==="function")updateDietStep(1);
   function callMenu(label,content){
     return new Promise(function(resolve,reject){
@@ -3168,18 +3204,21 @@ function generateAIDiet(profile){
   Promise.all([p1,p2]).then(function(results){
     var r1=results[0].raw,r2=results[1].raw;
     var m1=parseMenuJSON(r1);
-    if(!m1){showDietError("Menu 1: "+getJSONError(r1));return;}
+    if(!m1){showDietError("Menu 1: "+getJSONError(r1));forceHideAILoading();return;}
     m1=fixMenuMacros(m1,profile);
     if(typeof updateDietStep==="function")updateDietStep(2);
     var m2=parseMenuJSON(r2);
-    if(!m2){showDietError("Menu 2: "+getJSONError(r2));return;}
+    if(!m2){showDietError("Menu 2: "+getJSONError(r2));forceHideAILoading();return;}
     m2=fixMenuMacros(m2,profile);
     if(typeof updateDietStep==="function")updateDietStep(3);
     if(!userProfile)userProfile=profile;
     userProfile.dietData={menu1:m1,menu2:m2};
     saveUserProfile(userProfile);dietTab=0;dietMenu=1;expandedMeal=null;renderDietBody();
+    // Gwarancja: po sukcesie overlay zniknie nawet jeśli depth nie wyzerował się
+    forceHideAILoading();
   }).catch(function(err){
     showDietError(err&&err.message||String(err));
+    forceHideAILoading(); // KRYTYCZNE: w razie błędu zawsze odblokuj UI
   });
 }
 function parseMenuJSON(raw){
