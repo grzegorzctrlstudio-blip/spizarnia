@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-06-01-store-quick-switch-v41 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-06-01-exact-shopping-list-v42 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1088,7 +1088,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-06-01-store-quick-switch-v41";
+var APP_VERSION="2026-06-01-exact-shopping-list-v42";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -3364,6 +3364,7 @@ function generateAIDiet(profile,customWishes){
     +"Realne porcje: białko 100-250g/posiłek, węglowodany 60-200g/posiłek, tłuszcze 5-30g/posiłek. Min 10g każdego suchego składnika. NIE wymyślaj absurdalnych ilości (nie 10kg ryżu, nie 200g jajek). Max 30 min czas. Proste polskie dania.\n"
     +"⚠️ PRECYZJA MAKRO: aiTarget MUSI być realnie do osiągnięcia ze składników. PRZED zapisaniem przelicz w głowie: suma kcal/B/W/T ze składników (kcal100×g/100) MUSI być w granicach ±5% od aiTarget. Dobierz GRAMATURY składników tak żeby SUMA się ZGADZAŁA.\n"
     +"🎲 INTERCHANGEABLE: WSZYSTKIE 9 posiłków (3 śniadania + 3 obiady + 3 kolacje) muszą mieć IDENTYCZNE makro (kcal/B/W/T) z dokładnością ±10%. User będzie LOSOWO wybierał 1 śniadanie + 1 obiad + 1 kolacja i MUSI trafić w cel dnia. Każde danie = "+mK+" kcal / B"+mP+"g / W"+mC+"g / T"+mF+"g. To NIE jest sugestia tylko WYMÓG.\n"
+    +"🌈 RÓŻNORODNOŚĆ: NIE używaj tego samego głównego składnika węglowodanowego (tortille, ryż, makaron, ziemniaki, kasza, chleb) w więcej niż 2-3 z 9 posiłków. Każda sekcja (śniadania/obiady/kolacje) powinna mieć RÓŻNE bazy węglowodanowe. To ważne dla użytkownika - bo jak zje 14 tortilli w tygodniu to się zniechęci.\n"
     +"TYLKO JSON.";
   // Nowy format: skladniki z state/amountBasis (AI samo określa), przyprawy w osobnym polu
   // aiTarget - tylko założenie AI, NIE realne makro (realne policzy aplikacja ze składników)
@@ -5483,6 +5484,60 @@ function deductFromPantry(productId, amountG){
   savePantryProduct(productId, entry);
 }
 
+// DOKŁADNE sumowanie składników z listy konkretnie wybranych posiłków
+// (bez rotacji days/n_meals - każdy posiłek liczony DOKŁADNIE 1× w przekazanej liście).
+// Używane dla Planu tygodnia gdzie user już wybrał co je którego dnia.
+function calculateShoppingListFromSelectedMeals(selectedMeals){
+  var ingredients={};
+  selectedMeals.forEach(function(meal){
+    if(!meal||!meal.skladniki)return;
+    meal.skladniki.forEach(function(sk){
+      var rawName=sk.n||sk.name||"";
+      if(typeof isNonMacroSeasoning==="function"&&isNonMacroSeasoning(rawName))return;
+      var rawAmt=sk.il||sk.amount||"0";
+      var amt=parseAmount(rawAmt,sk.unit||"g");
+      var inGrams=isGramAmount(rawAmt);
+      var prod=findProduct(rawName);
+      // Konwersja amt -> jednostka produktu (sztuki/gramy)
+      if(prod&&prod.unit==="szt"&&prod.singleWeight){
+        if(inGrams)amt=Math.max(1,Math.ceil(amt/prod.singleWeight));
+      }else if(prod&&(prod.unit==="g"||prod.unit==="ml")){
+        if(!inGrams&&prod.singleWeight)amt=amt*prod.singleWeight;
+      }
+      var pid=prod?prod.id:("unknown_"+(dedupKey(rawName)||Math.random().toString(36).slice(2)));
+      if(!ingredients[pid]){
+        ingredients[pid]={
+          name:prod?prod.name:rawName,
+          totalAmount:0,
+          unit:prod?prod.unit:(sk.unit||"g"),
+          product:prod,
+          meals:[]
+        };
+      }
+      // DOKŁADNIE: każdy posiłek przyczynia się raz (bez perMealDays)
+      ingredients[pid].totalAmount+=amt;
+      var ml=meal.nazwa||"posiłek";
+      if(ingredients[pid].meals.indexOf(ml)===-1)ingredients[pid].meals.push(ml);
+    });
+  });
+  // Konwersja do shopList (jak w calculateShoppingListFromDiet)
+  var shopList=[];
+  Object.keys(ingredients).forEach(function(pid){
+    var ing=ingredients[pid];
+    if(!ing.totalAmount||ing.totalAmount<=0)return;
+    var available=getPantryAmountForProduct(ing.product,ing.name);
+    var missing=Math.max(0,ing.totalAmount-available);
+    if(missing<=0){
+      shopList.push({pid:pid,name:ing.name,product:ing.product,required:Math.round(ing.totalAmount),available:Math.round(available),missing:0,buy:null,status:"OK",meals:ing.meals.slice(0,2)});
+      return;
+    }
+    var buyInfo=convertToPurchaseUnits(ing.product,missing,ing.name);
+    shopList.push({pid:pid,name:ing.name,product:ing.product,required:Math.round(ing.totalAmount),available:Math.round(available),missing:Math.round(missing),buy:buyInfo,status:"MISSING",meals:ing.meals.slice(0,2)});
+  });
+  shopList.sort(function(a,b){return b.missing-a.missing;});
+  return shopList;
+}
+
 function calculateShoppingListFromDiet(days){
   days=Number(days)||1;
   var d=getDietData();
@@ -6007,23 +6062,17 @@ function generateDietShoppingListFromWeekPlan(days){
       if(m)selectedMeals[sec].push(m);
     });
   }
-  // Sztuczne menu = lista wybranych dań x days, ale rotacja w getDietIngredients
-  // dzieli przez liczbę propozycji. Bezpośrednio: wirtualne menu z 'days' kopiami,
-  // gdzie każdy dzień = 1 propozycja. days/menu.length = 1, więc każda używana raz.
-  var virtualDiet={menu1:{sniadania:selectedMeals.sniadania,obiady:selectedMeals.obiady,kolacje:selectedMeals.kolacje},menu2:{sniadania:[],obiady:[],kolacje:[]}};
-  // Wywołaj normalną kalkulację (rotacja sama policzy: days/n_meals = 1)
+  // DOKŁADNE sumowanie: WSZYSTKIE wybrane dania (śniadania + obiady + kolacje) raz każde
+  var allSelected=selectedMeals.sniadania.concat(selectedMeals.obiady,selectedMeals.kolacje);
   closeDiet();
   showPage("shop");
   document.getElementById("copy-btn").classList.add("show");
-  // Wstaw virtualDiet jako tymczasowo do getDietIngredients
-  var origGetDietData=window.getDietData;
-  window.getDietData=function(){return virtualDiet;};
   try{
-    var list=calculateShoppingListFromDiet(days);
+    var list=calculateShoppingListFromSelectedMeals(allSelected);
     var html=renderSmartShoppingList(list);
     html='<div style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--text2)">'
       +'<b style="color:var(--purple)">📋 Lista z Planu tygodnia na '+days+(days===1?" dzień":" dni")+'</b><br>'
-      +'Obliczona DOKŁADNIE z dań wybranych w Planie tygodnia (nie średnia)'
+      +'Obliczona DOKŁADNIE z '+allSelected.length+' wybranych dań (każde liczone 1×)'
       +'</div>'+html;
     var kupBtn='<button onclick="_currentShopList&&applyPurchasedItemsToPantry(_currentShopList)" '
       +'style="width:100%;background:var(--green);color:#000;border:none;border-radius:50px;'
@@ -6031,8 +6080,8 @@ function generateDietShoppingListFromWeekPlan(days){
       +'✅ Zakupy zrealizowane — dodaj do lodówki</button>';
     document.getElementById("shop-list-content").innerHTML=html+kupBtn;
     window._currentShopList=list;
-  }finally{
-    window.getDietData=origGetDietData;
+  }catch(e){
+    document.getElementById("shop-list-content").innerHTML='<div style="color:var(--red);padding:20px">Błąd generowania listy: '+e.message+'</div>';
   }
 }
 
