@@ -39,38 +39,38 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .spin{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:rot 1s linear infinite}
 @keyframes rot{to{transform:rotate(360deg)}}
 .splash-logo{font-size:56px;filter:drop-shadow(0 0 20px rgba(30,215,96,.3))}
-.splash-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px}
+.splash-name{font-size:22px;font-weight:500;color:var(--text);letter-spacing:-0.5px}
 .splash-sub{font-size:13px;color:var(--text3);text-align:center;line-height:1.6;max-width:260px}
 
 /* ── LOGIN ── */
 #login{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 24px 40px;gap:14px;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(30,215,96,.18) 0%,transparent 60%),radial-gradient(ellipse 70% 50% at 50% 100%,rgba(139,92,246,.15) 0%,transparent 60%),var(--bg)}
 .login-hero{width:100%;max-width:340px;margin-bottom:6px}
 .login-svg{width:100%;height:auto;display:block;filter:drop-shadow(0 8px 32px rgba(30,215,96,.25))}
-.login-title{font-size:32px;font-weight:900;letter-spacing:-1.2px;background:linear-gradient(135deg,#fff 0%,var(--text2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;margin-top:4px}
+.login-title{font-size:32px;font-weight:600;letter-spacing:-1.2px;background:linear-gradient(135deg,#fff 0%,var(--text2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;margin-top:4px}
 .login-sub{font-size:13px;color:var(--text3);text-align:center;max-width:300px;line-height:1.55;margin-bottom:12px}
 .login-mode-tabs{display:flex;width:100%;max-width:340px;background:var(--bg3);border-radius:50px;padding:4px;border:1px solid var(--border);margin-bottom:6px}
-.login-mode-btn{flex:1;background:transparent;border:none;color:var(--text3);font-size:13px;font-weight:800;padding:10px 14px;border-radius:50px;cursor:pointer;transition:all .2s}
+.login-mode-btn{flex:1;background:transparent;border:none;color:var(--text3);font-size:13px;font-weight:500;padding:10px 14px;border-radius:50px;cursor:pointer;transition:all .2s}
 .login-mode-btn.act{background:var(--brand);color:#000}
-.name-inp{width:100%;max-width:340px;background:var(--bg3);border:1.5px solid var(--border2);border-radius:14px;padding:15px 18px;font-size:16px;color:var(--text);outline:none;text-align:center;font-weight:700;transition:border .2s}
+.name-inp{width:100%;max-width:340px;background:var(--bg3);border:1.5px solid var(--border2);border-radius:14px;padding:15px 18px;font-size:16px;color:var(--text);outline:none;text-align:center;font-weight:400;transition:border .2s}
 .name-inp:focus{border-color:var(--green)}
 .name-inp::placeholder{color:var(--text3);font-weight:400}
-.login-btn{width:100%;max-width:340px;background:var(--brand);color:#000;border:none;border-radius:50px;padding:15px;font-size:15px;font-weight:900;cursor:pointer;letter-spacing:.3px;transition:transform .15s,filter .15s;margin-top:4px}
+.login-btn{width:100%;max-width:340px;background:var(--brand);color:#000;border:none;border-radius:50px;padding:15px;font-size:15px;font-weight:600;cursor:pointer;letter-spacing:.3px;transition:transform .15s,filter .15s;margin-top:4px}
 .login-btn:active{transform:scale(.97);filter:brightness(.9)}
 .login-tip{font-size:11px;color:var(--text3);text-align:center;margin-top:8px;line-height:1.55;max-width:300px}
 
 /* ── TOP NAV (segmented control) — single instance inside #app-hdr ── */
 .top-nav{display:flex;background:var(--bg3);border:1px solid var(--border);border-radius:50px;padding:4px;gap:4px;margin:0 0 12px}
-.tnav-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:transparent;border:none;color:var(--text3);font-size:13px;font-weight:700;padding:10px 8px;border-radius:50px;cursor:pointer;transition:background .2s,color .2s;white-space:nowrap}
-.tnav-btn.act{background:var(--brand);color:#000;font-weight:800}
+.tnav-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:transparent;border:none;color:var(--text3);font-size:13px;font-weight:400;padding:10px 8px;border-radius:50px;cursor:pointer;transition:background .2s,color .2s;white-space:nowrap}
+.tnav-btn.act{background:var(--brand);color:#000;font-weight:500}
 .tnav-ico{font-size:16px;line-height:1}
-.tnav-lbl{font-size:12px;font-weight:800;letter-spacing:.2px}
+.tnav-lbl{font-size:12px;font-weight:500;letter-spacing:.2px}
 @media (max-width:380px){.tnav-lbl{font-size:11px}}
 
 /* ── BOTTOM NAV (auxiliary, hidden by default — top nav is primary) ── */
 .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(17,17,24,.95);border-top:1px solid var(--border);backdrop-filter:blur(20px);z-index:50;padding:8px 0 max(8px,env(safe-area-inset-bottom))}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:none;background:none;cursor:pointer;padding:4px}
 .nav-ico{font-size:22px;line-height:1;transition:transform .2s}
-.nav-lbl{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text3);transition:color .2s}
+.nav-lbl{font-size:9px;font-weight:400;letter-spacing:.5px;text-transform:uppercase;color:var(--text3);transition:color .2s}
 .nav-btn.act .nav-lbl{color:var(--green)}
 .nav-btn.act .nav-ico{transform:scale(1.15);filter:drop-shadow(0 0 8px var(--green))}
 
@@ -84,13 +84,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .hdr-brand{display:flex;align-items:center;gap:10px}
 .hdr-logo{font-size:26px}
-.hdr-title{font-size:20px;font-weight:900;letter-spacing:-0.5px;color:var(--text)}
+.hdr-title{font-size:20px;font-weight:600;letter-spacing:-0.5px;color:var(--text)}
 .sync-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;margin-left:4px}
 .sync-dot.pulse{animation:pulse 1.5s infinite}
 .sync-dot.err{background:var(--red)}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
 .hdr-right{display:flex;align-items:center;gap:8px}
-.user-chip{background:var(--bg3);border:1px solid var(--border2);border-radius:50px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--blue);display:flex;align-items:center;gap:6px}
+.user-chip{background:var(--bg3);border:1px solid var(--border2);border-radius:50px;padding:6px 12px;font-size:12px;font-weight:400;color:var(--blue);display:flex;align-items:center;gap:6px}
 .icon-btn{width:36px;height:36px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:background .15s}
 .icon-btn:active{background:var(--bg4)}
 
@@ -110,7 +110,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .cat-chips-wrap.show{display:block}
 .cat-chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .cat-chips::-webkit-scrollbar{display:none}
-.cat-chip{display:flex;align-items:center;gap:7px;padding:11px 18px;border-radius:50px;border:2px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;font-weight:800;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0;min-height:44px}
+.cat-chip{display:flex;align-items:center;gap:7px;padding:11px 18px;border-radius:50px;border:2px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0;min-height:44px}
 .cat-chip:hover{border-color:var(--border2);background:var(--bg4)}
 .cat-chip.act{background:var(--brand);border-color:var(--brand);color:#000;box-shadow:0 4px 12px rgba(6,182,212,.35)}
 .cat-chip-ico{font-size:16px;line-height:1}
@@ -119,7 +119,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 /* ── FILTERS ── */
 .filters{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none}
 .filters::-webkit-scrollbar{display:none}
-.filter-btn{padding:7px 16px;border-radius:50px;border:1.5px solid var(--border);background:transparent;color:var(--text3);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .2s}
+.filter-btn{padding:7px 16px;border-radius:50px;border:1.5px solid var(--border);background:transparent;color:var(--text3);font-size:12px;font-weight:400;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .2s}
 .filter-btn.act{background:var(--bg3);border-color:var(--border2);color:var(--text)}
 .filter-btn.act.red{border-color:var(--red);color:var(--red)}
 .filter-btn.act.green{border-color:var(--green);color:var(--green)}
@@ -128,17 +128,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 /* ── PRODUCT ITEMS ── */
 .body{padding:0 16px}
 .cat-section{margin-bottom:14px}
-.cat-section-hdr{font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);padding:16px 0 8px;display:flex;align-items:center;gap:8px;border-top:1px solid var(--border)}
+.cat-section-hdr{font-size:11px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);padding:16px 0 8px;display:flex;align-items:center;gap:8px;border-top:1px solid var(--border)}
 .cat-section:first-child .cat-section-hdr{border-top:none;padding-top:8px}
 
 /* Kolorowy banner nagłówka kategorii w lodówce */
 .cat-banner{display:flex;align-items:center;gap:12px;border-radius:14px;padding:12px 16px;margin:18px 0 10px;border-left:5px solid;position:relative;overflow:hidden}
 .cat-banner::after{content:"";position:absolute;inset:0;opacity:.12;pointer-events:none}
-.cat-banner-ico{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#fff;flex-shrink:0;z-index:1}
+.cat-banner-ico{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600;color:#fff;flex-shrink:0;z-index:1}
 .cat-banner-info{flex:1;min-width:0;z-index:1}
-.cat-banner-name{font-size:16px;font-weight:900;color:#fff;letter-spacing:-.2px}
+.cat-banner-name{font-size:16px;font-weight:600;color:#fff;letter-spacing:-.2px}
 .cat-banner-sub{font-size:11px;color:rgba(255,255,255,.7);margin-top:1px;font-weight:600}
-.cat-banner-badge{background:rgba(255,255,255,.15);border-radius:50px;padding:5px 12px;font-size:11px;font-weight:800;color:#fff;z-index:1;flex-shrink:0}
+.cat-banner-badge{background:rgba(255,255,255,.15);border-radius:50px;padding:5px 12px;font-size:11px;font-weight:500;color:#fff;z-index:1;flex-shrink:0}
 
 .item{background:var(--bg2);border-radius:var(--radius);margin-bottom:8px;padding:14px;border:1px solid var(--border);transition:border .2s}
 .item.red{border-color:#FF4D4D22;background:rgba(255,77,77,.05)}
@@ -150,20 +150,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .item-photo-empty{width:48px;height:48px;border-radius:10px;background:var(--bg4);border:1.5px dashed var(--border2);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;flex-shrink:0;color:var(--text3);transition:border .2s}
 .item-photo-empty:active{border-color:var(--text3)}
 .item-info{flex:1;min-width:0}
-.item-name{font-size:18px;font-weight:800;color:var(--text);line-height:1.25;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.fresh-ok,.fresh-warn,.fresh-bad{font-size:13px;font-weight:700;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.item-name{font-size:18px;font-weight:500;color:var(--text);line-height:1.25;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fresh-ok,.fresh-warn,.fresh-bad{font-size:13px;font-weight:400;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
 .fresh-ok{color:var(--green)}
 .fresh-warn{color:var(--amber)}
 .fresh-bad{color:var(--red)}
 /* Button "Skanuj" pod świeżością */
-.scan-date-btn{margin-top:6px;display:inline-flex;align-items:center;gap:6px;background:var(--bg4);border:1.5px solid var(--border);color:var(--text2);border-radius:50px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.scan-date-btn{margin-top:6px;display:inline-flex;align-items:center;gap:6px;background:var(--bg4);border:1.5px solid var(--border);color:var(--text2);border-radius:50px;padding:7px 14px;font-size:12px;font-weight:400;cursor:pointer;transition:all .15s;white-space:nowrap}
 .scan-date-btn:hover{border-color:var(--blue);color:var(--blue)}
 .scan-date-btn.has-date{border-color:var(--amber);color:var(--amber);background:rgba(245,158,11,.1)}
-.item-badge{flex-shrink:0;border-radius:10px;padding:8px 12px;font-size:13px;font-weight:900;text-align:center;min-width:68px}
+.item-badge{flex-shrink:0;border-radius:10px;padding:8px 12px;font-size:13px;font-weight:600;text-align:center;min-width:68px}
 .item.red .item-badge{background:var(--red);color:#fff}
 .item.low .item-badge{background:var(--amber);color:#000}
 .item.grn .item-badge{background:var(--green);color:#000}
-.item-badge-main{font-size:13px;font-weight:900;line-height:1}
+.item-badge-main{font-size:13px;font-weight:600;line-height:1}
 .item-badge-sub{font-size:10px;font-weight:600;opacity:.8;margin-top:2px}
 
 .item-bottom{display:flex;align-items:center;gap:8px}
@@ -175,13 +175,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .item.grn .prog-fill{background:linear-gradient(90deg,var(--green2),var(--green))}
 .prog-label{font-size:10px;color:var(--text3);font-weight:600}
 .qty-ctrl{display:flex;align-items:center;gap:6px}
-.qty-btn{width:44px;height:44px;min-width:44px;min-height:44px;border:none;border-radius:12px;font-size:22px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .1s,filter .15s;line-height:1}
+.qty-btn{width:44px;height:44px;min-width:44px;min-height:44px;border:none;border-radius:12px;font-size:22px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .1s,filter .15s;line-height:1}
 .qty-btn:active{transform:scale(.92);filter:brightness(.85)}
 .item.red .qty-btn{background:#FF4D4D22;color:var(--red)}
 .item.low .qty-btn{background:#F59E0B22;color:var(--amber)}
 .item.grn .qty-btn{background:#1ED76022;color:var(--green)}
 .qty-num{min-width:44px;text-align:center;padding:0 2px}
-.qty-val{font-size:18px;font-weight:800;line-height:1.1;color:var(--text)}
+.qty-val{font-size:18px;font-weight:500;line-height:1.1;color:var(--text)}
 .qty-unit{font-size:9px;color:var(--text3);font-weight:600}
 /* Kolumna +/- na karcie produktu (po prawej stronie) */
 .qty-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;justify-self:end}
@@ -199,11 +199,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
   .scan-date-btn{font-size:11px;padding:6px 12px}
 }
 
-.exp-chip{margin-top:8px;display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border);color:var(--text3);transition:all .2s}
+.exp-chip{margin-top:8px;display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:400;cursor:pointer;border:1px solid var(--border);color:var(--text3);transition:all .2s}
 .exp-chip.ok{border-color:var(--green);color:var(--green)}
 .exp-chip.warn{border-color:var(--amber);color:var(--amber)}
 .exp-chip.bad{border-color:var(--red);color:var(--red)}
-.scan-chip{margin-top:8px;margin-left:4px;display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;background:var(--blue)22;border:1px solid var(--blue)55;color:var(--blue)}
+.scan-chip{margin-top:8px;margin-left:4px;display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:400;cursor:pointer;background:var(--blue)22;border:1px solid var(--blue)55;color:var(--blue)}
 
 .empty{text-align:center;padding:60px 20px;color:var(--text3);font-size:13px}
 .empty-ico{font-size:48px;margin-bottom:12px;opacity:.5}
@@ -211,15 +211,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 /* ── CHAT ── */
 .chat-hdr{background:var(--bg);padding:16px;border-bottom:1px solid var(--border);flex-shrink:0}
 .chat-hdr-title{display:flex;align-items:center;gap:10px;margin-bottom:4px}
-.chat-hdr-title h2{font-size:20px;font-weight:900;color:var(--text)}
-.ai-badge{background:var(--green);color:#000;border-radius:50px;padding:3px 10px;font-size:10px;font-weight:900;letter-spacing:.5px}
+.chat-hdr-title h2{font-size:20px;font-weight:600;color:var(--text)}
+.ai-badge{background:var(--green);color:#000;border-radius:50px;padding:3px 10px;font-size:10px;font-weight:600;letter-spacing:.5px}
 .chat-hdr p{font-size:12px;color:var(--text3)}
 .chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px}
 .msg{display:flex;gap:10px;align-items:flex-end;max-width:88%}
 .msg.user{align-self:flex-end;flex-direction:row-reverse}
 .msg-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
 .msg.ai .msg-av{background:linear-gradient(135deg,var(--purple),#4F46E5)}
-.msg.user .msg-av{background:var(--green);color:#000;font-size:13px;font-weight:900}
+.msg.user .msg-av{background:var(--green);color:#000;font-size:13px;font-weight:600}
 .msg-bub{border-radius:18px;padding:12px 16px;font-size:13.5px;line-height:1.65}
 .msg.ai .msg-bub{background:var(--bg3);color:var(--text2);border-bottom-left-radius:4px;border:1px solid var(--border)}
 .msg.user .msg-bub{background:var(--green);color:#000;font-weight:600;border-bottom-right-radius:4px}
@@ -232,58 +232,58 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 @keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-7px)}}
 .chat-sugs{display:flex;gap:8px;padding:8px 16px;overflow-x:auto;flex-shrink:0;scrollbar-width:none;border-top:1px solid var(--border);background:var(--bg)}
 .chat-sugs::-webkit-scrollbar{display:none}
-.sug-btn{background:var(--bg3);border:1px solid var(--border2);border-radius:50px;padding:8px 16px;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .2s}
+.sug-btn{background:var(--bg3);border:1px solid var(--border2);border-radius:50px;padding:8px 16px;font-size:12px;font-weight:400;color:var(--text2);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .2s}
 .sug-btn:active{background:var(--bg4)}
 .chat-inp-row{padding:12px 16px;background:var(--bg);border-top:1px solid var(--border);display:flex;gap:10px;align-items:flex-end;flex-shrink:0}
 .chat-inp{flex:1;background:var(--bg3);border:1.5px solid var(--border2);border-radius:20px;padding:12px 16px;font-size:14px;color:var(--text);outline:none;resize:none;max-height:100px;font-family:inherit;line-height:1.4;transition:border .2s}
 .chat-inp:focus{border-color:var(--green)}
 .chat-inp::placeholder{color:var(--text3)}
-.chat-send{background:var(--green);border:none;color:#000;border-radius:50%;width:44px;height:44px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:900;transition:transform .15s}
+.chat-send{background:var(--green);border:none;color:#000;border-radius:50%;width:44px;height:44px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:600;transition:transform .15s}
 .chat-send:active{transform:scale(.9)}
 .chat-send:disabled{background:var(--bg4);color:var(--text3);cursor:not-allowed}
 
 /* ── SHOP PAGE ── */
 .shop-hdr{background:var(--bg);padding:16px;border-bottom:1px solid var(--border);flex-shrink:0}
-.shop-hdr h2{font-size:20px;font-weight:900;color:var(--text)}
+.shop-hdr h2{font-size:20px;font-weight:600;color:var(--text)}
 .shop-hdr p{font-size:12px;color:var(--text3);margin-top:3px}
 .shop-body{flex:1;overflow-y:auto;padding:16px}
 .stores-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
 .store-card{border:none;border-radius:var(--radius);padding:16px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:transform .15s,filter .15s}
 .store-card:active{transform:scale(.95);filter:brightness(.9)}
 .store-card-ico{font-size:28px}
-.store-card-name{font-size:13px;font-weight:800;color:#fff}
+.store-card-name{font-size:13px;font-weight:500;color:#fff}
 .store-card-sub{font-size:10px;color:rgba(255,255,255,.65)}
 .receipt-drop{background:var(--bg3);border:2px dashed var(--border2);border-radius:var(--radius);padding:28px 20px;text-align:center;margin-bottom:16px;cursor:pointer;transition:all .2s}
 .receipt-drop:active{border-color:var(--purple);background:var(--bg4)}
 .receipt-results{background:var(--bg3);border-radius:var(--radius);padding:16px;margin-bottom:16px;display:none;border:1px solid var(--border)}
-.receipt-results h4{font-size:13px;font-weight:800;color:var(--text);margin-bottom:12px}
+.receipt-results h4{font-size:13px;font-weight:500;color:var(--text);margin-bottom:12px}
 .rp-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
 .rp-item:last-child{border-bottom:none}
 .rp-info{flex:1}
-.rp-name{font-size:12.5px;font-weight:700;color:var(--text)}
+.rp-name{font-size:12.5px;font-weight:400;color:var(--text)}
 .rp-mapped{font-size:11px;color:var(--green);margin-top:2px}
 .rp-skip{font-size:11px;color:var(--text3);margin-top:2px}
-.rp-qty{font-size:13px;font-weight:800;color:var(--amber)}
-.receipt-apply{width:100%;background:var(--green);border:none;color:#000;border-radius:50px;padding:14px;font-size:14px;font-weight:900;cursor:pointer;margin-top:12px;transition:filter .15s}
+.rp-qty{font-size:13px;font-weight:500;color:var(--amber)}
+.receipt-apply{width:100%;background:var(--green);border:none;color:#000;border-radius:50px;padding:14px;font-size:14px;font-weight:600;cursor:pointer;margin-top:12px;transition:filter .15s}
 .receipt-apply:active{filter:brightness(.9)}
-.gen-btn{width:100%;background:linear-gradient(135deg,var(--purple),#4F46E5);border:none;color:#fff;border-radius:50px;padding:15px;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px;transition:filter .15s}
+.gen-btn{width:100%;background:linear-gradient(135deg,var(--purple),#4F46E5);border:none;color:#fff;border-radius:50px;padding:15px;font-size:15px;font-weight:500;cursor:pointer;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px;transition:filter .15s}
 .gen-btn:active{filter:brightness(.9)}
 .gen-btn:disabled{opacity:.5;cursor:not-allowed}
 .gen-spin{width:18px;height:18px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:rot 1s linear infinite;display:none}
-.copy-btn{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:50px;padding:13px;font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;display:none;margin-bottom:12px;transition:background .15s}
+.copy-btn{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:50px;padding:13px;font-size:13px;font-weight:400;color:var(--text2);cursor:pointer;display:none;margin-bottom:12px;transition:background .15s}
 .copy-btn.show{display:block}
 .copy-btn:active{background:var(--bg4)}
-.shop-section-title{font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;margin-top:4px}
+.shop-section-title{font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;margin-top:4px}
 .shop-item{background:var(--bg3);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:6px;display:flex;align-items:center;gap:12px;border:1px solid var(--border);cursor:pointer;transition:background .15s}
 .shop-item:active{background:var(--bg4)}
 .shop-item.checked{opacity:.4}
 .shop-item-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;color:var(--green);transition:all .2s}
 .shop-item.checked .shop-item-check{background:var(--green);border-color:var(--green);color:#000}
 .shop-item-info{flex:1}
-.shop-item-name{font-size:13px;font-weight:700;color:var(--text)}
+.shop-item-name{font-size:13px;font-weight:400;color:var(--text)}
 .shop-item.checked .shop-item-name{text-decoration:line-through;color:var(--text3)}
 .shop-item-detail{font-size:11px;color:var(--text3);margin-top:2px}
-.prio{font-size:10px;font-weight:800;border-radius:50px;padding:3px 10px}
+.prio{font-size:10px;font-weight:500;border-radius:50px;padding:3px 10px}
 .prio-high{background:#FF4D4D22;color:var(--red)}
 .prio-med{background:#F59E0B22;color:var(--amber)}
 .prio-low{background:#3D8BFF22;color:var(--blue)}
@@ -295,13 +295,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .overlay.show{display:flex}
 .overlay.bottom{align-items:flex-end}
 .modal{background:var(--bg2);border-radius:20px;padding:22px;width:100%;max-width:420px;border:1px solid var(--border2)}
-.modal h3{font-size:17px;font-weight:800;color:var(--text);margin-bottom:6px}
+.modal h3{font-size:17px;font-weight:500;color:var(--text);margin-bottom:6px}
 .modal p{font-size:12px;color:var(--text3);margin-bottom:14px;line-height:1.6}
 .modal-inp{width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--radius-sm);padding:13px 16px;font-size:14px;color:var(--text);outline:none;margin-bottom:12px;transition:border .2s}
 .modal-inp:focus{border-color:var(--green)}
 .modal-inp::placeholder{color:var(--text3)}
 .modal-btns{display:flex;gap:8px}
-.mbtn{flex:1;padding:13px;border-radius:50px;border:none;font-weight:800;font-size:13px;cursor:pointer;transition:filter .15s}
+.mbtn{flex:1;padding:13px;border-radius:50px;border:none;font-weight:500;font-size:13px;cursor:pointer;transition:filter .15s}
 .mbtn:active{filter:brightness(.9)}
 .mbtn.ok{background:var(--green);color:#000}
 .mbtn.blue{background:var(--blue);color:#fff}
@@ -312,20 +312,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .scan-spin{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:rot 1s linear infinite;margin:0 auto 8px}
 .scan-result{background:var(--bg3);border-radius:var(--radius-sm);padding:12px;margin-bottom:12px;display:none;border:1px solid var(--border)}
 .scan-result b{color:var(--text);font-size:14px;display:block;margin-bottom:4px}
-.scan-result span{color:var(--green);font-size:13px;font-weight:700}
+.scan-result span{color:var(--green);font-size:13px;font-weight:400}
 .log-modal{background:var(--bg2);border-radius:20px 20px 0 0;width:100%;max-width:600px;max-height:80vh;display:flex;flex-direction:column;border:1px solid var(--border2)}
 .log-hdr{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border);flex-shrink:0}
-.log-hdr h3{font-size:17px;font-weight:800;color:var(--text)}
-.log-close{background:var(--bg3);border:none;color:var(--text2);border-radius:50px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer}
+.log-hdr h3{font-size:17px;font-weight:500;color:var(--text)}
+.log-close{background:var(--bg3);border:none;color:var(--text2);border-radius:50px;padding:7px 16px;font-size:12px;font-weight:400;cursor:pointer}
 .log-body{overflow-y:auto;padding:12px 16px;flex:1}
 .log-entry{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
 .log-entry:last-child{border-bottom:none}
-.log-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;flex-shrink:0;color:#fff}
+.log-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;flex-shrink:0;color:#fff}
 .log-info{flex:1}
-.log-who{font-size:12px;font-weight:800;color:var(--text)}
+.log-who{font-size:12px;font-weight:500;color:var(--text)}
 .log-what{font-size:11.5px;color:var(--text2);margin-top:2px}
 .log-when{font-size:10px;color:var(--text3);margin-top:2px}
-.lbadge{font-size:11px;font-weight:800;border-radius:50px;padding:3px 10px}
+.lbadge{font-size:11px;font-weight:500;border-radius:50px;padding:3px 10px}
 .lbadge.up{background:#1ED76022;color:var(--green)}
 .lbadge.dn{background:#FF4D4D22;color:var(--red)}
 .log-empty{text-align:center;padding:40px 20px;color:var(--text3);font-size:13px}
@@ -336,10 +336,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .dlg-overlay.show{display:flex}
 .dlg-box{background:var(--bg2);border-radius:20px;padding:26px 22px;width:100%;max-width:320px;border:1px solid var(--border2);text-align:center}
 .dlg-ico{font-size:36px;margin-bottom:10px}
-.dlg-title{font-size:17px;font-weight:800;color:var(--text);margin-bottom:6px}
+.dlg-title{font-size:17px;font-weight:500;color:var(--text);margin-bottom:6px}
 .dlg-msg{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:20px}
 .dlg-btns{display:flex;gap:8px}
-.dlg-btn{flex:1;padding:13px;border-radius:50px;border:none;font-size:14px;font-weight:800;cursor:pointer;transition:filter .15s}
+.dlg-btn{flex:1;padding:13px;border-radius:50px;border:none;font-size:14px;font-weight:500;cursor:pointer;transition:filter .15s}
 .dlg-btn:active{filter:brightness(.9)}
 .dlg-btn.ok{background:var(--green);color:#000}
 .dlg-btn.cancel{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
@@ -347,7 +347,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 
 /* ADMIN PASSWORD MODAL */
 .admin-pass-modal{background:var(--bg2);border-radius:20px;padding:22px;width:100%;max-width:340px;border:1px solid var(--border2);text-align:center}
-.admin-pass-modal h3{font-size:17px;font-weight:800;color:var(--text);margin-bottom:6px}
+.admin-pass-modal h3{font-size:17px;font-weight:500;color:var(--text);margin-bottom:6px}
 .admin-pass-modal p{font-size:12px;color:var(--text3);margin-bottom:14px}
 
 /* PHOTO MODAL */
@@ -359,7 +359,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 #single-product-overlay.show{display:flex}
 .spp-modal{background:var(--bg2);border-radius:24px;padding:22px;width:100%;max-width:480px;max-height:90vh;display:flex;flex-direction:column;border:1px solid var(--border2);overflow:hidden}
 .spp-hdr{margin-bottom:14px}
-.spp-title{font-size:18px;font-weight:900;color:var(--text);letter-spacing:-.3px;display:flex;align-items:center;gap:10px}
+.spp-title{font-size:18px;font-weight:600;color:var(--text);letter-spacing:-.3px;display:flex;align-items:center;gap:10px}
 .spp-sub{font-size:12px;color:var(--text3);margin-top:4px}
 .spp-search{width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:14px;padding:13px 16px;font-size:14px;color:var(--text);outline:none;margin-bottom:10px;color-scheme:dark;transition:border .15s}
 .spp-search:focus{border-color:var(--green)}
@@ -367,21 +367,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .spp-item{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;cursor:pointer;transition:background .15s;border:1px solid transparent}
 .spp-item:hover{background:var(--bg4)}
 .spp-item.sel{background:rgba(30,215,96,.1);border-color:var(--green)}
-.spp-item-name{flex:1;font-size:14px;font-weight:700;color:var(--text);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.spp-item-cur{font-size:13px;font-weight:800;color:var(--amber);flex-shrink:0;min-width:50px;text-align:right}
+.spp-item-name{flex:1;font-size:14px;font-weight:400;color:var(--text);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spp-item-cur{font-size:13px;font-weight:500;color:var(--amber);flex-shrink:0;min-width:50px;text-align:right}
 .spp-item-unit{font-size:10px;color:var(--text3);font-weight:600;flex-shrink:0;min-width:38px}
 .spp-empty{text-align:center;padding:30px 20px;color:var(--text3);font-size:13px}
 .spp-qty-section{margin-top:14px;background:var(--bg3);border-radius:14px;padding:14px;border:1px solid var(--border)}
-.spp-qty-name{font-size:15px;font-weight:800;color:var(--text);margin-bottom:6px}
+.spp-qty-name{font-size:15px;font-weight:500;color:var(--text);margin-bottom:6px}
 .spp-qty-meta{font-size:11px;color:var(--text3);margin-bottom:12px}
 .spp-qty-controls{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:8px}
-.spp-qty-btn{width:56px;height:56px;border:none;border-radius:14px;font-size:28px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.spp-qty-btn{width:56px;height:56px;border:none;border-radius:14px;font-size:28px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .spp-qty-btn.minus{background:var(--bg4);color:var(--red)}
 .spp-qty-btn.plus{background:var(--green);color:#000}
-.spp-qty-input{flex:1;max-width:120px;background:var(--bg4);border:2px solid var(--border2);border-radius:14px;padding:12px;font-size:24px;font-weight:900;color:var(--text);outline:none;text-align:center;color-scheme:dark}
+.spp-qty-input{flex:1;max-width:120px;background:var(--bg4);border:2px solid var(--border2);border-radius:14px;padding:12px;font-size:24px;font-weight:600;color:var(--text);outline:none;text-align:center;color-scheme:dark}
 .spp-qty-input:focus{border-color:var(--green)}
 .spp-actions{display:flex;gap:10px;margin-top:16px}
-.spp-actions button{flex:1;border:none;border-radius:50px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;transition:filter .15s}
+.spp-actions button{flex:1;border:none;border-radius:50px;padding:14px;font-size:14px;font-weight:500;cursor:pointer;transition:filter .15s}
 .spp-actions button:active{filter:brightness(.9)}
 .spp-back{background:var(--bg3);color:var(--text2);border:1px solid var(--border)!important}
 .spp-save{background:var(--green);color:#000;flex:2!important}
@@ -392,7 +392,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .pu-modal{background:var(--bg2);border-radius:24px;padding:24px 22px;width:100%;max-width:460px;border:1px solid var(--border2);max-height:90vh;overflow-y:auto}
 .pu-hdr{text-align:center;margin-bottom:22px}
 .pu-ico{font-size:42px;margin-bottom:10px;line-height:1}
-.pu-title{font-size:20px;font-weight:900;color:var(--text);letter-spacing:-.4px;margin-bottom:4px}
+.pu-title{font-size:20px;font-weight:600;color:var(--text);letter-spacing:-.4px;margin-bottom:4px}
 .pu-sub{font-size:13px;color:var(--text3);font-weight:600}
 .pu-opt{display:flex;align-items:center;gap:14px;width:100%;background:var(--bg3);border:1.5px solid var(--border);border-radius:18px;padding:18px;cursor:pointer;text-align:left;margin-bottom:10px;transition:all .15s}
 .pu-opt:hover{border-color:var(--green);background:var(--bg4)}
@@ -401,10 +401,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .pu-opt.purple .pu-opt-ico{background:rgba(139,92,246,.15)}
 .pu-opt.blue .pu-opt-ico{background:rgba(61,139,255,.15)}
 .pu-opt-text{flex:1;min-width:0}
-.pu-opt-title{font-size:15px;font-weight:800;color:var(--text);margin-bottom:3px}
+.pu-opt-title{font-size:15px;font-weight:500;color:var(--text);margin-bottom:3px}
 .pu-opt-desc{font-size:12px;color:var(--text3);font-weight:500;line-height:1.4}
 .pu-opt-arrow{font-size:24px;color:var(--text3);flex-shrink:0}
-.pu-cancel{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text3);border-radius:50px;padding:13px;font-size:13px;font-weight:700;cursor:pointer;margin-top:6px}
+.pu-cancel{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text3);border-radius:50px;padding:13px;font-size:13px;font-weight:400;cursor:pointer;margin-top:6px}
 .pu-cancel:active{background:var(--bg4)}
 
 /* PHOTO SLOTS — front / side / top + optional expiry */
@@ -417,9 +417,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .photo-slot.filled .photo-slot-img{display:block}
 .photo-slot-ico{font-size:26px;line-height:1}
 .photo-slot.filled .photo-slot-ico,.photo-slot.filled .photo-slot-lbl{display:none}
-.photo-slot-lbl{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;text-align:center;padding:0 4px}
-.photo-slot-badge{position:absolute;top:6px;left:6px;background:rgba(0,0,0,.7);color:#fff;font-size:9px;font-weight:800;padding:3px 7px;border-radius:50px;text-transform:uppercase;letter-spacing:.3px;z-index:2}
-.photo-slot-del{position:absolute;top:6px;right:6px;background:rgba(255,77,77,.9);color:#fff;border:none;border-radius:50%;width:24px;height:24px;font-size:13px;font-weight:900;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:2}
+.photo-slot-lbl{font-size:11px;font-weight:400;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;text-align:center;padding:0 4px}
+.photo-slot-badge{position:absolute;top:6px;left:6px;background:rgba(0,0,0,.7);color:#fff;font-size:9px;font-weight:500;padding:3px 7px;border-radius:50px;text-transform:uppercase;letter-spacing:.3px;z-index:2}
+.photo-slot-del{position:absolute;top:6px;right:6px;background:rgba(255,77,77,.9);color:#fff;border:none;border-radius:50%;width:24px;height:24px;font-size:13px;font-weight:600;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:2}
 .photo-slot.filled .photo-slot-del{display:flex}
 .photo-slot.exp{border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.05)}
 .photo-slot.exp.filled{border-color:var(--amber)}
@@ -437,23 +437,23 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 .diet-hdr{position:sticky;top:0;background:rgba(13,13,18,.98);border-bottom:1px solid var(--border);padding:14px 18px;display:flex;align-items:center;gap:12px;z-index:5}
 .diet-tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0;scrollbar-width:none}
 .diet-tabs::-webkit-scrollbar{display:none}
-.dtab{flex:1;min-width:fit-content;background:none;border:none;color:var(--text3);padding:13px 14px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:color .15s}
+.dtab{flex:1;min-width:fit-content;background:none;border:none;color:var(--text3);padding:13px 14px;font-size:12px;font-weight:400;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:color .15s}
 .dtab.act{color:var(--green);border-bottom-color:var(--green)}
-.meal-gen-btn{background:linear-gradient(135deg,var(--purple),#4F46E5);border:none;color:#fff;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer}
+.meal-gen-btn{background:linear-gradient(135deg,var(--purple),#4F46E5);border:none;color:#fff;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:400;cursor:pointer}
 
 /* ── ONBOARDING OVERLAY ── */
 #ob-overlay{display:none}
 #ob-overlay.show{display:flex;position:fixed;inset:0;z-index:400;background:var(--bg);overflow-y:auto;flex-direction:column;padding:24px 18px}
 .ob-step{display:none}
-.ob-title{font-size:22px;font-weight:900;color:var(--text);margin-bottom:6px;letter-spacing:-.5px}
+.ob-title{font-size:22px;font-weight:600;color:var(--text);margin-bottom:6px;letter-spacing:-.5px}
 .ob-sub{font-size:13px;color:var(--text3);margin-bottom:20px;line-height:1.5}
 .ob-inp{width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:12px;padding:14px 16px;font-size:15px;color:var(--text);outline:none;margin-bottom:10px;color-scheme:dark;transition:border .2s}
 .ob-inp:focus{border-color:var(--green)}
 .ob-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
-.ob-opt{background:var(--bg3);border:1.5px solid var(--border);border-radius:12px;padding:14px 12px;text-align:left;color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
+.ob-opt{background:var(--bg3);border:1.5px solid var(--border);border-radius:12px;padding:14px 12px;text-align:left;color:var(--text2);font-size:13px;font-weight:400;cursor:pointer;transition:all .15s}
 .ob-opt:active{transform:scale(.97)}
 .ob-opt.sel{background:rgba(30,215,96,.12);border-color:var(--green);color:var(--green)}
-.ob-pill{display:inline-block;background:var(--bg3);border:1.5px solid var(--border);border-radius:50px;padding:8px 14px;font-size:12px;font-weight:700;color:var(--text3);cursor:pointer;margin:3px;transition:all .15s}
+.ob-pill{display:inline-block;background:var(--bg3);border:1.5px solid var(--border);border-radius:50px;padding:8px 14px;font-size:12px;font-weight:400;color:var(--text3);cursor:pointer;margin:3px;transition:all .15s}
 .ob-pill.active{background:var(--green);border-color:var(--green);color:#000}
 
 /* ── EDIT MEAL OVERLAY ── */
@@ -467,11 +467,11 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 .up-row:active{background:var(--bg3)}
 .up-row-ico{font-size:22px;flex-shrink:0;width:36px;text-align:center}
 .up-row-text{flex:1}
-.up-row-title{font-size:14px;font-weight:700;color:var(--text)}
+.up-row-title{font-size:14px;font-weight:400;color:var(--text)}
 .up-row-sub{font-size:11px;color:var(--text3);margin-top:2px}
 .up-row-arrow{color:var(--text3);font-size:18px;flex-shrink:0}
 .user-chip{cursor:pointer}
-.admtab{flex:1;background:none;border:none;color:#6B6B85;padding:14px 12px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.admtab{flex:1;background:none;border:none;color:#6B6B85;padding:14px 12px;font-size:12px;font-weight:400;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
 .admtab.act{color:var(--green);border-bottom-color:var(--green)}
 
 /* DASHBOARD — centralna "Wszystkie produkty" + 3 mniejsze */
@@ -480,18 +480,18 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 .stat-main.act{border-color:var(--green);background:linear-gradient(135deg,rgba(30,215,96,.2) 0%,rgba(30,215,96,.08) 100%)}
 .stat-main-left{display:flex;align-items:center;gap:14px;flex:1;min-width:0}
 .stat-main-ico{font-size:28px;flex-shrink:0;width:48px;height:48px;border-radius:14px;background:rgba(30,215,96,.18);display:flex;align-items:center;justify-content:center}
-.stat-main-title{font-size:16px;font-weight:900;color:var(--text);letter-spacing:-.3px}
+.stat-main-title{font-size:16px;font-weight:600;color:var(--text);letter-spacing:-.3px}
 .stat-main-sub{font-size:11px;color:var(--text3);margin-top:2px;font-weight:600}
 .stat-main-right{text-align:right;flex-shrink:0}
-.stat-main-n{font-size:38px;font-weight:900;line-height:1;color:var(--green);letter-spacing:-1.5px}
-.stat-main-unit{font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-top:2px}
+.stat-main-n{font-size:38px;font-weight:600;line-height:1;color:var(--green);letter-spacing:-1.5px}
+.stat-main-unit{font-size:10px;color:var(--text3);font-weight:400;text-transform:uppercase;letter-spacing:.6px;margin-top:2px}
 
 .stats-3col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
 .stat-mini{background:var(--bg3);border-radius:14px;padding:12px 8px 10px;border:1.5px solid var(--border);cursor:pointer;text-align:center;transition:transform .15s,filter .15s,border-color .15s}
 .stat-mini:active{transform:scale(.95);filter:brightness(.9)}
 .stat-mini-ico{font-size:18px;margin-bottom:4px;line-height:1}
-.stat-mini-n{font-size:22px;font-weight:900;line-height:1;letter-spacing:-.5px}
-.stat-mini-lbl{font-size:10px;font-weight:800;margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
+.stat-mini-n{font-size:22px;font-weight:600;line-height:1;letter-spacing:-.5px}
+.stat-mini-lbl{font-size:10px;font-weight:500;margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
 .stat-mini.red .stat-mini-n,.stat-mini.red .stat-mini-lbl{color:var(--red)}
 .stat-mini.red.act{border-color:var(--red);background:rgba(255,77,77,.1)}
 .stat-mini.green .stat-mini-n,.stat-mini.green .stat-mini-lbl{color:var(--green)}
@@ -502,9 +502,9 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 /* PANTRY DATE CARD */
 .pantry-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .pantry-card-info{flex:1;min-width:0}
-.pantry-card-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
-.pantry-card-date{font-size:13px;font-weight:800;color:var(--text)}
-.pantry-card-btn{background:var(--green);color:#000;border:none;border-radius:50px;padding:10px 16px;font-size:12px;font-weight:800;cursor:pointer;flex-shrink:0;transition:filter .15s}
+.pantry-card-title{font-size:11px;font-weight:400;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.pantry-card-date{font-size:13px;font-weight:500;color:var(--text)}
+.pantry-card-btn{background:var(--green);color:#000;border:none;border-radius:50px;padding:10px 16px;font-size:12px;font-weight:500;cursor:pointer;flex-shrink:0;transition:filter .15s}
 .pantry-card-btn:active{filter:brightness(.9)}
 </style>
 </head>
@@ -663,9 +663,9 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
       </div>
 
       <!-- MOJA DIETA CTA - duży button na głównej stronie -->
-      <button class="diet-cta-btn" onclick="openDiet()" style="width:100%;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#000;border:none;border-radius:14px;padding:16px 18px;font-size:15px;font-weight:900;cursor:pointer;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 4px 16px rgba(6,182,212,.25);transition:filter .15s,transform .1s">
+      <button class="diet-cta-btn" onclick="openDiet()" style="width:100%;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#000;border:none;border-radius:14px;padding:16px 18px;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 4px 16px rgba(6,182,212,.25);transition:filter .15s,transform .1s">
         <span style="display:flex;align-items:center;gap:10px"><span style="font-size:24px">🍱</span><span>Moja Dieta</span></span>
-        <span style="font-size:11px;font-weight:700;opacity:.7">PRZEPISY · PLAN · ZAKUPY →</span>
+        <span style="font-size:11px;font-weight:400;opacity:.7">PRZEPISY · PLAN · ZAKUPY →</span>
       </button>
 
       <!-- SEARCH -->
@@ -713,26 +713,26 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
     </div>
     <div class="shop-body">
       <!-- Wybór sklepu -->
-      <div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">🏪 Sklep</div>
+      <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">🏪 Sklep</div>
       <div class="shop-store-pick" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:14px">
-        <button class="shop-pill" id="shop-pill-biedronka" data-store="biedronka" onclick="setShopStore('biedronka')" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:14px;padding:12px 6px;font-size:13px;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .15s">
+        <button class="shop-pill" id="shop-pill-biedronka" data-store="biedronka" onclick="setShopStore('biedronka')" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:14px;padding:12px 6px;font-size:13px;font-weight:500;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .15s">
           <span style="font-size:20px">🐝</span><span>Biedronka</span>
         </button>
-        <button class="shop-pill" id="shop-pill-lidl" data-store="lidl" onclick="setShopStore('lidl')" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:14px;padding:12px 6px;font-size:13px;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .15s">
+        <button class="shop-pill" id="shop-pill-lidl" data-store="lidl" onclick="setShopStore('lidl')" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:14px;padding:12px 6px;font-size:13px;font-weight:500;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .15s">
           <span style="font-size:20px">🏪</span><span>Lidl</span>
         </button>
-        <button class="shop-pill" id="shop-pill-both" data-store="both" onclick="setShopStore('both')" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:14px;padding:12px 6px;font-size:13px;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .15s">
+        <button class="shop-pill" id="shop-pill-both" data-store="both" onclick="setShopStore('both')" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:14px;padding:12px 6px;font-size:13px;font-weight:500;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .15s">
           <span style="font-size:20px">🛒</span><span>Oba</span>
         </button>
       </div>
 
       <!-- Wybór dni -->
-      <div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">📅 Na ile dni</div>
+      <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">📅 Na ile dni</div>
       <div class="shop-days-pick" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:14px">
-        <button class="shop-days" id="shop-days-1" data-days="1" onclick="setShopDays(1)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:12px;padding:11px 6px;font-size:13px;font-weight:800;cursor:pointer">1 dzień</button>
-        <button class="shop-days" id="shop-days-3" data-days="3" onclick="setShopDays(3)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:12px;padding:11px 6px;font-size:13px;font-weight:800;cursor:pointer">3 dni</button>
-        <button class="shop-days" id="shop-days-7" data-days="7" onclick="setShopDays(7)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:12px;padding:11px 6px;font-size:13px;font-weight:800;cursor:pointer">7 dni</button>
-        <button class="shop-days" id="shop-days-14" data-days="14" onclick="setShopDays(14)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:12px;padding:11px 6px;font-size:13px;font-weight:800;cursor:pointer">14 dni</button>
+        <button class="shop-days" id="shop-days-1" data-days="1" onclick="setShopDays(1)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:12px;padding:11px 6px;font-size:13px;font-weight:500;cursor:pointer">1 dzień</button>
+        <button class="shop-days" id="shop-days-3" data-days="3" onclick="setShopDays(3)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:12px;padding:11px 6px;font-size:13px;font-weight:500;cursor:pointer">3 dni</button>
+        <button class="shop-days" id="shop-days-7" data-days="7" onclick="setShopDays(7)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:12px;padding:11px 6px;font-size:13px;font-weight:500;cursor:pointer">7 dni</button>
+        <button class="shop-days" id="shop-days-14" data-days="14" onclick="setShopDays(14)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:12px;padding:11px 6px;font-size:13px;font-weight:500;cursor:pointer">14 dni</button>
       </div>
 
       <!-- Główny przycisk -->
@@ -753,7 +753,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
       </div>
 
       <!-- Sklepy online (zweryfikowane 2026-05) -->
-      <div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-top:24px;margin-bottom:10px">🛍️ Zamów online</div>
+      <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-top:24px;margin-bottom:10px">🛍️ Zamów online</div>
       <div class="stores-grid">
         <button class="store-card" onclick="openStore('biedronka')" style="background:linear-gradient(135deg,#DC2626,#991B1B)">
           <span class="store-card-ico">🐝</span>
@@ -807,21 +807,21 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 <div class="overlay" id="exp-overlay" onclick="if(event.target===this)closeExpiry()">
   <div class="modal" style="max-width:440px">
     <h3>📅 Data przydatności</h3>
-    <p id="exp-name" style="color:var(--text2);margin-bottom:14px;font-weight:700"></p>
+    <p id="exp-name" style="color:var(--text2);margin-bottom:14px;font-weight:400"></p>
 
-    <div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Szybki wybór</div>
+    <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Szybki wybór</div>
     <div id="exp-presets" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:14px">
-      <button class="exp-preset" data-days="1" onclick="setExpiryPreset(1)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:11px;font-weight:700;cursor:pointer">Jutro</button>
-      <button class="exp-preset" data-days="3" onclick="setExpiryPreset(3)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:11px;font-weight:700;cursor:pointer">Za 3 dni</button>
-      <button class="exp-preset" data-days="7" onclick="setExpiryPreset(7)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:11px;font-weight:700;cursor:pointer">Za tydzień</button>
-      <button class="exp-preset" data-days="14" onclick="setExpiryPreset(14)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:11px;font-weight:700;cursor:pointer">Za 2 tyg.</button>
-      <button class="exp-preset" data-days="30" onclick="setExpiryPreset(30)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:11px;font-weight:700;cursor:pointer">Za miesiąc</button>
-      <button class="exp-preset" data-days="180" onclick="setExpiryPreset(180)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:11px;font-weight:700;cursor:pointer">Za 6 mies.</button>
-      <button class="exp-preset" data-days="365" onclick="setExpiryPreset(365)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:11px;font-weight:700;cursor:pointer">Za rok</button>
-      <button class="exp-preset" data-days="default" onclick="setExpiryPreset('default')" style="background:rgba(30,215,96,.08);border:1.5px solid rgba(30,215,96,.3);color:var(--green);border-radius:10px;padding:10px 6px;font-size:11px;font-weight:700;cursor:pointer;grid-column:span 2">Wg kategorii</button>
+      <button class="exp-preset" data-days="1" onclick="setExpiryPreset(1)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:11px;font-weight:400;cursor:pointer">Jutro</button>
+      <button class="exp-preset" data-days="3" onclick="setExpiryPreset(3)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:11px;font-weight:400;cursor:pointer">Za 3 dni</button>
+      <button class="exp-preset" data-days="7" onclick="setExpiryPreset(7)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:11px;font-weight:400;cursor:pointer">Za tydzień</button>
+      <button class="exp-preset" data-days="14" onclick="setExpiryPreset(14)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:11px;font-weight:400;cursor:pointer">Za 2 tyg.</button>
+      <button class="exp-preset" data-days="30" onclick="setExpiryPreset(30)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:11px;font-weight:400;cursor:pointer">Za miesiąc</button>
+      <button class="exp-preset" data-days="180" onclick="setExpiryPreset(180)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:11px;font-weight:400;cursor:pointer">Za 6 mies.</button>
+      <button class="exp-preset" data-days="365" onclick="setExpiryPreset(365)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:11px;font-weight:400;cursor:pointer">Za rok</button>
+      <button class="exp-preset" data-days="default" onclick="setExpiryPreset('default')" style="background:rgba(30,215,96,.08);border:1.5px solid rgba(30,215,96,.3);color:var(--green);border-radius:10px;padding:10px 6px;font-size:11px;font-weight:400;cursor:pointer;grid-column:span 2">Wg kategorii</button>
     </div>
 
-    <div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Lub wybierz datę ręcznie</div>
+    <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Lub wybierz datę ręcznie</div>
     <input type="date" class="modal-inp" id="exp-date-inp" style="margin-bottom:14px">
 
     <div class="modal-btns" style="margin-bottom:8px">
@@ -875,7 +875,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 <div class="overlay" id="photo-overlay" onclick="if(event.target===this)closePhoto()">
   <div class="modal" style="max-width:460px">
     <h3 id="photo-modal-hdr">📷 Zdjęcia produktu</h3>
-    <p id="photo-modal-name" style="color:var(--text2);margin-bottom:14px;font-weight:700"></p>
+    <p id="photo-modal-name" style="color:var(--text2);margin-bottom:14px;font-weight:400"></p>
     <div id="photo-modal-info" style="font-size:11px;color:var(--text3);margin-bottom:10px"></div>
 
     <!-- 3 sloty + opcjonalny 4 dla scan:true -->
@@ -924,29 +924,29 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
   <div class="dlg-box" style="max-width:440px;text-align:left">
     <div style="text-align:center;margin-bottom:14px">
       <div style="font-size:32px">🏷️</div>
-      <div style="font-size:18px;font-weight:900;color:var(--text);margin-top:4px">Makro z etykiety</div>
+      <div style="font-size:18px;font-weight:600;color:var(--text);margin-top:4px">Makro z etykiety</div>
       <div style="font-size:12px;color:var(--text3);margin-top:4px">Sprawdź dane odczytane przez AI i popraw jeśli trzeba.</div>
     </div>
-    <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:700">Nazwa produktu</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:400">Nazwa produktu</div>
     <input id="lbl-rev-name" class="modal-inp" style="width:100%;margin-bottom:8px" placeholder="np. Skyr Pyszny Duet 2,8%">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-      <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:700">Marka</div>
+      <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:400">Marka</div>
         <input id="lbl-rev-brand" class="modal-inp" placeholder="Pyszny Duet"></div>
-      <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:700">Sklep</div>
+      <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:400">Sklep</div>
         <input id="lbl-rev-shop" class="modal-inp" placeholder="Biedronka / Lidl"></div>
     </div>
-    <div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-top:8px;margin-bottom:6px">Wartości / 100g</div>
+    <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-top:8px;margin-bottom:6px">Wartości / 100g</div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:10px">
-      <div><div style="font-size:10px;color:var(--amber);margin-bottom:3px;font-weight:700">kcal</div>
+      <div><div style="font-size:10px;color:var(--amber);margin-bottom:3px;font-weight:400">kcal</div>
         <input id="lbl-rev-kcal" type="number" class="modal-inp" style="padding:10px"></div>
-      <div><div style="font-size:10px;color:#60A5FA;margin-bottom:3px;font-weight:700">B (g)</div>
+      <div><div style="font-size:10px;color:#60A5FA;margin-bottom:3px;font-weight:400">B (g)</div>
         <input id="lbl-rev-prot" type="number" step="0.1" class="modal-inp" style="padding:10px"></div>
-      <div><div style="font-size:10px;color:var(--green);margin-bottom:3px;font-weight:700">W (g)</div>
+      <div><div style="font-size:10px;color:var(--green);margin-bottom:3px;font-weight:400">W (g)</div>
         <input id="lbl-rev-carb" type="number" step="0.1" class="modal-inp" style="padding:10px"></div>
-      <div><div style="font-size:10px;color:#F9A8D4;margin-bottom:3px;font-weight:700">T (g)</div>
+      <div><div style="font-size:10px;color:#F9A8D4;margin-bottom:3px;font-weight:400">T (g)</div>
         <input id="lbl-rev-fat" type="number" step="0.1" class="modal-inp" style="padding:10px"></div>
     </div>
-    <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:700">Wielkość opakowania (g/ml)</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:400">Wielkość opakowania (g/ml)</div>
     <input id="lbl-rev-pkg" type="number" class="modal-inp" style="width:100%;margin-bottom:14px" placeholder="np. 350">
     <div class="dlg-btns">
       <button class="dlg-btn cancel" onclick="closeLabelReview()">Anuluj</button>
@@ -1674,12 +1674,12 @@ function showReceiptResults(){
   html+='</div>';
   // Komunikat o duplikacie
   if(pendingDuplicateReceipt){
-    html+='<div style="background:rgba(255,77,77,.1);border:1px solid var(--red);border-radius:10px;padding:12px;margin-bottom:10px;font-size:12px;color:var(--red);font-weight:700">⚠️ Ten paragon jest już zapisany w historii. Produkty nie zostaną dodane drugi raz.</div>';
+    html+='<div style="background:rgba(255,77,77,.1);border:1px solid var(--red);border-radius:10px;padding:12px;margin-bottom:10px;font-size:12px;color:var(--red);font-weight:400">⚠️ Ten paragon jest już zapisany w historii. Produkty nie zostaną dodane drugi raz.</div>';
   }
   // Produkty
   if(receiptData&&receiptData.length){
     var sorted=sortByNamePL(receiptData,function(p){return p.matchedName||p.rawName||p.nazwa||p.n||"";});
-    html+='<div style="font-size:11px;font-weight:800;color:var(--green);margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">Produkty z paragonu ('+sorted.length+') — zaznacz co dodać:</div>';
+    html+='<div style="font-size:11px;font-weight:500;color:var(--green);margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">Produkty z paragonu ('+sorted.length+') — zaznacz co dodać:</div>';
     sorted.forEach(function(p){
       var i=receiptData.indexOf(p);
       var name=p.matchedName||p.rawName||p.nazwa||p.n||"";
@@ -1687,35 +1687,35 @@ function showReceiptResults(){
       var price=p.totalPrice||p.cenaCalkowita||p.cena||0;
       html+='<div style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--bg3);border-radius:10px;margin-bottom:6px;border:1px solid var(--border)">';
       html+='<input type="checkbox" id="rp-cb-'+i+'" checked style="width:18px;height:18px;accent-color:var(--green);cursor:pointer;flex-shrink:0">';
-      html+='<label for="rp-cb-'+i+'" style="flex:1;cursor:pointer"><div style="font-size:13px;font-weight:700;color:var(--text)">'+name+'</div>';
+      html+='<label for="rp-cb-'+i+'" style="flex:1;cursor:pointer"><div style="font-size:13px;font-weight:400;color:var(--text)">'+name+'</div>';
       html+='<div style="font-size:11px;color:var(--text3)">x'+qty+(price?' &bull; '+Number(price).toFixed(2)+' zł':'')+'</div></label>';
       html+='</div>';
     });
   }
   // Adjustments (rabaty / płatności)
   if(receiptAdjustments&&receiptAdjustments.length){
-    html+='<div style="font-size:11px;font-weight:800;color:var(--amber);margin-top:12px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">Rabaty i opusty ('+receiptAdjustments.length+')</div>';
+    html+='<div style="font-size:11px;font-weight:500;color:var(--amber);margin-top:12px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">Rabaty i opusty ('+receiptAdjustments.length+')</div>';
     receiptAdjustments.forEach(function(a){
       html+='<div style="display:flex;justify-content:space-between;padding:6px 10px;font-size:12px;background:rgba(245,158,11,.08);border-radius:8px;margin-bottom:4px">';
       html+='<span style="color:var(--text2)">'+(a.rawName||a.description||"Rabat")+'</span>';
-      html+='<span style="color:var(--amber);font-weight:700">'+Number(a.value||0).toFixed(2)+' zł</span>';
+      html+='<span style="color:var(--amber);font-weight:400">'+Number(a.value||0).toFixed(2)+' zł</span>';
       html+='</div>';
     });
   }
   // Niepewne pozycje
   if(receiptUncertain&&receiptUncertain.length){
-    html+='<div style="font-size:11px;font-weight:800;color:var(--blue);margin-top:14px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">Pozycje wymagające potwierdzenia ('+receiptUncertain.length+')</div>';
+    html+='<div style="font-size:11px;font-weight:500;color:var(--blue);margin-top:14px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">Pozycje wymagające potwierdzenia ('+receiptUncertain.length+')</div>';
     receiptUncertain.forEach(function(u,i){
       var raw=u.rawName||u.nazwa||u.name||"";
       var price=u.totalPrice||u.cena||0;
       html+='<div style="background:rgba(61,139,255,.08);border:1px solid rgba(61,139,255,.25);border-radius:10px;padding:10px;margin-bottom:8px">';
-      html+='<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">'+raw+'</div>';
+      html+='<div style="font-size:13px;font-weight:400;color:var(--text);margin-bottom:4px">'+raw+'</div>';
       html+='<div style="font-size:11px;color:var(--text3);margin-bottom:8px">'+(price?Number(price).toFixed(2)+' zł &bull; ':'')+(u.reason||"Sugerowany typ: produkt")+'</div>';
       html+='<div style="display:flex;gap:6px;flex-wrap:wrap">';
-      html+='<button onclick="confirmUncertain('+i+',\'product\')" style="flex:1;min-width:80px;background:var(--green);color:#000;border:none;border-radius:8px;padding:7px;font-size:11px;font-weight:700;cursor:pointer">To produkt</button>';
-      html+='<button onclick="confirmUncertain('+i+',\'discount\')" style="flex:1;min-width:80px;background:var(--amber);color:#000;border:none;border-radius:8px;padding:7px;font-size:11px;font-weight:700;cursor:pointer">To rabat/upust</button>';
-      html+='<button onclick="confirmUncertain('+i+',\'ignore\')" style="flex:1;min-width:60px;background:var(--bg4);color:var(--text2);border:1px solid var(--border);border-radius:8px;padding:7px;font-size:11px;font-weight:700;cursor:pointer">Pomiń</button>';
-      html+='<button onclick="confirmUncertainManual('+i+')" style="flex:1;min-width:90px;background:var(--bg4);color:var(--text2);border:1px solid var(--border);border-radius:8px;padding:7px;font-size:11px;font-weight:700;cursor:pointer">Wpisz opis ręcznie</button>';
+      html+='<button onclick="confirmUncertain('+i+',\'product\')" style="flex:1;min-width:80px;background:var(--green);color:#000;border:none;border-radius:8px;padding:7px;font-size:11px;font-weight:400;cursor:pointer">To produkt</button>';
+      html+='<button onclick="confirmUncertain('+i+',\'discount\')" style="flex:1;min-width:80px;background:var(--amber);color:#000;border:none;border-radius:8px;padding:7px;font-size:11px;font-weight:400;cursor:pointer">To rabat/upust</button>';
+      html+='<button onclick="confirmUncertain('+i+',\'ignore\')" style="flex:1;min-width:60px;background:var(--bg4);color:var(--text2);border:1px solid var(--border);border-radius:8px;padding:7px;font-size:11px;font-weight:400;cursor:pointer">Pomiń</button>';
+      html+='<button onclick="confirmUncertainManual('+i+')" style="flex:1;min-width:90px;background:var(--bg4);color:var(--text2);border:1px solid var(--border);border-radius:8px;padding:7px;font-size:11px;font-weight:400;cursor:pointer">Wpisz opis ręcznie</button>';
       html+='</div>';
       html+='</div>';
     });
@@ -2128,18 +2128,18 @@ function showShopExportModal(store,storeLabel,itemCount,text){
   var subTitle=store==="lidl"?"Lidl nie sprzedaje spożywki online (tylko katalog AGD/odzież).":store==="glovo"||store==="lisek"||store==="wolt"?"Ten serwis to apka mobilna — strona to landing.":"Sklepy spożywcze nie mają pola \"wklej listę\". Wybierz jak chcesz użyć listy:";
   ol.innerHTML='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:22px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.6)">'+
     '<div style="font-size:32px;margin-bottom:8px;text-align:center">🛒</div>'+
-    '<div style="font-size:17px;font-weight:900;color:var(--text);text-align:center;margin-bottom:4px">Lista zakupów — '+itemCount+' pozycji</div>'+
+    '<div style="font-size:17px;font-weight:600;color:var(--text);text-align:center;margin-bottom:4px">Lista zakupów — '+itemCount+' pozycji</div>'+
     '<div style="font-size:12px;color:var(--text3);text-align:center;margin-bottom:18px;line-height:1.4">'+subTitle+'</div>'+
     // Opcja 1: Web Share (mobile)
-    (canShare?'<button onclick="shopExportShare()" style="width:100%;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#000;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;justify-content:flex-start"><span style="font-size:20px">📤</span><div style="flex:1;text-align:left"><div>Udostępnij listę</div><div style="font-size:10px;font-weight:600;opacity:.75">Wyślij do Wiadomości / Mail / Notatek</div></div></button>':'')+
+    (canShare?'<button onclick="shopExportShare()" style="width:100%;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#000;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;justify-content:flex-start"><span style="font-size:20px">📤</span><div style="flex:1;text-align:left"><div>Udostępnij listę</div><div style="font-size:10px;font-weight:600;opacity:.75">Wyślij do Wiadomości / Mail / Notatek</div></div></button>':'')+
     // Opcja 2: Kopiuj
-    '<button onclick="shopExportCopy()" style="width:100%;background:var(--bg3);color:var(--text);border:1.5px solid var(--border);border-radius:12px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px"><span style="font-size:20px">📋</span><div style="flex:1;text-align:left"><div>Skopiuj listę</div><div style="font-size:10px;font-weight:600;color:var(--text3)">Wklej w swojej apce listy/notatek</div></div></button>'+
+    '<button onclick="shopExportCopy()" style="width:100%;background:var(--bg3);color:var(--text);border:1.5px solid var(--border);border-radius:12px;padding:14px;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px"><span style="font-size:20px">📋</span><div style="flex:1;text-align:left"><div>Skopiuj listę</div><div style="font-size:10px;font-weight:600;color:var(--text3)">Wklej w swojej apce listy/notatek</div></div></button>'+
     // Opcja 3: Drukuj
-    '<button onclick="shopExportPrint()" style="width:100%;background:var(--bg3);color:var(--text);border:1.5px solid var(--border);border-radius:12px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px"><span style="font-size:20px">🖨️</span><div style="flex:1;text-align:left"><div>Drukuj listę</div><div style="font-size:10px;font-weight:600;color:var(--text3)">Wersja do papieru</div></div></button>'+
+    '<button onclick="shopExportPrint()" style="width:100%;background:var(--bg3);color:var(--text);border:1.5px solid var(--border);border-radius:12px;padding:14px;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px"><span style="font-size:20px">🖨️</span><div style="flex:1;text-align:left"><div>Drukuj listę</div><div style="font-size:10px;font-weight:600;color:var(--text3)">Wersja do papieru</div></div></button>'+
     // Opcja 4: Otwórz sklep (sam — bez kłamstwa o wklejaniu)
-    '<button onclick="shopExportOpenStore()" data-store="'+store+'" style="width:100%;background:var(--bg3);color:var(--text);border:1.5px solid var(--border);border-radius:12px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:12px;display:flex;align-items:center;gap:10px"><span style="font-size:20px">🏪</span><div style="flex:1;text-align:left"><div>Otwórz '+storeLabel+'</div><div style="font-size:10px;font-weight:600;color:var(--text3)">W liście znajdziesz 🔍 przy każdej pozycji</div></div></button>'+
+    '<button onclick="shopExportOpenStore()" data-store="'+store+'" style="width:100%;background:var(--bg3);color:var(--text);border:1.5px solid var(--border);border-radius:12px;padding:14px;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:12px;display:flex;align-items:center;gap:10px"><span style="font-size:20px">🏪</span><div style="flex:1;text-align:left"><div>Otwórz '+storeLabel+'</div><div style="font-size:10px;font-weight:600;color:var(--text3)">W liście znajdziesz 🔍 przy każdej pozycji</div></div></button>'+
     // Anuluj
-    '<button onclick="closeShopExportModal()" style="width:100%;background:transparent;color:var(--text3);border:1px solid var(--border);border-radius:12px;padding:11px;font-size:13px;font-weight:700;cursor:pointer">Anuluj</button>'+
+    '<button onclick="closeShopExportModal()" style="width:100%;background:transparent;color:var(--text3);border:1px solid var(--border);border-radius:12px;padding:11px;font-size:13px;font-weight:400;cursor:pointer">Anuluj</button>'+
     '</div>';
   ol.style.display="flex";
   // Przechowaj w window żeby przyciski miały dostęp
@@ -2168,7 +2168,7 @@ function shopExportPrint(){
     if(!line.trim())return;
     html+='<div class="item"><span class="box"></span><span>'+line.replace(/^-\s*/,"").replace(/</g,"&lt;")+'</span></div>';
   });
-  html+='<button onclick="window.print()" style="position:fixed;bottom:20px;right:20px;background:#06B6D4;color:#000;border:none;border-radius:10px;padding:12px 20px;font-size:14px;font-weight:800;cursor:pointer">🖨️ Drukuj</button>';
+  html+='<button onclick="window.print()" style="position:fixed;bottom:20px;right:20px;background:#06B6D4;color:#000;border:none;border-radius:10px;padding:12px 20px;font-size:14px;font-weight:500;cursor:pointer">🖨️ Drukuj</button>';
   html+='</body></html>';
   w.document.write(html);
   w.document.close();
@@ -2235,7 +2235,7 @@ function render(){
     vis.forEach(function(it){
       var id=fbk(cat.id,it.n),ne=it.n.replace(/'/g,"\\'");
       var cur=state[id]||0,cc=cls(cur,it.target),pct=Math.min(100,Math.round(cur/Math.max(1,it.target)*100)),brak=Math.max(0,it.target-cur);
-      var ql=cc==="grn"?'<span style="color:var(--green);font-size:10px;font-weight:700">Wystarczy</span>':cc==="low"?'<span style="color:var(--amber);font-size:10px;font-weight:700">Kup jeszcze '+brak+" "+it.unit+'</span>':'<span style="color:var(--red);font-size:10px;font-weight:700">Brakuje '+brak+" "+it.unit+'</span>';
+      var ql=cc==="grn"?'<span style="color:var(--green);font-size:10px;font-weight:400">Wystarczy</span>':cc==="low"?'<span style="color:var(--amber);font-size:10px;font-weight:400">Kup jeszcze '+brak+" "+it.unit+'</span>':'<span style="color:var(--red);font-size:10px;font-weight:400">Brakuje '+brak+" "+it.unit+'</span>';
       // Photo lookup — używamy fbk("p", name) — taki sam klucz jak przy zapisie
       var pkey=fbk("p",it.n);
       var hasPhoto=photos[pkey];
@@ -2277,7 +2277,7 @@ function render(){
       // Prawa kolumna: +/-
       html+='<div class="qty-col">';
       html+='<button class="qty-btn" style="background:var(--bg3);color:var(--text)" onclick="adj(\''+id+'\',\''+cat.id+'\',\''+ne+'\',-1)">−</button>';
-      html+='<div style="min-width:44px;text-align:center;font-weight:800;color:var(--text)"><span style="font-size:20px;line-height:1.1">'+cur+'</span><span style="font-size:10px;color:var(--text3);display:block;margin-top:2px">'+it.unit+'</span></div>';
+      html+='<div style="min-width:44px;text-align:center;font-weight:500;color:var(--text)"><span style="font-size:20px;line-height:1.1">'+cur+'</span><span style="font-size:10px;color:var(--text3);display:block;margin-top:2px">'+it.unit+'</span></div>';
       html+='<button class="qty-btn" style="background:var(--green);color:#000" onclick="adj(\''+id+'\',\''+cat.id+'\',\''+ne+'\',1)">+</button>';
       html+='</div>';
       html+='</div></div>';
@@ -2327,7 +2327,7 @@ function openUserPanel(){
       var goalMap={lose:"Redukcja",maintain:"Utrzymanie",gain:"Masa mięśniowa"};
       var storeMap={biedronka:"Biedronka",lidl:"Lidl",both:"Biedronka + Lidl"};
       var html="";
-      html+='<div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:8px">'+displayName+'</div>';
+      html+='<div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:8px">'+displayName+'</div>';
       html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;color:var(--text3)">';
       if(userProfile.age)html+='<div>Wiek: <b style="color:var(--text)">'+userProfile.age+' lat</b></div>';
       if(userProfile.weight)html+='<div>Waga: <b style="color:var(--text)">'+userProfile.weight+' kg</b></div>';
@@ -2337,9 +2337,9 @@ function openUserPanel(){
       html+='<div>Kcal: <b style="color:var(--amber)">'+userProfile.kcal+'</b></div>';
       html+='</div>';
       html+='<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">';
-      html+='<span style="background:rgba(96,165,250,.15);border-radius:50px;padding:3px 10px;font-size:11px;font-weight:700;color:#60A5FA">B: '+(userProfile.prot||"?")+'g</span>';
-      html+='<span style="background:rgba(30,215,96,.12);border-radius:50px;padding:3px 10px;font-size:11px;font-weight:700;color:var(--green)">W: '+(userProfile.carb||"?")+'g</span>';
-      html+='<span style="background:rgba(249,168,212,.15);border-radius:50px;padding:3px 10px;font-size:11px;font-weight:700;color:#F9A8D4">T: '+(userProfile.fat||"?")+'g</span>';
+      html+='<span style="background:rgba(96,165,250,.15);border-radius:50px;padding:3px 10px;font-size:11px;font-weight:400;color:#60A5FA">B: '+(userProfile.prot||"?")+'g</span>';
+      html+='<span style="background:rgba(30,215,96,.12);border-radius:50px;padding:3px 10px;font-size:11px;font-weight:400;color:var(--green)">W: '+(userProfile.carb||"?")+'g</span>';
+      html+='<span style="background:rgba(249,168,212,.15);border-radius:50px;padding:3px 10px;font-size:11px;font-weight:400;color:#F9A8D4">T: '+(userProfile.fat||"?")+'g</span>';
       html+='</div>';
       card.innerHTML=html;
     }else{
@@ -2615,14 +2615,14 @@ function renderDietBody(){var body=document.getElementById("diet-body");if(!body
 function renderRecipes(){
   var d=getDietData(),menu=dietMenu===1?d.menu1:d.menu2;
   var h='<div style="display:flex;background:var(--bg3);border-radius:50px;padding:4px;margin-bottom:12px;border:1px solid var(--border)">'
-    +'<button onclick="dietMenu=1;expandedMeal=null;renderDietBody()" style="flex:1;padding:10px;border-radius:50px;border:none;font-size:13px;font-weight:800;cursor:pointer;background:'+(dietMenu===1?"var(--green);color:#000":"transparent;color:var(--text3)")+'">Menu 1</button>'
-    +'<button onclick="dietMenu=2;expandedMeal=null;renderDietBody()" style="flex:1;padding:10px;border-radius:50px;border:none;font-size:13px;font-weight:800;cursor:pointer;background:'+(dietMenu===2?"var(--green);color:#000":"transparent;color:var(--text3)")+'">Menu 2</button>'
+    +'<button onclick="dietMenu=1;expandedMeal=null;renderDietBody()" style="flex:1;padding:10px;border-radius:50px;border:none;font-size:13px;font-weight:500;cursor:pointer;background:'+(dietMenu===1?"var(--green);color:#000":"transparent;color:var(--text3)")+'">Menu 1</button>'
+    +'<button onclick="dietMenu=2;expandedMeal=null;renderDietBody()" style="flex:1;padding:10px;border-radius:50px;border:none;font-size:13px;font-weight:500;cursor:pointer;background:'+(dietMenu===2?"var(--green);color:#000":"transparent;color:var(--text3)")+'">Menu 2</button>'
     +'</div>';
   var secs=[{k:"sniadania",l:"Sniadania"},{k:"obiady",l:"Obiady"},{k:"kolacje",l:"Kolacje"}];
   secs.forEach(function(sec){
     var secMeals=menu[sec.k]||[];
     h+='<div style="margin-bottom:20px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">';
-    h+='<div style="font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3)">'+sec.l+'</div>';
+    h+='<div style="font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3)">'+sec.l+'</div>';
     h+='<button class="meal-gen-btn" onclick="generateSingleMeal('+dietMenu+',\''+sec.k+'\',null)">+ Nowa potrawa</button>';
     h+='</div>';
     secMeals.forEach(function(m,mIdx){
@@ -2644,14 +2644,14 @@ function renderRecipes(){
       // Status badge
       var statusBadge="";
       if(hasCalc&&calc.isComplete&&!calc.isSuspicious){
-        statusBadge='<span title="Makro policzone z produktów (USDA/Open Food Facts/lokalna baza)" style="background:rgba(30,215,96,.15);border:1px solid rgba(30,215,96,.4);border-radius:6px;padding:2px 6px;font-size:10px;font-weight:700;color:var(--green)">✓ z produktów</span>';
+        statusBadge='<span title="Makro policzone z produktów (USDA/Open Food Facts/lokalna baza)" style="background:rgba(30,215,96,.15);border:1px solid rgba(30,215,96,.4);border-radius:6px;padding:2px 6px;font-size:10px;font-weight:400;color:var(--green)">✓ z produktów</span>';
       }else if(hasCalc&&!calc.isComplete){
-        statusBadge='<span title="'+calc.missing.length+' składników bez danych" style="background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);border-radius:6px;padding:2px 6px;font-size:10px;font-weight:700;color:var(--amber)">⚠ brakuje danych ('+calc.missing.length+')</span>';
+        statusBadge='<span title="'+calc.missing.length+' składników bez danych" style="background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);border-radius:6px;padding:2px 6px;font-size:10px;font-weight:400;color:var(--amber)">⚠ brakuje danych ('+calc.missing.length+')</span>';
       }else if(!hasCalc){
-        statusBadge='<span title="Brak rozpoznanych składników" style="background:rgba(255,77,77,.15);border:1px solid rgba(255,77,77,.4);border-radius:6px;padding:2px 6px;font-size:10px;font-weight:700;color:var(--red)">⚠ brak danych</span>';
+        statusBadge='<span title="Brak rozpoznanych składników" style="background:rgba(255,77,77,.15);border:1px solid rgba(255,77,77,.4);border-radius:6px;padding:2px 6px;font-size:10px;font-weight:400;color:var(--red)">⚠ brak danych</span>';
       }
       if(calc.isSuspicious){
-        statusBadge+='<span title="Kalorie nie zgadzają się z makro (B*4+W*4+T*9='+calc.kcalFromMacros+')" style="background:rgba(255,77,77,.12);border:1px solid rgba(255,77,77,.35);border-radius:6px;padding:2px 6px;font-size:10px;font-weight:700;color:var(--red);margin-left:4px">⚠ podejrzane</span>';
+        statusBadge+='<span title="Kalorie nie zgadzają się z makro (B*4+W*4+T*9='+calc.kcalFromMacros+')" style="background:rgba(255,77,77,.12);border:1px solid rgba(255,77,77,.35);border-radius:6px;padding:2px 6px;font-size:10px;font-weight:400;color:var(--red);margin-left:4px">⚠ podejrzane</span>';
       }
       // Porównanie z AI target
       var aiKcal=Number(aiTarget&&aiTarget.kcal||0);
@@ -2660,14 +2660,14 @@ function renderRecipes(){
       h+='<div style="background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:8px;overflow:hidden">';
       h+='<div style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between">';
       h+='<div style="flex:1;cursor:pointer" onclick="expandedMeal=expandedMeal===\''+uid+'\'?null:\''+uid+'\';renderDietBody()">';
-      h+='<div style="font-size:14px;font-weight:800;color:var(--text)">'+m.nazwa+'</div>';
+      h+='<div style="font-size:14px;font-weight:500;color:var(--text)">'+m.nazwa+'</div>';
       h+='<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;align-items:center">';
-      h+='<span style="background:rgba(245,158,11,.15);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;color:var(--amber)">'+dispKcal+' kcal</span>';
-      h+='<span style="background:rgba(96,165,250,.15);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;color:#60A5FA">B '+dispProt+'g</span>';
-      h+='<span style="background:rgba(30,215,96,.12);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;color:var(--green)">W '+dispCarb+'g</span>';
-      h+='<span style="background:rgba(249,168,212,.15);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;color:#F9A8D4">T '+dispFat+'g</span>';
+      h+='<span style="background:rgba(245,158,11,.15);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:400;color:var(--amber)">'+dispKcal+' kcal</span>';
+      h+='<span style="background:rgba(96,165,250,.15);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:400;color:#60A5FA">B '+dispProt+'g</span>';
+      h+='<span style="background:rgba(30,215,96,.12);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:400;color:var(--green)">W '+dispCarb+'g</span>';
+      h+='<span style="background:rgba(249,168,212,.15);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:400;color:#F9A8D4">T '+dispFat+'g</span>';
       h+=statusBadge;
-      if(showDiff)h+='<span title="AI target: '+aiKcal+' kcal. Realne ze składników: '+calc.kcal+' kcal" style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.35);border-radius:6px;padding:2px 6px;font-size:10px;font-weight:700;color:var(--purple)">AI '+aiKcal+' / Δ'+diffPct+'%</span>';
+      if(showDiff)h+='<span title="AI target: '+aiKcal+' kcal. Realne ze składników: '+calc.kcal+' kcal" style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.35);border-radius:6px;padding:2px 6px;font-size:10px;font-weight:400;color:var(--purple)">AI '+aiKcal+' / Δ'+diffPct+'%</span>';
       h+='</div></div>';
       h+='<div style="display:flex;gap:5px;align-items:center;flex-shrink:0;margin-left:8px">';
       h+='<button class="meal-gen-btn" onclick="event.stopPropagation();generateSingleMeal('+dietMenu+',\''+sec.k+'\','+mIdx+')">Inna</button>';
@@ -2677,15 +2677,15 @@ function renderRecipes(){
       if(open){
         h+='<div style="padding:0 14px 14px">';
         // Tabela składników z per-row macro + ŹRÓDŁA DANYCH
-        h+='<div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Składniki, makro i źródła</div>';
+        h+='<div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Składniki, makro i źródła</div>';
         h+='<table style="width:100%;border-collapse:collapse;margin-bottom:10px;font-size:12px;background:var(--bg3);border-radius:10px;overflow:hidden">';
         h+='<thead><tr style="background:var(--bg4)">';
-        h+='<th style="text-align:left;color:var(--text3);padding:8px 10px;font-weight:700">Składnik / Źródło</th>';
-        h+='<th style="text-align:right;color:var(--text3);padding:8px 6px;font-weight:700">Ilość</th>';
-        h+='<th style="text-align:right;color:var(--amber);padding:8px 6px;font-weight:700">kcal</th>';
-        h+='<th style="text-align:right;color:#60A5FA;padding:8px 6px;font-weight:700">B</th>';
-        h+='<th style="text-align:right;color:var(--green);padding:8px 6px;font-weight:700">W</th>';
-        h+='<th style="text-align:right;color:#F9A8D4;padding:8px 10px;font-weight:700">T</th>';
+        h+='<th style="text-align:left;color:var(--text3);padding:8px 10px;font-weight:400">Składnik / Źródło</th>';
+        h+='<th style="text-align:right;color:var(--text3);padding:8px 6px;font-weight:400">Ilość</th>';
+        h+='<th style="text-align:right;color:var(--amber);padding:8px 6px;font-weight:400">kcal</th>';
+        h+='<th style="text-align:right;color:#60A5FA;padding:8px 6px;font-weight:400">B</th>';
+        h+='<th style="text-align:right;color:var(--green);padding:8px 6px;font-weight:400">W</th>';
+        h+='<th style="text-align:right;color:#F9A8D4;padding:8px 10px;font-weight:400">T</th>';
         h+='</tr></thead><tbody>';
         (calc.rows||[]).forEach(function(r){
           // PRZYPRAWY - mały dyskretny wiersz, ignorowane w sumie
@@ -2702,13 +2702,13 @@ function renderRecipes(){
           var srcColor={localFallback:"var(--purple)",openFoodFacts:"#60A5FA",usda:"var(--green)",cache:"var(--text3)",manualAdmin:"var(--amber)"}[r.source]||"var(--text3)";
           h+='<tr>';
           h+='<td style="padding:6px 10px;'+nameStyle+';border-bottom:1px solid var(--bg2)">';
-          h+='<div style="font-weight:700">'+r.name+(isOk?"":' <span title="'+(r.warning||"Brak danych")+'" style="font-size:10px;color:var(--red)">⚠</span>')+'</div>';
+          h+='<div style="font-weight:400">'+r.name+(isOk?"":' <span title="'+(r.warning||"Brak danych")+'" style="font-size:10px;color:var(--red)">⚠</span>')+'</div>';
           // Dopasowany produkt + sklep/marka (Biedronka/Lidl)
           if(r.productName&&r.productName!==r.name){
             var shopBadge="";
             if(r.brand||r.shop){
               var shopText=[r.brand,r.shop].filter(Boolean).join(", ");
-              shopBadge=' <span style="background:rgba(96,165,250,.12);border-radius:4px;padding:1px 5px;font-size:9px;color:#60A5FA;font-weight:700">'+shopText+'</span>';
+              shopBadge=' <span style="background:rgba(96,165,250,.12);border-radius:4px;padding:1px 5px;font-size:9px;color:#60A5FA;font-weight:400">'+shopText+'</span>';
             }
             h+='<div style="font-size:10px;color:var(--text2);margin-top:2px">→ '+r.productName+shopBadge+'</div>';
           }
@@ -2732,7 +2732,7 @@ function renderRecipes(){
           h+='</tr>';
         });
         // Wiersz SUMA (REALNA)
-        h+='<tr style="background:rgba(30,215,96,.06);font-weight:900">';
+        h+='<tr style="background:rgba(30,215,96,.06);font-weight:600">';
         h+='<td style="padding:8px 10px;color:var(--green)" colspan="2">SUMA z produktów (realne)</td>';
         h+='<td style="text-align:right;padding:8px 6px;color:var(--amber)">'+calc.kcal+'</td>';
         h+='<td style="text-align:right;padding:8px 6px;color:#60A5FA">'+calc.protein+'</td>';
@@ -2821,12 +2821,12 @@ function renderRecipes(){
     var diffOk=Math.abs(dayTotal.kcal-userProfile.kcal)<userProfile.kcal*0.1;
     var color=diffOk?"var(--green)":"var(--amber)";
     h+='<div style="background:'+(diffOk?"rgba(30,215,96,.08)":"rgba(245,158,11,.08)")+';border:1px solid '+color+';border-radius:var(--radius);padding:14px 16px;margin-bottom:12px">';
-    h+='<div style="font-size:10px;font-weight:800;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.6px">Bilans Menu '+dietMenu+' — średnia dnia (1 z każdej sekcji)</div>';
+    h+='<div style="font-size:10px;font-weight:500;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.6px">Bilans Menu '+dietMenu+' — średnia dnia (1 z każdej sekcji)</div>';
     h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:8px">';
-    h+='<div style="text-align:center"><div style="font-size:20px;font-weight:900;color:'+color+'">'+dayTotal.kcal+'</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">kcal</div></div>';
-    h+='<div style="text-align:center"><div style="font-size:20px;font-weight:900;color:#60A5FA">'+dayTotal.prot+'g</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Białko</div></div>';
-    h+='<div style="text-align:center"><div style="font-size:20px;font-weight:900;color:var(--green)">'+dayTotal.carb+'g</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Węgle</div></div>';
-    h+='<div style="text-align:center"><div style="font-size:20px;font-weight:900;color:#F9A8D4">'+dayTotal.fat+'g</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Tłuszcze</div></div>';
+    h+='<div style="text-align:center"><div style="font-size:20px;font-weight:600;color:'+color+'">'+dayTotal.kcal+'</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">kcal</div></div>';
+    h+='<div style="text-align:center"><div style="font-size:20px;font-weight:600;color:#60A5FA">'+dayTotal.prot+'g</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Białko</div></div>';
+    h+='<div style="text-align:center"><div style="font-size:20px;font-weight:600;color:var(--green)">'+dayTotal.carb+'g</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Węgle</div></div>';
+    h+='<div style="text-align:center"><div style="font-size:20px;font-weight:600;color:#F9A8D4">'+dayTotal.fat+'g</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Tłuszcze</div></div>';
     h+='</div>';
     h+='<div style="font-size:11px;color:var(--text3);font-weight:600">Cel: <b style="color:var(--text)">'+userProfile.kcal+' kcal</b> &bull; B:'+userProfile.prot+'g W:'+userProfile.carb+'g T:'+userProfile.fat+'g</div>';
     var badCount=perSection.filter(function(s){return s.count>0&&s.validCnt<s.count;}).reduce(function(a,s){return a+(s.count-s.validCnt);},0);
@@ -2838,11 +2838,11 @@ function renderRecipes(){
     }
     h+='</div>';
   }
-  h+='<button onclick="generateShopFromDiet()" style="width:100%;background:linear-gradient(135deg,var(--purple),#4F46E5);color:#fff;border:none;border-radius:50px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;margin-top:4px">Generuj liste zakupow z diety</button>';
+  h+='<button onclick="generateShopFromDiet()" style="width:100%;background:linear-gradient(135deg,var(--purple),#4F46E5);color:#fff;border:none;border-radius:50px;padding:14px;font-size:14px;font-weight:500;cursor:pointer;margin-top:4px">Generuj liste zakupow z diety</button>';
   return h;
 }
 
-function renderUploadDiet(){return'<button onclick="generateAIDiet(userProfile)" style="width:100%;background:linear-gradient(135deg,var(--green2),var(--green));color:#000;border:none;border-radius:50px;padding:14px;font-size:14px;font-weight:900;cursor:pointer;margin-bottom:16px">Generuj diete AI na nowo</button><div style="font-size:13px;font-weight:700;color:var(--text3);margin-bottom:8px">lub wklej tekst planu:</div><textarea id="diet-upload-text" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px;font-size:13px;color:var(--text);outline:none;min-height:100px;font-family:inherit;resize:vertical;margin-bottom:10px" placeholder="Wklej tekst planu zywieniowego..."></textarea><button onclick="parseDietText()" style="width:100%;background:linear-gradient(135deg,var(--purple),#4F46E5);color:#fff;border:none;border-radius:50px;padding:13px;font-size:14px;font-weight:800;cursor:pointer">Analizuj z AI</button>';}
+function renderUploadDiet(){return'<button onclick="generateAIDiet(userProfile)" style="width:100%;background:linear-gradient(135deg,var(--green2),var(--green));color:#000;border:none;border-radius:50px;padding:14px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:16px">Generuj diete AI na nowo</button><div style="font-size:13px;font-weight:400;color:var(--text3);margin-bottom:8px">lub wklej tekst planu:</div><textarea id="diet-upload-text" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:10px;padding:12px;font-size:13px;color:var(--text);outline:none;min-height:100px;font-family:inherit;resize:vertical;margin-bottom:10px" placeholder="Wklej tekst planu zywieniowego..."></textarea><button onclick="parseDietText()" style="width:100%;background:linear-gradient(135deg,var(--purple),#4F46E5);color:#fff;border:none;border-radius:50px;padding:13px;font-size:14px;font-weight:500;cursor:pointer">Analizuj z AI</button>';}
 function parseDietText(){var txt=document.getElementById("diet-upload-text");if(!txt||!txt.value.trim())return;if(!apiKey)return;var body=document.getElementById("diet-body");body.innerHTML='<div style="text-align:center;padding:40px"><div class="spin" style="margin:0 auto"></div></div>';callAPI([{role:"user",content:'Przeanalizuj plan diety. TYLKO JSON: {"menu1":{"sniadania":[{"nazwa":"","czas":"","kcal":0,"prot":0,"carb":0,"fat":0,"skladniki":[{"n":"","il":""}],"przepis":""}],"obiady":[...],"kolacje":[...]},"menu2":{...}}. Plan: '+txt.value}],"Jestes dietetykiem. TYLKO JSON bez markdown.",function(res){try{var clean=res.replace(/```json/gi,"").replace(/```/g,"").trim();var p=JSON.parse(clean.slice(clean.indexOf("{"),clean.lastIndexOf("}")+1));if(!userProfile)userProfile={};userProfile.dietData=p;saveUserProfile(userProfile);switchDietTab(0);}catch(e){renderDietBody();}},function(){renderDietBody();},3500);}
 function generateShopFromDiet(){var d=getDietData(),menu=dietMenu===1?d.menu1:d.menu2;var allIngr=[];["sniadania","obiady","kolacje"].forEach(function(t){(menu[t]||[]).forEach(function(m){(m.skladniki||[]).forEach(function(s){allIngr.push(s.n+" "+s.il);});});});var inStock=[];CATS.forEach(function(cat){cat.items.forEach(function(it){if((state[fbk(cat.id,it.n)]||0)>=it.target)inStock.push(it.n);});});closeDiet();showPage("shop");callAPI([{role:"user",content:"Skladniki z diety: "+allIngr.join(", ")+". Mam juz: "+inStock.join(", ")+". Lista zakupow. TYLKO JSON: {\"komentarz\":\"\",\"produkty\":[{\"nazwa\":\"\",\"ilosc\":\"\",\"priorytet\":\"wysoki\",\"powod\":\"\"}]}"}],SYS,function(res){var clean=res.replace(/```json/gi,"").replace(/```/g,"").trim();try{renderShopList(JSON.parse(clean.slice(clean.indexOf("{"),clean.lastIndexOf("}")+1)));}catch(e){document.getElementById("shop-list-content").innerHTML='<div class="ai-note">'+res+'</div>';}},function(err){dlgAlert("X","Blad",err);});}
 
@@ -2919,16 +2919,16 @@ function startDietGeneration(){
   body.innerHTML=
     '<div style="text-align:center;padding:40px 20px">'
     +'<div style="font-size:60px;margin-bottom:16px;animation:spin_diet 2s linear infinite;display:inline-block">&#129302;</div>'
-    +'<div style="font-size:18px;font-weight:900;color:var(--text);margin-bottom:8px">Generuje Twoja diete...</div>'
+    +'<div style="font-size:18px;font-weight:600;color:var(--text);margin-bottom:8px">Generuje Twoja diete...</div>'
     +'<div style="font-size:13px;color:var(--text3);margin-bottom:6px">Claude AI dobiera posilki z '+storeName+'</div>'
     +'<div style="font-size:12px;color:var(--text3);margin-bottom:24px">'
     +'Cel: <b style="color:var(--green)">'+{lose:"Redukcja tluszczu",maintain:"Utrzymanie wagi",gain:"Masa miesniowa"}[userProfile.goal]+'</b> &bull; '
     +userProfile.kcal+' kcal/dzien &bull; B:'+userProfile.prot+'g W:'+userProfile.carb+'g T:'+userProfile.fat+'g'
     +'</div>'
     +'<div class="spin" style="margin:0 auto 20px"></div>'
-    +'<div id="diet-gen-step" style="font-size:13px;color:var(--amber);font-weight:700">Krok 1/2 &mdash; Menu 1...</div>'
+    +'<div id="diet-gen-step" style="font-size:13px;color:var(--amber);font-weight:400">Krok 1/2 &mdash; Menu 1...</div>'
     +'<div style="margin-top:20px;background:var(--bg3);border-radius:12px;padding:16px;text-align:left;border:1px solid var(--border)">'
-    +'<div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.8px">Co sie teraz dzieje?</div>'
+    +'<div style="font-size:11px;font-weight:500;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.8px">Co sie teraz dzieje?</div>'
     +'<div style="font-size:12px;color:var(--text2);line-height:2">'
     +'<div>&#9989; Analizuje Twoje parametry</div>'
     +'<div>&#9989; Dobiera produkty z '+storeName+'</div>'
@@ -3059,7 +3059,7 @@ function parseMenuJSON(raw){
   }catch(ex){return null;}
 }
 function getJSONError(raw){try{var c=raw.replace(/```json/gi,"").replace(/```/g,"").trim();JSON.parse(c.slice(c.indexOf("{"),c.lastIndexOf("}")+1));return"OK";}catch(ex){return ex.message.slice(0,80);}}
-function showDietError(msg){document.getElementById("diet-body").innerHTML='<div style="text-align:center;padding:40px"><div style="font-size:40px;margin-bottom:10px">X</div><div style="color:var(--red);font-weight:700;margin-bottom:8px">Blad generowania</div><div style="font-size:12px;color:var(--text3);margin-bottom:16px;word-break:break-all">'+msg+'</div><button onclick="generateAIDiet(userProfile)" style="background:var(--green);color:#000;border:none;border-radius:50px;padding:12px 24px;font-size:14px;font-weight:800;cursor:pointer">Sprobuj ponownie</button></div>';}
+function showDietError(msg){document.getElementById("diet-body").innerHTML='<div style="text-align:center;padding:40px"><div style="font-size:40px;margin-bottom:10px">X</div><div style="color:var(--red);font-weight:400;margin-bottom:8px">Blad generowania</div><div style="font-size:12px;color:var(--text3);margin-bottom:16px;word-break:break-all">'+msg+'</div><button onclick="generateAIDiet(userProfile)" style="background:var(--green);color:#000;border:none;border-radius:50px;padding:12px 24px;font-size:14px;font-weight:500;cursor:pointer">Sprobuj ponownie</button></div>';}
 function fixMenuMacros(menu,profile){var secs=["sniadania","obiady","kolacje"],mK=Math.round(profile.kcal/3),mP=Math.round(profile.prot/3),mC=Math.round(profile.carb/3),mF=Math.round(profile.fat/3);secs.forEach(function(sec){if(!menu[sec])menu[sec]=[];menu[sec].forEach(function(m){if(!m.kcal||m.kcal<100||m.kcal>2500)m.kcal=mK;if(!m.prot||m.prot<5)m.prot=mP;if(!m.carb||m.carb<5)m.carb=mC;if(!m.fat||m.fat<2)m.fat=mF;if(!m.skladniki||!m.skladniki.length)m.skladniki=[{n:"Brak danych",il:"?"}];if(!m.przepis)m.przepis="Przygotuj zgodnie z gramaturami.";if(!m.nazwa)m.nazwa="Posilek";if(!m.czas)m.czas="20 min";});});return menu;}
 
 // ── EDIT MEAL ─────────────────────────────────────────────────────────────────
@@ -3186,7 +3186,7 @@ function startApp(){
     },3000);
   }).catch(function(ex){
     var sl=document.getElementById("splash-lbl");
-    if(sl)sl.innerHTML="Blad polaczenia: "+ex.message+"<br><br><button onclick='startApp()' style='background:var(--green);color:#000;border:none;border-radius:50px;padding:12px 24px;font-size:14px;font-weight:800;cursor:pointer'>Sprobuj ponownie</button><br><br><button onclick='goOffline()' style='background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:50px;padding:10px 20px;font-size:12px;font-weight:700;cursor:pointer;margin-top:8px'>Otworz bez sieci</button>";
+    if(sl)sl.innerHTML="Blad polaczenia: "+ex.message+"<br><br><button onclick='startApp()' style='background:var(--green);color:#000;border:none;border-radius:50px;padding:12px 24px;font-size:14px;font-weight:500;cursor:pointer'>Sprobuj ponownie</button><br><br><button onclick='goOffline()' style='background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:50px;padding:10px 20px;font-size:12px;font-weight:400;cursor:pointer;margin-top:8px'>Otworz bez sieci</button>";
   });
 }
 function goOffline(){state=mkState();document.getElementById("splash").style.display="none";document.getElementById("app").style.display="block";buildCatChips();setSyncUI("err");render();}
@@ -3272,7 +3272,7 @@ function openPurchaseHistory(){
       body.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px">🧾</div>Brak zeskanowanych paragonów.<br><br>Użyj skanera paragonu w zakładce Zakupy.</div>';
       return;
     }
-    var html='<div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px">'+purchaseHistory.length+' paragonów</div>';
+    var html='<div style="font-size:11px;font-weight:500;color:var(--text3);margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px">'+purchaseHistory.length+' paragonów</div>';
     var uid=profileKey(userName||"");
     purchaseHistory.forEach(function(p){
       var d=p.ts?new Date(p.ts).toLocaleDateString("pl-PL"):(p.displayDate||p.data||"?");
@@ -3282,9 +3282,9 @@ function openPurchaseHistory(){
       html+='<div style="background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:10px;overflow:hidden">';
       html+='<div style="padding:12px 14px;display:flex;align-items:center;gap:10px">';
       html+='<div style="font-size:24px;cursor:pointer" onclick="toggleReceiptDetails(this.parentElement)">🧾</div>';
-      html+='<div style="flex:1;cursor:pointer" onclick="toggleReceiptDetails(this.parentElement)"><div style="font-size:13px;font-weight:700;color:var(--text)">'+(p.sklep||"Sklep")+'</div>';
+      html+='<div style="flex:1;cursor:pointer" onclick="toggleReceiptDetails(this.parentElement)"><div style="font-size:13px;font-weight:400;color:var(--text)">'+(p.sklep||"Sklep")+'</div>';
       html+='<div style="font-size:11px;color:var(--text3)">'+d+' &bull; '+skladCount+' produktów'+(p.suma?' &bull; <b style="color:var(--amber)">'+Number(p.suma).toFixed(2)+' zł</b>':'')+'</div></div>';
-      html+='<button onclick="event.stopPropagation();deleteReceipt(\''+uid+'\',\''+rid+'\')" style="background:rgba(255,77,77,.1);border:1px solid rgba(255,77,77,.3);color:var(--red);border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer">Usuń</button>';
+      html+='<button onclick="event.stopPropagation();deleteReceipt(\''+uid+'\',\''+rid+'\')" style="background:rgba(255,77,77,.1);border:1px solid rgba(255,77,77,.3);color:var(--red);border-radius:8px;padding:6px 10px;font-size:11px;font-weight:400;cursor:pointer">Usuń</button>';
       html+='</div>';
       html+='<div style="display:none;padding:0 14px 12px">';
       products.forEach(function(prod){
@@ -3296,7 +3296,7 @@ function openPurchaseHistory(){
         html+='</div>';
       });
       if(p.adjustments&&p.adjustments.length){
-        html+='<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:11px;color:var(--amber);font-weight:700">Rabaty:</div>';
+        html+='<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:11px;color:var(--amber);font-weight:400">Rabaty:</div>';
         p.adjustments.forEach(function(a){
           html+='<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:11px;color:var(--text3)">';
           html+='<span>'+(a.rawName||a.description||"Rabat")+'</span>';
@@ -4914,22 +4914,22 @@ function renderSmartShoppingList(list){
   var html="";
   var storeLabel={biedronka:"🐝 Biedronka",lidl:"🏪 Lidl",both:"🐝🏪 Biedronka + Lidl"}[shopStore]||"Biedronka";
   html+='<div style="background:linear-gradient(135deg,rgba(139,92,246,.12),rgba(61,139,255,.08));border:1px solid rgba(139,92,246,.3);border-radius:14px;padding:14px 16px;margin-bottom:14px">';
-  html+='<div style="font-size:13px;font-weight:800;color:var(--purple);margin-bottom:6px">🗺️ Trasa zakupowa — '+storeLabel+'</div>';
+  html+='<div style="font-size:13px;font-weight:500;color:var(--purple);margin-bottom:6px">🗺️ Trasa zakupowa — '+storeLabel+'</div>';
   html+='<div style="font-size:12px;color:var(--text2);line-height:1.6">';
   html+='<b style="color:var(--text)">'+tooBuy.length+'</b> produktów do kupienia &bull; <b style="color:var(--text)">'+have.length+'</b> już masz';
   html+='<br>Posortowane wg <b style="color:var(--text)">trasy slalomem przez alejki</b> &bull; Na <b style="color:var(--text)">'+(shopDays||7)+' dni</b>';
   html+='</div></div>';
 
   if(tooBuy.length){
-    html+='<div style="font-size:11px;font-weight:800;color:var(--red);margin-bottom:10px;text-transform:uppercase;letter-spacing:.6px">🛒 Do kupienia ('+tooBuy.length+')</div>';
+    html+='<div style="font-size:11px;font-weight:500;color:var(--red);margin-bottom:10px;text-transform:uppercase;letter-spacing:.6px">🛒 Do kupienia ('+tooBuy.length+')</div>';
     // Renderuj grupę po grupie
     var globalIdx=0;
     groupKeys.forEach(function(gk){
       var grp=groups[gk];
       html+='<div style="display:flex;align-items:center;gap:8px;margin:14px 0 8px;padding:8px 12px;background:var(--bg3);border-radius:10px;border:1px solid var(--border)">';
       html+='<span style="font-size:18px">'+grp.meta.ico+'</span>';
-      html+='<span style="font-size:13px;font-weight:800;color:var(--text);flex:1">'+grp.meta.label+'</span>';
-      html+='<span style="font-size:11px;color:var(--text3);font-weight:700">'+grp.items.length+' poz.</span>';
+      html+='<span style="font-size:13px;font-weight:500;color:var(--text);flex:1">'+grp.meta.label+'</span>';
+      html+='<span style="font-size:11px;color:var(--text3);font-weight:400">'+grp.items.length+' poz.</span>';
       html+='</div>';
       grp.items.forEach(function(item){
         var idx=globalIdx++;
@@ -4943,12 +4943,12 @@ function renderSmartShoppingList(list){
         var byWeight=buy.byWeight||!!prod&&prod.soldByWeight;
         var packLine="";
         if(byWeight){
-          packLine='<span style="font-size:22px;font-weight:900;color:var(--green)">'+Math.ceil(totalAmount)+' '+unit+'</span><span style="font-size:13px;color:var(--text3);font-weight:600"> na wagę</span>';
+          packLine='<span style="font-size:22px;font-weight:600;color:var(--green)">'+Math.ceil(totalAmount)+' '+unit+'</span><span style="font-size:13px;color:var(--text3);font-weight:600"> na wagę</span>';
         }else if(prod&&prod.unit==="szt"){
-          packLine='<span style="font-size:22px;font-weight:900;color:var(--green)">'+pcs+' '+pkgUnit+'</span>'
+          packLine='<span style="font-size:22px;font-weight:600;color:var(--green)">'+pcs+' '+pkgUnit+'</span>'
             +(pkgSize?'<span style="font-size:13px;color:var(--text3);font-weight:600"> × '+pkgSize+' szt = '+totalAmount+' szt</span>':'');
         }else{
-          packLine='<span style="font-size:22px;font-weight:900;color:var(--green)">'+pcs+' '+pkgUnit+'</span>'
+          packLine='<span style="font-size:22px;font-weight:600;color:var(--green)">'+pcs+' '+pkgUnit+'</span>'
             +(pkgSize?'<span style="font-size:13px;color:var(--text3);font-weight:600"> × '+pkgSize+unit+' = '+totalAmount+unit+'</span>':'');
         }
         // Sklep badge (mini) — preferuj wybrany sklep (shopStore)
@@ -4958,7 +4958,7 @@ function renderSmartShoppingList(list){
         if(shopName){
           var color=shopName.toLowerCase().indexOf("biedronka")!==-1?"#DC2626":shopName.toLowerCase().indexOf("lidl")!==-1?"#1D4ED8":"#7C3AED";
           var shortLabel=shopName.toLowerCase().indexOf("biedronka")!==-1?"Bie":shopName.toLowerCase().indexOf("lidl")!==-1?"Lidl":shopName.substring(0,3);
-          shopBadge='<span style="background:'+color+'22;border:1px solid '+color+'66;color:'+color+';border-radius:50px;padding:2px 8px;font-size:10px;font-weight:800;flex-shrink:0">'+shortLabel+'</span>';
+          shopBadge='<span style="background:'+color+'22;border:1px solid '+color+'66;color:'+color+';border-radius:50px;padding:2px 8px;font-size:10px;font-weight:500;flex-shrink:0">'+shortLabel+'</span>';
         }
         // Pakowanie (krótka linia w wierszu) - pokazuj GRAMY oraz szac. SZTUKI gdzie sensowne
         var quickLine="";
@@ -4991,27 +4991,27 @@ function renderSmartShoppingList(list){
         html+='<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer" onclick="toggleShopRow(this)">';
         html+='<input type="checkbox" id="shop-cb-'+idx+'" data-shop-cb style="width:22px;height:22px;accent-color:var(--green);cursor:pointer;flex-shrink:0" onclick="event.stopPropagation();toggleShopItemChecked(this,'+idx+')">';
         html+='<div style="flex:1;min-width:0">';
-        html+='<div style="font-size:14px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+displayName+'</div>';
+        html+='<div style="font-size:14px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+displayName+'</div>';
         if(subTitle&&subTitle!==displayName){
           html+='<div style="font-size:11px;color:var(--text2);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+subTitle+'</div>';
         }
-        html+='<div style="font-size:12px;color:var(--green);font-weight:700;margin-top:2px">'+quickLine+'</div>';
+        html+='<div style="font-size:12px;color:var(--green);font-weight:400;margin-top:2px">'+quickLine+'</div>';
         html+='</div>';
         html+=shopBadge;
         // 🔍 Per-item link do wyszukiwarki sklepu (otwiera produkt w wybranym serwisie)
         var searchStore=shopForBrand==="lidl"?"frisco":shopForBrand; // Lidl nie ma online - fallback Frisco
         var safeName=(displayName||item.name||"").replace(/'/g,"\\'");
         html+='<button title="Znajdź w sklepie" onclick="event.stopPropagation();window.open(buildStoreSearchURL(\''+searchStore+'\',\''+safeName+'\'),\'_blank\',\'noopener\')" style="background:var(--bg3);border:1px solid var(--border);color:var(--brand);border-radius:50px;width:30px;height:30px;font-size:14px;cursor:pointer;flex-shrink:0;padding:0;display:flex;align-items:center;justify-content:center">🔍</button>';
-        html+='<span style="color:var(--text3);font-size:11px;flex-shrink:0;font-weight:700">'+item.missing+unit+'</span>';
+        html+='<span style="color:var(--text3);font-size:11px;flex-shrink:0;font-weight:400">'+item.missing+unit+'</span>';
         html+='<span class="shop-row-arrow" style="color:var(--text3);font-size:14px;flex-shrink:0;transition:transform .2s">›</span>';
         html+='</div>';
         // ROZWIJANE szczegóły (domyślnie ukryte)
         html+='<div class="shop-row-details" style="display:none;padding:0 12px 12px;border-top:1px solid var(--border)">';
         html+='<div style="background:rgba(30,215,96,.06);border-radius:8px;padding:8px 10px;margin-top:8px;margin-bottom:6px;font-size:13px;color:var(--text2)"><b style="color:var(--green)">Kup:</b> '+packLine+'</div>';
         html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;font-size:11px;margin-bottom:4px">';
-        html+='<div style="background:var(--bg3);border-radius:6px;padding:5px 6px;text-align:center"><div style="color:var(--text3);font-size:10px">Potrzebne</div><div style="color:var(--text);font-weight:800">'+item.required+' '+unit+'</div></div>';
-        html+='<div style="background:var(--bg3);border-radius:6px;padding:5px 6px;text-align:center"><div style="color:var(--text3);font-size:10px">Masz</div><div style="color:var(--text);font-weight:800">'+item.available+' '+unit+'</div></div>';
-        html+='<div style="background:rgba(255,77,77,.08);border-radius:6px;padding:5px 6px;text-align:center"><div style="color:var(--red);font-size:10px">Brakuje</div><div style="color:var(--red);font-weight:800">'+item.missing+' '+unit+'</div></div>';
+        html+='<div style="background:var(--bg3);border-radius:6px;padding:5px 6px;text-align:center"><div style="color:var(--text3);font-size:10px">Potrzebne</div><div style="color:var(--text);font-weight:500">'+item.required+' '+unit+'</div></div>';
+        html+='<div style="background:var(--bg3);border-radius:6px;padding:5px 6px;text-align:center"><div style="color:var(--text3);font-size:10px">Masz</div><div style="color:var(--text);font-weight:500">'+item.available+' '+unit+'</div></div>';
+        html+='<div style="background:rgba(255,77,77,.08);border-radius:6px;padding:5px 6px;text-align:center"><div style="color:var(--red);font-size:10px">Brakuje</div><div style="color:var(--red);font-weight:500">'+item.missing+' '+unit+'</div></div>';
         html+='</div>';
         if(buy.surplus>0){
           html+='<div style="font-size:11px;color:var(--amber);font-weight:600;margin-top:4px">+ Nadwyżka: '+buy.surplus+' '+unit+'</div>';
@@ -5025,12 +5025,12 @@ function renderSmartShoppingList(list){
     });
   }
   if(have.length){
-    html+='<div style="margin-top:18px;font-size:11px;font-weight:800;color:var(--green);margin-bottom:8px;text-transform:uppercase;letter-spacing:.6px">✓ Masz wystarczająco ('+have.length+')</div>';
+    html+='<div style="margin-top:18px;font-size:11px;font-weight:500;color:var(--green);margin-bottom:8px;text-transform:uppercase;letter-spacing:.6px">✓ Masz wystarczająco ('+have.length+')</div>';
     have.forEach(function(item){
       var unit=item.product?item.product.unit:"g";
       html+='<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(30,215,96,.05);border-radius:10px;margin-bottom:5px;border:1px solid rgba(30,215,96,.18)">';
-      html+='<span style="color:var(--green);font-size:16px;font-weight:900">✓</span>';
-      html+='<span style="font-size:13px;font-weight:700;color:var(--text2);flex:1">'+item.name+'</span>';
+      html+='<span style="color:var(--green);font-size:16px;font-weight:600">✓</span>';
+      html+='<span style="font-size:13px;font-weight:400;color:var(--text2);flex:1">'+item.name+'</span>';
       html+='<span style="font-size:11px;color:var(--text3);font-weight:600">'+item.available+'/'+item.required+' '+unit+'</span>';
       html+='</div>';
     });
@@ -5053,7 +5053,7 @@ function toggleShopItemChecked(cb,idx){
   if(!card)return;
   card.style.opacity=cb.checked?".55":"1";
   // Linia przekreślenia na nazwie
-  var nameDiv=card.querySelector('div[style*="font-size:14px"][style*="font-weight:800"]');
+  var nameDiv=card.querySelector('div[style*="font-size:14px"][style*="font-weight:500"]');
   if(nameDiv){
     nameDiv.style.textDecoration=cb.checked?"line-through":"none";
   }
@@ -5070,14 +5070,14 @@ function renderWeekPlan(){
   var hasMenu1=d.menu1&&(d.menu1.sniadania||[]).length>0;
   var hasMenu2=d.menu2&&(d.menu2.sniadania||[]).length>0;
   if(!hasMenu1&&!hasMenu2){
-    return'<div style="text-align:center;padding:30px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px">📅</div>Brak diety. Wygeneruj dietę najpierw.<br><br><button onclick="startDietGeneration()" style="background:var(--green);color:#000;border:none;border-radius:50px;padding:12px 24px;font-size:13px;font-weight:800;cursor:pointer">Generuj dietę AI</button></div>';
+    return'<div style="text-align:center;padding:30px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px">📅</div>Brak diety. Wygeneruj dietę najpierw.<br><br><button onclick="startDietGeneration()" style="background:var(--green);color:#000;border:none;border-radius:50px;padding:12px 24px;font-size:13px;font-weight:500;cursor:pointer">Generuj dietę AI</button></div>';
   }
   
   var h='';
   // Wybór liczby dni
   h+='<div style="display:flex;gap:6px;margin-bottom:14px">';
   [1,3,5,7].forEach(function(n){
-    h+='<button onclick="planDays='+n+';renderDietBody()" style="flex:1;padding:9px 4px;border-radius:10px;border:1.5px solid '+(planDays===n?"var(--green)":"var(--border)")+';background:'+(planDays===n?"rgba(30,215,96,.15)":"transparent")+';color:'+(planDays===n?"var(--green)":"var(--text3)")+';font-size:12px;font-weight:800;cursor:pointer">'+n+(n===1?" dzień":" dni")+'</button>';
+    h+='<button onclick="planDays='+n+';renderDietBody()" style="flex:1;padding:9px 4px;border-radius:10px;border:1.5px solid '+(planDays===n?"var(--green)":"var(--border)")+';background:'+(planDays===n?"rgba(30,215,96,.15)":"transparent")+';color:'+(planDays===n?"var(--green)":"var(--text3)")+';font-size:12px;font-weight:500;cursor:pointer">'+n+(n===1?" dzień":" dni")+'</button>';
   });
   h+='</div>';
   
@@ -5089,8 +5089,8 @@ function renderWeekPlan(){
     
     h+='<div style="background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:10px;overflow:hidden">';
     h+='<div style="padding:10px 14px;background:var(--bg3);display:flex;align-items:center;justify-content:space-between">';
-    h+='<div style="font-size:13px;font-weight:800;color:var(--text)">'+dayName+'</div>';
-    h+='<div style="font-size:10px;font-weight:700;color:var(--text3)">'+menuLabel+'</div>';
+    h+='<div style="font-size:13px;font-weight:500;color:var(--text)">'+dayName+'</div>';
+    h+='<div style="font-size:10px;font-weight:400;color:var(--text3)">'+menuLabel+'</div>';
     h+='</div>';
     
     var dayKcal=0,dayProt=0,dayCarb=0,dayFat=0;
@@ -5101,7 +5101,7 @@ function renderWeekPlan(){
       dayKcal+=(m.kcal||0);dayProt+=(m.prot||0);dayCarb+=(m.carb||0);dayFat+=(m.fat||0);
       h+='<div style="padding:8px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px">';
       h+='<span style="font-size:16px">'+meal.icon+'</span>';
-      h+='<div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--text)">'+m.nazwa+'</div>';
+      h+='<div style="flex:1"><div style="font-size:12px;font-weight:400;color:var(--text)">'+m.nazwa+'</div>';
       h+='<div style="font-size:10px;color:var(--text3)">'+m.kcal+' kcal &bull; B:'+m.prot+'g W:'+m.carb+'g T:'+m.fat+'g</div></div>';
       h+='</div>';
     });
@@ -5116,8 +5116,8 @@ function renderWeekPlan(){
   
   // Przycisk listy zakupów na N dni
   h+='<div style="margin-top:14px;display:flex;gap:8px">';
-  h+='<button onclick="generateDietShoppingList('+planDays+')" style="flex:2;background:linear-gradient(135deg,var(--purple),#4F46E5);color:#fff;border:none;border-radius:50px;padding:13px;font-size:13px;font-weight:800;cursor:pointer">📊 Lista zakupów na '+planDays+(planDays===1?" dzień":" dni")+'</button>';
-  h+='<button onclick="generateShopFromDiet()" style="flex:1;background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:50px;padding:13px;font-size:12px;font-weight:700;cursor:pointer">AI lista</button>';
+  h+='<button onclick="generateDietShoppingList('+planDays+')" style="flex:2;background:linear-gradient(135deg,var(--purple),#4F46E5);color:#fff;border:none;border-radius:50px;padding:13px;font-size:13px;font-weight:500;cursor:pointer">📊 Lista zakupów na '+planDays+(planDays===1?" dzień":" dni")+'</button>';
+  h+='<button onclick="generateShopFromDiet()" style="flex:1;background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:50px;padding:13px;font-size:12px;font-weight:400;cursor:pointer">AI lista</button>';
   h+='</div>';
   return h;
 }
@@ -5136,7 +5136,7 @@ function generateDietShoppingList(days){
   // Przycisk "Kupione" — dodaje pełne opakowania do pantry
   var kupBtn='<button onclick="_currentShopList&&applyPurchasedItemsToPantry(_currentShopList)" '
     +'style="width:100%;background:var(--green);color:#000;border:none;border-radius:50px;'
-    +'padding:13px;font-size:14px;font-weight:800;cursor:pointer;margin-top:10px">'
+    +'padding:13px;font-size:14px;font-weight:500;cursor:pointer;margin-top:10px">'
     +'✅ Zakupy zrealizowane — dodaj do lodówki</button>';
   document.getElementById("shop-list-content").innerHTML=html+kupBtn;
   window._currentShopList=list;
@@ -5220,7 +5220,7 @@ function renderPriceAnalysis(){
       });
     });
     
-    var html='<div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px">Analiza cen — '+purchaseHistory.length+' paragonów</div>';
+    var html='<div style="font-size:11px;font-weight:500;color:var(--text3);margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px">Analiza cen — '+purchaseHistory.length+' paragonów</div>';
     
     // Porównanie sklepów
     var compareItems=Object.values(priceMap).filter(function(p){
@@ -5229,14 +5229,14 @@ function renderPriceAnalysis(){
     
     if(compareItems.length){
       html+='<div style="background:rgba(61,139,255,.08);border:1px solid rgba(61,139,255,.2);border-radius:var(--radius);padding:14px;margin-bottom:14px">';
-      html+='<div style="font-size:11px;font-weight:800;color:var(--blue);margin-bottom:10px;text-transform:uppercase">Biedronka vs Lidl</div>';
+      html+='<div style="font-size:11px;font-weight:500;color:var(--blue);margin-bottom:10px;text-transform:uppercase">Biedronka vs Lidl</div>';
       compareItems.slice(0,8).forEach(function(p){
         var avgB=(p.Biedronka.reduce(function(a,b){return a+b;},0)/p.Biedronka.length).toFixed(2);
         var avgL=(p.Lidl.reduce(function(a,b){return a+b;},0)/p.Lidl.length).toFixed(2);
         var cheaper=parseFloat(avgB)<parseFloat(avgL)?"Biedronka":"Lidl";
         var diff=Math.abs(parseFloat(avgB)-parseFloat(avgL)).toFixed(2);
         html+='<div style="padding:8px 0;border-bottom:1px solid var(--border)">';
-        html+='<div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">'+p.name+'</div>';
+        html+='<div style="font-size:12px;font-weight:400;color:var(--text);margin-bottom:4px">'+p.name+'</div>';
         html+='<div style="display:flex;gap:10px;align-items:center">';
         html+='<span style="font-size:11px">🐝 Biedronka: <b style="color:'+(cheaper==="Biedronka"?"var(--green)":"var(--text2)")+'">'+avgB+' zł</b></span>';
         html+='<span style="font-size:11px">🏪 Lidl: <b style="color:'+(cheaper==="Lidl"?"var(--green)":"var(--text2)")+'">'+avgL+' zł</b></span>';
@@ -5251,7 +5251,7 @@ function renderPriceAnalysis(){
     if(months.length>1){
       var maxVal=Math.max.apply(null,months.map(function(m){return monthlyTotals[m];}));
       html+='<div style="background:var(--bg2);border-radius:var(--radius);padding:14px;margin-bottom:14px;border:1px solid var(--border)">';
-      html+='<div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:12px;text-transform:uppercase">Wydatki miesięcznie (zł)</div>';
+      html+='<div style="font-size:11px;font-weight:500;color:var(--text3);margin-bottom:12px;text-transform:uppercase">Wydatki miesięcznie (zł)</div>';
       html+='<svg width="100%" height="100" viewBox="0 0 300 100" preserveAspectRatio="none">';
       var barW=300/months.length-4;
       months.forEach(function(m,i){
@@ -5270,16 +5270,16 @@ function renderPriceAnalysis(){
     }).slice(0,8);
     
     if(sortedProducts.length){
-      html+='<div style="font-size:11px;font-weight:800;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">Najczęściej kupowane</div>';
+      html+='<div style="font-size:11px;font-weight:500;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px">Najczęściej kupowane</div>';
       sortedProducts.forEach(function(p,i){
         var count=p.Biedronka.length+p.Lidl.length+p.Inny.length;
         var allPrices=p.Biedronka.concat(p.Lidl).concat(p.Inny);
         var avg=allPrices.length?(allPrices.reduce(function(a,b){return a+b;},0)/allPrices.length).toFixed(2):"?";
         html+='<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg3);border-radius:8px;margin-bottom:4px">';
-        html+='<span style="font-size:14px;font-weight:900;color:var(--text3);min-width:20px">'+(i+1)+'.</span>';
-        html+='<span style="flex:1;font-size:12px;font-weight:700;color:var(--text)">'+p.name+'</span>';
+        html+='<span style="font-size:14px;font-weight:600;color:var(--text3);min-width:20px">'+(i+1)+'.</span>';
+        html+='<span style="flex:1;font-size:12px;font-weight:400;color:var(--text)">'+p.name+'</span>';
         html+='<span style="font-size:11px;color:var(--text3)">'+count+'x</span>';
-        html+='<span style="font-size:12px;font-weight:800;color:var(--amber)">~'+avg+' zł</span>';
+        html+='<span style="font-size:12px;font-weight:500;color:var(--amber)">~'+avg+' zł</span>';
         html+='</div>';
       });
     }
@@ -5444,9 +5444,9 @@ function renderAdminProducts(){
   var query=String(adminProductsSearch||"").toLowerCase().trim();
   var html='';
   html+='<div style="background:linear-gradient(135deg,rgba(139,92,246,.15),rgba(61,139,255,.08));border:1px solid rgba(139,92,246,.35);border-radius:14px;padding:14px;margin-bottom:14px">';
-  html+='<div style="font-size:13px;font-weight:800;color:var(--purple);margin-bottom:4px">🏷️ Baza produktów</div>';
+  html+='<div style="font-size:13px;font-weight:500;color:var(--purple);margin-bottom:4px">🏷️ Baza produktów</div>';
   html+='<div style="font-size:12px;color:var(--text2);margin-bottom:10px">'+PRODUCT_DB.length+' produktów &bull; '+Object.keys(userProductOverrides).length+' własnych override\'ów. Możesz zeskanować etykietę aby dodać konkretną markę.</div>';
-  html+='<button onclick="openLabelScanner()" style="width:100%;background:linear-gradient(135deg,var(--purple),#4F46E5);color:#fff;border:none;border-radius:50px;padding:13px;font-size:14px;font-weight:800;cursor:pointer">📸 Zeskanuj etykietę produktu</button>';
+  html+='<button onclick="openLabelScanner()" style="width:100%;background:linear-gradient(135deg,var(--purple),#4F46E5);color:#fff;border:none;border-radius:50px;padding:13px;font-size:14px;font-weight:500;cursor:pointer">📸 Zeskanuj etykietę produktu</button>';
   html+='</div>';
 
   html+='<input type="text" placeholder="🔍 Szukaj produktu lub marki..." value="'+query.replace(/"/g,"&quot;")+'" oninput="adminProductsSearch=this.value;renderAdminProducts()" style="width:100%;background:#1A1A24;border:1.5px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 14px;font-size:13px;color:#fff;outline:none;margin-bottom:14px;color-scheme:dark">';
@@ -5477,20 +5477,20 @@ function renderAdminProducts(){
     // Nagłówek
     html+='<div onclick="adminProductsExpanded=adminProductsExpanded===\''+p.id+'\'?null:\''+p.id+'\';renderAdminProducts()" style="cursor:pointer;display:flex;align-items:center;gap:10px">';
     html+='<div style="flex:1;min-width:0">';
-    html+='<div style="font-size:13px;font-weight:800;color:#fff">'+p.name+'</div>';
+    html+='<div style="font-size:13px;font-weight:500;color:#fff">'+p.name+'</div>';
     html+='<div style="font-size:11px;color:#6B6B85;margin-top:2px">'+p.n100.kcal+' kcal &bull; B:'+p.n100.prot+'g W:'+p.n100.carb+'g T:'+p.n100.fat+'g'+(hasBrands?" &bull; "+p.brands.length+" marek":"")+'</div>';
     html+='</div>';
-    if(ov)html+='<span style="background:rgba(245,158,11,.15);border:1px solid var(--amber);color:var(--amber);border-radius:50px;padding:3px 8px;font-size:10px;font-weight:700">override</span>';
+    if(ov)html+='<span style="background:rgba(245,158,11,.15);border:1px solid var(--amber);color:var(--amber);border-radius:50px;padding:3px 8px;font-size:10px;font-weight:400">override</span>';
     html+='<span style="color:#6B6B85;font-size:14px;flex-shrink:0;transition:transform .2s;transform:rotate('+(expanded?'90deg':'0deg')+')">›</span>';
     html+='</div>';
     if(expanded){
       html+='<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06)">';
       if(hasBrands){
-        html+='<div style="font-size:11px;font-weight:800;color:#8B5CF6;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Marki ('+p.brands.length+')</div>';
+        html+='<div style="font-size:11px;font-weight:500;color:#8B5CF6;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Marki ('+p.brands.length+')</div>';
         p.brands.forEach(function(b){
           var shopColor=String(b.shop||"").toLowerCase().indexOf("biedronka")!==-1?"#DC2626":String(b.shop||"").toLowerCase().indexOf("lidl")!==-1?"#1D4ED8":"#7C3AED";
           html+='<div style="background:#0D0D15;border-radius:10px;padding:10px 12px;margin-bottom:6px;border-left:3px solid '+shopColor+'">';
-          html+='<div style="font-size:12px;font-weight:700;color:#fff;margin-bottom:3px">'+b.brand+'</div>';
+          html+='<div style="font-size:12px;font-weight:400;color:#fff;margin-bottom:3px">'+b.brand+'</div>';
           html+='<div style="font-size:11px;color:#6B6B85">'+(b.n100.kcal||0)+' kcal &bull; B:'+(b.n100.prot||0)+'g W:'+(b.n100.carb||0)+'g T:'+(b.n100.fat||0)+'g'+(b.pkgSize?" &bull; opak. "+b.pkgSize+"g":"")+'</div>';
           html+='</div>';
         });
@@ -5510,7 +5510,7 @@ function renderAdminProducts(){
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function adminStat(val, label, color) {
   return '<div style="background:#111118;border-radius:14px;padding:14px;border:1px solid rgba(255,255,255,.06);text-align:center">'
-    + '<div style="font-size:24px;font-weight:900;color:' + (color||"#fff") + '">' + (val||"0") + '</div>'
+    + '<div style="font-size:24px;font-weight:600;color:' + (color||"#fff") + '">' + (val||"0") + '</div>'
     + '<div style="font-size:11px;color:#6B6B85;margin-top:4px">' + label + '</div></div>';
 }
 
@@ -5520,15 +5520,15 @@ function adminUserCard(uid, p, receiptsCount) {
   var goalMap = {lose:"Redukcja", maintain:"Utrzymanie", gain:"Masa"};
   return '<div style="background:#111118;border-radius:16px;padding:14px;margin-bottom:10px;border:1px solid rgba(255,255,255,.06)">'
     + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
-    + '<div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#1ED760,#17A84A);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#000;flex-shrink:0">' + name.charAt(0) + '</div>'
-    + '<div style="flex:1"><div style="font-size:14px;font-weight:800;color:#fff">' + name + '</div>'
+    + '<div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#1ED760,#17A84A);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;color:#000;flex-shrink:0">' + name.charAt(0) + '</div>'
+    + '<div style="flex:1"><div style="font-size:14px;font-weight:500;color:#fff">' + name + '</div>'
     + '<div style="font-size:11px;color:#6B6B85">' + uid + '</div></div>'
-    + '<button onclick="deleteAdminUser(\'' + uid + '\')" style="background:#FF4D4D15;border:1px solid #FF4D4D44;color:#FF4D4D;border-radius:10px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer">Usuń</button>'
+    + '<button onclick="deleteAdminUser(\'' + uid + '\')" style="background:#FF4D4D15;border:1px solid #FF4D4D44;color:#FF4D4D;border-radius:10px;padding:6px 12px;font-size:11px;font-weight:400;cursor:pointer">Usuń</button>'
     + '</div>'
     + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">'
-    + '<div style="background:#0D0D15;border-radius:10px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:900;color:' + (p.kcal?"#F59E0B":"#6B6B85") + '">' + (p.kcal||"—") + '</div><div style="font-size:9px;color:#6B6B85;margin-top:2px">kcal</div></div>'
-    + '<div style="background:#0D0D15;border-radius:10px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:900;color:' + (hasDiet?"#1ED760":"#FF4D4D") + '">' + (hasDiet?"✓":"✗") + '</div><div style="font-size:9px;color:#6B6B85;margin-top:2px">Dieta</div></div>'
-    + '<div style="background:#0D0D15;border-radius:10px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:900;color:#60A5FA">' + (receiptsCount||0) + '</div><div style="font-size:9px;color:#6B6B85;margin-top:2px">Paragony</div></div>'
+    + '<div style="background:#0D0D15;border-radius:10px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:600;color:' + (p.kcal?"#F59E0B":"#6B6B85") + '">' + (p.kcal||"—") + '</div><div style="font-size:9px;color:#6B6B85;margin-top:2px">kcal</div></div>'
+    + '<div style="background:#0D0D15;border-radius:10px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:600;color:' + (hasDiet?"#1ED760":"#FF4D4D") + '">' + (hasDiet?"✓":"✗") + '</div><div style="font-size:9px;color:#6B6B85;margin-top:2px">Dieta</div></div>'
+    + '<div style="background:#0D0D15;border-radius:10px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:600;color:#60A5FA">' + (receiptsCount||0) + '</div><div style="font-size:9px;color:#6B6B85;margin-top:2px">Paragony</div></div>'
     + '</div>'
     + (p.goal ? '<div style="margin-top:8px;font-size:11px;color:#6B6B85">Cel: <b style="color:#fff">' + (goalMap[p.goal]||p.goal) + '</b>'
       + (p.stores?' &bull; <b style="color:#fff">' + ({biedronka:"Biedronka",lidl:"Lidl",both:"Oba sklepy"}[p.stores]||p.stores) + '</b>':"") + '</div>' : "")
@@ -5565,8 +5565,8 @@ function renderAdminUsers(data, counts) {
   var body = document.getElementById("admin-body");
   var uids = Object.keys(data);
   var html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">'
-    + '<div style="font-size:12px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px">Użytkownicy (' + uids.length + ')</div>'
-    + '<button onclick="loadAdminUsers()" style="background:#1A1A24;border:1px solid rgba(255,255,255,.08);color:#6B6B85;border-radius:10px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer">Odśwież</button>'
+    + '<div style="font-size:12px;font-weight:500;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px">Użytkownicy (' + uids.length + ')</div>'
+    + '<button onclick="loadAdminUsers()" style="background:#1A1A24;border:1px solid rgba(255,255,255,.08);color:#6B6B85;border-radius:10px;padding:6px 14px;font-size:11px;font-weight:400;cursor:pointer">Odśwież</button>'
     + '</div>';
   uids.forEach(function(uid) {
     html += adminUserCard(uid, data[uid] || {}, counts[uid] || 0);
@@ -5644,7 +5644,7 @@ function renderAdminDiets(data) {
     + adminStat(noDiet.length, "Bez diety", "#FF4D4D")
     + '</div>';
   if (withDiet.length) {
-    html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Diety użytkowników</div>';
+    html += '<div style="font-size:11px;font-weight:500;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Diety użytkowników</div>';
     withDiet.forEach(function(uid) {
       var p = data[uid];
       var name = uid.replace(/_/g, " ").replace(/\b\w/g, function(l){ return l.toUpperCase(); });
@@ -5653,7 +5653,7 @@ function renderAdminDiets(data) {
       var meals1 = (m1.sniadania||[]).length + (m1.obiady||[]).length + (m1.kolacje||[]).length;
       var meals2 = (m2.sniadania||[]).length + (m2.obiady||[]).length + (m2.kolacje||[]).length;
       html += '<div style="background:#111118;border-radius:14px;padding:12px 14px;margin-bottom:8px;border:1px solid rgba(255,255,255,.06)">'
-        + '<div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:6px">' + name + '</div>'
+        + '<div style="font-size:13px;font-weight:500;color:#fff;margin-bottom:6px">' + name + '</div>'
         + '<div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:#6B6B85">'
         + '<span>Cel: <b style="color:#fff">' + ({lose:"Redukcja",maintain:"Utrzymanie",gain:"Masa"}[p.goal]||p.goal||"?") + '</b></span>'
         + '<span>' + (p.kcal||"?") + ' kcal</span>'
@@ -5664,11 +5664,11 @@ function renderAdminDiets(data) {
     });
   }
   if (noDiet.length) {
-    html += '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;margin-top:14px">Bez diety (' + noDiet.length + ')</div>';
+    html += '<div style="font-size:11px;font-weight:500;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;margin-top:14px">Bez diety (' + noDiet.length + ')</div>';
     noDiet.forEach(function(uid) {
       var name = uid.replace(/_/g, " ").replace(/\b\w/g, function(l){ return l.toUpperCase(); });
       html += '<div style="background:#111118;border-radius:12px;padding:10px 14px;margin-bottom:6px;border:1px solid rgba(255,77,77,.15);display:flex;justify-content:space-between;align-items:center">'
-        + '<span style="font-size:12px;font-weight:700;color:#B0B0C8">' + name + '</span>'
+        + '<span style="font-size:12px;font-weight:400;color:#B0B0C8">' + name + '</span>'
         + '<span style="font-size:11px;color:#FF4D4D">Brak diety</span></div>';
     });
   }
@@ -5717,10 +5717,10 @@ function renderAdminReceipts(receipts) {
     var products = sortByNamePL(r.produkty||[], function(p){return p.matchedName||p.rawName||p.nazwa||p.n||"";});
     html += '<div style="background:#111118;border-radius:14px;padding:12px 14px;margin-bottom:8px;border:1px solid rgba(255,255,255,.06)">'
       + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px">'
-      + '<div style="flex:1"><div style="font-size:13px;font-weight:800;color:#fff">' + (r.sklep||"Sklep") + '</div>'
+      + '<div style="flex:1"><div style="font-size:13px;font-weight:500;color:#fff">' + (r.sklep||"Sklep") + '</div>'
       + '<div style="font-size:11px;color:#6B6B85">' + name + ' &bull; ' + d + '</div></div>'
-      + (r.suma ? '<div style="font-size:14px;font-weight:900;color:#F59E0B">' + Number(r.suma).toFixed(2) + ' zł</div>' : '')
-      + '<button onclick="deleteReceipt(\''+uid+'\',\''+rid+'\')" style="background:rgba(255,77,77,.1);border:1px solid rgba(255,77,77,.3);color:#FF4D4D;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer">Usuń</button>'
+      + (r.suma ? '<div style="font-size:14px;font-weight:600;color:#F59E0B">' + Number(r.suma).toFixed(2) + ' zł</div>' : '')
+      + '<button onclick="deleteReceipt(\''+uid+'\',\''+rid+'\')" style="background:rgba(255,77,77,.1);border:1px solid rgba(255,77,77,.3);color:#FF4D4D;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:400;cursor:pointer">Usuń</button>'
       + '</div>';
     if (products.length) {
       html += '<div style="border-top:1px solid rgba(255,255,255,.06);padding-top:6px">';
@@ -5779,10 +5779,10 @@ function renderAdminStats(receipts, users) {
   // Goals breakdown
   var goals = {}; users.forEach(function(u){ if(u.goal)(goals[u.goal]=(goals[u.goal]||0)+1); });
   html += '<div style="background:#111118;border-radius:14px;padding:14px;border:1px solid rgba(255,255,255,.06);margin-bottom:12px">'
-    + '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Cele użytkowników</div>';
+    + '<div style="font-size:11px;font-weight:500;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Cele użytkowników</div>';
   [{key:"gain",label:"Budowa masy",c:"#1ED760"},{key:"maintain",label:"Utrzymanie",c:"#F59E0B"},{key:"lose",label:"Redukcja",c:"#FF4D4D"}].forEach(function(g){
     var n = goals[g.key]||0; var pct = users.length ? Math.round(n/users.length*100) : 0;
-    html += '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="color:#B0B0C8">' + g.label + '</span><span style="color:'+g.c+';font-weight:700">' + n + ' (' + pct + '%)</span></div>'
+    html += '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="color:#B0B0C8">' + g.label + '</span><span style="color:'+g.c+';font-weight:400">' + n + ' (' + pct + '%)</span></div>'
       + '<div style="height:5px;background:#1A1A24;border-radius:4px"><div style="height:100%;width:'+pct+'%;background:'+g.c+';border-radius:4px"></div></div></div>';
   });
   html += '</div>';
@@ -5796,18 +5796,18 @@ function renderAdminApi() {
     var hasKey = !!(key && key.length > 10);
     var maskedKey = hasKey ? "sk-ant-••••••••••••••" : "Brak klucza";
     var html = '<div style="background:#111118;border-radius:14px;padding:16px;margin-bottom:12px;border:1px solid rgba(255,255,255,.06)">'
-      + '<div style="font-size:11px;font-weight:800;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Klucz Claude API</div>'
+      + '<div style="font-size:11px;font-weight:500;color:#6B6B85;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Klucz Claude API</div>'
       + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">'
       + '<div style="width:10px;height:10px;border-radius:50%;background:' + (hasKey ? "#1ED760" : "#FF4D4D") + ';flex-shrink:0"></div>'
-      + '<div style="font-size:13px;font-weight:700;color:#fff">' + (hasKey ? "Klucz API aktywny" : "Brak klucza API") + '</div></div>'
+      + '<div style="font-size:13px;font-weight:400;color:#fff">' + (hasKey ? "Klucz API aktywny" : "Brak klucza API") + '</div></div>'
       + '<div style="font-size:12px;color:#6B6B85;font-family:monospace;background:#0D0D15;border-radius:10px;padding:10px;margin-bottom:14px">' + maskedKey + '</div>'
       + '<input id="admin-api-inp" type="password" placeholder="sk-ant-api03-..." '
       + 'style="width:100%;background:#1A1A24;border:1.5px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 14px;font-size:13px;color:#fff;outline:none;margin-bottom:10px;color-scheme:dark">'
       + '<div style="display:flex;gap:8px">'
-      + '<button onclick="adminSaveApiKey()" style="flex:2;padding:12px;border-radius:12px;border:none;background:#1ED760;color:#000;font-size:13px;font-weight:800;cursor:pointer">Zapisz klucz</button>'
-      + (hasKey ? '<button onclick="adminDeleteApiKey()" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(255,77,77,.4);background:rgba(255,77,77,.08);color:#FF4D4D;font-size:12px;font-weight:700;cursor:pointer">Usuń klucz</button>' : "")
+      + '<button onclick="adminSaveApiKey()" style="flex:2;padding:12px;border-radius:12px;border:none;background:#1ED760;color:#000;font-size:13px;font-weight:500;cursor:pointer">Zapisz klucz</button>'
+      + (hasKey ? '<button onclick="adminDeleteApiKey()" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(255,77,77,.4);background:rgba(255,77,77,.08);color:#FF4D4D;font-size:12px;font-weight:400;cursor:pointer">Usuń klucz</button>' : "")
       + '</div></div>'
-      + '<button onclick="testAdminApi()" style="width:100%;padding:13px;border-radius:12px;border:1px solid rgba(61,139,255,.3);background:rgba(61,139,255,.08);color:#60A5FA;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:10px">🔗 Testuj połączenie API</button>'
+      + '<button onclick="testAdminApi()" style="width:100%;padding:13px;border-radius:12px;border:1px solid rgba(61,139,255,.3);background:rgba(61,139,255,.08);color:#60A5FA;font-size:13px;font-weight:400;cursor:pointer;margin-bottom:10px">🔗 Testuj połączenie API</button>'
       + '<div id="admin-api-test-result"></div>';
     body.innerHTML = html;
   }).catch(function() {
@@ -5840,8 +5840,8 @@ function testAdminApi() {
   var r = document.getElementById("admin-api-test-result");
   if (r) r.innerHTML = '<div style="text-align:center;padding:10px;color:#6B6B85">Testowanie połączenia...</div>';
   callAPI([{role:"user",content:"Odpowiedz jednym słowem: OK"}], "Odpowiedz jednym słowem: OK",
-    function(resp) { if (r) r.innerHTML = '<div style="background:rgba(30,215,96,.08);border:1px solid rgba(30,215,96,.2);border-radius:10px;padding:12px;text-align:center;font-size:13px;color:#1ED760;font-weight:700">✅ API działa poprawnie</div>'; },
-    function(err) { if (r) r.innerHTML = '<div style="background:rgba(255,77,77,.08);border:1px solid rgba(255,77,77,.2);border-radius:10px;padding:12px;text-align:center;font-size:13px;color:#FF4D4D;font-weight:700">❌ Nie udało się połączyć z API</div>'; },
+    function(resp) { if (r) r.innerHTML = '<div style="background:rgba(30,215,96,.08);border:1px solid rgba(30,215,96,.2);border-radius:10px;padding:12px;text-align:center;font-size:13px;color:#1ED760;font-weight:400">✅ API działa poprawnie</div>'; },
+    function(err) { if (r) r.innerHTML = '<div style="background:rgba(255,77,77,.08);border:1px solid rgba(255,77,77,.2);border-radius:10px;padding:12px;text-align:center;font-size:13px;color:#FF4D4D;font-weight:400">❌ Nie udało się połączyć z API</div>'; },
     100
   );
 }
@@ -6171,27 +6171,27 @@ function renderPantryAudit(prods){
     html+='<div data-audit-card="'+sk+'" style="background:var(--bg2);border-radius:16px;padding:16px;margin-bottom:12px;border:1px solid var(--border)">';
     // Header
     html+='<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:4px">';
-    html+='<div style="font-size:17px;font-weight:800;color:var(--text);flex:1;line-height:1.25">'+p.n+'</div>';
-    html+='<div style="font-size:12px;color:var(--amber);font-weight:700;text-align:right;flex-shrink:0">'+requiredHint+'</div>';
+    html+='<div style="font-size:17px;font-weight:500;color:var(--text);flex:1;line-height:1.25">'+p.n+'</div>';
+    html+='<div style="font-size:12px;color:var(--amber);font-weight:400;text-align:right;flex-shrink:0">'+requiredHint+'</div>';
     html+='</div>';
     if(mealHint)html+='<div style="font-size:11px;color:var(--text3);margin-bottom:14px">'+mealHint+'</div>';
     // BIG BUTTONS row
     html+='<div style="display:flex;gap:10px;margin-bottom:12px">';
     html+='<button data-aud-btn="no" onclick="setAudit(\''+sk+'\',0,this)" '+
-      'style="flex:1;padding:18px 12px;border-radius:14px;border:2px solid '+(isNo?"var(--red)":"var(--border)")+';background:'+(isNo?"rgba(255,77,77,.18)":"var(--bg3)")+';color:'+(isNo?"#fff":"var(--red)")+';font-size:16px;font-weight:800;cursor:pointer;transition:all .15s;line-height:1.1">'+
+      'style="flex:1;padding:18px 12px;border-radius:14px;border:2px solid '+(isNo?"var(--red)":"var(--border)")+';background:'+(isNo?"rgba(255,77,77,.18)":"var(--bg3)")+';color:'+(isNo?"#fff":"var(--red)")+';font-size:16px;font-weight:500;cursor:pointer;transition:all .15s;line-height:1.1">'+
       '<div style="font-size:22px;margin-bottom:4px">✕</div>Nie mam</button>';
     html+='<button data-aud-btn="yes" onclick="setAudit(\''+sk+'\','+target+',this)" '+
-      'style="flex:1;padding:18px 12px;border-radius:14px;border:2px solid '+(isHas?"var(--green)":"var(--border)")+';background:'+(isHas?"rgba(30,215,96,.18)":"var(--bg3)")+';color:'+(isHas?"#fff":"var(--green)")+';font-size:16px;font-weight:800;cursor:pointer;transition:all .15s;line-height:1.1">'+
+      'style="flex:1;padding:18px 12px;border-radius:14px;border:2px solid '+(isHas?"var(--green)":"var(--border)")+';background:'+(isHas?"rgba(30,215,96,.18)":"var(--bg3)")+';color:'+(isHas?"#fff":"var(--green)")+';font-size:16px;font-weight:500;cursor:pointer;transition:all .15s;line-height:1.1">'+
       '<div style="font-size:22px;margin-bottom:4px">✓</div>Mam</button>';
     html+='</div>';
     // Quantity controls - te same przyciski qty-btn co na karcie produktu w lodówce
     html+='<div style="display:flex;align-items:center;gap:10px;background:var(--bg3);border-radius:12px;padding:10px 12px;border:1px solid var(--border)">';
-    html+='<div style="font-size:13px;font-weight:700;color:var(--text3);flex-shrink:0">Ile mam:</div>';
+    html+='<div style="font-size:13px;font-weight:400;color:var(--text3);flex-shrink:0">Ile mam:</div>';
     html+='<button type="button" class="qty-btn" style="background:var(--bg4);color:var(--red)" onclick="auditChangeQty(\''+sk+'\',-1)" aria-label="mniej">−</button>';
     html+='<input type="number" min="0" step="1" inputmode="numeric" data-aud-inp="'+sk+'" onchange="setAuditVal(\''+sk+'\',this.value)" oninput="setAuditVal(\''+sk+'\',this.value)" value="'+cur+'" '+
-      'style="flex:1;background:transparent;border:none;font-size:24px;color:var(--text);outline:none;text-align:center;font-weight:900;font-family:inherit;padding:6px 4px;-webkit-appearance:none;appearance:textfield;min-width:0">';
+      'style="flex:1;background:transparent;border:none;font-size:24px;color:var(--text);outline:none;text-align:center;font-weight:600;font-family:inherit;padding:6px 4px;-webkit-appearance:none;appearance:textfield;min-width:0">';
     html+='<button type="button" class="qty-btn" style="background:var(--green);color:#000" onclick="auditChangeQty(\''+sk+'\',1)" aria-label="więcej">+</button>';
-    html+='<div style="font-size:14px;color:var(--text3);font-weight:700;min-width:44px;text-align:right">'+unit+'</div>';
+    html+='<div style="font-size:14px;color:var(--text3);font-weight:400;min-width:44px;text-align:right">'+unit+'</div>';
     html+='</div>';
     html+='</div>';
   });
@@ -6456,16 +6456,16 @@ function closeAdminPanel(){
   <div style="background:rgba(13,13,18,.98);border-bottom:1px solid var(--border);padding:14px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10">
     <button onclick="closeUserPanel()" style="background:var(--bg3);border:none;color:var(--text3);border-radius:50%;width:38px;height:38px;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">&#8592;</button>
     <div style="flex:1">
-      <div style="font-size:17px;font-weight:900;color:var(--text)" id="up-name">Panel użytkownika</div>
+      <div style="font-size:17px;font-weight:600;color:var(--text)" id="up-name">Panel użytkownika</div>
       <div style="font-size:11px;color:var(--text3)" id="up-sub">Twoje dane i diety</div>
     </div>
-    <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green2));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#000;flex-shrink:0" id="up-avatar">U</div>
+    <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green2));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;color:#000;flex-shrink:0" id="up-avatar">U</div>
   </div>
   <div style="padding:16px;flex:1">
-    <div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Twój profil</div>
+    <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Twój profil</div>
     <div id="up-profile-card" style="background:var(--bg2);border-radius:14px;padding:14px;margin-bottom:14px;border:1px solid var(--border)"></div>
 
-    <div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Dieta</div>
+    <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Dieta</div>
     <div class="up-row" onclick="closeUserPanel();openDiet()">
       <div class="up-row-ico">🍽️</div>
       <div class="up-row-text">
@@ -6483,7 +6483,7 @@ function closeAdminPanel(){
       <div class="up-row-arrow">›</div>
     </div>
 
-    <div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;margin-top:14px">Zakupy</div>
+    <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;margin-top:14px">Zakupy</div>
     <div class="up-row" onclick="closeUserPanel();openUserPurchaseHistory()">
       <div class="up-row-ico">🧾</div>
       <div class="up-row-text">
@@ -6501,7 +6501,7 @@ function closeAdminPanel(){
       <div class="up-row-arrow">›</div>
     </div>
 
-    <div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;margin-top:14px">Ustawienia</div>
+    <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;margin-top:14px">Ustawienia</div>
     <div class="up-row" onclick="editUserProfile()">
       <div class="up-row-ico">✏️</div>
       <div class="up-row-text">
@@ -6528,7 +6528,7 @@ function closeAdminPanel(){
   <div class="diet-hdr">
     <button onclick="closeDiet()" style="background:var(--bg3);border:none;color:var(--text3);border-radius:50%;width:38px;height:38px;font-size:18px;cursor:pointer;flex-shrink:0">&#8592;</button>
     <div style="flex:1">
-      <div style="font-size:17px;font-weight:900;color:var(--text)">Moja dieta</div>
+      <div style="font-size:17px;font-weight:600;color:var(--text)">Moja dieta</div>
       <div style="font-size:11px;color:var(--text3)"><span id="diet-user-name"></span></div>
     </div>
   </div>
@@ -6553,16 +6553,16 @@ function closeAdminPanel(){
       <div class="ob-sub">Zacznijmy od podstawowych danych. Możesz wybrać sposób ustalenia diety: ręcznie albo wkleić istniejący plan, a AI go przeanalizuje.</div>
       <input class="ob-inp" id="ob-first-name" placeholder="Imię">
       <input class="ob-inp" id="ob-last-name" placeholder="Nazwisko">
-      <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin:14px 0 8px">Sposób utworzenia diety</div>
+      <div style="font-size:12px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin:14px 0 8px">Sposób utworzenia diety</div>
       <div class="ob-grid">
         <div class="ob-opt sel" id="ob-method-manual" onclick="selectObMethod('manual',this)">
           <div style="font-size:22px;margin-bottom:6px">🧑‍🍳</div>
-          <div style="font-weight:800;color:var(--text)">Ręcznie</div>
+          <div style="font-weight:500;color:var(--text)">Ręcznie</div>
           <div style="font-size:11px;color:var(--text3);margin-top:4px;font-weight:500">Wypełnię profil krok po kroku</div>
         </div>
         <div class="ob-opt" id="ob-method-ai" onclick="selectObMethod('ai',this)">
           <div style="font-size:22px;margin-bottom:6px">🤖</div>
-          <div style="font-weight:800;color:var(--text)">AI z planu</div>
+          <div style="font-weight:500;color:var(--text)">AI z planu</div>
           <div style="font-size:11px;color:var(--text3);margin-top:4px;font-weight:500">Wkleję istniejący plan</div>
         </div>
       </div>
@@ -6578,19 +6578,19 @@ function closeAdminPanel(){
       <div class="ob-sub">Potrzebne do obliczenia zapotrzebowania kalorycznego.</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
         <div>
-          <div style="font-size:11px;color:var(--text3);margin-bottom:5px;font-weight:700">Wiek (lat)</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:5px;font-weight:400">Wiek (lat)</div>
           <input class="ob-inp" id="ob-age" type="number" placeholder="30" min="14" max="99" style="margin-bottom:0">
         </div>
         <div>
-          <div style="font-size:11px;color:var(--text3);margin-bottom:5px;font-weight:700">Waga (kg)</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:5px;font-weight:400">Waga (kg)</div>
           <input class="ob-inp" id="ob-weight" type="number" placeholder="75" min="30" max="250" style="margin-bottom:0">
         </div>
         <div>
-          <div style="font-size:11px;color:var(--text3);margin-bottom:5px;font-weight:700">Wzrost (cm)</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:5px;font-weight:400">Wzrost (cm)</div>
           <input class="ob-inp" id="ob-height" type="number" placeholder="175" min="120" max="220" style="margin-bottom:0">
         </div>
         <div>
-          <div style="font-size:11px;color:var(--text3);margin-bottom:5px;font-weight:700">Płeć</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:5px;font-weight:400">Płeć</div>
           <select class="ob-inp" id="ob-gender" style="margin-bottom:0;appearance:none;background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22><path d=%22M2 4l4 4 4-4%22 stroke=%22%236B6B85%22 fill=%22none%22 stroke-width=%222%22/></svg>');background-repeat:no-repeat;background-position:right 14px center;padding-right:36px">
             <option value="m">Mężczyzna</option>
             <option value="f">Kobieta</option>
@@ -6631,7 +6631,7 @@ function closeAdminPanel(){
         <div class="ob-opt" data-val="lidl" onclick="selectOb('stores','lidl',this)"><b style="color:var(--text)">🏪 Lidl</b></div>
         <div class="ob-opt" data-val="both" onclick="selectOb('stores','both',this)"><b style="color:var(--text)">Oba sklepy</b></div>
       </div>
-      <div style="font-size:11px;color:var(--text3);margin-bottom:5px;font-weight:700;margin-top:14px">Wykluczenia (opcjonalnie)</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:5px;font-weight:400;margin-top:14px">Wykluczenia (opcjonalnie)</div>
       <input class="ob-inp" id="ob-exclude" placeholder="np. wieprzowina, orzechy, gluten">
     </div>
 
@@ -6639,7 +6639,7 @@ function closeAdminPanel(){
     <div class="ob-step" id="ob-step-4b">
       <div class="ob-title">Preferencje smakowe (opcjonalnie)</div>
       <div class="ob-sub">Zaznacz produkty, które lubisz, a które nie. Możesz pominąć.</div>
-      <div style="font-size:11px;color:var(--green);font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Lubię</div>
+      <div style="font-size:11px;color:var(--green);font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Lubię</div>
       <div style="margin-bottom:14px">
         <span class="ob-pill" data-val="kurczak" onclick="togglePref(this,'liked')">Kurczak</span>
         <span class="ob-pill" data-val="losos" onclick="togglePref(this,'liked')">Łosoś</span>
@@ -6651,7 +6651,7 @@ function closeAdminPanel(){
         <span class="ob-pill" data-val="orzechy" onclick="togglePref(this,'liked')">Orzechy</span>
         <span class="ob-pill" data-val="twarog" onclick="togglePref(this,'liked')">Twaróg</span>
       </div>
-      <div style="font-size:11px;color:var(--red);font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Nie lubię</div>
+      <div style="font-size:11px;color:var(--red);font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Nie lubię</div>
       <div>
         <span class="ob-pill" data-val="ryby" onclick="togglePref(this,'disliked')">Ryby</span>
         <span class="ob-pill" data-val="kasza_gryczana" onclick="togglePref(this,'disliked')">Kasza gryczana</span>
@@ -6668,18 +6668,18 @@ function closeAdminPanel(){
       <div class="ob-sub">Obliczone na podstawie Twoich parametrów. Po kliknięciu „Zaczynamy!" AI wygeneruje Twoją dietę.</div>
       <div style="background:var(--bg3);border-radius:14px;padding:18px;border:1px solid var(--border);margin-bottom:16px">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-          <div style="text-align:center"><div style="font-size:28px;font-weight:900;color:var(--amber)" id="ob-res-kcal">0 kcal</div><div style="font-size:11px;color:var(--text3);margin-top:4px">Kalorie / dzień</div></div>
-          <div style="text-align:center"><div style="font-size:28px;font-weight:900;color:#60A5FA" id="ob-res-prot">0g</div><div style="font-size:11px;color:var(--text3);margin-top:4px">Białko</div></div>
-          <div style="text-align:center"><div style="font-size:28px;font-weight:900;color:var(--green)" id="ob-res-carb">0g</div><div style="font-size:11px;color:var(--text3);margin-top:4px">Węglowodany</div></div>
-          <div style="text-align:center"><div style="font-size:28px;font-weight:900;color:#F9A8D4" id="ob-res-fat">0g</div><div style="font-size:11px;color:var(--text3);margin-top:4px">Tłuszcze</div></div>
+          <div style="text-align:center"><div style="font-size:28px;font-weight:600;color:var(--amber)" id="ob-res-kcal">0 kcal</div><div style="font-size:11px;color:var(--text3);margin-top:4px">Kalorie / dzień</div></div>
+          <div style="text-align:center"><div style="font-size:28px;font-weight:600;color:#60A5FA" id="ob-res-prot">0g</div><div style="font-size:11px;color:var(--text3);margin-top:4px">Białko</div></div>
+          <div style="text-align:center"><div style="font-size:28px;font-weight:600;color:var(--green)" id="ob-res-carb">0g</div><div style="font-size:11px;color:var(--text3);margin-top:4px">Węglowodany</div></div>
+          <div style="text-align:center"><div style="font-size:28px;font-weight:600;color:#F9A8D4" id="ob-res-fat">0g</div><div style="font-size:11px;color:var(--text3);margin-top:4px">Tłuszcze</div></div>
         </div>
       </div>
     </div>
 
     <!-- Buttons -->
     <div style="display:flex;gap:10px;margin-top:20px">
-      <button id="ob-back-btn" onclick="obBack()" style="flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:50px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;display:none">← Wstecz</button>
-      <button id="ob-next-btn" onclick="obNext()" style="flex:2;background:var(--green);border:none;color:#000;border-radius:50px;padding:14px;font-size:14px;font-weight:800;cursor:pointer">Dalej →</button>
+      <button id="ob-back-btn" onclick="obBack()" style="flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:50px;padding:14px;font-size:14px;font-weight:400;cursor:pointer;display:none">← Wstecz</button>
+      <button id="ob-next-btn" onclick="obNext()" style="flex:2;background:var(--green);border:none;color:#000;border-radius:50px;padding:14px;font-size:14px;font-weight:500;cursor:pointer">Dalej →</button>
     </div>
   </div>
 </div>
@@ -6687,22 +6687,22 @@ function closeAdminPanel(){
 <!-- ══ EDIT MEAL OVERLAY ════════════════════════════════════════════════ -->
 <div id="edit-meal-overlay">
   <div style="background:var(--bg2);border-radius:20px;padding:20px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;border:1px solid var(--border2)">
-    <div style="font-size:17px;font-weight:800;color:var(--text);margin-bottom:14px">Edycja posiłku</div>
-    <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:700">Nazwa</div>
+    <div style="font-size:17px;font-weight:500;color:var(--text);margin-bottom:14px">Edycja posiłku</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:400">Nazwa</div>
     <input class="ob-inp" id="edit-meal-name" style="margin-bottom:10px">
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:10px">
-      <div><div style="font-size:10px;color:var(--text3);margin-bottom:3px;font-weight:700">Kcal</div><input class="ob-inp" id="edit-meal-kcal" type="number" style="margin-bottom:0;padding:10px"></div>
-      <div><div style="font-size:10px;color:var(--text3);margin-bottom:3px;font-weight:700">B (g)</div><input class="ob-inp" id="edit-meal-prot" type="number" style="margin-bottom:0;padding:10px"></div>
-      <div><div style="font-size:10px;color:var(--text3);margin-bottom:3px;font-weight:700">W (g)</div><input class="ob-inp" id="edit-meal-carb" type="number" style="margin-bottom:0;padding:10px"></div>
-      <div><div style="font-size:10px;color:var(--text3);margin-bottom:3px;font-weight:700">T (g)</div><input class="ob-inp" id="edit-meal-fat" type="number" style="margin-bottom:0;padding:10px"></div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:3px;font-weight:400">Kcal</div><input class="ob-inp" id="edit-meal-kcal" type="number" style="margin-bottom:0;padding:10px"></div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:3px;font-weight:400">B (g)</div><input class="ob-inp" id="edit-meal-prot" type="number" style="margin-bottom:0;padding:10px"></div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:3px;font-weight:400">W (g)</div><input class="ob-inp" id="edit-meal-carb" type="number" style="margin-bottom:0;padding:10px"></div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:3px;font-weight:400">T (g)</div><input class="ob-inp" id="edit-meal-fat" type="number" style="margin-bottom:0;padding:10px"></div>
     </div>
-    <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:700">Składniki (jeden na linię, format: nazwa - ilość)</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:400">Składniki (jeden na linię, format: nazwa - ilość)</div>
     <textarea id="edit-meal-ingr" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:12px;padding:12px;font-size:13px;color:var(--text);outline:none;min-height:100px;font-family:inherit;resize:vertical;margin-bottom:10px;color-scheme:dark"></textarea>
-    <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:700">Przepis</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:400">Przepis</div>
     <textarea id="edit-meal-recipe" style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:12px;padding:12px;font-size:13px;color:var(--text);outline:none;min-height:120px;font-family:inherit;resize:vertical;margin-bottom:14px;color-scheme:dark"></textarea>
     <div style="display:flex;gap:8px">
-      <button onclick="closeEditMeal()" style="flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:50px;padding:13px;font-size:13px;font-weight:700;cursor:pointer">Anuluj</button>
-      <button onclick="saveEditMeal()" style="flex:2;background:var(--green);border:none;color:#000;border-radius:50px;padding:13px;font-size:13px;font-weight:800;cursor:pointer">Zapisz</button>
+      <button onclick="closeEditMeal()" style="flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:50px;padding:13px;font-size:13px;font-weight:400;cursor:pointer">Anuluj</button>
+      <button onclick="saveEditMeal()" style="flex:2;background:var(--green);border:none;color:#000;border-radius:50px;padding:13px;font-size:13px;font-weight:500;cursor:pointer">Zapisz</button>
     </div>
   </div>
 </div>
@@ -6712,7 +6712,7 @@ function closeAdminPanel(){
   <div style="background:rgba(13,13,18,.98);border-bottom:1px solid var(--border);padding:14px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10">
     <button onclick="closeAdminPanel()" style="background:var(--bg3);border:none;color:var(--text3);border-radius:50%;width:38px;height:38px;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">&#8592;</button>
     <div style="flex:1">
-      <div style="font-size:17px;font-weight:900;color:var(--text)">Panel administratora</div>
+      <div style="font-size:17px;font-weight:600;color:var(--text)">Panel administratora</div>
       <div style="font-size:11px;color:var(--text3)">Pełna Lodówka &bull; <span id="admin-firebase-status">Firebase</span> &bull; <span id="admin-app-version" style="font-family:monospace;color:var(--text3)"></span></div>
     </div>
     <div id="admin-api-dot" style="width:8px;height:8px;border-radius:50%;background:var(--green)"></div>
@@ -6732,15 +6732,15 @@ function closeAdminPanel(){
 <div id="admin-login-overlay">
   <div style="background:var(--bg2);border-radius:20px;padding:24px;width:100%;max-width:340px;border:1px solid var(--border2);text-align:center">
     <div style="font-size:36px;margin-bottom:12px">🔐</div>
-    <div style="font-size:18px;font-weight:900;color:var(--text);margin-bottom:6px">Panel administratora</div>
+    <div style="font-size:18px;font-weight:600;color:var(--text);margin-bottom:6px">Panel administratora</div>
     <div style="font-size:13px;color:var(--text3);margin-bottom:18px">Wpisz hasło administratora</div>
     <input id="admin-pass-inp" type="password" placeholder="Hasło administratora"
       style="width:100%;background:var(--bg3);border:1.5px solid var(--border2);border-radius:12px;padding:13px 16px;font-size:14px;color:var(--text);outline:none;margin-bottom:6px;color-scheme:dark"
       onkeydown="if(event.key==='Enter')checkAdminPassword()">
     <div id="admin-pass-error" style="font-size:12px;color:var(--red);margin-bottom:12px;display:none">Nieprawidłowe hasło administratora.</div>
     <div style="display:flex;gap:8px;margin-top:8px">
-      <button onclick="closeAdminLogin()" style="flex:1;padding:13px;border-radius:50px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:13px;font-weight:700;cursor:pointer">Anuluj</button>
-      <button onclick="checkAdminPassword()" style="flex:1;padding:13px;border-radius:50px;border:none;background:var(--green);color:#000;font-size:13px;font-weight:800;cursor:pointer">Wejdź</button>
+      <button onclick="closeAdminLogin()" style="flex:1;padding:13px;border-radius:50px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:13px;font-weight:400;cursor:pointer">Anuluj</button>
+      <button onclick="checkAdminPassword()" style="flex:1;padding:13px;border-radius:50px;border:none;background:var(--green);color:#000;font-size:13px;font-weight:500;cursor:pointer">Wejdź</button>
     </div>
   </div>
 </div>
@@ -6749,8 +6749,8 @@ function closeAdminPanel(){
 <div id="pantry-audit-overlay" style="display:none;position:fixed;inset:0;z-index:400;background:#0A0A0F;flex-direction:column;overflow:hidden">
   <div style="background:rgba(13,13,18,.98);border-bottom:1px solid rgba(255,255,255,.08);padding:14px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0;position:sticky;top:0;z-index:10">
     <button onclick="closePantryAudit()" style="background:#1A1A24;border:none;color:#6B6B85;border-radius:50%;width:38px;height:38px;font-size:18px;cursor:pointer">&#8592;</button>
-    <div style="flex:1"><div style="font-size:17px;font-weight:900;color:#fff">Produkty z diety</div><div style="font-size:11px;color:#6B6B85">Zaznacz co masz w lodówce</div></div>
-    <button onclick="savePantryAudit()" style="background:#1ED760;color:#000;border:none;border-radius:50px;padding:10px 18px;font-size:13px;font-weight:800;cursor:pointer">Zapisz stan</button>
+    <div style="flex:1"><div style="font-size:17px;font-weight:600;color:#fff">Produkty z diety</div><div style="font-size:11px;color:#6B6B85">Zaznacz co masz w lodówce</div></div>
+    <button onclick="savePantryAudit()" style="background:#1ED760;color:#000;border:none;border-radius:50px;padding:10px 18px;font-size:13px;font-weight:500;cursor:pointer">Zapisz stan</button>
   </div>
   <div id="pantry-audit-body" style="flex:1;overflow-y:auto;padding:16px"></div>
 </div>
