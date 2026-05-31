@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-ai-timeout-cancel-v19 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-sonnet-parallel-v20 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1088,7 +1088,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-31-ai-timeout-cancel-v19";
+var APP_VERSION="2026-05-31-sonnet-parallel-v20";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -1350,10 +1350,14 @@ function cancelAILoading(){
   if(typeof dlgAlert==="function")dlgAlert("⨯","Anulowano","Generowanie AI zostało przerwane przez Ciebie.");
 }
 
-function callAPI(messages,system,onOk,onErr,maxTok){
+// Model AI:
+// - claude-sonnet-4-5 → ~3x szybszy niż Opus, jakość praktycznie identyczna do diety/chat/scanu
+// - Opus tylko dla najtrudniejszych zadań (zaawansowane analizy)
+var AI_MODEL_DEFAULT="claude-sonnet-4-5";
+function callAPI(messages,system,onOk,onErr,maxTok,modelOverride){
   if(!apiKey){if(onErr)onErr("Brak klucza API");return;}
   showAILoading();
-  var body={model:"claude-opus-4-5",max_tokens:maxTok||1400,messages:messages};
+  var body={model:modelOverride||AI_MODEL_DEFAULT,max_tokens:maxTok||1400,messages:messages};
   if(system)body.system=system;
   // AbortController dla cancel + timeout
   var ac=null;
@@ -3151,19 +3155,32 @@ function generateAIDiet(profile){
   document.getElementById("diet-overlay").classList.add("show");
   var body=document.getElementById("diet-body");
   body.innerHTML='<div style="text-align:center;padding:60px 20px"><div style="font-size:50px;margin-bottom:16px">AI</div><div id="diet-gen-step" style="font-size:14px;color:var(--text2);margin-bottom:20px">Generuje Menu 1...</div><div class="spin" style="margin:0 auto"></div></div>';
-  callAPI([{role:"user",content:base+" MENU 1 - 3 sniadania+3 obiady+3 kolacje: "+fmt}],sys,function(r1){
-    var m1=parseMenuJSON(r1);if(!m1){showDietError("Menu 1: "+getJSONError(r1));return;}
+  // RÓWNOLEGLE Menu 1 + Menu 2 (zamiast sekwencyjnie) — czas o połowę krótszy
+  showAILoading("🍱 Generuję Menu 1 i Menu 2 równolegle...","To trwa ~20-30s. Sonnet zamiast Opusa = ~3x szybciej.");
+  if(typeof updateDietStep==="function")updateDietStep(1);
+  function callMenu(label,content){
+    return new Promise(function(resolve,reject){
+      callAPI([{role:"user",content:content}],sys,function(raw){resolve({label:label,raw:raw});},function(err){reject(new Error(label+": "+err));},3500);
+    });
+  }
+  var p1=callMenu("Menu 1",base+" MENU 1 - 3 sniadania+3 obiady+3 kolacje: "+fmt);
+  var p2=callMenu("Menu 2",base+" MENU 2 - 3 INNE sniadania+3 inne obiady+3 inne kolacje (inne skladniki i techniki, bez powtorzen): "+fmt);
+  Promise.all([p1,p2]).then(function(results){
+    var r1=results[0].raw,r2=results[1].raw;
+    var m1=parseMenuJSON(r1);
+    if(!m1){showDietError("Menu 1: "+getJSONError(r1));return;}
     m1=fixMenuMacros(m1,profile);
     if(typeof updateDietStep==="function")updateDietStep(2);
-    callAPI([{role:"user",content:base+" MENU 2 - 3 INNE sniadania+3 inne obiady+3 inne kolacje (inne skladniki i techniki, bez powtorzen): "+fmt}],sys,function(r2){
-      var m2=parseMenuJSON(r2);if(!m2){showDietError("Menu 2: "+getJSONError(r2));return;}
-      m2=fixMenuMacros(m2,profile);
-      if(typeof updateDietStep==="function")updateDietStep(3);
-      if(!userProfile)userProfile=profile;
-      userProfile.dietData={menu1:m1,menu2:m2};
-      saveUserProfile(userProfile);dietTab=0;dietMenu=1;expandedMeal=null;renderDietBody();
-    },function(err){showDietError(err);},3500);
-  },function(err){showDietError(err);},3500);
+    var m2=parseMenuJSON(r2);
+    if(!m2){showDietError("Menu 2: "+getJSONError(r2));return;}
+    m2=fixMenuMacros(m2,profile);
+    if(typeof updateDietStep==="function")updateDietStep(3);
+    if(!userProfile)userProfile=profile;
+    userProfile.dietData={menu1:m1,menu2:m2};
+    saveUserProfile(userProfile);dietTab=0;dietMenu=1;expandedMeal=null;renderDietBody();
+  }).catch(function(err){
+    showDietError(err&&err.message||String(err));
+  });
 }
 function parseMenuJSON(raw){
   try{
