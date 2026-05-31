@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-06-01-fish-off-validation-v37 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-06-01-spices-with-amounts-v38 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1088,7 +1088,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-06-01-fish-off-validation-v37";
+var APP_VERSION="2026-06-01-spices-with-amounts-v38";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -3034,7 +3034,22 @@ function renderRecipes(){
         // Sekcja przypraw - mały opis poniżej tabeli (z meal.przyprawy lub z calc.seasonings)
         var przyprawy=(m.przyprawy&&m.przyprawy.length?m.przyprawy:calc.seasonings||[]);
         if(przyprawy&&przyprawy.length){
-          h+='<div style="font-size:11px;color:var(--text3);background:rgba(139,92,246,.04);border:1px solid rgba(139,92,246,.15);border-radius:8px;padding:6px 10px;margin-bottom:10px">🧂 <b style="color:var(--purple)">Przyprawy</b> (nie wpływają na makro): '+przyprawy.join(", ")+'</div>';
+          // Format: ["sól", "pieprz"] LUB [{n:"sól",il:"1 łyżeczka"}, ...] LUB ["sól: 1 łyżeczka"]
+          var przyprawyHtml=przyprawy.map(function(p){
+            if(typeof p==="string"){
+              // String może być "nazwa" lub "nazwa - ilość" lub "nazwa: ilość"
+              var parts=p.split(/[:\-—]\s*/);
+              if(parts.length>=2){
+                return '<b style="color:var(--text2)">'+parts[0].trim()+'</b> <span style="color:var(--text3)">— '+parts.slice(1).join(" ").trim()+'</span>';
+              }
+              return '<b style="color:var(--text2)">'+p+'</b> <span style="color:var(--text3);font-style:italic">— do smaku</span>';
+            }
+            // Object: {n,il}
+            var name=p.n||p.name||p.nazwa||"";
+            var il=p.il||p.amount||p.ilosc||"do smaku";
+            return '<b style="color:var(--text2)">'+name+'</b> <span style="color:var(--text3)">— '+il+'</span>';
+          }).join(", &nbsp; ");
+          h+='<div style="font-size:11px;color:var(--text3);background:rgba(139,92,246,.04);border:1px solid rgba(139,92,246,.15);border-radius:8px;padding:8px 10px;margin-bottom:10px;line-height:1.7">🧂 <b style="color:var(--purple)">Przyprawy</b> <span style="color:var(--text3);font-size:10px">(nie wpływają na makro)</span><br>'+przyprawyHtml+'</div>';
         }
         // Przepis
         h+='<div style="background:var(--bg3);border-radius:10px;padding:12px;font-size:12px;color:var(--text2);line-height:1.8"><b style="color:var(--text);display:block;margin-bottom:6px">Przygotowanie:</b>'+(m.przepis||"").replace(/\n/g,"<br>")+'</div>';
@@ -3152,7 +3167,8 @@ function generateSingleMeal(menuNum,section,replaceIdx){
     +"- Puszki (fasola, tuńczyk): state='prepared', amountBasis='drained'\n"
     +"- Nabiał: state='prepared', amountBasis='asPackaged'\n"
     +"PRZYPRAWY:\n"
-    +"- Sól/pieprz/papryka słodka/oregano: NIE w 'skladniki', tylko w osobnym polu 'przyprawy':['sól','pieprz',...].\n"
+    +"- Sól/pieprz/papryka/oregano: w osobnym polu 'przyprawy' jako OBIEKTY z ilością: [{\"n\":\"sól\",\"il\":\"1 łyżeczka\"},{\"n\":\"pieprz\",\"il\":\"szczypta\"}].\n"
+    +"- ZAWSZE podaj ilość ('szczypta', '1 łyżeczka', '1/2 łyżeczki').\n"
     +"- Oliwa/masło orzechowe/miód idą do 'skladniki' (mają kalorie).\n"
     +"Realne porcje (białko 100-250g, węglowodany 60-200g). aiTarget MUSI być realnie osiągalne ze składników (suma kcal/B/W/T ze składników =/-5% target). DOSTOSUJ GRAMATURY żeby suma się zgadzała.\n"
     +"TYLKO JSON: {\"nazwa\":\"...\",\"czas\":\"15 min\",\"aiTarget\":{\"kcal\":LICZBA,\"protein\":LICZBA,\"carbs\":LICZBA,\"fat\":LICZBA},\"skladniki\":[{\"n\":\"Pierś z Kurczaka\",\"il\":\"150g\",\"state\":\"raw\",\"amountBasis\":\"raw\"}],\"przyprawy\":[\"sól\",\"pieprz\"],\"przepis\":\"1. Krok.\"}";
@@ -3299,7 +3315,8 @@ function generateAIDiet(profile,customWishes){
     +"- Oliwa/masło/miód: state='prepared', amountBasis='asPackaged'\n"
     +"ZASADY PRZYPRAW (KRYTYCZNE):\n"
     +"- NIE wpisuj soli/pieprzu/papryki słodkiej/oregano/czosnku granulowanego/itp. w 'skladniki' (nie mają wpływu na makro).\n"
-    +"- Dodaj przyprawy w OSOBNYM polu 'przyprawy': ['sól','pieprz','papryka słodka',...].\n"
+    +"- Dodaj przyprawy w OSOBNYM polu 'przyprawy' jako OBIEKTY z ilością: [{\"n\":\"sól\",\"il\":\"1 łyżeczka\"},{\"n\":\"pieprz\",\"il\":\"szczypta\"},{\"n\":\"papryka słodka\",\"il\":\"1 łyżeczka\"}].\n"
+    +"- ZAWSZE podaj ilość każdej przyprawy (np. 'szczypta', '1 łyżeczka', '2 łyżeczki', '1/2 łyżeczki').\n"
     +"- Oliwy, masła orzechowego, miodu, tahini NIE traktuj jako przyprawy — one mają kalorie, idą do 'skladniki'.\n"
     +"Realne porcje: białko 100-250g/posiłek, węglowodany 60-200g/posiłek, tłuszcze 5-30g/posiłek. Min 10g każdego suchego składnika. NIE wymyślaj absurdalnych ilości (nie 10kg ryżu, nie 200g jajek). Max 30 min czas. Proste polskie dania.\n"
     +"⚠️ PRECYZJA MAKRO: aiTarget MUSI być realnie do osiągnięcia ze składników. PRZED zapisaniem przelicz w głowie: suma kcal/B/W/T ze składników (kcal100×g/100) MUSI być w granicach ±5% od aiTarget. Dobierz GRAMATURY składników tak żeby SUMA się ZGADZAŁA.\n"
@@ -5124,9 +5141,9 @@ function sanitizeMealIngredients(skladniki,mealRef){
     var amt=sk.il||sk.amount||"";
     var alts=splitOrIngredients(name);
     var primary=alts.length>0?alts[0]:name;
-    // === Jeśli to przyprawa, NIE dodawaj do skladnikow (zachowaj w mealRef.przyprawy) ===
+    // === Jeśli to przyprawa, NIE dodawaj do skladnikow (zachowaj w mealRef.przyprawy z ilością) ===
     if(typeof isNonMacroSeasoning==="function"&&isNonMacroSeasoning(primary)){
-      extractedSeasonings.push(primary);
+      extractedSeasonings.push(amt?{n:primary,il:String(amt)}:{n:primary,il:"do smaku"});
       return;
     }
     if(alts.length>=1){
