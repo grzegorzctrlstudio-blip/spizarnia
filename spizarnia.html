@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-products-pack-v31 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-admin-product-sources-v32 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1088,7 +1088,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-31-products-pack-v31";
+var APP_VERSION="2026-05-31-admin-product-sources-v32";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -5962,24 +5962,76 @@ var adminProductsExpanded=null;
 function renderAdminProducts(){
   var body=document.getElementById("admin-body");
   if(!body)return;
-  // Połącz PRODUCT_DB + user overrides
   var query=String(adminProductsSearch||"").toLowerCase().trim();
+  // === ZBUDUJ POŁĄCZONĄ LISTĘ: PRODUCT_DB (markowe Bie/Lidl) + LOCAL_NUTRITION_FALLBACK (USDA) ===
+  // Każdy produkt znormalizowany do tej samej struktury z polem source
+  var unifiedItems=[];
+  // 1. PRODUCT_DB (lokalna markowa baza)
+  PRODUCT_DB.forEach(function(p){
+    unifiedItems.push({
+      id:p.id,
+      name:p.name,
+      n100:p.n100,
+      aliases:p.aliases||[],
+      brands:p.brands||[],
+      source:"productDB",
+      sourceLabel:"Biedronka/Lidl",
+      sourceNote:"Lokalna baza markowa (PRODUCT_DB)",
+      sourceColor:"#8B5CF6",
+      raw:p
+    });
+  });
+  // 2. LOCAL_NUTRITION_FALLBACK (USDA generic)
+  if(typeof LOCAL_NUTRITION_FALLBACK!=="undefined"&&LOCAL_NUTRITION_FALLBACK){
+    LOCAL_NUTRITION_FALLBACK.forEach(function(p){
+      // Konwertuj na ten sam format co PRODUCT_DB
+      unifiedItems.push({
+        id:p.id,
+        name:p.displayName||p.canonicalName,
+        n100:{kcal:p.kcal100,prot:p.protein100,carb:p.carbs100,fat:p.fat100},
+        aliases:p.aliases||[],
+        brands:[],
+        source:p.source||"localFallback",
+        sourceLabel:(p.sourceNote||"").indexOf("USDA")===0?"USDA":(p.source||"localFallback"),
+        sourceNote:p.sourceNote||"Lokalna tabela fallback",
+        sourceColor:(p.sourceNote||"").indexOf("USDA")===0?"#16A34A":"#06B6D4",
+        confidence:p.confidenceBase,
+        verified:p.verified,
+        state:p.state,
+        raw:p
+      });
+    });
+  }
+  // Statystyki
+  var countByDb={productDB:0,USDA:0,other:0};
+  unifiedItems.forEach(function(i){
+    if(i.source==="productDB")countByDb.productDB++;
+    else if(i.sourceLabel==="USDA")countByDb.USDA++;
+    else countByDb.other++;
+  });
+
   var html='';
   html+='<div style="background:linear-gradient(135deg,rgba(139,92,246,.15),rgba(61,139,255,.08));border:1px solid rgba(139,92,246,.35);border-radius:14px;padding:14px;margin-bottom:14px">';
-  html+='<div style="font-size:13px;font-weight:500;color:var(--purple);margin-bottom:4px">🏷️ Baza produktów</div>';
-  html+='<div style="font-size:12px;color:var(--text2);margin-bottom:10px">'+PRODUCT_DB.length+' produktów &bull; '+Object.keys(userProductOverrides).length+' własnych override\'ów. Możesz zeskanować etykietę aby dodać konkretną markę.</div>';
+  html+='<div style="font-size:13px;font-weight:500;color:var(--purple);margin-bottom:4px">🏷️ Baza produktów ('+unifiedItems.length+')</div>';
+  html+='<div style="font-size:11px;color:var(--text2);margin-bottom:6px;line-height:1.6">';
+  html+='<span style="color:#8B5CF6;font-weight:500">●</span> '+countByDb.productDB+' Biedronka/Lidl &nbsp;';
+  html+='<span style="color:#16A34A;font-weight:500">●</span> '+countByDb.USDA+' USDA &nbsp;';
+  html+='<span style="color:#06B6D4;font-weight:500">●</span> '+countByDb.other+' Lokalna fallback';
+  html+='</div>';
+  html+='<div style="font-size:11px;color:var(--text3);margin-bottom:10px">'+Object.keys(userProductOverrides).length+' własnych override\'ów. Możesz zeskanować etykietę aby dodać konkretną markę.</div>';
   html+='<button onclick="openLabelScanner()" style="width:100%;background:linear-gradient(135deg,var(--purple),#4F46E5);color:#fff;border:none;border-radius:50px;padding:13px;font-size:14px;font-weight:500;cursor:pointer">📸 Zeskanuj etykietę produktu</button>';
   html+='</div>';
 
-  html+='<input type="text" placeholder="🔍 Szukaj produktu lub marki..." value="'+query.replace(/"/g,"&quot;")+'" oninput="adminProductsSearch=this.value;renderAdminProducts()" style="width:100%;background:#1A1A24;border:1.5px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 14px;font-size:13px;color:#fff;outline:none;margin-bottom:14px;color-scheme:dark">';
+  html+='<input type="text" placeholder="🔍 Szukaj produktu, marki lub źródła (USDA/Biedronka/Lidl)..." value="'+query.replace(/"/g,"&quot;")+'" oninput="adminProductsSearch=this.value;renderAdminProducts()" style="width:100%;background:#1A1A24;border:1.5px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 14px;font-size:13px;color:#fff;outline:none;margin-bottom:14px;color-scheme:dark">';
 
-  // Sortuj i filtruj
-  var items=PRODUCT_DB.slice();
+  // Filtruj
+  var items=unifiedItems.slice();
   if(query){
     items=items.filter(function(p){
-      if(p.name.toLowerCase().indexOf(query)!==-1)return true;
-      if((p.aliases||[]).some(function(a){return a.toLowerCase().indexOf(query)!==-1;}))return true;
+      if((p.name||"").toLowerCase().indexOf(query)!==-1)return true;
+      if((p.aliases||[]).some(function(a){return String(a).toLowerCase().indexOf(query)!==-1;}))return true;
       if((p.brands||[]).some(function(b){return String(b.brand).toLowerCase().indexOf(query)!==-1;}))return true;
+      if((p.sourceLabel||"").toLowerCase().indexOf(query)!==-1)return true;
       return false;
     });
   }
@@ -5995,20 +6047,31 @@ function renderAdminProducts(){
     var expanded=adminProductsExpanded===p.id;
     var hasBrands=p.brands&&p.brands.length>0;
     var ov=userProductOverrides[p.id];
-    html+='<div style="background:#111118;border-radius:14px;padding:12px 14px;margin-bottom:8px;border:1px solid rgba(255,255,255,.06)">';
+    html+='<div style="background:#111118;border-radius:14px;padding:12px 14px;margin-bottom:8px;border:1px solid rgba(255,255,255,.06);border-left:3px solid '+p.sourceColor+'">';
     // Nagłówek
     html+='<div onclick="adminProductsExpanded=adminProductsExpanded===\''+p.id+'\'?null:\''+p.id+'\';renderAdminProducts()" style="cursor:pointer;display:flex;align-items:center;gap:10px">';
     html+='<div style="flex:1;min-width:0">';
-    html+='<div style="font-size:13px;font-weight:500;color:#fff">'+p.name+'</div>';
-    html+='<div style="font-size:11px;color:#6B6B85;margin-top:2px">'+p.n100.kcal+' kcal &bull; B:'+p.n100.prot+'g W:'+p.n100.carb+'g T:'+p.n100.fat+'g'+(hasBrands?" &bull; "+p.brands.length+" marek":"")+'</div>';
+    html+='<div style="font-size:13px;font-weight:500;color:#fff;display:flex;align-items:center;gap:6px;flex-wrap:wrap">';
+    html+='<span>'+p.name+'</span>';
+    html+='<span style="background:'+p.sourceColor+'22;border:1px solid '+p.sourceColor+'66;color:'+p.sourceColor+';border-radius:50px;padding:1px 7px;font-size:9px;font-weight:600">'+p.sourceLabel+'</span>';
+    if(p.verified===false)html+='<span style="background:rgba(245,158,11,.15);border:1px solid var(--amber);color:var(--amber);border-radius:50px;padding:1px 6px;font-size:9px;font-weight:600">niezweryfikowane</span>';
+    html+='</div>';
+    html+='<div style="font-size:11px;color:#6B6B85;margin-top:3px">'+p.n100.kcal+' kcal &bull; B:'+p.n100.prot+'g W:'+p.n100.carb+'g T:'+p.n100.fat+'g'+(hasBrands?" &bull; "+p.brands.length+" marek":"")+(p.confidence?" &bull; "+Math.round(p.confidence*100)+"% conf.":"")+'</div>';
     html+='</div>';
     if(ov)html+='<span style="background:rgba(245,158,11,.15);border:1px solid var(--amber);color:var(--amber);border-radius:50px;padding:3px 8px;font-size:10px;font-weight:400">override</span>';
     html+='<span style="color:#6B6B85;font-size:14px;flex-shrink:0;transition:transform .2s;transform:rotate('+(expanded?'90deg':'0deg')+')">›</span>';
     html+='</div>';
     if(expanded){
       html+='<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06)">';
+      // ŹRÓDŁO danych
+      html+='<div style="background:'+p.sourceColor+'15;border-radius:10px;padding:10px 12px;margin-bottom:10px;border:1px solid '+p.sourceColor+'33">';
+      html+='<div style="font-size:11px;font-weight:600;color:'+p.sourceColor+';text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">📊 Źródło danych makro</div>';
+      html+='<div style="font-size:12px;color:var(--text2);line-height:1.5">'+(p.sourceNote||"Brak informacji o źródle")+'</div>';
+      if(p.state)html+='<div style="font-size:10px;color:var(--text3);margin-top:4px">Stan produktu: <b>'+(typeof getStateLabelPL==="function"?getStateLabelPL(p.state)||p.state:p.state)+'</b></div>';
+      html+='</div>';
+      // Marki (PRODUCT_DB)
       if(hasBrands){
-        html+='<div style="font-size:11px;font-weight:500;color:#8B5CF6;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Marki ('+p.brands.length+')</div>';
+        html+='<div style="font-size:11px;font-weight:500;color:#8B5CF6;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Konkretne marki sklepowe ('+p.brands.length+')</div>';
         p.brands.forEach(function(b){
           var shopColor=String(b.shop||"").toLowerCase().indexOf("biedronka")!==-1?"#DC2626":String(b.shop||"").toLowerCase().indexOf("lidl")!==-1?"#1D4ED8":"#7C3AED";
           html+='<div style="background:#0D0D15;border-radius:10px;padding:10px 12px;margin-bottom:6px;border-left:3px solid '+shopColor+'">';
@@ -6016,11 +6079,11 @@ function renderAdminProducts(){
           html+='<div style="font-size:11px;color:#6B6B85">'+(b.n100.kcal||0)+' kcal &bull; B:'+(b.n100.prot||0)+'g W:'+(b.n100.carb||0)+'g T:'+(b.n100.fat||0)+'g'+(b.pkgSize?" &bull; opak. "+b.pkgSize+"g":"")+'</div>';
           html+='</div>';
         });
-      }else{
+      }else if(p.source==="productDB"){
         html+='<div style="font-size:11px;color:#6B6B85;text-align:center;padding:10px;background:#0D0D15;border-radius:8px;margin-bottom:8px">Brak konkretnych marek w bazie. Dodaj zdjęciem etykiety.</div>';
       }
-      if(p.aliases){
-        html+='<div style="font-size:11px;color:#6B6B85;margin-top:8px">Aliasy: <i>'+p.aliases.join(", ")+'</i></div>';
+      if(p.aliases&&p.aliases.length){
+        html+='<div style="font-size:11px;color:#6B6B85;margin-top:8px">Aliasy ('+p.aliases.length+'): <i>'+p.aliases.join(", ")+'</i></div>';
       }
       html+='</div>';
     }
