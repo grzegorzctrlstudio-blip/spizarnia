@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-06-01-no-search-icon-v39 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-06-01-plan-tyg-baza-v40 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1088,7 +1088,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-06-01-no-search-icon-v39";
+var APP_VERSION="2026-06-01-plan-tyg-baza-v40";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -3149,7 +3149,7 @@ function generateSingleMeal(menuNum,section,replaceIdx){
   var storeName={biedronka:"Biedronka",lidl:"Lidl",both:"Biedronka i Lidl"}[userProfile.stores]||"Biedronka";
   var userLiked2=(userProfile.liked&&userProfile.liked.length)?"Lubie: "+userProfile.liked.join(", ")+". ":"";  var userDisliked2=(userProfile.disliked&&userProfile.disliked.length)?"NIE lubie: "+userProfile.disliked.join(", ")+". ":"";  var prompt="Wygeneruj 1 posilek ("+mealName+"). Cel: "+mK+" kcal B:"+mP+"g W:"+mC+"g T:"+mF+"g (+/-5%). Sklep: "+storeName+". "+(userProfile.exclude?"Wykluczone: "+userProfile.exclude+". ":"")+userLiked2+userDisliked2+
     (existing?"NIE POWTARZAJ: "+existing+". ":"Cos nowego. ")+
-    "Produkty: "+FULL_PRODUCTS+". ZASADY JEDNOSTEK SKŁADNIKÓW:\n"
+    "📦 BAZA PRODUKTÓW (UŻYWAJ TYLKO TYCH NAZW): "+FULL_PRODUCTS+(typeof LOCAL_NUTRITION_FALLBACK!=="undefined"?", "+LOCAL_NUTRITION_FALLBACK.map(function(p){return p.canonicalName;}).filter(Boolean).join(", "):"")+".\nZASADY JEDNOSTEK SKŁADNIKÓW:\n"
     +"- jaja: zawsze SZTUKI (np. '3 szt.'), NIGDY w gramach\n"
     +"- chleb: kromki lub gramy (np. '2 kromki' lub '60g')\n"
     +"- mleko/jogurt/kefir/oliwa: ml lub szklanki (np. '200ml', '1 szklanka')\n"
@@ -3286,7 +3286,15 @@ function generateAIDiet(profile,customWishes){
   var dislikedStr=(profile.disliked&&profile.disliked.length)?" WYKLUCZ nielubiane: "+profile.disliked.join(", "):"";
   // Dodatkowe życzenia użytkownika (z modala)
   var wishesStr=(customWishes&&String(customWishes).trim())?"\n🎯 DODATKOWE ŻYCZENIA UŻYTKOWNIKA (priorytetowo wkomponuj w dietę): \""+String(customWishes).trim()+"\"\n":"";
-  var base="Użytkownik: "+goalTxt+", "+profile.kcal+" kcal/dzień, B:"+profile.prot+"g W:"+profile.carb+"g T:"+profile.fat+"g. Na posiłek: "+mK+" kcal B:"+mP+"g W:"+mC+"g T:"+mF+"g (+/-5%). Sklep: "+storeName+"."+(profile.exclude?" Wykluczone: "+profile.exclude+".":"")+likedStr+dislikedStr+" Produkty: "+FULL_PRODUCTS+"."+wishesStr+"\n"
+  // PEŁNA BAZA PRODUKTÓW - FULL_PRODUCTS (markowe Biedronka/Lidl) + canonicalName z LOCAL_NUTRITION_FALLBACK (~150 USDA)
+  // AI MA OBOWIĄZEK używać TYLKO z tej listy - inaczej "brak produktu w bazie"
+  var fallbackProducts="";
+  if(typeof LOCAL_NUTRITION_FALLBACK!=="undefined"&&LOCAL_NUTRITION_FALLBACK){
+    fallbackProducts=", "+LOCAL_NUTRITION_FALLBACK.map(function(p){return p.canonicalName;}).filter(function(n){return n;}).join(", ");
+  }
+  var allProducts=FULL_PRODUCTS+fallbackProducts;
+  var base="Użytkownik: "+goalTxt+", "+profile.kcal+" kcal/dzień, B:"+profile.prot+"g W:"+profile.carb+"g T:"+profile.fat+"g. Na posiłek: "+mK+" kcal B:"+mP+"g W:"+mC+"g T:"+mF+"g (+/-5%). Sklep: "+storeName+"."+(profile.exclude?" Wykluczone: "+profile.exclude+".":"")+likedStr+dislikedStr+"\n"
+    +"📦 BAZA PRODUKTÓW (UŻYWAJ TYLKO TYCH NAZW, dokładnie jak są - to zapewnia spójność z bazą makro):\n"+allProducts+"\n"+wishesStr+"\n"
     +"ZASADY JEDNOSTEK SKŁADNIKÓW (BARDZO WAŻNE):\n"
     +"- jaja: ZAWSZE SZTUKI (np. '3 szt.'), NIGDY w gramach\n"
     +"- chleb: kromki lub gramy (np. '2 kromki' lub '60g')\n"
@@ -5861,54 +5869,136 @@ function renderWeekPlan(){
   if(!hasMenu1&&!hasMenu2){
     return'<div style="text-align:center;padding:30px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px">📅</div>Brak diety. Wygeneruj dietę najpierw.<br><br><button onclick="startDietGeneration()" style="background:var(--green);color:#000;border:none;border-radius:50px;padding:12px 24px;font-size:13px;font-weight:500;cursor:pointer">Generuj dietę AI</button></div>';
   }
-  
+  if(!window.weekPlan||typeof window.weekPlan!=="object")window.weekPlan={};
+
   var h='';
+  // Info
+  h+='<div style="background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.3);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:11px;color:var(--text2);line-height:1.5">📋 Wybierz dokładnie co zjesz każdego dnia. Lista zakupów policzy się <b style="color:var(--brand)">DOKŁADNIE z Twoich wyborów</b>.</div>';
   // Wybór liczby dni
   h+='<div style="display:flex;gap:6px;margin-bottom:14px">';
   [1,3,5,7].forEach(function(n){
-    h+='<button onclick="planDays='+n+';renderDietBody()" style="flex:1;padding:9px 4px;border-radius:10px;border:1.5px solid '+(planDays===n?"var(--green)":"var(--border)")+';background:'+(planDays===n?"rgba(30,215,96,.15)":"transparent")+';color:'+(planDays===n?"var(--green)":"var(--text3)")+';font-size:12px;font-weight:500;cursor:pointer">'+n+(n===1?" dzień":" dni")+'</button>';
+    h+='<button onclick="planDays='+n+';renderDietBody()" style="flex:1;padding:9px 4px;border-radius:10px;border:1.5px solid '+(planDays===n?"var(--brand)":"var(--border)")+';background:'+(planDays===n?"rgba(6,182,212,.15)":"transparent")+';color:'+(planDays===n?"var(--brand)":"var(--text3)")+';font-size:12px;font-weight:500;cursor:pointer">'+n+(n===1?" dzień":" dni")+'</button>';
   });
   h+='</div>';
-  
-  // Plan dni
+
+  // Plan dni - DROPDOWNY wyboru per sekcja
   for(var day=0;day<planDays;day++){
-    var useMenu=(day%2===0)?d.menu1:d.menu2;
-    var menuLabel=(day%2===0)?"Menu 1":"Menu 2";
     var dayName=DAYS[day%7];
-    
+    var dayKey="d"+day;
+    if(!weekPlan[dayKey])weekPlan[dayKey]={};
+    // Domyślnie: pierwsze danie z menu rotacja (day%2)
+    var defaultMenu=(day%2===0)?1:2;
+
     h+='<div style="background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:10px;overflow:hidden">';
-    h+='<div style="padding:10px 14px;background:var(--bg3);display:flex;align-items:center;justify-content:space-between">';
-    h+='<div style="font-size:13px;font-weight:500;color:var(--text)">'+dayName+'</div>';
-    h+='<div style="font-size:10px;font-weight:400;color:var(--text3)">'+menuLabel+'</div>';
+    h+='<div style="padding:10px 14px;background:var(--bg3);display:flex;align-items:center;gap:8px">';
+    h+='<span style="font-size:13px;font-weight:600;color:var(--brand);flex:1">Dzień '+(day+1)+' — '+dayName+'</span>';
     h+='</div>';
-    
+
     var dayKcal=0,dayProt=0,dayCarb=0,dayFat=0;
-    [{key:"sniadania",icon:"🌅"},{key:"obiady",icon:"☀️"},{key:"kolacje",icon:"🌙"}].forEach(function(meal){
-      var meals=useMenu[meal.key]||[];
-      if(!meals.length)return;
-      var m=meals[0];// Zawsze bierz pierwsze danie
+    [{key:"sniadania",icon:"🌅",label:"Śniadanie"},{key:"obiady",icon:"☀️",label:"Obiad"},{key:"kolacje",icon:"🌙",label:"Kolacja"}].forEach(function(meal){
+      var sel=weekPlan[dayKey][meal.key];
+      var menuNum=sel?sel.menu:defaultMenu;
+      var idx=sel?sel.idx:0;
+      var useMenu=(menuNum===2)?d.menu2:d.menu1;
+      var allMeals=[];
+      // Zbierz wszystkie posiłki z obu menu (Menu 1 + Menu 2)
+      if(d.menu1&&d.menu1[meal.key])d.menu1[meal.key].forEach(function(m,i){allMeals.push({menu:1,idx:i,meal:m});});
+      if(d.menu2&&d.menu2[meal.key])d.menu2[meal.key].forEach(function(m,i){allMeals.push({menu:2,idx:i,meal:m});});
+      if(!allMeals.length)return;
+      // Znajdź wybrane
+      var chosen=allMeals.find(function(a){return a.menu===menuNum&&a.idx===idx;})||allMeals[0];
+      var m=chosen.meal;
       dayKcal+=(m.kcal||0);dayProt+=(m.prot||0);dayCarb+=(m.carb||0);dayFat+=(m.fat||0);
-      h+='<div style="padding:8px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px">';
+      // Dropdown options
+      var opts="";
+      allMeals.forEach(function(a){
+        var isSel=(a.menu===chosen.menu&&a.idx===chosen.idx);
+        opts+='<option value="'+a.menu+":"+a.idx+'"'+(isSel?" selected":"")+'>'+a.meal.nazwa+' ('+(a.meal.kcal||0)+' kcal) — M'+a.menu+'</option>';
+      });
+      h+='<div style="padding:10px 14px;border-bottom:1px solid var(--border)">';
+      h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
       h+='<span style="font-size:16px">'+meal.icon+'</span>';
-      h+='<div style="flex:1"><div style="font-size:12px;font-weight:400;color:var(--text)">'+m.nazwa+'</div>';
-      h+='<div style="font-size:10px;color:var(--text3)">'+m.kcal+' kcal &bull; B:'+m.prot+'g W:'+m.carb+'g T:'+m.fat+'g</div></div>';
+      h+='<span style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:500">'+meal.label+'</span>';
+      h+='<span style="margin-left:auto;font-size:10px;color:var(--text3)">'+(m.kcal||0)+' kcal &bull; B:'+(m.prot||0)+'g W:'+(m.carb||0)+'g T:'+(m.fat||0)+'g</span>';
+      h+='</div>';
+      h+='<select onchange="setWeekPlanMeal(\''+dayKey+'\',\''+meal.key+'\',this.value)" style="width:100%;background:var(--bg3);border:1.5px solid var(--border);color:var(--text);border-radius:8px;padding:8px 10px;font-size:13px;font-weight:500;cursor:pointer;outline:none;color-scheme:dark">';
+      h+=opts;
+      h+='</select>';
       h+='</div>';
     });
-    
-    // Podsumowanie dnia
+
     var ok=userProfile&&Math.abs(dayKcal-userProfile.kcal)<userProfile.kcal*0.1;
-    h+='<div style="padding:8px 14px;display:flex;gap:8px;align-items:center">';
-    h+='<span style="font-size:10px;color:'+(ok?"var(--green)":"var(--amber)")+'">'+dayKcal+' kcal</span>';
-    h+='<span style="font-size:10px;color:var(--text3)">B:'+dayProt+'g W:'+dayCarb+'g T:'+dayFat+'g</span>';
+    h+='<div style="padding:10px 14px;display:flex;gap:8px;align-items:center;background:var(--bg3)">';
+    h+='<span style="font-size:12px;color:'+(ok?"var(--green)":"var(--amber)")+';font-weight:600">'+dayKcal+' kcal</span>';
+    h+='<span style="font-size:11px;color:var(--text3)">B:'+dayProt+'g W:'+dayCarb+'g T:'+dayFat+'g</span>';
+    if(userProfile)h+='<span style="margin-left:auto;font-size:10px;color:var(--text3)">cel '+userProfile.kcal+'</span>';
     h+='</div></div>';
   }
-  
-  // Przycisk listy zakupów na N dni
+
+  // Przycisk listy zakupów z DOKŁADNIE wybranych dań
   h+='<div style="margin-top:14px;display:flex;gap:8px">';
-  h+='<button onclick="generateDietShoppingList('+planDays+')" style="flex:2;background:linear-gradient(135deg,var(--purple),#4F46E5);color:#fff;border:none;border-radius:50px;padding:13px;font-size:13px;font-weight:500;cursor:pointer">📊 Lista zakupów na '+planDays+(planDays===1?" dzień":" dni")+'</button>';
-  h+='<button onclick="generateShopFromDiet()" style="flex:1;background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:50px;padding:13px;font-size:12px;font-weight:400;cursor:pointer">AI lista</button>';
+  h+='<button onclick="generateDietShoppingListFromWeekPlan('+planDays+')" style="flex:1;background:linear-gradient(135deg,var(--purple),#4F46E5);color:#fff;border:none;border-radius:50px;padding:13px;font-size:13px;font-weight:500;cursor:pointer">📊 Lista zakupów z wybranych dań ('+planDays+(planDays===1?" dzień":" dni")+')</button>';
   h+='</div>';
   return h;
+}
+// Zapisz wybór dla danego dnia/sekcji do weekPlan + Firebase
+function setWeekPlanMeal(dayKey,sectionKey,val){
+  if(!weekPlan)weekPlan={};
+  if(!weekPlan[dayKey])weekPlan[dayKey]={};
+  var parts=String(val||"").split(":");
+  weekPlan[dayKey][sectionKey]={menu:Number(parts[0])||1,idx:Number(parts[1])||0};
+  // Zapis do Firebase profilu
+  try{
+    if(typeof FB!=="undefined"&&typeof profileKey==="function"&&typeof userName!=="undefined"&&typeof fbPut==="function"){
+      fbPut(FB+"/profiles/"+profileKey(userName)+"/weekplan",weekPlan).catch(function(){});
+    }
+  }catch(e){}
+  renderDietBody();
+}
+// Generuj listę zakupów z DOKŁADNIE wybranych dań w Planie tygodnia
+function generateDietShoppingListFromWeekPlan(days){
+  var d=getDietData();
+  // Zbuduj wirtualne "menu" które zawiera wybrane dania dla każdego dnia
+  var selectedMeals={sniadania:[],obiady:[],kolacje:[]};
+  for(var day=0;day<days;day++){
+    var dayKey="d"+day;
+    var defaultMenu=(day%2===0)?1:2;
+    ["sniadania","obiady","kolacje"].forEach(function(sec){
+      var sel=weekPlan&&weekPlan[dayKey]&&weekPlan[dayKey][sec];
+      var menuNum=sel?sel.menu:defaultMenu;
+      var idx=sel?sel.idx:0;
+      var src=(menuNum===2)?d.menu2:d.menu1;
+      var m=src&&src[sec]&&src[sec][idx];
+      if(m)selectedMeals[sec].push(m);
+    });
+  }
+  // Sztuczne menu = lista wybranych dań x days, ale rotacja w getDietIngredients
+  // dzieli przez liczbę propozycji. Bezpośrednio: wirtualne menu z 'days' kopiami,
+  // gdzie każdy dzień = 1 propozycja. days/menu.length = 1, więc każda używana raz.
+  var virtualDiet={menu1:{sniadania:selectedMeals.sniadania,obiady:selectedMeals.obiady,kolacje:selectedMeals.kolacje},menu2:{sniadania:[],obiady:[],kolacje:[]}};
+  // Wywołaj normalną kalkulację (rotacja sama policzy: days/n_meals = 1)
+  closeDiet();
+  showPage("shop");
+  document.getElementById("copy-btn").classList.add("show");
+  // Wstaw virtualDiet jako tymczasowo do getDietIngredients
+  var origGetDietData=window.getDietData;
+  window.getDietData=function(){return virtualDiet;};
+  try{
+    var list=calculateShoppingListFromDiet(days);
+    var html=renderSmartShoppingList(list);
+    html='<div style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--text2)">'
+      +'<b style="color:var(--purple)">📋 Lista z Planu tygodnia na '+days+(days===1?" dzień":" dni")+'</b><br>'
+      +'Obliczona DOKŁADNIE z dań wybranych w Planie tygodnia (nie średnia)'
+      +'</div>'+html;
+    var kupBtn='<button onclick="_currentShopList&&applyPurchasedItemsToPantry(_currentShopList)" '
+      +'style="width:100%;background:var(--green);color:#000;border:none;border-radius:50px;'
+      +'padding:13px;font-size:14px;font-weight:500;cursor:pointer;margin-top:10px">'
+      +'✅ Zakupy zrealizowane — dodaj do lodówki</button>';
+    document.getElementById("shop-list-content").innerHTML=html+kupBtn;
+    window._currentShopList=list;
+  }finally{
+    window.getDietData=origGetDietData;
+  }
 }
 
 // Wygeneruj listę zakupów na N dni z matematyki
