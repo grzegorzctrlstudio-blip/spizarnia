@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-scaling-stronger-v30 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-products-pack-v31 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1088,7 +1088,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-31-scaling-stronger-v30";
+var APP_VERSION="2026-05-31-products-pack-v31";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -4239,6 +4239,40 @@ var LOCAL_NUTRITION_FALLBACK=[
   // === WARZYWA ===
   {id:"f_szpinak",canonicalName:"szpinak",aliases:["szpinak","spinach"],kcal100:23,protein100:2.9,carbs100:3.6,fat100:0.4,state:"raw",sourceNote:"USDA: Spinach, raw",confidenceBase:0.95,verified:true},
   {id:"f_jarmuz",canonicalName:"jarmuż",aliases:["jarmuż","jarmuz","kale"],kcal100:49,protein100:4.3,carbs100:9,fat100:0.9,state:"raw",sourceNote:"USDA: Kale, raw",confidenceBase:0.95,verified:true},
+  {id:"f_brukselka",canonicalName:"brukselka",aliases:["brukselka","brussels sprouts"],kcal100:43,protein100:3.4,carbs100:9,fat100:0.3,state:"raw",sourceNote:"USDA: Brussels sprouts, raw",confidenceBase:0.95,verified:true},
+  {id:"f_buraki",canonicalName:"buraki",aliases:["buraki","burak","ćwikła","cwikla","beets"],kcal100:43,protein100:1.6,carbs100:10,fat100:0.2,state:"raw",singleWeight:150,sourceNote:"USDA: Beets, raw",confidenceBase:0.95,verified:true},
+  {id:"f_dynia",canonicalName:"dynia",aliases:["dynia","pumpkin"],kcal100:26,protein100:1,carbs100:6.5,fat100:0.1,state:"raw",sourceNote:"USDA: Pumpkin, raw",confidenceBase:0.95,verified:true},
+  {id:"f_kabaczek",canonicalName:"kabaczek",aliases:["kabaczek"],kcal100:17,protein100:1.2,carbs100:3.1,fat100:0.3,state:"raw",sourceNote:"Polish typical zucchini variety",confidenceBase:0.9,verified:true},
+  {id:"f_baklazan",canonicalName:"bakłażan",aliases:["bakłażan","baklazan","eggplant","oberżyna"],kcal100:25,protein100:1,carbs100:5.9,fat100:0.2,state:"raw",singleWeight:280,sourceNote:"USDA: Eggplant, raw",confidenceBase:0.95,verified:true},
+  {id:"f_seler",canonicalName:"seler",aliases:["seler","seler naciowy","celery"],kcal100:14,protein100:0.7,carbs100:3,fat100:0.2,state:"raw",sourceNote:"USDA: Celery, raw",confidenceBase:0.9,verified:true},
+  {id:"f_rzodkiewka",canonicalName:"rzodkiewka",aliases:["rzodkiewka","rzodkiewki","radish"],kcal100:16,protein100:0.7,carbs100:3.4,fat100:0.1,state:"raw",sourceNote:"USDA: Radishes, raw",confidenceBase:0.95,verified:true},
+  {id:"f_botwina",canonicalName:"botwina",aliases:["botwina","botwinka","beet greens"],kcal100:22,protein100:2.2,carbs100:4.3,fat100:0.1,state:"raw",sourceNote:"USDA: Beet greens, raw",confidenceBase:0.9,verified:true},
+  {id:"f_roszponka",canonicalName:"roszponka",aliases:["roszponka","lamb's lettuce","mache"],kcal100:21,protein100:2,carbs100:3.6,fat100:0.4,state:"raw",sourceNote:"USDA: Mache (corn salad)",confidenceBase:0.9,verified:true},
+  {id:"f_cykoria",canonicalName:"cykoria",aliases:["cykoria","endywia","chicory"],kcal100:17,protein100:0.9,carbs100:3.3,fat100:0.2,state:"raw",sourceNote:"USDA: Chicory greens, raw",confidenceBase:0.9,verified:true},
+  // OWOCE rozszerzenie
+  {id:"f_mango",canonicalName:"mango",aliases:["mango"],kcal100:60,protein100:0.8,carbs100:15,fat100:0.4,state:"raw",singleWeight:200,sourceNote:"USDA: Mangos, raw",confidenceBase:0.95,verified:true},
+  {id:"f_ananas",canonicalName:"ananas",aliases:["ananas","pineapple"],kcal100:50,protein100:0.5,carbs100:13,fat100:0.1,state:"raw",sourceNote:"USDA: Pineapple, raw",confidenceBase:0.95,verified:true},
+  {id:"f_arbuz",canonicalName:"arbuz",aliases:["arbuz","watermelon"],kcal100:30,protein100:0.6,carbs100:8,fat100:0.2,state:"raw",sourceNote:"USDA: Watermelon, raw",confidenceBase:0.95,verified:true},
+  {id:"f_melon",canonicalName:"melon",aliases:["melon","cantaloupe"],kcal100:34,protein100:0.8,carbs100:8,fat100:0.2,state:"raw",sourceNote:"USDA: Cantaloupe, raw",confidenceBase:0.95,verified:true},
+  {id:"f_brzoskwinia",canonicalName:"brzoskwinia",aliases:["brzoskwinia","brzoskwinie","peach"],kcal100:39,protein100:0.9,carbs100:10,fat100:0.3,state:"raw",singleWeight:150,sourceNote:"USDA: Peaches, raw",confidenceBase:0.95,verified:true},
+  {id:"f_morela",canonicalName:"morela",aliases:["morela","morele","apricot"],kcal100:48,protein100:1.4,carbs100:11,fat100:0.4,state:"raw",singleWeight:35,sourceNote:"USDA: Apricots, raw",confidenceBase:0.95,verified:true},
+  {id:"f_sliwka",canonicalName:"śliwka",aliases:["śliwka","sliwka","śliwki","sliwki","plum"],kcal100:46,protein100:0.7,carbs100:11,fat100:0.3,state:"raw",singleWeight:70,sourceNote:"USDA: Plums, raw",confidenceBase:0.95,verified:true},
+  {id:"f_wisnie",canonicalName:"wiśnie",aliases:["wiśnie","wisnie","czereśnie","czeresnie","cherries"],kcal100:50,protein100:1,carbs100:12,fat100:0.3,state:"raw",sourceNote:"USDA: Cherries, raw",confidenceBase:0.95,verified:true},
+  {id:"f_grejpfrut",canonicalName:"grejpfrut",aliases:["grejpfrut","grapefruit"],kcal100:42,protein100:0.8,carbs100:11,fat100:0.1,state:"raw",singleWeight:230,sourceNote:"USDA: Grapefruit, raw",confidenceBase:0.95,verified:true},
+  {id:"f_mandarynka",canonicalName:"mandarynka",aliases:["mandarynka","mandarynki","clementine","tangerine"],kcal100:53,protein100:0.8,carbs100:13,fat100:0.3,state:"raw",singleWeight:90,sourceNote:"USDA: Tangerines, raw",confidenceBase:0.95,verified:true},
+  {id:"f_winogrona",canonicalName:"winogrona",aliases:["winogrona","grapes"],kcal100:67,protein100:0.6,carbs100:17,fat100:0.4,state:"raw",sourceNote:"USDA: Grapes, raw",confidenceBase:0.95,verified:true},
+  // NASIONA / ORZECHY
+  {id:"f_chia",canonicalName:"chia",aliases:["chia","nasiona chia","chia seeds"],kcal100:486,protein100:17,carbs100:42,fat100:31,state:"raw",sourceNote:"USDA: Seeds, chia",confidenceBase:0.95,verified:true},
+  {id:"f_siemie_lniane",canonicalName:"siemię lniane",aliases:["siemię lniane","siemie lniane","len","flaxseed","linseed"],kcal100:534,protein100:18,carbs100:29,fat100:42,state:"raw",sourceNote:"USDA: Seeds, flaxseed",confidenceBase:0.95,verified:true},
+  {id:"f_sezam",canonicalName:"sezam",aliases:["sezam","sesame seeds"],kcal100:573,protein100:18,carbs100:23,fat100:50,state:"raw",sourceNote:"USDA: Seeds, sesame",confidenceBase:0.95,verified:true},
+  {id:"f_orzechy_nerkowca",canonicalName:"orzechy nerkowca",aliases:["nerkowce","orzechy nerkowca","cashews"],kcal100:553,protein100:18,carbs100:30,fat100:44,state:"raw",sourceNote:"USDA: Nuts, cashew nuts",confidenceBase:0.95,verified:true},
+  {id:"f_orzechy_laskowe",canonicalName:"orzechy laskowe",aliases:["orzechy laskowe","hazelnuts"],kcal100:628,protein100:15,carbs100:17,fat100:61,state:"raw",sourceNote:"USDA: Nuts, hazelnuts",confidenceBase:0.95,verified:true},
+  // BIAŁKO ROŚLINNE
+  {id:"f_tofu",canonicalName:"tofu",aliases:["tofu","tofu naturalne","tofu wędzone"],kcal100:144,protein100:17,carbs100:2.8,fat100:8.7,state:"prepared",sourceNote:"USDA: Tofu, raw, firm",confidenceBase:0.95,verified:true},
+  {id:"f_tempeh",canonicalName:"tempeh",aliases:["tempeh"],kcal100:193,protein100:19,carbs100:9.4,fat100:11,state:"prepared",sourceNote:"USDA: Tempeh",confidenceBase:0.9,verified:true},
+  {id:"f_kielki",canonicalName:"kiełki",aliases:["kiełki","kielki","kiełki sojowe","sprouts"],kcal100:23,protein100:3,carbs100:2,fat100:0.7,state:"raw",sourceNote:"USDA: Sprouts, mixed bean",confidenceBase:0.9,verified:true},
+  {id:"f_groszek_zielony",canonicalName:"groszek zielony",aliases:["groszek zielony","groszek","green peas"],kcal100:81,protein100:5.4,carbs100:14,fat100:0.4,state:"raw",sourceNote:"USDA: Peas, green, raw",confidenceBase:0.95,verified:true},
+  {id:"f_kukurydza",canonicalName:"kukurydza",aliases:["kukurydza","kukurydza puszka","corn"],kcal100:86,protein100:3.3,carbs100:19,fat100:1.2,state:"prepared",sourceNote:"USDA: Corn, sweet, canned",confidenceBase:0.9,verified:true},
   {id:"f_brokul",canonicalName:"brokuł",aliases:["brokuł","brokul","broccoli"],kcal100:34,protein100:2.8,carbs100:7,fat100:0.4,state:"raw",singleWeight:400,sourceNote:"USDA: Broccoli, raw",confidenceBase:0.95,verified:true},
   {id:"f_marchew",canonicalName:"marchew",aliases:["marchew","marchewka","carrot"],kcal100:41,protein100:0.9,carbs100:10,fat100:0.2,state:"raw",singleWeight:80,sourceNote:"USDA: Carrots, raw",confidenceBase:0.95,verified:true},
   {id:"f_pomidor",canonicalName:"pomidor",aliases:["pomidor","pomidory","tomato"],kcal100:18,protein100:0.9,carbs100:3.9,fat100:0.2,state:"raw",singleWeight:120,sourceNote:"USDA: Tomatoes, red, ripe, raw",confidenceBase:0.95,verified:true},
