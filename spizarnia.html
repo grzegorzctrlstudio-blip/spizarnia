@@ -3189,9 +3189,44 @@ var PRODUCT_DB = [
 // klucze = product.id, wartości = {n100, pkgSize, brand, shop}
 var userProductOverrides={};
 
+// ── Normalizacja nazw produktów PL ────────────────────────────────────────
+// Usuwa polskie znaki, lowercase, robi "ogórek"==="ogurek", "brokuł"==="brokul"
+function normalizePL(s){
+  return String(s||"").toLowerCase().trim()
+    .replace(/ą/g,"a").replace(/ć/g,"c").replace(/ę/g,"e")
+    .replace(/ł/g,"l").replace(/ń/g,"n").replace(/ó/g,"u") // ó→u dla fuzzy (ogórek/ogurek)
+    .replace(/ś/g,"s").replace(/ź/g,"z").replace(/ż/g,"z")
+    .replace(/[^a-z0-9 ]+/g," ").replace(/\s+/g," ").trim();
+}
+// Dopasowanie nazw produktów (fuzzy, słowo-set)
+// Działa dla: "Brokul" === "Brokuł", "Mielona wołowina" === "Wołowina Mielona",
+// "Cebula" jest podzbiorem "Cebula Biała", "Ogórek" === "Ogurek"
+function namesMatch(n1,n2){
+  var a=normalizePL(n1), b=normalizePL(n2);
+  if(!a||!b)return false;
+  if(a===b)return true;
+  var wa=a.split(" ").filter(Boolean);
+  var wb=b.split(" ").filter(Boolean);
+  if(!wa.length||!wb.length)return false;
+  // Identyczne zbiory słów (różna kolejność)
+  var sa=wa.slice().sort().join(" ");
+  var sb=wb.slice().sort().join(" ");
+  if(sa===sb)return true;
+  // Krótszy jest podzbiorem dłuższego (Cebula ⊆ Cebula Biała)
+  var shorter=wa.length<=wb.length?wa:wb;
+  var longer=wa.length<=wb.length?wb:wa;
+  if(shorter.length>=1&&shorter.every(function(w){return longer.indexOf(w)!==-1;}))return true;
+  // Substring całego stringa (np. "filet z kurczaka" zawiera "kurczak")
+  if(a.indexOf(b)!==-1||b.indexOf(a)!==-1)return true;
+  return false;
+}
+// Stały klucz do dedup (np. dla ext__ albo receiptLearning)
+function dedupKey(name){
+  return normalizePL(name).replace(/\s+/g,"_");
+}
+
 function findProduct(name,opts){
   if(!name)return null;
-  var n=String(name).toLowerCase().trim();
   opts=opts||{};
   // 1) Najpierw sprawdź czy nazwa zawiera nazwę MARKI (np. "Skyr Pyszny Duet" / "Pilos jogurt")
   for(var i=0;i<PRODUCT_DB.length;i++){
@@ -3199,10 +3234,8 @@ function findProduct(name,opts){
     if(p.brands){
       for(var k=0;k<p.brands.length;k++){
         var br=p.brands[k];
-        var bn=String(br.brand||"").toLowerCase();
-        if(!bn)continue;
-        if(n===bn||n.indexOf(bn)!==-1||bn.indexOf(n)!==-1){
-          // Zwróć produkt z nadpisanymi n100/pkgSize z konkretnej marki
+        if(!br.brand)continue;
+        if(namesMatch(name,br.brand)){
           return Object.assign({},p,{
             _matchedBrand:br.brand,
             _brandShop:br.shop||null,
@@ -3214,15 +3247,13 @@ function findProduct(name,opts){
       }
     }
   }
-  // 2) Sprawdź user override (per-product n100)
-  // 3) Klasyczne dopasowanie po nazwie/aliasie
+  // 2) Klasyczne dopasowanie po nazwie/aliasie (z normalizacją PL)
   for(var i2=0;i2<PRODUCT_DB.length;i2++){
     var p2=PRODUCT_DB[i2];
-    var matched=false;
-    if(p2.name.toLowerCase()===n){matched=true;}
-    else if(p2.aliases){
+    var matched=namesMatch(name,p2.name);
+    if(!matched&&p2.aliases){
       for(var j=0;j<p2.aliases.length;j++){
-        if(p2.aliases[j]===n||n.indexOf(p2.aliases[j])!==-1||p2.aliases[j].indexOf(n)!==-1){matched=true;break;}
+        if(namesMatch(name,p2.aliases[j])){matched=true;break;}
       }
     }
     if(matched){
@@ -3323,12 +3354,15 @@ function getDietIngredients(diet, menuKey, days){
   ["sniadania","obiady","kolacje"].forEach(function(typ){
     (menu[typ]||[]).forEach(function(meal){
       (meal.skladniki||[]).forEach(function(sk){
+        var rawName=sk.n||sk.name||"";
         var amt=parseAmount(sk.il||sk.amount||"0", sk.unit||"g");
-        var prod=findProduct(sk.n||sk.name||"");
-        var pid=prod?prod.id:(sk.n||"unknown_"+Math.random()).replace(/\s+/g,"_").toLowerCase();
+        var prod=findProduct(rawName);
+        // Jeśli znaleziono produkt w bazie - pid = prod.id (deterministyczne)
+        // Inaczej - dedupKey z normalizacji PL (żeby "brokul" i "Brokuł" miały TEN SAM pid)
+        var pid=prod?prod.id:("unknown_"+(dedupKey(rawName)||Math.random().toString(36).slice(2)));
         if(!ingredients[pid]){
           ingredients[pid]={
-            name:prod?prod.name:(sk.n||""),
+            name:prod?prod.name:rawName,
             totalAmount:0,
             unit:prod?prod.unit:(sk.unit||"g"),
             product:prod,
@@ -3336,7 +3370,8 @@ function getDietIngredients(diet, menuKey, days){
           };
         }
         ingredients[pid].totalAmount+=amt*days;
-        ingredients[pid].meals.push(meal.nazwa+" ("+typ+")");
+        var ml=meal.nazwa+" ("+typ+")";
+        if(ingredients[pid].meals.indexOf(ml)===-1)ingredients[pid].meals.push(ml);
       });
     });
   });
@@ -4499,7 +4534,10 @@ function deleteReceipt(userId,receiptId){
 
 // ── Receipt Learning ─────────────────────────────────────────────────────
 function normalizeRawName(name){
-  return String(name||"").toLowerCase().trim().replace(/[.$#\[\]\/]/g,"_").replace(/\s+/g,"_");
+  // Wykorzystuje normalizację PL (lowercase + strip diacritics + ó→u)
+  // dla deterministycznych kluczy: "Brokuł" === "Brokul" === "brokuł"
+  var n=normalizePL(name).replace(/\s+/g,"_");
+  return n||"unknown";
 }
 function loadReceiptLearning(){
   if(!userName)return Promise.resolve({});
@@ -4634,11 +4672,11 @@ function closePantryAudit(){
 }
 function buildDietProductAuditList(){
   var prods={};
+  // Szuka w CATS używając fuzzy namesMatch (PL diacritics + word-set)
   function findCATSItem(name){
-    var ln=String(name||"").toLowerCase().trim();
     var foundCat=null,foundIt=null;
     CATS.forEach(function(cat){cat.items.forEach(function(it){
-      if(!foundIt&&(it.n.toLowerCase()===ln||it.n.toLowerCase().indexOf(ln)!==-1||ln.indexOf(it.n.toLowerCase())!==-1)){
+      if(!foundIt&&namesMatch(name,it.n)){
         foundCat=cat;foundIt=it;
       }
     });});
@@ -4649,7 +4687,19 @@ function buildDietProductAuditList(){
     if(!name)return;
     var amount=sk.il||sk.amount||"";
     var found=findCATSItem(name);
-    var key=found?fbk(found.cat.id,found.it.n):"ext__"+normalizeRawName(name);
+    var key;
+    if(found){
+      key=fbk(found.cat.id,found.it.n);
+    }else{
+      // Sprawdź czy istnieje już ext__ produkt o pasującej (po normalizacji) nazwie
+      var matchedKey=null;
+      for(var k in prods){
+        if(!prods.hasOwnProperty(k))continue;
+        if(k.indexOf("ext__")!==0)continue;
+        if(namesMatch(prods[k].n,name)){matchedKey=k;break;}
+      }
+      key=matchedKey||("ext__"+dedupKey(name));
+    }
     if(!prods[key]){
       prods[key]={
         n:found?found.it.n:name,
@@ -4661,8 +4711,8 @@ function buildDietProductAuditList(){
         meals:[]
       };
     }
-    if(amount)prods[key].requiredText.push(String(amount));
-    if(mealName)prods[key].meals.push(mealName);
+    if(amount&&prods[key].requiredText.indexOf(String(amount))===-1)prods[key].requiredText.push(String(amount));
+    if(mealName&&prods[key].meals.indexOf(mealName)===-1)prods[key].meals.push(mealName);
   }
   var d=(typeof getDietData==="function")?getDietData():null;
   var menus=[];
