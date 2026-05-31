@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-admin-product-sources-v32 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-spreads-pack-v33 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1088,7 +1088,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-31-admin-product-sources-v32";
+var APP_VERSION="2026-05-31-spreads-pack-v33";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -4321,6 +4321,18 @@ var LOCAL_NUTRITION_FALLBACK=[
   {id:"f_migdaly",canonicalName:"migdały",aliases:["migdały","migdaly","almonds","platki migdalow","płatki migdałów"],kcal100:579,protein100:21,carbs100:22,fat100:50,state:"raw",sourceNote:"USDA: Nuts, almonds",confidenceBase:0.95,verified:true},
   {id:"f_orzechy_wloskie",canonicalName:"orzechy włoskie",aliases:["orzechy włoskie","orzechy wloskie","walnuts"],kcal100:654,protein100:15,carbs100:14,fat100:65,state:"raw",sourceNote:"USDA: Nuts, walnuts, English",confidenceBase:0.95,verified:true},
   {id:"f_maslo_orzechowe",canonicalName:"masło orzechowe",aliases:["masło orzechowe","maslo orzechowe","masło orzechowe vitanella","peanut butter"],kcal100:588,protein100:25,carbs100:20,fat100:50,state:"prepared",sourceNote:"USDA: Peanut butter, smooth style, no salt",confidenceBase:0.9,verified:true},
+  {id:"f_maslo_migdalowe",canonicalName:"masło migdałowe",aliases:["masło migdałowe","maslo migdalowe","almond butter"],kcal100:614,protein100:21,carbs100:19,fat100:56,state:"prepared",sourceNote:"USDA: Almond butter, plain",confidenceBase:0.95,verified:true},
+  {id:"f_tahini",canonicalName:"tahini",aliases:["tahini","pasta sezamowa","sesame paste"],kcal100:595,protein100:17,carbs100:21,fat100:53,state:"prepared",sourceNote:"USDA: Seeds, sesame butter, tahini",confidenceBase:0.95,verified:true},
+  {id:"f_maslo_z_nerkowca",canonicalName:"masło z nerkowca",aliases:["masło z nerkowca","maslo z nerkowca","masło nerkowca","cashew butter"],kcal100:587,protein100:18,carbs100:28,fat100:50,state:"prepared",sourceNote:"USDA: Cashew butter, plain",confidenceBase:0.9,verified:true},
+  {id:"f_maslo",canonicalName:"masło",aliases:["masło","maslo","butter"],kcal100:717,protein100:0.9,carbs100:0.1,fat100:81,state:"prepared",sourceNote:"USDA: Butter, salted",confidenceBase:0.95,verified:true},
+  {id:"f_smietana_30",canonicalName:"śmietana 30%",aliases:["śmietana 30%","smietana 30","śmietana kremówka","śmietana"],kcal100:292,protein100:2.5,carbs100:3,fat100:30,state:"prepared",densityGPerMl:1.0,sourceNote:"USDA: Cream, fluid, heavy whipping",confidenceBase:0.9,verified:true},
+  {id:"f_smietana_18",canonicalName:"śmietana 18%",aliases:["śmietana 18%","smietana 18","śmietana do zupy"],kcal100:181,protein100:2.9,carbs100:3.7,fat100:18,state:"prepared",densityGPerMl:1.01,sourceNote:"USDA: Cream, fluid, light whipping",confidenceBase:0.9,verified:true},
+  {id:"f_smietana_12",canonicalName:"śmietana 12%",aliases:["śmietana 12%","smietana 12"],kcal100:130,protein100:3.2,carbs100:4,fat100:12,state:"prepared",densityGPerMl:1.02,sourceNote:"USDA: Cream, half and half",confidenceBase:0.9,verified:true},
+  {id:"f_miod",canonicalName:"miód",aliases:["miód","miod","honey"],kcal100:304,protein100:0.3,carbs100:82,fat100:0,state:"prepared",sourceNote:"USDA: Honey",confidenceBase:0.99,verified:true},
+  {id:"f_syrop_klonowy",canonicalName:"syrop klonowy",aliases:["syrop klonowy","maple syrup"],kcal100:260,protein100:0,carbs100:67,fat100:0.1,state:"prepared",sourceNote:"USDA: Syrups, maple",confidenceBase:0.95,verified:true},
+  {id:"f_dzem",canonicalName:"dżem",aliases:["dżem","dzem","jam","konfitura"],kcal100:278,protein100:0.4,carbs100:69,fat100:0.1,state:"prepared",sourceNote:"USDA: Jams and preserves",confidenceBase:0.9,verified:true},
+  {id:"f_dzem_chia",canonicalName:"dżem chia",aliases:["dżem chia","chia jam"],kcal100:120,protein100:2,carbs100:18,fat100:4,state:"prepared",sourceNote:"Typical chia jam (with seeds, low sugar)",confidenceBase:0.8,verified:true},
+  {id:"f_nutella",canonicalName:"nutella",aliases:["nutella","krem czekoladowy","hazelnut spread"],kcal100:539,protein100:6.3,carbs100:57,fat100:31,state:"prepared",sourceNote:"Nutella manufacturer label",confidenceBase:0.95,verified:true},
   // === PIECZYWO ===
   {id:"f_chleb_pelnoziarnisty",canonicalName:"chleb pełnoziarnisty",aliases:["chleb pełnoziarnisty","chleb pelnoziarnisty","whole grain bread","chleb razowy"],kcal100:247,protein100:13,carbs100:41,fat100:3.4,state:"prepared",gramsPerPiece:30,sourceNote:"USDA: Bread, whole-wheat (kromka ~30g)",confidenceBase:0.9,verified:true},
   {id:"f_chleb_zytni",canonicalName:"chleb żytni",aliases:["chleb żytni","chleb zytni","rye bread"],kcal100:259,protein100:8.5,carbs100:48,fat100:3.3,state:"prepared",gramsPerPiece:30,sourceNote:"USDA: Bread, rye (kromka ~30g)",confidenceBase:0.9,verified:true},
