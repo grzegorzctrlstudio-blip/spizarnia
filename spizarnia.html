@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-pantry-matching-lidl-v5 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-admin-delete-shop-urls-v6 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -717,18 +717,13 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
         <button class="receipt-apply" onclick="applyReceipt()">✅ Zaktualizuj lodówkę</button>
       </div>
 
-      <!-- Sklepy online (na dole) -->
+      <!-- Sklepy online (zweryfikowane 2026-05) -->
       <div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-top:24px;margin-bottom:10px">🛍️ Zamów online</div>
       <div class="stores-grid">
         <button class="store-card" onclick="openStore('biedronka')" style="background:linear-gradient(135deg,#DC2626,#991B1B)">
           <span class="store-card-ico">🐝</span>
-          <span class="store-card-name">Biedronka Home</span>
-          <span class="store-card-sub">Dostawa ~2h</span>
-        </button>
-        <button class="store-card" onclick="openStore('lidl')" style="background:linear-gradient(135deg,#1D4ED8,#1E3A8A)">
-          <span class="store-card-ico">🏪</span>
-          <span class="store-card-name">Lidl Online</span>
-          <span class="store-card-sub">Plus / Dostawa</span>
+          <span class="store-card-name">Biedronka</span>
+          <span class="store-card-sub">zakupy.biedronka.pl</span>
         </button>
         <button class="store-card" onclick="openStore('frisco')" style="background:linear-gradient(135deg,#16A34A,#14532D)">
           <span class="store-card-ico">🚚</span>
@@ -738,7 +733,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
         <button class="store-card" onclick="openStore('glovo')" style="background:linear-gradient(135deg,#D97706,#92400E)">
           <span class="store-card-ico">⚡</span>
           <span class="store-card-name">Glovo</span>
-          <span class="store-card-sub">Ekspresowo</span>
+          <span class="store-card-sub">Biedronka, Lidl</span>
         </button>
         <button class="store-card" onclick="openStore('lisek')" style="background:linear-gradient(135deg,#7C3AED,#4C1D95)">
           <span class="store-card-ico">🦊</span>
@@ -749,6 +744,11 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
           <span class="store-card-ico">🛵</span>
           <span class="store-card-name">Wolt Market</span>
           <span class="store-card-sub">Ekspresowo</span>
+        </button>
+        <button class="store-card" onclick="openStore('lidl')" style="background:linear-gradient(135deg,#1D4ED8,#1E3A8A)">
+          <span class="store-card-ico">🏪</span>
+          <span class="store-card-name">Lidl (via Glovo)</span>
+          <span class="store-card-sub">Brak własnej online</span>
         </button>
       </div>
     </div>
@@ -1029,7 +1029,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-31-pantry-matching-lidl-v5";
+var APP_VERSION="2026-05-31-admin-delete-shop-urls-v6";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -1180,6 +1180,7 @@ function fbGet(p){return fbf(p);}
 function fbPatch(p,d){return fbf(p,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)});}
 function fbPost(p,d){return fbf(p,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)});}
 function fbPut(p,d){return fbf(p,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)});}
+function fbDelete(p){return fbf(p,{method:"DELETE"});}
 function setSyncUI(m){var d=document.getElementById("sdot");if(!d)return;d.className="sync-dot"+(m==="saving"?" pulse":"")+(m==="err"?" err":"");d.style.background=m==="err"?"var(--red)":m==="saving"?"var(--amber)":"var(--green)";}
 
 // ── NAV ───────────────────────────────────────────────────────────────────────
@@ -2009,14 +2010,16 @@ function copyShopList(silent){
   return true;
 }
 // Deep-linki do sklepów online — gdzie się da otwórz wyszukiwarkę/zamówienie + skopiuj listę.
-// Status linków (potwierdzone 2026-05):
-// - Biedronka Home (delivery): https://www.biedronka.pl/pl/produkty (lub gazetka) — wyszukiwarka uniwersalna
-// - Lidl: https://www.lidl.pl (Lidl Plus ma własną apkę, ale www ma katalog)
-// - Frisco: https://www.frisco.pl/search?query= (działa)
-// - Glovo: https://glovoapp.com/pl/pl/warszawa/ — bez deep search
-// - Lisek/Wolt: aplikacje mobilne, www jako landing
+// ZWERYFIKOWANE 2026-05 (WebSearch):
+// - Biedronka: zakupy.biedronka.pl (spożywka z dostawą), home.biedronka.pl (AGD/dom)
+// - Lidl: lidl.pl - SPRZEDAJE TYLKO AGD/MEBLE/ODZIEŻ ONLINE, brak spożywki (status 2026)
+//        → linkujemy do Glovo które obsługuje Lidla w niektórych miastach
+// - Frisco: frisco.pl/search?query= (działa, spożywka z dostawą)
+// - Glovo: glovoapp.com (Biedronka, Lidl, restauracje)
+// - Lisek: lisek.app (NIE lisek.app/pl - to 404!)
+// - Wolt: wolt.com/pl
 function openStore(store){
-  var labels={biedronka:"Biedronka Home",lidl:"Lidl Online",frisco:"Frisco.pl",glovo:"Glovo",lisek:"Lisek",wolt:"Wolt Market"};
+  var labels={biedronka:"Biedronka — zakupy online",lidl:"Lidl (Glovo)",frisco:"Frisco.pl",glovo:"Glovo",lisek:"Lisek",wolt:"Wolt Market"};
   var items=buildShopListText();
   if(!items.length){
     dlgAlert("ℹ️","Brak listy","Najpierw wygeneruj listę z diety (zielony przycisk powyżej).");
@@ -2026,20 +2029,25 @@ function openStore(store){
   copyShopList(true);
   var firstQuery=encodeURIComponent((items[0]||"").replace(/^-\s*/,"").split(":")[0].trim());
   var urls={
-    // Biedronka.pl ma wyszukiwarkę na głównej, Biedronka Home dostawa: home.biedronka.pl
-    biedronka:"https://home.biedronka.pl/",
-    // Lidl.pl ma katalog produktów online (Lidl Plus apka osobno) - poszukiwacz na lidl.pl
-    lidl:"https://www.lidl.pl/q/search?q="+firstQuery,
-    // Frisco - działająca wyszukiwarka
+    // Biedronka - prawdziwa wyszukiwarka spożywki z dostawą
+    biedronka:"https://zakupy.biedronka.pl/szukaj?q="+firstQuery,
+    // Lidl nie ma spożywki online — kierujemy do Glovo gdzie obsługuje Lidl
+    lidl:"https://glovoapp.com/pl/pl/",
+    // Frisco - dziala wyszukiwarka spozywki
     frisco:"https://www.frisco.pl/search?query="+firstQuery,
-    // Glovo - wyszukaj w okolicy (musi user dać miasto)
-    glovo:"https://glovoapp.com/pl/pl/warszawa/zakupy/",
-    // Lisek - apka, landing pl
-    lisek:"https://lisek.app/pl",
+    // Glovo - landing
+    glovo:"https://glovoapp.com/pl/pl/",
+    // Lisek - apka, landing
+    lisek:"https://lisek.app/",
     // Wolt Market - landing
-    wolt:"https://wolt.com/pl/discovery/wolt-market"
+    wolt:"https://wolt.com/pl/"
   };
-  dlgConfirm("📋","Lista skopiowana — "+items.length+" pozycji","Otworzyć "+(labels[store]||store)+" i wkleić listę?",function(){
+  // Dodatkowa info dla Lidla
+  var subtitle="Lista skopiowana — "+items.length+" pozycji";
+  if(store==="lidl"){
+    subtitle+=". Uwaga: Lidl nie ma własnej spożywki online — kierujemy do Glovo.";
+  }
+  dlgConfirm("📋",subtitle,"Otworzyć "+(labels[store]||store)+" i wkleić listę?",function(){
     window.open(urls[store]||urls.frisco,"_blank","noopener");
   },"Otwórz sklep");
 }
@@ -4514,6 +4522,7 @@ function deleteAdminUser(uid) {
   showDlg("⚠️", "Usuń użytkownika", "Czy na pewno chcesz usunąć użytkownika \"" + uid + "\" i wszystkie jego dane? Tej operacji nie można cofnąć.",
     [{label:"Anuluj", cls:"cancel"},
      {label:"Usuń", cls:"danger", cb: function() {
+      // Wszystkie ścieżki użytkownika - z prefiksem user_ i bez (różne moduły używają różnych konwencji)
       var paths = [
         FB + "/profiles/" + uid,
         FB + "/rooms/user_" + uid,
@@ -4523,22 +4532,39 @@ function deleteAdminUser(uid) {
         FB + "/purchaseHistory/" + uid,
         FB + "/pantry/" + uid,
         FB + "/pantryState/" + uid,
+        FB + "/productOverrides/" + uid,
+        FB + "/receiptLearning/" + uid,
+        // Fallback paths (na wypadek starszych konwencji)
+        FB + "/rooms/" + uid,
+        FB + "/logs/" + uid,
+        FB + "/expiry/" + uid,
+        FB + "/photos/" + uid
       ];
-      var done = 0, errors = 0;
+      var done = 0, errors = 0, errMsgs = [];
       paths.forEach(function(path) {
-        fbPut(path, null).then(function() {
+        // Używamy HTTP DELETE (jednoznacznie usuwa node), z fallbackiem na PUT null
+        fbDelete(path).catch(function(){return fbPut(path, null);}).then(function() {
           done++;
-          if (done + errors === paths.length) {
-            dlgAlert("✅", "Usunięto", "Użytkownik " + uid + " został usunięty.");
-            loadAdminUsers();
-          }
-        }).catch(function() {
+          if (done + errors === paths.length) finish();
+        }).catch(function(e) {
           errors++;
-          if (done + errors === paths.length) {
-            dlgAlert("❌", "Błąd", "Nie udało się usunąć wszystkich danych. Spróbuj ponownie.");
-          }
+          errMsgs.push(path.split("/").slice(-2).join("/")+": "+(e&&e.message||"?"));
+          if (done + errors === paths.length) finish();
         });
       });
+      function finish(){
+        // Daj Firebase chwilę na propagację (eventual consistency)
+        setTimeout(function(){
+          if(errors===0){
+            dlgAlert("✅", "Usunięto", "Użytkownik " + uid + " został usunięty.");
+          }else if(done>0){
+            dlgAlert("⚠️", "Częściowo usunięto", "Usunięto "+done+"/"+paths.length+" ścieżek. Błędy: "+errMsgs.slice(0,3).join("; "));
+          }else{
+            dlgAlert("❌", "Błąd", "Nie udało się usunąć danych użytkownika.");
+          }
+          loadAdminUsers();
+        }, 300);
+      }
     }}]
   );
 }
