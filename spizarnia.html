@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-diet-cta-brand-rotation-v14 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-real-shop-export-v15 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1064,7 +1064,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-31-diet-cta-brand-rotation-v14";
+var APP_VERSION="2026-05-31-real-shop-export-v15";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -2079,38 +2079,106 @@ function copyShopList(silent){
 // - Glovo: glovoapp.com (Biedronka, Lidl, restauracje)
 // - Lisek: lisek.app (NIE lisek.app/pl - to 404!)
 // - Wolt: wolt.com/pl
+// Buduje deep-link wyszukiwarki sklepu dla pojedynczego produktu (per-item)
+function buildStoreSearchURL(store,query){
+  var q=encodeURIComponent(String(query||"").replace(/^-\s*/,"").split(":")[0].trim());
+  var urls={
+    biedronka:"https://zakupy.biedronka.pl/szukaj?q="+q,
+    frisco:"https://www.frisco.pl/search?query="+q,
+    lidl:"https://www.lidl.pl/q/search?q="+q, // katalog (bez spożywki)
+    glovo:"https://glovoapp.com/pl/pl/", // brak deep search
+    lisek:"https://lisek.app/",
+    wolt:"https://wolt.com/pl/"
+  };
+  return urls[store]||urls.frisco;
+}
+
+// === ZAKUPY ONLINE - bez fałszywego "wklej listę" ===
+// Sklepy NIE mają pola "wklej całą listę". Realne opcje:
+// 1. Web Share API (mobile) - natywny share do Wiadomości/Mail/Notatek
+// 2. Per-item "Szukaj w sklepie" - klik otwiera wyszukiwarkę DLA TEJ pozycji
+// 3. Kopiuj do schowka - user wkleja do swojej apki listy/notatek
+// 4. Drukuj listę
 function openStore(store){
-  var labels={biedronka:"Biedronka — zakupy online",lidl:"Lidl (Glovo)",frisco:"Frisco.pl",glovo:"Glovo",lisek:"Lisek",wolt:"Wolt Market"};
+  var labels={biedronka:"Biedronka (zakupy.biedronka.pl)",lidl:"Lidl (katalog)",frisco:"Frisco.pl",glovo:"Glovo",lisek:"Lisek",wolt:"Wolt Market"};
   var items=buildShopListText();
   if(!items.length){
     dlgAlert("ℹ️","Brak listy","Najpierw wygeneruj listę z diety (zielony przycisk powyżej).");
     return;
   }
-  // Skopiuj listę do schowka
-  copyShopList(true);
-  var firstQuery=encodeURIComponent((items[0]||"").replace(/^-\s*/,"").split(":")[0].trim());
-  var urls={
-    // Biedronka - prawdziwa wyszukiwarka spożywki z dostawą
-    biedronka:"https://zakupy.biedronka.pl/szukaj?q="+firstQuery,
-    // Lidl nie ma spożywki online — kierujemy do Glovo gdzie obsługuje Lidl
-    lidl:"https://glovoapp.com/pl/pl/",
-    // Frisco - dziala wyszukiwarka spozywki
-    frisco:"https://www.frisco.pl/search?query="+firstQuery,
-    // Glovo - landing
-    glovo:"https://glovoapp.com/pl/pl/",
-    // Lisek - apka, landing
-    lisek:"https://lisek.app/",
-    // Wolt Market - landing
-    wolt:"https://wolt.com/pl/"
-  };
-  // Dodatkowa info dla Lidla
-  var subtitle="Lista skopiowana — "+items.length+" pozycji";
-  if(store==="lidl"){
-    subtitle+=". Uwaga: Lidl nie ma własnej spożywki online — kierujemy do Glovo.";
+  // Buduj tekst listy
+  var dt=new Date().toLocaleDateString("pl-PL");
+  var text="🛒 PEŁNA LODÓWKA — Lista zakupów\n"+dt+"\n"+(window.shopDays?"Na "+window.shopDays+" dni\n":"")+"\n"+items.join("\n");
+  // Modal z 3 realnymi opcjami (nie kłamstwo o wklejaniu listy)
+  showShopExportModal(store,labels[store]||store,items.length,text);
+}
+
+// Modal z REALNYMI opcjami eksportu listy
+function showShopExportModal(store,storeLabel,itemCount,text){
+  // Sprawdź czy Web Share API jest dostępne (mobile, większość przeglądarek)
+  var canShare=navigator.share&&typeof navigator.share==="function";
+  var ol=document.getElementById("shop-export-overlay");
+  if(!ol){
+    ol=document.createElement("div");
+    ol.id="shop-export-overlay";
+    ol.style.cssText="display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.78);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px";
+    ol.onclick=function(e){if(e.target===ol)closeShopExportModal();};
+    document.body.appendChild(ol);
   }
-  dlgConfirm("📋",subtitle,"Otworzyć "+(labels[store]||store)+" i wkleić listę?",function(){
-    window.open(urls[store]||urls.frisco,"_blank","noopener");
-  },"Otwórz sklep");
+  var subTitle=store==="lidl"?"Lidl nie sprzedaje spożywki online (tylko katalog AGD/odzież).":store==="glovo"||store==="lisek"||store==="wolt"?"Ten serwis to apka mobilna — strona to landing.":"Sklepy spożywcze nie mają pola \"wklej listę\". Wybierz jak chcesz użyć listy:";
+  ol.innerHTML='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:22px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.6)">'+
+    '<div style="font-size:32px;margin-bottom:8px;text-align:center">🛒</div>'+
+    '<div style="font-size:17px;font-weight:900;color:var(--text);text-align:center;margin-bottom:4px">Lista zakupów — '+itemCount+' pozycji</div>'+
+    '<div style="font-size:12px;color:var(--text3);text-align:center;margin-bottom:18px;line-height:1.4">'+subTitle+'</div>'+
+    // Opcja 1: Web Share (mobile)
+    (canShare?'<button onclick="shopExportShare()" style="width:100%;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#000;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px;justify-content:flex-start"><span style="font-size:20px">📤</span><div style="flex:1;text-align:left"><div>Udostępnij listę</div><div style="font-size:10px;font-weight:600;opacity:.75">Wyślij do Wiadomości / Mail / Notatek</div></div></button>':'')+
+    // Opcja 2: Kopiuj
+    '<button onclick="shopExportCopy()" style="width:100%;background:var(--bg3);color:var(--text);border:1.5px solid var(--border);border-radius:12px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px"><span style="font-size:20px">📋</span><div style="flex:1;text-align:left"><div>Skopiuj listę</div><div style="font-size:10px;font-weight:600;color:var(--text3)">Wklej w swojej apce listy/notatek</div></div></button>'+
+    // Opcja 3: Drukuj
+    '<button onclick="shopExportPrint()" style="width:100%;background:var(--bg3);color:var(--text);border:1.5px solid var(--border);border-radius:12px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:10px"><span style="font-size:20px">🖨️</span><div style="flex:1;text-align:left"><div>Drukuj listę</div><div style="font-size:10px;font-weight:600;color:var(--text3)">Wersja do papieru</div></div></button>'+
+    // Opcja 4: Otwórz sklep (sam — bez kłamstwa o wklejaniu)
+    '<button onclick="shopExportOpenStore()" data-store="'+store+'" style="width:100%;background:var(--bg3);color:var(--text);border:1.5px solid var(--border);border-radius:12px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:12px;display:flex;align-items:center;gap:10px"><span style="font-size:20px">🏪</span><div style="flex:1;text-align:left"><div>Otwórz '+storeLabel+'</div><div style="font-size:10px;font-weight:600;color:var(--text3)">W liście znajdziesz 🔍 przy każdej pozycji</div></div></button>'+
+    // Anuluj
+    '<button onclick="closeShopExportModal()" style="width:100%;background:transparent;color:var(--text3);border:1px solid var(--border);border-radius:12px;padding:11px;font-size:13px;font-weight:700;cursor:pointer">Anuluj</button>'+
+    '</div>';
+  ol.style.display="flex";
+  // Przechowaj w window żeby przyciski miały dostęp
+  window._shopExportText=text;
+  window._shopExportStore=store;
+}
+function closeShopExportModal(){var el=document.getElementById("shop-export-overlay");if(el)el.style.display="none";}
+function shopExportShare(){
+  if(navigator.share){
+    navigator.share({title:"Lista zakupów - Pełna Lodówka",text:window._shopExportText}).then(closeShopExportModal).catch(function(){});
+  }
+}
+function shopExportCopy(){
+  copyShopList(false);
+  closeShopExportModal();
+}
+function shopExportPrint(){
+  // Otwórz okno do druku z prostym HTML
+  var w=window.open("","_blank","width=600,height=800");
+  if(!w)return;
+  var lines=String(window._shopExportText||"").split("\n");
+  var html='<html><head><title>Lista zakupów</title><style>body{font-family:system-ui,sans-serif;padding:24px;color:#000;background:#fff;line-height:1.6}h1{font-size:18px;border-bottom:2px solid #000;padding-bottom:6px}.item{padding:8px 0;border-bottom:1px dashed #aaa;display:flex;align-items:start;gap:8px}.box{display:inline-block;width:16px;height:16px;border:2px solid #000;flex-shrink:0;margin-top:2px}@media print{button{display:none}}</style></head><body>';
+  html+='<h1>'+(lines[0]||"Lista zakupów")+'</h1>';
+  html+='<div style="font-size:11px;color:#666;margin-bottom:16px">'+(lines[1]||"")+' '+(lines[2]||"")+'</div>';
+  lines.slice(3).forEach(function(line){
+    if(!line.trim())return;
+    html+='<div class="item"><span class="box"></span><span>'+line.replace(/^-\s*/,"").replace(/</g,"&lt;")+'</span></div>';
+  });
+  html+='<button onclick="window.print()" style="position:fixed;bottom:20px;right:20px;background:#06B6D4;color:#000;border:none;border-radius:10px;padding:12px 20px;font-size:14px;font-weight:800;cursor:pointer">🖨️ Drukuj</button>';
+  html+='</body></html>';
+  w.document.write(html);
+  w.document.close();
+  closeShopExportModal();
+}
+function shopExportOpenStore(){
+  var store=window._shopExportStore;
+  var firstItem=(String(window._shopExportText||"").split("\n").find(function(l){return l.indexOf("- ")===0;})||"").replace(/^-\s*/,"");
+  window.open(buildStoreSearchURL(store,firstItem),"_blank","noopener");
+  closeShopExportModal();
 }
 
 // ── CHAT ──────────────────────────────────────────────────────────────────────
@@ -4930,6 +4998,10 @@ function renderSmartShoppingList(list){
         html+='<div style="font-size:12px;color:var(--green);font-weight:700;margin-top:2px">'+quickLine+'</div>';
         html+='</div>';
         html+=shopBadge;
+        // 🔍 Per-item link do wyszukiwarki sklepu (otwiera produkt w wybranym serwisie)
+        var searchStore=shopForBrand==="lidl"?"frisco":shopForBrand; // Lidl nie ma online - fallback Frisco
+        var safeName=(displayName||item.name||"").replace(/'/g,"\\'");
+        html+='<button title="Znajdź w sklepie" onclick="event.stopPropagation();window.open(buildStoreSearchURL(\''+searchStore+'\',\''+safeName+'\'),\'_blank\',\'noopener\')" style="background:var(--bg3);border:1px solid var(--border);color:var(--brand);border-radius:50px;width:30px;height:30px;font-size:14px;cursor:pointer;flex-shrink:0;padding:0;display:flex;align-items:center;justify-content:center">🔍</button>';
         html+='<span style="color:var(--text3);font-size:11px;flex-shrink:0;font-weight:700">'+item.missing+unit+'</span>';
         html+='<span class="shop-row-arrow" style="color:var(--text3);font-size:14px;flex-shrink:0;transition:transform .2s">›</span>';
         html+='</div>';
