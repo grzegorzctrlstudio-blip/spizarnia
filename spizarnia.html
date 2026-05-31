@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-clean-chips-v9 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-chips-inside-hdr-v10 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -99,8 +99,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .search-clear.show{display:flex}
 
 /* ── CATEGORY CHIPS ── */
-/* Sticky tuż POD #app-hdr (header + top-nav razem ~118px). z-index niższy niż header. */
-.cat-chips-wrap{position:sticky;top:var(--hdr-h,118px);z-index:25;background:var(--bg);padding:12px 16px 12px;margin:8px -16px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);box-shadow:0 6px 16px -8px rgba(0,0,0,.5)}
+/* WEWNĄTRZ #app-hdr (sticky top:0) → razem kleją się do gory viewportu.
+   Widoczne tylko na pantry — toggleuje showPage przez data-page atrybut. */
+.cat-chips-wrap{background:var(--bg);padding:10px 0 12px;margin:8px -16px 0;padding-left:16px;padding-right:16px;border-top:1px solid var(--border);box-shadow:0 6px 16px -8px rgba(0,0,0,.5);display:none}
+.cat-chips-wrap.show{display:block}
 .cat-chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .cat-chips::-webkit-scrollbar{display:none}
 .cat-chip{display:flex;align-items:center;gap:7px;padding:11px 18px;border-radius:50px;border:2px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;font-weight:800;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0;min-height:44px}
@@ -601,6 +603,14 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
       <button class="tnav-btn" id="tnav-chat" onclick="showPage('chat')"><span class="tnav-ico">🤖</span><span class="tnav-lbl">Agent AI</span></button>
       <button class="tnav-btn" id="tnav-shop" onclick="showPage('shop')"><span class="tnav-ico">🛒</span><span class="tnav-lbl">Zakupy</span></button>
     </div>
+
+    <!-- CATEGORY CHIPS — wewnątrz #app-hdr żeby zawsze były sticky tuż pod top-nav.
+         Widoczne tylko na stronie pantry (klasa toggle przez showPage) -->
+    <div class="cat-chips-wrap show" id="cat-chips-wrap">
+      <div class="cat-chips" id="cat-chips">
+        <button class="cat-chip act" id="chip-all" onclick="setCatFilter('all')">Wszystko</button>
+      </div>
+    </div>
   </div>
 
   <!-- PANTRY -->
@@ -652,13 +662,6 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
         <span class="search-ico">🔍</span>
         <input class="search-inp" id="sinp" placeholder="Szukaj w lodówce..." oninput="onSearch(this.value)">
         <button class="search-clear" id="xbtn" onclick="clearSearch()">✕</button>
-      </div>
-
-      <!-- CATEGORY CHIPS (sticky podczas scrollu) -->
-      <div class="cat-chips-wrap">
-        <div class="cat-chips" id="cat-chips">
-          <button class="cat-chip act" id="chip-all" onclick="setCatFilter('all')">Wszystko</button>
-        </div>
       </div>
 
       <!-- Filtry statusu są obsługiwane przez kafle dashboardu -->
@@ -1050,7 +1053,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-31-clean-chips-v9";
+var APP_VERSION="2026-05-31-chips-inside-hdr-v10";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -1216,6 +1219,9 @@ function showPage(p){
     // Top nav segmented control (primary) — single shared instance
     var tb=document.getElementById("tnav-"+x);if(tb)tb.classList[x===p?"add":"remove"]("act");
   });
+  // Cat-chips widoczne tylko na pantry
+  var ccw=document.getElementById("cat-chips-wrap");
+  if(ccw)ccw.classList[p==="pantry"?"add":"remove"]("show");
   if(p==="chat"&&chatHistory.length===0)addWelcome();
   if(p==="shop"){
     // Inicjalizuj pille sklepu (preferuj z profilu jeśli ustawiony)
