@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-edit-profile-back-v25 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-meal-autoscale-v26 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1088,7 +1088,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-31-edit-profile-back-v25";
+var APP_VERSION="2026-05-31-meal-autoscale-v26";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -3095,7 +3095,7 @@ function generateSingleMeal(menuNum,section,replaceIdx){
     +"PRZYPRAWY:\n"
     +"- Sól/pieprz/papryka słodka/oregano: NIE w 'skladniki', tylko w osobnym polu 'przyprawy':['sól','pieprz',...].\n"
     +"- Oliwa/masło orzechowe/miód idą do 'skladniki' (mają kalorie).\n"
-    +"Realne porcje (białko 100-250g, węglowodany 60-200g). aiTarget = założenie (aplikacja policzy realne).\n"
+    +"Realne porcje (białko 100-250g, węglowodany 60-200g). aiTarget MUSI być realnie osiągalne ze składników (suma kcal/B/W/T ze składników =/-5% target). DOSTOSUJ GRAMATURY żeby suma się zgadzała.\n"
     +"TYLKO JSON: {\"nazwa\":\"...\",\"czas\":\"15 min\",\"aiTarget\":{\"kcal\":LICZBA,\"protein\":LICZBA,\"carbs\":LICZBA,\"fat\":LICZBA},\"skladniki\":[{\"n\":\"Pierś z Kurczaka\",\"il\":\"150g\",\"state\":\"raw\",\"amountBasis\":\"raw\"}],\"przyprawy\":[\"sól\",\"pieprz\"],\"przepis\":\"1. Krok.\"}";
   var body=document.getElementById("diet-body");
   body.innerHTML='<div style="text-align:center;padding:40px"><div style="font-size:36px;margin-bottom:10px">AI</div><div style="color:var(--text2);margin-bottom:8px">Generuje nowe '+mealName+'...</div><div class="spin" style="margin:0 auto"></div></div>';
@@ -3108,6 +3108,31 @@ function generateSingleMeal(menuNum,section,replaceIdx){
       if(!meal.nazwa||!meal.kcal)throw new Error("Brakujace pola");
       // Sanityzacja - rozdziel "lub", dedup
       if(meal.skladniki)meal.skladniki=sanitizeMealIngredients(meal.skladniki,meal);
+      // Przenieś AI makro do aiTarget + policz computed + auto-skaluj do targetu
+      if(!meal.aiTarget&&(meal.kcal||meal.prot||meal.carb||meal.fat)){
+        meal.aiTarget={kcal:Number(meal.kcal||0),protein:Number(meal.prot||0),carbs:Number(meal.carb||0),fat:Number(meal.fat||0)};
+      }
+      if(typeof calculateMealMacros==="function"){
+        meal.computed=calculateMealMacros(meal);
+        meal.macroSource="products";
+        // Auto-skaluj gramatury żeby realne makro = aiTarget ±5%
+        if(typeof scaleMealToTarget==="function"){
+          for(var i=0;i<2;i++){
+            var before=meal.computed&&meal.computed.kcal;
+            scaleMealToTarget(meal);
+            if(!meal.computed)break;
+            var diff=Math.abs(meal.computed.kcal-(meal.aiTarget&&meal.aiTarget.kcal||1))/(meal.aiTarget&&meal.aiTarget.kcal||1);
+            if(diff<=0.05)break;
+            if(meal.computed.kcal===before)break;
+          }
+        }
+        if(meal.computed&&meal.computed.isComplete&&meal.computed.kcal>0){
+          meal.kcal=meal.computed.kcal;
+          meal.prot=meal.computed.protein;
+          meal.carb=meal.computed.carbs;
+          meal.fat=meal.computed.fat;
+        }
+      }
       if(!userProfile.dietData)userProfile.dietData=JSON.parse(JSON.stringify(GRZES_DIET));
       var mk="menu"+menuNum;
       if(!userProfile.dietData[mk])userProfile.dietData[mk]={};
@@ -3215,7 +3240,9 @@ function generateAIDiet(profile){
     +"- NIE wpisuj soli/pieprzu/papryki słodkiej/oregano/czosnku granulowanego/itp. w 'skladniki' (nie mają wpływu na makro).\n"
     +"- Dodaj przyprawy w OSOBNYM polu 'przyprawy': ['sól','pieprz','papryka słodka',...].\n"
     +"- Oliwy, masła orzechowego, miodu, tahini NIE traktuj jako przyprawy — one mają kalorie, idą do 'skladniki'.\n"
-    +"Realne porcje: białko 100-250g/posiłek, węglowodany 60-200g/posiłek, tłuszcze 5-30g/posiłek. Min 10g każdego suchego składnika. NIE wymyślaj absurdalnych ilości (nie 10kg ryżu, nie 200g jajek). Max 30 min czas. Proste polskie dania. aiTarget = TYLKO twoje założenie (aplikacja policzy realne ze składników). TYLKO JSON.";
+    +"Realne porcje: białko 100-250g/posiłek, węglowodany 60-200g/posiłek, tłuszcze 5-30g/posiłek. Min 10g każdego suchego składnika. NIE wymyślaj absurdalnych ilości (nie 10kg ryżu, nie 200g jajek). Max 30 min czas. Proste polskie dania.\n"
+    +"⚠️ PRECYZJA MAKRO: aiTarget MUSI być realnie do osiągnięcia ze składników. PRZED zapisaniem przelicz w głowie: suma kcal/B/W/T ze składników (kcal100×g/100) MUSI być w granicach ±5% od aiTarget. Dobierz GRAMATURY składników tak żeby SUMA się ZGADZAŁA. Jeśli wyliczasz 600 kcal a target 720 — zwiększ porcje białka/węgli. Aplikacja policzy realne i pokaże różnicę — minimalizuj ją.\n"
+    +"TYLKO JSON.";
   // Nowy format: skladniki z state/amountBasis (AI samo określa), przyprawy w osobnym polu
   // aiTarget - tylko założenie AI, NIE realne makro (realne policzy aplikacja ze składników)
   var fmt='{"sniadania":[{"nazwa":"...","czas":"15 min","aiTarget":{"kcal":0,"protein":0,"carbs":0,"fat":0},"skladniki":[{"n":"Pierś z Kurczaka","il":"150g","state":"raw","amountBasis":"raw","preferredShop":"Biedronka/Lidl"},{"n":"Ryż","il":"70g","state":"dry","amountBasis":"beforeCooking","preferredShop":"Biedronka/Lidl"}],"przyprawy":["sól","pieprz","papryka słodka"],"przepis":"1. Krok."}],"obiady":[...],"kolacje":[...]}';
@@ -3312,6 +3339,67 @@ function repairTruncatedJSON(jsonStr){
   }
   return s;
 }
+// ── AUTO-SKALOWANIE POSIŁKÓW DO aiTarget ────────────────────────────────────
+// Cel: realne computed.kcal trafi w aiTarget.kcal z dokładnością ±5%.
+// Strategia: jeśli AI dał posiłek z 600 kcal a target = 720, mnożymy WSZYSTKIE
+// gramatury × 1.2 (pomijając jaja/szt, które nie skalują się dobrze).
+// Mnożymy też cap'ujemy do zakresu [0.5, 1.5] żeby nie absurdalnie zmieniać porcje.
+function scaleMealToTarget(meal){
+  if(!meal||!meal.aiTarget||!meal.computed)return meal;
+  var targetKcal=Number(meal.aiTarget.kcal||0);
+  var realKcal=Number(meal.computed.kcal||0);
+  if(!targetKcal||!realKcal)return meal;
+  var diff=Math.abs(realKcal-targetKcal)/targetKcal;
+  if(diff<=0.05)return meal; // już mieści się w ±5%, nic nie robimy
+  var factor=targetKcal/realKcal;
+  // Cap: nie skalować absurdalnie (np. AI dał 100 kcal a target 800 = factor 8x)
+  if(factor<0.5)factor=0.5;
+  if(factor>1.5)factor=1.5;
+  if(!meal.skladniki||!meal.skladniki.length)return meal;
+  // Mnóż gramatury (tylko składniki w g/ml — nie szt/kromki/łyżki bo nie mają sensu przy ułamkach)
+  meal.skladniki=meal.skladniki.map(function(sk){
+    var name=sk.n||sk.name||"";
+    var amountText=String(sk.il||sk.amount||"");
+    // Pomiń przyprawy
+    if(typeof isNonMacroSeasoning==="function"&&isNonMacroSeasoning(name))return sk;
+    // Skaluj tylko gramy/ml (nie szt., bo "3 jaja × 1.2 = 3.6 jaja" jest dziwne)
+    var m=amountText.toLowerCase().replace(",",".").match(/^([\d.]+)\s*(g|kg|ml|l)\b/);
+    if(!m)return sk;
+    var n=parseFloat(m[1]);
+    var unit=m[2];
+    var scaled=n*factor;
+    // Zaokrąglij do sensownych wartości
+    if(unit==="g"||unit==="ml")scaled=Math.round(scaled/5)*5; // co 5g/ml
+    else scaled=Math.round(scaled*10)/10; // kg/l co 0.1
+    if(scaled<1)scaled=1; // minimum
+    sk.il=scaled+unit;
+    return sk;
+  });
+  // Przelicz computed po skalowaniu
+  meal.computed=calculateMealMacros(meal);
+  meal._scaled={factor:Math.round(factor*100)/100,originalKcal:realKcal,targetKcal:targetKcal,newKcal:meal.computed.kcal};
+  return meal;
+}
+// Skaluje WSZYSTKIE posiłki w menu do swoich aiTarget
+function scaleAllMealsToTargets(menu){
+  if(!menu)return menu;
+  ["sniadania","obiady","kolacje"].forEach(function(typ){
+    (menu[typ]||[]).forEach(function(meal){
+      if(!meal||!meal.aiTarget||!meal.computed)return;
+      // Max 2 iteracje skalowania (po pierwszym mnożeniu zaokrąglenia mogą trochę odbić)
+      for(var i=0;i<2;i++){
+        var before=meal.computed&&meal.computed.kcal;
+        scaleMealToTarget(meal);
+        if(!meal.computed)break;
+        var diff=Math.abs(meal.computed.kcal-meal.aiTarget.kcal)/meal.aiTarget.kcal;
+        if(diff<=0.05)break; // już mieści się
+        if(meal.computed.kcal===before)break; // nie zmienia się
+      }
+    });
+  });
+  return menu;
+}
+
 function parseMenuJSON(raw){
   try{
     var clean=raw.replace(/```json/gi,"").replace(/```/g,"").trim();
@@ -3365,6 +3453,22 @@ function parseMenuJSON(raw){
         }
       });
     });
+    // AUTO-SKALOWANIE: po wyliczeniu computed, dopasuj gramatury do aiTarget (±5%)
+    // Dzięki temu realne makro zawsze odpowiada założeniom AI.
+    if(typeof scaleAllMealsToTargets==="function"){
+      scaleAllMealsToTargets(p);
+      // Po skalowaniu zaktualizuj kompatybilne pola meal.kcal/prot/carb/fat
+      ["sniadania","obiady","kolacje"].forEach(function(typ){
+        (p[typ]||[]).forEach(function(meal){
+          if(meal&&meal.computed&&meal.computed.isComplete&&meal.computed.kcal>0){
+            meal.kcal=meal.computed.kcal;
+            meal.prot=meal.computed.protein;
+            meal.carb=meal.computed.carbs;
+            meal.fat=meal.computed.fat;
+          }
+        });
+      });
+    }
     return p;
   }catch(ex){return null;}
 }
