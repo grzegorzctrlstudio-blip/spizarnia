@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-06-01-timeout-retry-v35 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-06-01-shop-mix-both-v36 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1088,7 +1088,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-06-01-timeout-retry-v35";
+var APP_VERSION="2026-06-01-shop-mix-both-v36";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -5544,8 +5544,17 @@ function getStoreAisle(item,shop){
 function pickBrandForShop(product,shop){
   if(!product||!product.brands||!product.brands.length)return null;
   if(shop==="both"){
-    // wybierz pierwszy z lepszym confidence/n100
-    return product.brands[0];
+    // ROTACJA: deterministycznie naprzemiennie Biedronka/Lidl per produkt
+    // (hash id % 2 - stabilny wybór, ten sam produkt zawsze ma ten sam brand)
+    var bie=product.brands.filter(function(b){return String(b.shop||"").toLowerCase().indexOf("biedronka")!==-1;});
+    var lidl=product.brands.filter(function(b){return String(b.shop||"").toLowerCase().indexOf("lidl")!==-1;});
+    if(bie.length&&lidl.length){
+      // Hash z product.id determinuje wybór (stabilny - nie losowe)
+      var h=0,s=String(product.id||product.name||"");
+      for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;
+      return (Math.abs(h)%2===0)?bie[0]:lidl[0];
+    }
+    return bie[0]||lidl[0]||product.brands[0];
   }
   var shopLabel=shop==="biedronka"?"biedronka":shop==="lidl"?"lidl":"";
   return product.brands.find(function(b){
@@ -5571,21 +5580,14 @@ function renderSmartShoppingList(list){
   var shopForBrand=(shopStore==="both")?"biedronka":shopStore;
   tooBuy.forEach(function(it){
     if(it.product&&it.product.brands&&it.product.brands.length){
-      var brand=pickBrandForShop(it.product,shopForBrand);
+      var brand=pickBrandForShop(it.product,shopStore); // PRZEKAZ ORYGINALNE shopStore (both = rotacja)
       if(brand){
         it._brand=brand;
         it._displayName=brand.brand||brand.productName||it.name;
+        it._shop=brand.shop||"";
       }
     }
   });
-  // GRUPUJ wg ŚCIEŻKI SKLEPU (slalom przez alejki Biedronka/Lidl)
-  var groups={};
-  tooBuy.forEach(function(it){
-    var g=getStoreAisle(it,shopForBrand);
-    if(!groups[g.key])groups[g.key]={meta:g,items:[]};
-    groups[g.key].items.push(it);
-  });
-  var groupKeys=Object.keys(groups).sort(function(a,b){return groups[a].meta.order-groups[b].meta.order;});
 
   var html="";
   var storeLabel={biedronka:"🐝 Biedronka",lidl:"🏪 Lidl",both:"🐝🏪 Biedronka + Lidl"}[shopStore]||"Biedronka";
@@ -5596,19 +5598,46 @@ function renderSmartShoppingList(list){
   html+='<br>Posortowane wg <b style="color:var(--text)">trasy slalomem przez alejki</b> &bull; Na <b style="color:var(--text)">'+(shopDays||7)+' dni</b>';
   html+='</div></div>';
 
+  // === DLA "OBA" - PODZIAŁ NA 2 SEKCJE PER SKLEP ===
+  // Najpierw Biedronka, potem Lidl. W każdej sekcji alejki w trasie.
+  function renderShopBlock(items,shopKey,shopHeader,shopColor){
+    if(!items.length)return "";
+    var blockHtml="";
+    blockHtml+='<div style="background:'+shopColor+'15;border:1px solid '+shopColor+'66;border-radius:12px;padding:10px 14px;margin:18px 0 10px;display:flex;align-items:center;gap:10px">';
+    blockHtml+='<span style="font-size:22px">'+shopHeader.split(" ")[0]+'</span>';
+    blockHtml+='<span style="font-size:14px;font-weight:600;color:'+shopColor+';flex:1">'+shopHeader.split(" ").slice(1).join(" ")+'</span>';
+    blockHtml+='<span style="font-size:11px;color:var(--text3);font-weight:500">'+items.length+' poz.</span>';
+    blockHtml+='</div>';
+    // Wewnątrz - grupy alejek
+    var grps={};
+    items.forEach(function(it){
+      var g=getStoreAisle(it,shopKey);
+      if(!grps[g.key])grps[g.key]={meta:g,items:[]};
+      grps[g.key].items.push(it);
+    });
+    var gKeys=Object.keys(grps).sort(function(a,b){return grps[a].meta.order-grps[b].meta.order;});
+    gKeys.forEach(function(gk){
+      var grp=grps[gk];
+      blockHtml+='<div style="display:flex;align-items:center;gap:8px;margin:10px 0 6px;padding:6px 12px;background:var(--bg3);border-radius:10px;border:1px solid var(--border)">';
+      blockHtml+='<span style="font-size:16px">'+grp.meta.ico+'</span>';
+      blockHtml+='<span style="font-size:12px;font-weight:500;color:var(--text);flex:1">'+grp.meta.label+'</span>';
+      blockHtml+='<span style="font-size:10px;color:var(--text3);font-weight:400">'+grp.items.length+' poz.</span>';
+      blockHtml+='</div>';
+      grp.items.forEach(function(item){
+        blockHtml+=renderShopItem(item);
+      });
+    });
+    return blockHtml;
+  }
+
   if(tooBuy.length){
     html+='<div style="font-size:11px;font-weight:500;color:var(--red);margin-bottom:10px;text-transform:uppercase;letter-spacing:.6px">🛒 Do kupienia ('+tooBuy.length+')</div>';
-    // Renderuj grupę po grupie
+
+    // Renderer pojedynczego wiersza produktu — używany w obu trybach (single+both)
     var globalIdx=0;
-    groupKeys.forEach(function(gk){
-      var grp=groups[gk];
-      html+='<div style="display:flex;align-items:center;gap:8px;margin:14px 0 8px;padding:8px 12px;background:var(--bg3);border-radius:10px;border:1px solid var(--border)">';
-      html+='<span style="font-size:18px">'+grp.meta.ico+'</span>';
-      html+='<span style="font-size:13px;font-weight:500;color:var(--text);flex:1">'+grp.meta.label+'</span>';
-      html+='<span style="font-size:11px;color:var(--text3);font-weight:400">'+grp.items.length+' poz.</span>';
-      html+='</div>';
-      grp.items.forEach(function(item){
-        var idx=globalIdx++;
+    function _renderShopItemRow(item){
+      var idx=globalIdx++;
+      var html="";
         var prod=item.product;
         var unit=prod?prod.unit:"g";
         var pkgUnit=prod?(prod.pkgUnit||"opak."):"";
@@ -5697,8 +5726,65 @@ function renderSmartShoppingList(list){
         }
         html+='</div>';
         html+='</div>';
+      return html;
+    } // koniec _renderShopItemRow
+
+    // Renderuj wg trybu: both → dzielone na Biedronka/Lidl, inaczej → grupy alejek
+    if(shopStore==="both"){
+      var biedronkaItems=[],lidlItems=[];
+      tooBuy.forEach(function(it){
+        var s=String(it._shop||"").toLowerCase();
+        if(s.indexOf("lidl")!==-1)lidlItems.push(it);
+        else biedronkaItems.push(it);
       });
-    });
+      // Render bloku per sklep
+      function renderBlock(items,shopKey,shopHeader,shopColor,headerIcon){
+        if(!items.length)return "";
+        var bh="";
+        bh+='<div style="background:'+shopColor+'15;border:1px solid '+shopColor+'66;border-radius:12px;padding:10px 14px;margin:18px 0 10px;display:flex;align-items:center;gap:10px">';
+        bh+='<span style="font-size:22px">'+headerIcon+'</span>';
+        bh+='<span style="font-size:14px;font-weight:600;color:'+shopColor+';flex:1">'+shopHeader+'</span>';
+        bh+='<span style="font-size:11px;color:var(--text3);font-weight:500">'+items.length+' poz.</span>';
+        bh+='</div>';
+        var grps={};
+        items.forEach(function(it){
+          var g=getStoreAisle(it,shopKey);
+          if(!grps[g.key])grps[g.key]={meta:g,items:[]};
+          grps[g.key].items.push(it);
+        });
+        var gKeys=Object.keys(grps).sort(function(a,b){return grps[a].meta.order-grps[b].meta.order;});
+        gKeys.forEach(function(gk){
+          var grp=grps[gk];
+          bh+='<div style="display:flex;align-items:center;gap:8px;margin:10px 0 6px;padding:6px 12px;background:var(--bg3);border-radius:10px;border:1px solid var(--border)">';
+          bh+='<span style="font-size:16px">'+grp.meta.ico+'</span>';
+          bh+='<span style="font-size:12px;font-weight:500;color:var(--text);flex:1">'+grp.meta.label+'</span>';
+          bh+='<span style="font-size:10px;color:var(--text3)">'+grp.items.length+' poz.</span>';
+          bh+='</div>';
+          grp.items.forEach(function(item){bh+=_renderShopItemRow(item);});
+        });
+        return bh;
+      }
+      html+=renderBlock(biedronkaItems,"biedronka","Biedronka","#DC2626","🐝");
+      html+=renderBlock(lidlItems,"lidl","Lidl","#1D4ED8","🏪");
+    }else{
+      // POJEDYNCZY sklep - bezpośrednio grupy alejek
+      var groups={};
+      tooBuy.forEach(function(it){
+        var g=getStoreAisle(it,shopForBrand);
+        if(!groups[g.key])groups[g.key]={meta:g,items:[]};
+        groups[g.key].items.push(it);
+      });
+      var groupKeys=Object.keys(groups).sort(function(a,b){return groups[a].meta.order-groups[b].meta.order;});
+      groupKeys.forEach(function(gk){
+        var grp=groups[gk];
+        html+='<div style="display:flex;align-items:center;gap:8px;margin:14px 0 8px;padding:8px 12px;background:var(--bg3);border-radius:10px;border:1px solid var(--border)">';
+        html+='<span style="font-size:18px">'+grp.meta.ico+'</span>';
+        html+='<span style="font-size:13px;font-weight:500;color:var(--text);flex:1">'+grp.meta.label+'</span>';
+        html+='<span style="font-size:11px;color:var(--text3)">'+grp.items.length+' poz.</span>';
+        html+='</div>';
+        grp.items.forEach(function(item){html+=_renderShopItemRow(item);});
+      });
+    }
   }
   if(have.length){
     html+='<div style="margin-top:18px;font-size:11px;font-weight:500;color:var(--green);margin-bottom:8px;text-transform:uppercase;letter-spacing:.6px">✓ Masz wystarczająco ('+have.length+')</div>';
