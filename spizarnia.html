@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-06-01-spices-with-amounts-v38 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-06-01-no-search-icon-v39 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1088,7 +1088,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-06-01-spices-with-amounts-v38";
+var APP_VERSION="2026-06-01-no-search-icon-v39";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -5733,10 +5733,7 @@ function renderSmartShoppingList(list){
         html+='<div style="font-size:12px;color:var(--green);font-weight:400;margin-top:2px">'+quickLine+'</div>';
         html+='</div>';
         html+=shopBadge;
-        // 🔍 Per-item link do wyszukiwarki sklepu (otwiera produkt w wybranym serwisie)
-        var searchStore=shopForBrand==="lidl"?"frisco":shopForBrand; // Lidl nie ma online - fallback Frisco
-        var safeName=(displayName||item.name||"").replace(/'/g,"\\'");
-        html+='<button title="Znajdź w sklepie" onclick="event.stopPropagation();window.open(buildStoreSearchURL(\''+searchStore+'\',\''+safeName+'\'),\'_blank\',\'noopener\')" style="background:var(--bg3);border:1px solid var(--border);color:var(--brand);border-radius:50px;width:30px;height:30px;font-size:14px;cursor:pointer;flex-shrink:0;padding:0;display:flex;align-items:center;justify-content:center">🔍</button>';
+        // Usunięto przycisk 🔍 "Szukaj w sklepie" - user uznał za nieprzydatny.
         html+='<span style="color:var(--text3);font-size:11px;flex-shrink:0;font-weight:400">'+item.missing+unit+'</span>';
         html+='<span class="shop-row-arrow" style="color:var(--text3);font-size:14px;flex-shrink:0;transition:transform .2s">›</span>';
         html+='</div>';
