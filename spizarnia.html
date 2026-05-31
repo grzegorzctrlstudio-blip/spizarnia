@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-fix-shopfromdiet-v24 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-edit-profile-back-v25 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1088,7 +1088,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-31-fix-shopfromdiet-v24";
+var APP_VERSION="2026-05-31-edit-profile-back-v25";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -2547,6 +2547,21 @@ function closeUserPanel(){
 function editUserProfile(){
   closeUserPanel();
   showOb();
+  // Oznacz że wszedł z user panel (żeby X wracał do panelu, a nie zamykał całość)
+  window._obEntryPoint="userPanel";
+  // Pokaż przycisk X (wróć)
+  var btn=document.getElementById("ob-close-btn");
+  if(btn)btn.style.display="flex";
+}
+// Wróć z onboarding do skąd przyszedł (najczęściej user panel)
+function closeOnboardingBack(){
+  hideOb();
+  var btn=document.getElementById("ob-close-btn");
+  if(btn)btn.style.display="none";
+  if(window._obEntryPoint==="userPanel"&&typeof openUserPanel==="function"){
+    openUserPanel();
+  }
+  window._obEntryPoint=null;
 }
 function userPanelGenerateDiet(){
   if(!userProfile||!userProfile.kcal){
@@ -2640,6 +2655,9 @@ function showOb(){
 
 function hideOb(){
   document.getElementById("ob-overlay").classList.remove("show");
+  // Ukryj przycisk X (wróć) - zostanie znowu pokazany w editUserProfile
+  var btn=document.getElementById("ob-close-btn");
+  if(btn)btn.style.display="none";
 }
 
 function renderObStep(){
@@ -6804,6 +6822,8 @@ function closeAdminPanel(){
 
 <!-- ══ ONBOARDING OVERLAY ═══════════════════════════════════════════════ -->
 <div id="ob-overlay">
+  <!-- Przycisk WRÓĆ (X) - widoczny tylko gdy user już ma profil (czyli wszedł z Edytuj profil) -->
+  <button id="ob-close-btn" onclick="closeOnboardingBack()" style="display:none;position:fixed;top:18px;left:18px;width:42px;height:42px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:50%;font-size:18px;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center" title="Wróć">←</button>
   <div style="max-width:480px;margin:0 auto;width:100%">
     <div style="display:flex;justify-content:center;gap:6px;margin-bottom:24px" id="ob-progress"></div>
 
