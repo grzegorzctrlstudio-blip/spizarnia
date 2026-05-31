@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-sanitize-lub-stem-pl-v4 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-pantry-matching-lidl-v5 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -717,13 +717,18 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
         <button class="receipt-apply" onclick="applyReceipt()">✅ Zaktualizuj lodówkę</button>
       </div>
 
-      <!-- Sklepy online (na dole, mniej eksponowane) -->
+      <!-- Sklepy online (na dole) -->
       <div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-top:24px;margin-bottom:10px">🛍️ Zamów online</div>
       <div class="stores-grid">
         <button class="store-card" onclick="openStore('biedronka')" style="background:linear-gradient(135deg,#DC2626,#991B1B)">
           <span class="store-card-ico">🐝</span>
-          <span class="store-card-name">Biedronka Go</span>
+          <span class="store-card-name">Biedronka Home</span>
           <span class="store-card-sub">Dostawa ~2h</span>
+        </button>
+        <button class="store-card" onclick="openStore('lidl')" style="background:linear-gradient(135deg,#1D4ED8,#1E3A8A)">
+          <span class="store-card-ico">🏪</span>
+          <span class="store-card-name">Lidl Online</span>
+          <span class="store-card-sub">Plus / Dostawa</span>
         </button>
         <button class="store-card" onclick="openStore('frisco')" style="background:linear-gradient(135deg,#16A34A,#14532D)">
           <span class="store-card-ico">🚚</span>
@@ -739,6 +744,11 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
           <span class="store-card-ico">🦊</span>
           <span class="store-card-name">Lisek</span>
           <span class="store-card-sub">~15 minut</span>
+        </button>
+        <button class="store-card" onclick="openStore('wolt')" style="background:linear-gradient(135deg,#06B6D4,#0E7490)">
+          <span class="store-card-ico">🛵</span>
+          <span class="store-card-name">Wolt Market</span>
+          <span class="store-card-sub">Ekspresowo</span>
         </button>
       </div>
     </div>
@@ -1019,7 +1029,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-31-sanitize-lub-stem-pl-v4";
+var APP_VERSION="2026-05-31-pantry-matching-lidl-v5";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -1999,8 +2009,14 @@ function copyShopList(silent){
   return true;
 }
 // Deep-linki do sklepów online — gdzie się da otwórz wyszukiwarkę/zamówienie + skopiuj listę.
+// Status linków (potwierdzone 2026-05):
+// - Biedronka Home (delivery): https://www.biedronka.pl/pl/produkty (lub gazetka) — wyszukiwarka uniwersalna
+// - Lidl: https://www.lidl.pl (Lidl Plus ma własną apkę, ale www ma katalog)
+// - Frisco: https://www.frisco.pl/search?query= (działa)
+// - Glovo: https://glovoapp.com/pl/pl/warszawa/ — bez deep search
+// - Lisek/Wolt: aplikacje mobilne, www jako landing
 function openStore(store){
-  var labels={biedronka:"Biedronka Go",frisco:"Frisco.pl",glovo:"Glovo",lisek:"Lisek"};
+  var labels={biedronka:"Biedronka Home",lidl:"Lidl Online",frisco:"Frisco.pl",glovo:"Glovo",lisek:"Lisek",wolt:"Wolt Market"};
   var items=buildShopListText();
   if(!items.length){
     dlgAlert("ℹ️","Brak listy","Najpierw wygeneruj listę z diety (zielony przycisk powyżej).");
@@ -2008,14 +2024,20 @@ function openStore(store){
   }
   // Skopiuj listę do schowka
   copyShopList(true);
-  // Buduj URL — dla Frisco/Lisek/Glovo nie ma publicznego API do wstrzykiwania koszyka,
-  // ale można otworzyć wyszukiwarkę z pierwszą pozycją.
   var firstQuery=encodeURIComponent((items[0]||"").replace(/^-\s*/,"").split(":")[0].trim());
   var urls={
-    biedronka:"https://www.biedronka.pl/pl/szukaj?q="+firstQuery,
+    // Biedronka.pl ma wyszukiwarkę na głównej, Biedronka Home dostawa: home.biedronka.pl
+    biedronka:"https://home.biedronka.pl/",
+    // Lidl.pl ma katalog produktów online (Lidl Plus apka osobno) - poszukiwacz na lidl.pl
+    lidl:"https://www.lidl.pl/q/search?q="+firstQuery,
+    // Frisco - działająca wyszukiwarka
     frisco:"https://www.frisco.pl/search?query="+firstQuery,
-    glovo:"https://glovoapp.com/pl/pl/warszawa/zakupy/?q="+firstQuery,
-    lisek:"https://lisek.app/pl"
+    // Glovo - wyszukaj w okolicy (musi user dać miasto)
+    glovo:"https://glovoapp.com/pl/pl/warszawa/zakupy/",
+    // Lisek - apka, landing pl
+    lisek:"https://lisek.app/pl",
+    // Wolt Market - landing
+    wolt:"https://wolt.com/pl/discovery/wolt-market"
   };
   dlgConfirm("📋","Lista skopiowana — "+items.length+" pozycji","Otworzyć "+(labels[store]||store)+" i wkleić listę?",function(){
     window.open(urls[store]||urls.frisco,"_blank","noopener");
@@ -3650,35 +3672,59 @@ function getDietIngredients(diet, menuKey, days){
 
 // Pobierz stan lodówki dla produktu (ilość w gramach/ml/szt)
 function getPantryAmountForProduct(prod, productName){
+  var totalGrams=0;
   // 1. Sprawdź nową strukturę /pantry/{userId}
   if(prod&&pantryData){
     var entry=pantryData[prod.id];
-    if(entry&&entry.amount>0)return entry.amount;
+    if(entry&&entry.amount>0){
+      // Jeśli amount jest w szt a produkt mierzony w gramach - konwertuj
+      var amt=Number(entry.amount)||0;
+      var entryUnit=String(entry.unit||prod.unit||"g").toLowerCase();
+      var prodUnit=String(prod.unit||"g").toLowerCase();
+      if((entryUnit==="szt"||entryUnit==="szt.")&&prodUnit!=="szt"&&prod.singleWeight){
+        amt=amt*prod.singleWeight;
+      }
+      totalGrams+=amt;
+    }
   }
-  // 2. Fallback — szacuj ze starego stanu CATS
+  // 2. ZAWSZE też sumuj ze starego stanu CATS (użytkownik dodaje przez +/- na dashboard)
+  // Używamy namesMatch (z stem PL) + aliases - znacznie lepiej matchuje
   if(prod){
-    var found=0;
+    var prodName=prod.name||"";
+    var sw=Number(prod.singleWeight||prod.pkgSize||100);
     CATS.forEach(function(cat){cat.items.forEach(function(it){
-      var itLow=it.n.toLowerCase();
-      var match=(prod.aliases||[]).some(function(a){return a===itLow||itLow.indexOf(a)!==-1;});
-      if(match){
-        var cur=state[fbk(cat.id,it.n)]||0;
-        found+=cur*(prod.pkgSize||100);
+      // Match na 3 sposoby: alias dokładny, namesMatch product.name vs CAT it.n, namesMatch alias vs CAT it.n
+      var itLow=String(it.n||"").toLowerCase();
+      var matchAlias=(prod.aliases||[]).some(function(a){
+        var al=String(a||"").toLowerCase();
+        return al===itLow||namesMatch(al,it.n);
+      });
+      var matchName=namesMatch(prodName,it.n);
+      if(matchAlias||matchName){
+        var cur=Number(state[fbk(cat.id,it.n)])||0;
+        if(cur>0){
+          // CATS items zwykle w szt — konwertuj na gramy używając singleWeight produktu
+          var prodUnit2=String(prod.unit||"g").toLowerCase();
+          if(prodUnit2==="szt"){
+            // Produkt w szt — porównujemy szt:szt, nie mnożymy
+            totalGrams+=cur;
+          }else{
+            totalGrams+=cur*sw;
+          }
+        }
       }
     });});
-    return found;
   }
-  // 3. Szukaj po nazwie w CATS
-  var found2=0;
-  if(productName){
+  // 3. Fallback po nazwie productName (gdy brak prod)
+  if(!prod&&productName){
     CATS.forEach(function(cat){cat.items.forEach(function(it){
-      if(it.n.toLowerCase()===productName.toLowerCase()){
-        var cur=state[fbk(cat.id,it.n)]||0;
-        found2=cur*(it.pkgSize||100);
+      if(namesMatch(productName,it.n)){
+        var cur=Number(state[fbk(cat.id,it.n)])||0;
+        if(cur>0)totalGrams+=cur*(it.pkgSize||100);
       }
     });});
   }
-  return found2;
+  return totalGrams;
 }
 
 // Zapisz produkt do pantry
