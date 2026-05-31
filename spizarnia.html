@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-06-01-plan-tyg-baza-v40 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-06-01-store-quick-switch-v41 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1088,7 +1088,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-06-01-plan-tyg-baza-v40";
+var APP_VERSION="2026-06-01-store-quick-switch-v41";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -2518,6 +2518,8 @@ function updateAISys(){if(!userProfile)return;var st={biedronka:"Biedronke",lidl
 // ── USER PANEL ────────────────────────────────────────────────────────────────
 function openUserPanel(){
   var el=document.getElementById("user-panel-overlay");if(!el)return;
+  // Po render podświetl aktywny sklep (setTimeout - po renderze DOM)
+  setTimeout(function(){if(typeof userPanelHighlightStore==="function")userPanelHighlightStore();},50);
   // Header
   var nameEl=document.getElementById("up-name");
   var subEl=document.getElementById("up-sub");
@@ -2579,6 +2581,39 @@ function closeOnboardingBack(){
     openUserPanel();
   }
   window._obEntryPoint=null;
+}
+// Szybka zmiana sklepu z User Panel - aktualizuje profil + Firebase + UI sklepu
+function userPanelSetStore(store){
+  if(!userProfile){
+    dlgAlert("ℹ️","Brak profilu","Najpierw uzupełnij profil.");
+    return;
+  }
+  if(!["biedronka","lidl","both"].includes(store))return;
+  userProfile.stores=store;
+  // Zapisz do Firebase
+  try{
+    if(typeof saveUserProfile==="function")saveUserProfile(userProfile);
+  }catch(e){}
+  // Update SYS prompt
+  try{if(typeof updateAISys==="function")updateAISys();}catch(e){}
+  // Sync z shopStore globalne
+  try{if(typeof shopStore!=="undefined")shopStore=store;}catch(e){}
+  // Update highlight w UI
+  userPanelHighlightStore();
+  // Toast
+  var lbl={biedronka:"🐝 Biedronka",lidl:"🏪 Lidl",both:"🐝🏪 Oba sklepy"}[store];
+  if(typeof dlgAlert==="function")dlgAlert("✓","Sklep zmieniony","Twój sklep: "+lbl+". Następna dieta i lista zakupów wezmą to pod uwagę.");
+}
+function userPanelHighlightStore(){
+  var curStore=userProfile&&userProfile.stores||"biedronka";
+  ["biedronka","lidl","both"].forEach(function(s){
+    var btn=document.querySelector('[data-up-store="'+s+'"]');
+    if(!btn)return;
+    var on=(s===curStore);
+    btn.style.borderColor=on?"var(--brand)":"var(--border)";
+    btn.style.background=on?"rgba(6,182,212,.15)":"var(--bg3)";
+    btn.style.color=on?"var(--brand)":"var(--text2)";
+  });
 }
 function userPanelGenerateDiet(){
   if(!userProfile||!userProfile.kcal){
@@ -7444,6 +7479,27 @@ function closeAdminPanel(){
     </div>
 
     <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;margin-top:14px">Ustawienia</div>
+    <!-- Szybki przełącznik sklepu -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:12px 14px;margin-bottom:8px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div style="font-size:22px">🛒</div>
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:500;color:var(--text)">Sklep do zakupów</div>
+          <div style="font-size:11px;color:var(--text3)">Dieta i lista dostosują się do wybranego</div>
+        </div>
+      </div>
+      <div id="up-store-picker" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+        <button onclick="userPanelSetStore('biedronka')" data-up-store="biedronka" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 4px;font-size:12px;font-weight:500;cursor:pointer;line-height:1.4">
+          <div style="font-size:18px">🐝</div>Biedronka
+        </button>
+        <button onclick="userPanelSetStore('lidl')" data-up-store="lidl" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 4px;font-size:12px;font-weight:500;cursor:pointer;line-height:1.4">
+          <div style="font-size:18px">🏪</div>Lidl
+        </button>
+        <button onclick="userPanelSetStore('both')" data-up-store="both" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 4px;font-size:12px;font-weight:500;cursor:pointer;line-height:1.4">
+          <div style="font-size:18px">🐝🏪</div>Oba
+        </button>
+      </div>
+    </div>
     <div class="up-row" onclick="editUserProfile()">
       <div class="up-row-ico">✏️</div>
       <div class="up-row-text">
