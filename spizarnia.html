@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-thin-fonts-v16 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-quick-presets-v17 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -740,6 +740,18 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
         <div class="gen-spin" id="gen-spin"></div>
         <span id="gen-btn-txt">🛒 Wygeneruj listę z diety</span>
       </button>
+
+      <!-- SZYBKIE PRESETY: alternatywne konfiguracje 1 klikiem -->
+      <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin:14px 0 8px">⚡ Szybkie listy alternatywne</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px">
+        <button onclick="applyShopPreset('biedronka',3)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:12px;font-weight:500;cursor:pointer;text-align:left;line-height:1.4"><div style="font-size:11px;opacity:.7">🐝 Biedronka</div><div>3 dni</div></button>
+        <button onclick="applyShopPreset('biedronka',7)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:12px;font-weight:500;cursor:pointer;text-align:left;line-height:1.4"><div style="font-size:11px;opacity:.7">🐝 Biedronka</div><div>7 dni</div></button>
+        <button onclick="applyShopPreset('lidl',3)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:12px;font-weight:500;cursor:pointer;text-align:left;line-height:1.4"><div style="font-size:11px;opacity:.7">🏪 Lidl</div><div>3 dni</div></button>
+        <button onclick="applyShopPreset('lidl',7)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:12px;font-weight:500;cursor:pointer;text-align:left;line-height:1.4"><div style="font-size:11px;opacity:.7">🏪 Lidl</div><div>7 dni</div></button>
+        <button onclick="applyShopPreset('both',7)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:12px;font-weight:500;cursor:pointer;text-align:left;line-height:1.4"><div style="font-size:11px;opacity:.7">🐝🏪 Oba</div><div>7 dni</div></button>
+        <button onclick="applyShopPreset('both',14)" style="background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 6px;font-size:12px;font-weight:500;cursor:pointer;text-align:left;line-height:1.4"><div style="font-size:11px;opacity:.7">🐝🏪 Oba</div><div>14 dni</div></button>
+      </div>
+
       <button class="copy-btn" id="copy-btn" onclick="copyShopList()" style="margin-bottom:14px">📋 Kopiuj listę do schowka</button>
 
       <!-- Wyniki listy zakupów -->
@@ -1064,7 +1076,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-31-thin-fonts-v16";
+var APP_VERSION="2026-05-31-quick-presets-v17";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -1990,26 +2002,47 @@ function selectShopStore(store){shopStore=store;["biedronka","lidl","both"].forE
 
 // Nowy wybór sklepu na stronie Zakupów (z pillami)
 function setShopStore(store){
+  var changed=shopStore!==store;
   shopStore=store||"biedronka";
   ["biedronka","lidl","both"].forEach(function(s){
     var btn=document.getElementById("shop-pill-"+s);
     if(!btn)return;
     var on=s===shopStore;
-    btn.style.borderColor=on?"var(--green)":"var(--border)";
-    btn.style.background=on?"rgba(30,215,96,.15)":"var(--bg3)";
-    btn.style.color=on?"var(--green)":"var(--text2)";
+    btn.style.borderColor=on?"var(--brand)":"var(--border)";
+    btn.style.background=on?"rgba(6,182,212,.15)":"var(--bg3)";
+    btn.style.color=on?"var(--brand)":"var(--text2)";
   });
+  // AUTO-REGENERACJA: jeśli lista już wygenerowana, odśwież z nową konfiguracją
+  if(changed)maybeAutoRegenerateShopList();
 }
 function setShopDays(days){
+  var changed=shopDays!==Number(days);
   shopDays=Number(days)||7;
   [1,3,7,14].forEach(function(d){
     var btn=document.getElementById("shop-days-"+d);
     if(!btn)return;
     var on=d===shopDays;
-    btn.style.borderColor=on?"var(--green)":"var(--border)";
-    btn.style.background=on?"rgba(30,215,96,.15)":"var(--bg3)";
-    btn.style.color=on?"var(--green)":"var(--text2)";
+    btn.style.borderColor=on?"var(--brand)":"var(--border)";
+    btn.style.background=on?"rgba(6,182,212,.15)":"var(--bg3)";
+    btn.style.color=on?"var(--brand)":"var(--text2)";
   });
+  if(changed)maybeAutoRegenerateShopList();
+}
+// Auto-regeneracja listy gdy zmieni się sklep lub liczba dni (i lista już jest wygenerowana)
+function maybeAutoRegenerateShopList(){
+  var content=document.getElementById("shop-list-content");
+  if(!content)return;
+  // Sprawdź czy lista jest wygenerowana (ma w sobie listę produktów)
+  var hasList=content.innerHTML&&content.innerHTML.indexOf("Trasa zakupowa")!==-1;
+  if(hasList&&typeof generateDietShoppingList==="function"){
+    generateDietShoppingList(shopDays);
+  }
+}
+// SZYBKIE PRESETY: jeden klik = sklep+dni+regeneracja
+function applyShopPreset(store,days){
+  setShopStore(store);
+  setShopDays(days);
+  if(typeof generateDietShoppingList==="function")generateDietShoppingList(days);
 }
 function generateShopList(){if(!apiKey){dlgAlert("X","Niedostepne","Skonfiguruj klucz API");return;}var btn=document.getElementById("gen-btn"),spin=document.getElementById("gen-spin"),txt=document.getElementById("gen-btn-txt");btn.disabled=true;spin.style.display="block";txt.textContent="Generuje...";var missing=[],expiring=[];CATS.forEach(function(cat){cat.items.forEach(function(it){var cur=state[fbk(cat.id,it.n)]||0;if(cur<it.target)missing.push(it.n+"(mam:"+cur+",potrzeba:"+it.target+" "+it.unit+")");var d=getDaysLeft(it);if(d!==null&&d<=3&&cur>0)expiring.push(it.n+"("+d+"dni)");});});var storeName={biedronka:"Biedronka",lidl:"Lidl",both:"Biedronka i Lidl"}[shopStore]||"Biedronka";var prompt="Lista zakupow do "+storeName+". Braki w lodowce: "+missing.join("; ")+". Wygasaja wkrotce: "+(expiring.join("; ")||"nic")+". Jezeli uzytkownik ostatnio kupowal cos w Biedronce uwzgledniej te produkty przy priorytetach. TYLKO JSON: {\"komentarz\":\"\",\"produkty\":[{\"nazwa\":\"\",\"ilosc\":\"\",\"priorytet\":\"wysoki/sredni/niski\",\"powod\":\"\"}]}";callAPI([{role:"user",content:prompt}],SYS,function(res){btn.disabled=false;spin.style.display="none";txt.textContent="Odswiez liste";var clean=res.replace(/```json/gi,"").replace(/```/g,"").trim();var s=clean.indexOf("{"),e=clean.lastIndexOf("}");try{renderShopList(JSON.parse(s!==-1&&e!==-1?clean.slice(s,e+1):clean));}catch(ex){document.getElementById("shop-list-content").innerHTML='<div class="ai-note">'+res+'</div>';}},function(err){btn.disabled=false;spin.style.display="none";txt.textContent="Generuj liste AI";document.getElementById("shop-list-content").innerHTML='<div class="ai-note" style="color:var(--red)">Blad: '+err+'</div>';});}
 function renderShopList(data){shopChecked={};document.getElementById("copy-btn").classList.add("show");var high=[],med=[],low=[];(data.produkty||[]).forEach(function(p){if(p.priorytet==="wysoki"||p.priorytet==="high")high.push(p);else if(p.priorytet==="niski"||p.priorytet==="low")low.push(p);else med.push(p);});var html='<div class="ai-note">'+(data.komentarz||"")+'</div>';function sec(items,title,cls){if(!items.length)return"";var s='<div style="margin-bottom:14px"><div class="shop-sec-title">'+title+'</div>';items.forEach(function(p,i){var id="si-"+cls+i;s+='<div class="shop-item" id="'+id+'" onclick="toggleShopItem(this.id)"><div class="shop-item-check"></div><div class="shop-item-info"><div class="shop-item-name">'+p.nazwa+'</div><div class="shop-item-detail">'+p.ilosc+' - '+p.powod+'</div></div><span class="prio prio-'+cls+'">'+p.priorytet+'</span></div>';});return s+"</div>";}html+=sec(high,"Pilne","high")+sec(med,"Wazne","med")+sec(low,"Warto miec","low");document.getElementById("shop-list-content").innerHTML=html;}
