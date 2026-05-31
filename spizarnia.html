@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-fix-overlay-depth-v21 -->
+<!-- Pełna Lodówka — APP_VERSION: 2026-05-31-json-repair-tokens-v22 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -1088,7 +1088,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-05-31-fix-overlay-depth-v21";
+var APP_VERSION="2026-05-31-json-repair-tokens-v22";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -3196,7 +3196,8 @@ function generateAIDiet(profile){
   if(typeof updateDietStep==="function")updateDietStep(1);
   function callMenu(label,content){
     return new Promise(function(resolve,reject){
-      callAPI([{role:"user",content:content}],sys,function(raw){resolve({label:label,raw:raw});},function(err){reject(new Error(label+": "+err));},3500);
+      // 8000 tokenów = ~6000 słów - wystarczy dla 9 dań z makro, składnikami, przepisem
+      callAPI([{role:"user",content:content}],sys,function(raw){resolve({label:label,raw:raw});},function(err){reject(new Error(label+": "+err));},8000);
     });
   }
   var p1=callMenu("Menu 1",base+" MENU 1 - 3 sniadania+3 obiady+3 kolacje: "+fmt);
@@ -3221,12 +3222,85 @@ function generateAIDiet(profile){
     forceHideAILoading(); // KRYTYCZNE: w razie błędu zawsze odblokuj UI
   });
 }
+// Auto-repair niekompletnego JSON: gdy AI urwie (max_tokens), brakuje zamknięć ]/}
+// Strategia: usuń ostatni niekompletny element, dodaj brakujące zamknięcia
+function repairTruncatedJSON(jsonStr){
+  if(!jsonStr)return jsonStr;
+  var s=jsonStr.trim();
+  // Jeśli kończy się na " lub w środku stringa - obetnij ostatnią niekompletną linię
+  // Policz otwarte/zamknięte nawiasy { } i [ ]
+  var depth={brace:0,bracket:0},inStr=false,esc=false,lastSafeIdx=-1;
+  for(var i=0;i<s.length;i++){
+    var ch=s[i];
+    if(esc){esc=false;continue;}
+    if(ch==="\\"&&inStr){esc=true;continue;}
+    if(ch==='"'){inStr=!inStr;continue;}
+    if(inStr)continue;
+    if(ch==="{")depth.brace++;
+    else if(ch==="}"){depth.brace--;if(depth.brace>=0&&depth.bracket===0)lastSafeIdx=i;}
+    else if(ch==="[")depth.bracket++;
+    else if(ch==="]"){depth.bracket--;}
+  }
+  // Jeśli JSON jest niekompletny - obetnij do ostatniego "}" + dodaj brakujące zamknięcia
+  if(depth.brace>0||depth.bracket>0||inStr){
+    // Usuń wszystko po ostatnim kompletnym obiekcie+przecinku
+    var trimmed=s;
+    // Znajdź ostatni przecinek na poziomie naszego stringa
+    var lastComma=-1;
+    var d2={brace:0,bracket:0},inS=false,e2=false;
+    for(var j=0;j<trimmed.length;j++){
+      var c=trimmed[j];
+      if(e2){e2=false;continue;}
+      if(c==="\\"&&inS){e2=true;continue;}
+      if(c==='"'){inS=!inS;continue;}
+      if(inS)continue;
+      if(c==="{")d2.brace++;
+      else if(c==="}")d2.brace--;
+      else if(c==="[")d2.bracket++;
+      else if(c==="]")d2.bracket--;
+      else if(c===","&&d2.brace>=1&&d2.bracket>=1)lastComma=j;
+    }
+    if(lastComma>0)trimmed=trimmed.slice(0,lastComma);
+    // Domknij brakujące ]
+    var reD={brace:0,bracket:0},reIs=false,reE=false;
+    for(var k=0;k<trimmed.length;k++){
+      var cc=trimmed[k];
+      if(reE){reE=false;continue;}
+      if(cc==="\\"&&reIs){reE=true;continue;}
+      if(cc==='"'){reIs=!reIs;continue;}
+      if(reIs)continue;
+      if(cc==="{")reD.brace++;
+      else if(cc==="}")reD.brace--;
+      else if(cc==="[")reD.bracket++;
+      else if(cc==="]")reD.bracket--;
+    }
+    while(reD.bracket-->0)trimmed+="]";
+    while(reD.brace-->0)trimmed+="}";
+    return trimmed;
+  }
+  return s;
+}
 function parseMenuJSON(raw){
   try{
     var clean=raw.replace(/```json/gi,"").replace(/```/g,"").trim();
     var s=clean.indexOf("{"),e=clean.lastIndexOf("}");
-    if(s===-1||e===-1)return null;
-    var p=JSON.parse(clean.slice(s,e+1).replace(/,\s*([}\]])/g,"$1"));
+    if(s===-1)return null;
+    // Próba 1: jak jest
+    var jsonPart=e!==-1?clean.slice(s,e+1):clean.slice(s);
+    var p=null;
+    try{p=JSON.parse(jsonPart.replace(/,\s*([}\]])/g,"$1"));}
+    catch(parseErr){
+      // Próba 2: auto-repair niekompletnego JSON (AI urwane przez max_tokens)
+      try{
+        var repaired=repairTruncatedJSON(jsonPart);
+        p=JSON.parse(repaired.replace(/,\s*([}\]])/g,"$1"));
+        console.warn("Naprawiono ucięty JSON. Sekcje:",p?Object.keys(p):"brak");
+      }catch(repairErr){
+        console.error("parseMenuJSON: parse i repair fail:",parseErr.message,"->",repairErr.message);
+        return null;
+      }
+    }
+    if(!p)return null;
     if(!(p.sniadania&&p.obiady&&p.kolacje))return null;
     // Sanityzacja + Nutrition Resolver: AI makro -> aiTarget, computed liczy się ze składników
     ["sniadania","obiady","kolacje"].forEach(function(typ){
