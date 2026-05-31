@@ -2518,7 +2518,7 @@ function getDietData(){
       ["sniadania","obiady","kolacje"].forEach(function(typ){
         (d[mk][typ]||[]).forEach(function(meal){
           if(meal&&meal.skladniki){
-            meal.skladniki=sanitizeMealIngredients(meal.skladniki);
+            meal.skladniki=sanitizeMealIngredients(meal.skladniki,meal);
           }
         });
       });
@@ -2609,6 +2609,14 @@ function renderRecipes(){
         h+='<th style="text-align:right;color:#F9A8D4;padding:8px 10px;font-weight:700">T</th>';
         h+='</tr></thead><tbody>';
         (calc.rows||[]).forEach(function(r){
+          // PRZYPRAWY - mały dyskretny wiersz, ignorowane w sumie
+          if(r.resolutionStatus==="seasoning"){
+            h+='<tr style="background:rgba(139,92,246,.03);font-size:11px;color:var(--text3);font-style:italic">';
+            h+='<td style="padding:5px 10px;border-bottom:1px solid var(--bg2)" colspan="2">'+r.name+' — przyprawa (pominięto w makro)</td>';
+            h+='<td colspan="4" style="border-bottom:1px solid var(--bg2)"></td>';
+            h+='</tr>';
+            return;
+          }
           var isOk=r.resolutionStatus==="resolved";
           var nameStyle=isOk?"color:var(--text2)":"color:var(--text3);font-style:italic";
           var srcLabel={localFallback:"Lokalna baza",openFoodFacts:"OpenFoodFacts",usda:"USDA",cache:"Cache",manualAdmin:"Ręczne"}[r.source]||"";
@@ -2616,12 +2624,25 @@ function renderRecipes(){
           h+='<tr>';
           h+='<td style="padding:6px 10px;'+nameStyle+';border-bottom:1px solid var(--bg2)">';
           h+='<div style="font-weight:700">'+r.name+(isOk?"":' <span title="'+(r.warning||"Brak danych")+'" style="font-size:10px;color:var(--red)">⚠</span>')+'</div>';
+          // Dopasowany produkt + sklep/marka (Biedronka/Lidl)
+          if(r.productName&&r.productName!==r.name){
+            var shopBadge="";
+            if(r.brand||r.shop){
+              var shopText=[r.brand,r.shop].filter(Boolean).join(", ");
+              shopBadge=' <span style="background:rgba(96,165,250,.12);border-radius:4px;padding:1px 5px;font-size:9px;color:#60A5FA;font-weight:700">'+shopText+'</span>';
+            }
+            h+='<div style="font-size:10px;color:var(--text2);margin-top:2px">→ '+r.productName+shopBadge+'</div>';
+          }
           if(srcLabel){
-            h+='<div style="font-size:10px;color:'+srcColor+';margin-top:2px"><b>'+srcLabel+'</b>';
-            if(r.confidence)h+=' &middot; '+r.confidence+'%';
-            if(r.productName&&r.productName!==r.name)h+=' &middot; '+r.productName;
-            h+='</div>';
-            if(r.warning)h+='<div style="font-size:10px;color:var(--amber);margin-top:2px">⚠ '+r.warning+'</div>';
+            h+='<div style="font-size:10px;color:'+srcColor+';margin-top:2px">📊 '+srcLabel+'</div>';
+          }
+          // Polski label stanu (NIE pokazujemy "dry"/"raw"/"cooked")
+          if(r.stateLabelPL){
+            h+='<div style="font-size:10px;color:var(--text3);margin-top:2px;font-style:italic">liczone: '+r.stateLabelPL+'</div>';
+          }
+          // Ostrzeżenie po polsku (bez "dry"/"raw")
+          if(r.warning){
+            h+='<div style="font-size:10px;color:var(--amber);margin-top:2px">⚠ '+r.warning+'</div>';
           }
           h+='</td>';
           h+='<td style="text-align:right;padding:6px 6px;color:var(--text3);border-bottom:1px solid var(--bg2);white-space:nowrap">'+(r.amountText||"")+'<br><span style="font-size:10px;opacity:.6">'+(r.grams||0)+'g</span></td>';
@@ -2665,6 +2686,11 @@ function renderRecipes(){
         }
         if(calc.isSuspicious){
           h+='<div style="font-size:11px;color:var(--red);background:rgba(255,77,77,.06);border:1px solid rgba(255,77,77,.3);border-radius:8px;padding:8px 10px;margin-bottom:10px">⚠️ Podejrzane dane: kcal ('+calc.kcal+') nie zgadzają się z B*4+W*4+T*9 = '+calc.kcalFromMacros+' (różnica '+Math.round(calc.diffKcal)+').</div>';
+        }
+        // Sekcja przypraw - mały opis poniżej tabeli (z meal.przyprawy lub z calc.seasonings)
+        var przyprawy=(m.przyprawy&&m.przyprawy.length?m.przyprawy:calc.seasonings||[]);
+        if(przyprawy&&przyprawy.length){
+          h+='<div style="font-size:11px;color:var(--text3);background:rgba(139,92,246,.04);border:1px solid rgba(139,92,246,.15);border-radius:8px;padding:6px 10px;margin-bottom:10px">🧂 <b style="color:var(--purple)">Przyprawy</b> (nie wpływają na makro): '+przyprawy.join(", ")+'</div>';
         }
         // Przepis
         h+='<div style="background:var(--bg3);border-radius:10px;padding:12px;font-size:12px;color:var(--text2);line-height:1.8"><b style="color:var(--text);display:block;margin-bottom:6px">Przygotowanie:</b>'+(m.przepis||"").replace(/\n/g,"<br>")+'</div>';
@@ -2761,11 +2787,19 @@ function generateSingleMeal(menuNum,section,replaceIdx){
     +"- owoce: SZTUKI dla bananów/jabłek/cytryny; GRAMY dla truskawek/borówek\n"
     +"- pasta/masło orzechowe: gramy lub łyżki (np. '20g' lub '2 łyżki')\n"
     +"ZASADY NAZW SKŁADNIKÓW (KRYTYCZNE):\n"
-    +"- KAŻDY składnik = OSOBNA pozycja. ZAKAZ 'lub'/'albo'/'/' w nazwie składnika.\n"
-    +"- NIE 'Miód lub banan' — WYBIERZ JEDEN: 'Miód' ALBO 'Banany'.\n"
+    +"- KAŻDY składnik = OSOBNA pozycja. ZAKAZ 'lub'/'albo'/'/'.\n"
     +"- Używaj DOKŁADNIE nazw z listy produktów (np. 'Pierś z Kurczaka', NIE 'Piersi kurczaka').\n"
-    +"Realne porcje (białko 100-250g, węglowodany 60-200g). Nie wymyślaj absurdalnych ilości.\n"
-    +"TYLKO JSON. W 'il' tylko ilość+jednostka, BEZ 'lub' (np. '150g' lub '3 szt.', nie '150g lub 3 szt.'): {\"nazwa\":\"...\",\"czas\":\"15 min\",\"kcal\":LICZBA,\"prot\":LICZBA,\"carb\":LICZBA,\"fat\":LICZBA,\"skladniki\":[{\"n\":\"Produkt\",\"il\":\"150g\"}],\"przepis\":\"1. Krok.\"}";
+    +"- PREFERUJ produkty z Biedronki/Lidla.\n"
+    +"ZASADY STANU SKŁADNIKA (obowiązkowe pole 'state' i 'amountBasis'):\n"
+    +"- Ryż/makaron/kasza: state='dry', amountBasis='beforeCooking'\n"
+    +"- Mięso surowe: state='raw', amountBasis='raw'; grillowane: state='cooked', amountBasis='afterCooking'\n"
+    +"- Puszki (fasola, tuńczyk): state='prepared', amountBasis='drained'\n"
+    +"- Nabiał: state='prepared', amountBasis='asPackaged'\n"
+    +"PRZYPRAWY:\n"
+    +"- Sól/pieprz/papryka słodka/oregano: NIE w 'skladniki', tylko w osobnym polu 'przyprawy':['sól','pieprz',...].\n"
+    +"- Oliwa/masło orzechowe/miód idą do 'skladniki' (mają kalorie).\n"
+    +"Realne porcje (białko 100-250g, węglowodany 60-200g). aiTarget = założenie (aplikacja policzy realne).\n"
+    +"TYLKO JSON: {\"nazwa\":\"...\",\"czas\":\"15 min\",\"aiTarget\":{\"kcal\":LICZBA,\"protein\":LICZBA,\"carbs\":LICZBA,\"fat\":LICZBA},\"skladniki\":[{\"n\":\"Pierś z Kurczaka\",\"il\":\"150g\",\"state\":\"raw\",\"amountBasis\":\"raw\"}],\"przyprawy\":[\"sól\",\"pieprz\"],\"przepis\":\"1. Krok.\"}";
   var body=document.getElementById("diet-body");
   body.innerHTML='<div style="text-align:center;padding:40px"><div style="font-size:36px;margin-bottom:10px">AI</div><div style="color:var(--text2);margin-bottom:8px">Generuje nowe '+mealName+'...</div><div class="spin" style="margin:0 auto"></div></div>';
   callAPI([{role:"user",content:prompt}],"Jestes dietetykiem. TYLKO JSON bez markdown.",function(res){
@@ -2776,7 +2810,7 @@ function generateSingleMeal(menuNum,section,replaceIdx){
       var meal=JSON.parse(clean.slice(s,e+1).replace(/,\s*([}\]])/g,"$1"));
       if(!meal.nazwa||!meal.kcal)throw new Error("Brakujace pola");
       // Sanityzacja - rozdziel "lub", dedup
-      if(meal.skladniki)meal.skladniki=sanitizeMealIngredients(meal.skladniki);
+      if(meal.skladniki)meal.skladniki=sanitizeMealIngredients(meal.skladniki,meal);
       if(!userProfile.dietData)userProfile.dietData=JSON.parse(JSON.stringify(GRZES_DIET));
       var mk="menu"+menuNum;
       if(!userProfile.dietData[mk])userProfile.dietData[mk]={};
@@ -2866,8 +2900,26 @@ function generateAIDiet(profile){
     +"- NIE 'Pierś kurczaka lub indyk' — wybierz jeden.\n"
     +"- Używaj DOKŁADNIE nazw produktów z listy powyżej (np. 'Pierś z Kurczaka', NIE 'Piersi kurczaka').\n"
     +"- Jeden składnik = jedna nazwa = jedna ilość.\n"
-    +"Realne porcje: białko 100-250g/posiłek, węglowodany 60-200g/posiłek, tłuszcze 5-30g/posiłek. Min 10g każdego suchego składnika. NIE wymyślaj absurdalnych ilości (nie 10kg ryżu, nie 200g jajek). Max 30 min czas. Proste polskie dania. Policz makro dokładnie. TYLKO JSON.";
-  var fmt='{"sniadania":[{"nazwa":"...","czas":"15 min","kcal":0,"prot":0,"carb":0,"fat":0,"skladniki":[{"n":"Produkt","il":"150g"}],"przepis":"1. Krok."}],"obiady":[...],"kolacje":[...]}';
+    +"- PREFERUJ produkty z Biedronki/Lidla (paczkowane, markowe gdy znane).\n"
+    +"ZASADY STANU SKŁADNIKA (state + amountBasis - obowiązkowe):\n"
+    +"- Każdy składnik MUSI mieć pole 'state' i 'amountBasis'.\n"
+    +"- state: raw|dry|cooked|prepared|drained|unknown\n"
+    +"- amountBasis: raw|beforeCooking|afterCooking|readyToEat|drained|asPackaged\n"
+    +"- Ryż/makaron/kasza/płatki: state='dry', amountBasis='beforeCooking' (np. 70g suchego ryżu PRZED gotowaniem)\n"
+    +"- Mięso/ryba surowa: state='raw', amountBasis='raw'\n"
+    +"- Mięso grillowane/pieczone: state='cooked', amountBasis='afterCooking'\n"
+    +"- Fasola/ciecierzyca/tuńczyk z puszki: state='prepared', amountBasis='drained' (po odsączeniu)\n"
+    +"- Jogurt/skyr/twaróg/mleko: state='prepared', amountBasis='asPackaged'\n"
+    +"- Warzywa/owoce świeże: state='raw', amountBasis='raw'\n"
+    +"- Oliwa/masło/miód: state='prepared', amountBasis='asPackaged'\n"
+    +"ZASADY PRZYPRAW (KRYTYCZNE):\n"
+    +"- NIE wpisuj soli/pieprzu/papryki słodkiej/oregano/czosnku granulowanego/itp. w 'skladniki' (nie mają wpływu na makro).\n"
+    +"- Dodaj przyprawy w OSOBNYM polu 'przyprawy': ['sól','pieprz','papryka słodka',...].\n"
+    +"- Oliwy, masła orzechowego, miodu, tahini NIE traktuj jako przyprawy — one mają kalorie, idą do 'skladniki'.\n"
+    +"Realne porcje: białko 100-250g/posiłek, węglowodany 60-200g/posiłek, tłuszcze 5-30g/posiłek. Min 10g każdego suchego składnika. NIE wymyślaj absurdalnych ilości (nie 10kg ryżu, nie 200g jajek). Max 30 min czas. Proste polskie dania. aiTarget = TYLKO twoje założenie (aplikacja policzy realne ze składników). TYLKO JSON.";
+  // Nowy format: skladniki z state/amountBasis (AI samo określa), przyprawy w osobnym polu
+  // aiTarget - tylko założenie AI, NIE realne makro (realne policzy aplikacja ze składników)
+  var fmt='{"sniadania":[{"nazwa":"...","czas":"15 min","aiTarget":{"kcal":0,"protein":0,"carbs":0,"fat":0},"skladniki":[{"n":"Pierś z Kurczaka","il":"150g","state":"raw","amountBasis":"raw","preferredShop":"Biedronka/Lidl"},{"n":"Ryż","il":"70g","state":"dry","amountBasis":"beforeCooking","preferredShop":"Biedronka/Lidl"}],"przyprawy":["sól","pieprz","papryka słodka"],"przepis":"1. Krok."}],"obiady":[...],"kolacje":[...]}';
   var sys="Jestes dietetykiem. TYLKO JSON bez markdown. Nie pisz nic przed ani po JSON.";
   document.getElementById("diet-overlay").classList.add("show");
   var body=document.getElementById("diet-body");
@@ -2898,7 +2950,7 @@ function parseMenuJSON(raw){
       (p[typ]||[]).forEach(function(meal){
         if(!meal)return;
         if(meal.skladniki){
-          meal.skladniki=sanitizeMealIngredients(meal.skladniki);
+          meal.skladniki=sanitizeMealIngredients(meal.skladniki,meal);
         }
         // Przenieś AI makro do aiTarget (NIE są to realne wartości, tylko target)
         if(!meal.aiTarget&&(meal.kcal||meal.prot||meal.carb||meal.fat)){
@@ -3526,6 +3578,100 @@ var NUTRITION_API_MODE="frontendOnly"; // "frontendOnly" | "proxy"
 var NUTRITION_CACHE_TTL_MS=30*24*60*60*1000; // 30 dni
 var NUTRITION_CACHE_PREFIX="nut:";
 
+// ── PRZYPRAWY (ignorowane w kalkulacji makro) ───────────────────────────────
+// Te składniki są pomijane przy liczeniu kcal/B/W/T. Nie dopasowuje się ich do
+// żadnego produktu (np. "sól" nie może zostać zmapowana do "fasolki szparagowej").
+var NON_MACRO_SEASONINGS=[
+  "sol","sól","pieprz","pieprz czarny","pieprz biały","pieprz bialy","pieprz cytrynowy",
+  "papryka slodka","papryka słodka","papryka ostra","papryka wedzona","papryka wędzona",
+  "czosnek granulowany","czosnek suszony","cebula granulowana","cebula suszona",
+  "oregano","bazylia","tymianek","rozmaryn","majeranek","kolendra",
+  "cynamon","kurkuma","curry","chili","chilli","papryczka chili","kmin","kminek",
+  "ziola prowansalskie","zioła prowansalskie","liść laurowy","lisc laurowy","liść lawrowy",
+  "ziele angielskie","galka muszkatolowa","gałka muszkatołowa",
+  "przyprawa do kurczaka","przyprawa do miesa","przyprawa do mięsa","przyprawa do warzyw",
+  "przyprawa do ryb","przyprawa do gulaszu","przyprawa uniwersalna","przyprawa",
+  "sos sojowy","ocet","ocet jabłkowy","ocet jablkowy","ocet balsamiczny","ocet winny",
+  "musztarda","sok z cytryny","sok cytryny","sok z limonki","woda","lód","lod",
+  "erytrytol","ksylitol","stewia","slodzik","słodzik","sweetener",
+  "natka pietruszki","natka","koperek","szczypiorek","mieta","mięta"
+];
+var NON_MACRO_SEASONINGS_SET={};
+NON_MACRO_SEASONINGS.forEach(function(s){
+  NON_MACRO_SEASONINGS_SET[normalizeFallbackKey(s)]=true;
+});
+function isNonMacroSeasoning(name){
+  if(!name)return false;
+  var k=normalizeFallbackKey(name);
+  if(NON_MACRO_SEASONINGS_SET[k])return true;
+  // Match poszczegolnych slow w nazwie typu "sol kuchenna", "pieprz mlony"
+  var words=k.split(" ");
+  for(var i=0;i<words.length;i++){
+    var w=words[i];
+    if(w.length>=3&&NON_MACRO_SEASONINGS_SET[w])return true;
+  }
+  return false;
+}
+
+// ── POLSKIE ETYKIETY STANÓW PRZYGOTOWANIA ───────────────────────────────────
+// Zamiast technicznego "dry"/"raw"/"cooked" pokazujemy użytkownikowi polski tekst.
+var STATE_LABELS_PL={
+  raw:"surowe",
+  dry:"przed gotowaniem",
+  cooked:"po ugotowaniu",
+  prepared:"gotowe do spożycia",
+  drained:"po odsączeniu",
+  unknown:""
+};
+var AMOUNT_BASIS_LABELS_PL={
+  raw:"surowe",
+  beforeCooking:"przed gotowaniem",
+  afterCooking:"po ugotowaniu",
+  readyToEat:"gotowe do spożycia",
+  drained:"po odsączeniu",
+  asPackaged:"jak na opakowaniu"
+};
+function getStateLabelPL(state,amountBasis){
+  if(amountBasis&&AMOUNT_BASIS_LABELS_PL[amountBasis])return AMOUNT_BASIS_LABELS_PL[amountBasis];
+  if(state&&STATE_LABELS_PL[state])return STATE_LABELS_PL[state];
+  return "";
+}
+
+// ── AUTOMATYCZNA INFERENCJA STANU Z NAZWY SKŁADNIKA ─────────────────────────
+// Nie pytaj usera o "dry" jeśli można to ustalić z nazwy/przepisu.
+function inferIngredientState(name){
+  var n=normalizeFallbackKey(name);
+  // Puszka/słoik → prepared, drained
+  if(/puszka|w wodzie|w sosie wlasnym|w sosie/.test(n)){
+    return{state:"prepared",amountBasis:"drained",edibleForm:"drained",auto:true};
+  }
+  // Wędliny / wędzone → prepared
+  if(/wedzon|wedlin|salami|szynka|polędwica|poledwica|kielbas|kiełbas/.test(n)){
+    return{state:"prepared",amountBasis:"asPackaged",edibleForm:"readyToEat",auto:true};
+  }
+  // Suchy (przed gotowaniem) - zboża, makaron, kasza, suche strączki
+  if(/^(ryz|ryż|makaron|kasza|płatki|platki|soczewica suchaczerwona|ciecierzyca sucha|fasola sucha)$|sucha?$|^(ryz|ryż|makaron|kasza)\s/.test(n)){
+    return{state:"dry",amountBasis:"beforeCooking",edibleForm:"dry",auto:true};
+  }
+  // Gotowane/grillowane/pieczone
+  if(/gotowan|ugotow|grillowan|pieczon|smażon|smazon|usmaz|cooked|prepared/.test(n)){
+    return{state:"cooked",amountBasis:"afterCooking",edibleForm:"cooked",auto:true};
+  }
+  // Surowe (mięso, ryby, warzywa, owoce)
+  if(/surow|swiez|śwież/.test(n)){
+    return{state:"raw",amountBasis:"raw",edibleForm:"raw",auto:true};
+  }
+  // Nabiał, oliwy, sosy, miód → asPackaged/prepared
+  if(/jogurt|skyr|kefir|maslank|maślank|mleko|oliwa|olej|miod|miód|syrop|tahini|musztarda|ketchup|majonez|serek|twarog|twaróg|ser /.test(n)){
+    return{state:"prepared",amountBasis:"asPackaged",edibleForm:"readyToEat",auto:true};
+  }
+  // Owoce/warzywa standardowo
+  if(/banan|jablk|jabłk|pomidor|ogorek|ogórek|papryka|cebula|brokul|brokuł|szpinak|salat|sałat|truskaw|borowk|borówk|malin|kapust|marchew|ziemniak|batat|cukini|por |awokado/.test(n)){
+    return{state:"raw",amountBasis:"raw",edibleForm:"raw",auto:true};
+  }
+  return{state:"unknown",amountBasis:null,edibleForm:null,auto:false};
+}
+
 // ── LOKALNY FALLBACK — generyczne produkty z weryfikowalnymi wartościami z USDA ──
 // Te wartości są CIENKO zweryfikowane z USDA FoodData Central / standardowych tabel.
 // Mogą uzupełniać/przesłaniać dane z PRODUCT_DB gdy AI poda generyczną nazwę.
@@ -3953,17 +4099,36 @@ function calculateMealMacros(meal){
   var skladniki=meal&&meal.skladniki||meal&&meal.ingredients||[];
   var computed={kcal:0,protein:0,carbs:0,fat:0,kcalFromMacros:0,diffKcal:0,
                 rows:[],missing:[],isComplete:true,isSuspicious:false,
-                calculatedAt:(new Date()).toISOString()};
+                seasonings:[],calculatedAt:(new Date()).toISOString()};
   skladniki.forEach(function(sk){
     var name=sk.n||sk.name||"";
+    // === KRYTYCZNE: pomijamy przyprawy ===
+    // Sól nigdy nie może być mapowana do fasolki szparagowej.
+    if(isNonMacroSeasoning(name)){
+      computed.seasonings.push(name);
+      computed.rows.push({
+        name:name,amountText:sk.il||sk.amount||"",grams:0,
+        kcal:null,protein:null,carbs:null,fat:null,
+        source:"seasoning",resolutionStatus:"seasoning",
+        productName:"Przyprawa — pominięto w makro",
+        warning:""
+      });
+      return;
+    }
     var amountText=sk.il||sk.amount||"";
     var parsed=typeof amountText==="number"?{amount:amountText,unit:sk.unit||"g"}:parseIngredientAmount(amountText);
-    var preparationState=sk.preparationState||detectPreparationState(name);
+    // Stan przygotowania: priorytet jawnego pola sk.state, sk.amountBasis, potem auto-inferencja
+    var inferred=inferIngredientState(name);
+    var state=sk.state||sk.preparationState||inferred.state||"unknown";
+    var amountBasis=sk.amountBasis||inferred.amountBasis||null;
+    var edibleForm=sk.edibleForm||inferred.edibleForm||null;
     var ingredient={
       name:name,
       amount:parsed.amount,
       unit:parsed.unit,
-      preparationState:preparationState,
+      preparationState:state,
+      amountBasis:amountBasis,
+      edibleForm:edibleForm,
       barcode:sk.barcode||null
     };
     // Resolve product synchronously
@@ -3977,20 +4142,21 @@ function calculateMealMacros(meal){
       computed.missing.push(name);
       computed.isComplete=false;
       computed.rows.push({name:name,amountText:amountText,grams:0,kcal:null,protein:null,carbs:null,fat:null,
-                          source:"none",resolutionStatus:"unresolved",warning:"Brak produktu w bazie"});
+                          source:"none",resolutionStatus:"unresolved",warning:"Brak produktu w bazie",
+                          stateLabelPL:getStateLabelPL(state,amountBasis)});
       return;
     }
     if(confidence<0.7){
       ingredient.resolutionStatus="ambiguous";
-      ingredient.resolutionWarning="Niepewne dopasowanie ("+Math.round(confidence*100)+"%)";
+      ingredient.resolutionWarning="Niepewne dopasowanie";
     }else{
       ingredient.resolutionStatus="resolved";
     }
-    // State ambiguity warning (raw vs cooked dla zbóż/mięsa)
+    // Stan ambiguity warning — TYLKO gdy AI nie podało jawnego amountBasis dla wrażliwych
     var stateWarning="";
-    if(prod.state!=="unknown"&&preparationState==="unknown"){
-      var sensitiveCats=/(ryż|ryz|makaron|kasza|mięso|mieso|ziemniak|batat|fasol|ciecierzy)/.test(normalizeFallbackKey(name));
-      if(sensitiveCats)stateWarning="Doprecyzuj stan: "+prod.state;
+    if(!amountBasis&&state==="unknown"){
+      var sensitiveCats=/(ryż|ryz|makaron|kasza|mięso|mieso|ziemniak|batat|fasol|ciecierzy|płatk|platk)/.test(normalizeFallbackKey(name));
+      if(sensitiveCats)stateWarning="Doprecyzuj wagę: przed czy po gotowaniu?";
     }
     var macros=calculateIngredientMacrosNew(ingredient);
     if(!macros){
@@ -3999,7 +4165,7 @@ function calculateMealMacros(meal){
       computed.rows.push({name:name,amountText:amountText,grams:0,kcal:null,protein:null,carbs:null,fat:null,
                           source:prod.source,resolutionStatus:"missingMacros",
                           warning:"Brak konwersji jednostki na gramy",
-                          productName:prod.displayName});
+                          productName:prod.displayName,stateLabelPL:getStateLabelPL(state,amountBasis)});
       return;
     }
     computed.kcal+=macros.kcal;
@@ -4018,9 +4184,12 @@ function calculateMealMacros(meal){
       sourceUrl:prod.sourceUrl,
       sourceNote:prod.sourceNote,
       productName:prod.displayName,
+      brand:prod.brand,
+      shop:prod.shop||(prod._matchedShop)||null,
       confidence:Math.round(confidence*100),
       resolutionStatus:ingredient.resolutionStatus,
-      warning:stateWarning||ingredient.resolutionWarning||""
+      warning:stateWarning||ingredient.resolutionWarning||"",
+      stateLabelPL:getStateLabelPL(state,amountBasis)
     });
   });
   computed.kcal=Math.round(computed.kcal);
@@ -4144,7 +4313,16 @@ function namesMatch(n1,n2){
   var longer=wa.length<=wb.length?wb:wa;
   if(shorter.length>=1&&shorter.every(function(w){return longer.indexOf(w)!==-1;}))return true;
   // Substring całego stringa (np. "filet z kurczaka" zawiera "kurczak")
-  if(a.indexOf(b)!==-1||b.indexOf(a)!==-1)return true;
+  // ALE wymaga granicy słowa (sól NIE matchuje fasolki szparagowej, choć "sol" jest w "fasolka")
+  function substrAtWordBoundary(haystack, needle){
+    if(needle.length<4)return false; // krótkie słowa wymagają dokładnego matchu
+    var idx=haystack.indexOf(needle);
+    if(idx<0)return false;
+    var before=idx===0||haystack[idx-1]===" ";
+    var after=idx+needle.length===haystack.length||haystack[idx+needle.length]===" ";
+    return before&&after;
+  }
+  if(substrAtWordBoundary(a,b)||substrAtWordBoundary(b,a))return true;
   // STEM match: "piersi kurczaka" vs "piers z kurczaka" - obetnij końcówki i ignoruj "z"
   var stA=stemSet(a), stB=stemSet(b);
   if(stA.length&&stB.length){
@@ -4168,18 +4346,29 @@ function splitOrIngredients(name){
   return parts.map(function(p){return p.trim();}).filter(function(p){return p.length>=2;});
 }
 // Sanityzuje listę składników: rozdziela "lub", deduplikuje przez namesMatch (sumując ilości)
-function sanitizeMealIngredients(skladniki){
+// Także: przyprawy z 'skladniki' są przenoszone do meal.przyprawy (gdy mealRef podany)
+function sanitizeMealIngredients(skladniki,mealRef){
   if(!Array.isArray(skladniki))return [];
   var out=[];
+  var extractedSeasonings=[];
   skladniki.forEach(function(sk){
     var name=sk.n||sk.name||"";
     var amt=sk.il||sk.amount||"";
     var alts=splitOrIngredients(name);
-    if(alts.length>1){
-      // Bierzemy pierwszą opcję jako preferowaną (mniej duplikatów w audycie)
-      out.push({n:alts[0],il:amt});
-    }else if(alts.length===1){
-      out.push({n:alts[0],il:amt});
+    var primary=alts.length>0?alts[0]:name;
+    // === Jeśli to przyprawa, NIE dodawaj do skladnikow (zachowaj w mealRef.przyprawy) ===
+    if(typeof isNonMacroSeasoning==="function"&&isNonMacroSeasoning(primary)){
+      extractedSeasonings.push(primary);
+      return;
+    }
+    if(alts.length>=1){
+      // Zachowaj dodatkowe pola jeśli AI je podał (state, amountBasis, edibleForm)
+      var entry={n:primary,il:amt};
+      if(sk.state)entry.state=sk.state;
+      if(sk.amountBasis)entry.amountBasis=sk.amountBasis;
+      if(sk.edibleForm)entry.edibleForm=sk.edibleForm;
+      if(sk.preparationState&&!entry.state)entry.state=sk.preparationState;
+      out.push(entry);
     }
   });
   // Dedup: jeśli dwa składniki = ten sam produkt (namesMatch), zachowaj pierwszy
@@ -4188,6 +4377,10 @@ function sanitizeMealIngredients(skladniki){
     var dup=deduped.find(function(d){return namesMatch(d.n,sk.n);});
     if(!dup)deduped.push(sk);
   });
+  // Przenieś wyekstrahowane przyprawy do mealRef
+  if(mealRef&&extractedSeasonings.length){
+    mealRef.przyprawy=(mealRef.przyprawy||[]).concat(extractedSeasonings);
+  }
   return deduped;
 }
 // Stały klucz do dedup (np. dla ext__ albo receiptLearning)
