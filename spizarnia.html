@@ -658,6 +658,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
         <div class="pantry-card-info">
           <div class="pantry-card-title">Stan lodówki na dzień</div>
           <div class="pantry-card-date" id="pantry-update-lbl">Nie ustawiono daty aktualizacji lodówki</div>
+          <div id="pantry-status-badge" style="margin-top:6px;display:none"></div>
         </div>
         <button class="pantry-card-btn" onclick="showUpdatePantryModal()">Zaktualizuj stan</button>
       </div>
@@ -1053,6 +1054,14 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
   </div>
 </div>
 
+<!-- HISTORIA RUCHÓW PRODUKTU (timeline IN/OUT) -->
+<div class="overlay bottom" id="pantry-history-overlay" onclick="if(event.target===this)closePantryHistory()">
+  <div class="log-modal">
+    <div class="log-hdr"><h3 id="pantry-history-title">📋 Historia produktu</h3><button class="log-close" onclick="closePantryHistory()">Zamknij</button></div>
+    <div class="log-body" id="pantry-history-body"></div>
+  </div>
+</div>
+
 <!-- CUSTOM DIALOG -->
 <div class="dlg-overlay" id="dlg">
   <div class="dlg-box">
@@ -1088,7 +1097,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-06-01-exact-shopping-list-v42";
+var APP_VERSION="2026-06-01-pantry-lifecycle-v43";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -1110,6 +1119,12 @@ var pendingSimilarReceipt=null;
 var receiptLearningCache={};
 var userProfile=null,obStep=0,obSels={},obMethod="manual";
 var dietTab=0,dietMenu=1,expandedMeal=null,weekPlan={};
+// ── HISTORIA RUCHÓW LODÓWKI (per produkt timeline in/out) ──────────────────
+// pantryLog[productId] = [{ts, type:"in/out", qty, source, sourceId?, note?, balance?}]
+// Persisted do Firebase /profiles/X/pantryLog
+var pantryLog={};
+// markedAsEaten[dayKey_sectionKey] = true (przyciski 'Zjadłem' w Planie tygodnia)
+var mealsEaten={};
 var editMealCtx={section:null,idx:null};
 var SYS="Jestes agentem kulinarnym. Odpowiadaj po polsku.";
 
@@ -1449,10 +1464,32 @@ function updateShopBar(){
 function updatePantryDateUI(){
   var l=document.getElementById("pantry-update-lbl");
   if(!l)return;
-  if(!shopTs){l.textContent="Nie ustawiono daty aktualizacji lodówki";return;}
-  var d=new Date(shopTs),days=Math.floor((Date.now()-shopTs)/86400000);
-  var ago=days===0?" (dziś)":days===1?" (wczoraj)":" ("+days+" dni temu)";
-  l.textContent=d.toLocaleDateString("pl-PL",{day:"numeric",month:"long",year:"numeric"})+ago;
+  if(!shopTs){l.textContent="Nie ustawiono daty aktualizacji lodówki";}
+  else{
+    var d=new Date(shopTs),days=Math.floor((Date.now()-shopTs)/86400000);
+    var ago=days===0?" (dziś)":days===1?" (wczoraj)":" ("+days+" dni temu)";
+    l.textContent=d.toLocaleDateString("pl-PL",{day:"numeric",month:"long",year:"numeric"})+ago;
+  }
+  // Status badge (🟢/🟡/🔴 + % + sugestia)
+  var sb=document.getElementById("pantry-status-badge");
+  if(sb){
+    try{
+      var st=calculatePantryStatus();
+      var suggest="";
+      if(st.status==="full")suggest="Wszystko gotowe — czas gotować";
+      else if(st.status==="in_progress")suggest="Część składników się kończy";
+      else suggest="Czas zaplanować zakupy";
+      sb.innerHTML='<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,.04);border:1px solid '+st.color+';border-radius:10px">'
+        +'<span style="font-size:18px">'+st.emoji+'</span>'
+        +'<div style="flex:1;min-width:0">'
+          +'<div style="font-size:12px;color:'+st.color+';font-weight:600">'+st.label+' • '+st.percent+'%</div>'
+          +'<div style="font-size:11px;color:var(--text3);margin-top:1px">'+suggest+(st.needed?' · '+st.have+'/'+st.needed+' z '+(st.basedOn==="diet"?"diety":"bazy"):'')+'</div>'
+        +'</div>'
+        +(st.status!=="full"?'<button onclick="openDiet()" style="background:transparent;border:1px solid '+st.color+';color:'+st.color+';border-radius:8px;padding:4px 10px;font-size:11px;cursor:pointer">Zakupy</button>':'')
+      +'</div>';
+      sb.style.display="block";
+    }catch(e){sb.style.display="none";}
+  }
 }
 function savePantryUpdateDate(source,shop,note){
   shopTs=Date.now();
@@ -2110,6 +2147,13 @@ function adj(id,catId,name,delta){
     productTs[id]=Date.now();
     if(EP){var tk="t_"+id,tp={};tp[tk]=productTs[id];fbPatch(EP,tp).catch(function(){});}
   }
+  // Log do pantryLog (manual +/-)
+  try{
+    var diff=nv-o;
+    if(diff!==0&&typeof logPantryMovement==="function"){
+      logPantryMovement(id,diff>0?"in":"out",Math.abs(diff),"manual",null,name||"");
+    }
+  }catch(e){}
   render();
   clearTimeout(saveTimer);
   setSyncUI("saving");
@@ -2123,6 +2167,51 @@ function adj(id,catId,name,delta){
 }
 function openLog(){document.getElementById("log-overlay").classList.add("show");renderLog();}
 function closeLog(){document.getElementById("log-overlay").classList.remove("show");}
+function closePantryHistory(){var o=document.getElementById("pantry-history-overlay");if(o)o.classList.remove("show");}
+function openPantryHistory(productName){
+  var prod=typeof findProduct==="function"?findProduct(productName):null;
+  if(!prod){dlgAlert("⚠️","Brak produktu","Nie znaleziono produktu w bazie.");return;}
+  var log=getPantryLogForProduct(prod.id);
+  var t=document.getElementById("pantry-history-title");
+  if(t)t.textContent="📋 "+(prod.name||productName);
+  var b=document.getElementById("pantry-history-body");
+  if(!b)return;
+  if(!log.length){
+    b.innerHTML='<div style="text-align:center;padding:30px;color:var(--text3)"><div style="font-size:40px;margin-bottom:12px">📭</div>Brak historii ruchów dla tego produktu</div>';
+  }else{
+    // Bilans aktualny
+    var inSum=0,outSum=0;
+    log.forEach(function(e){if(e.type==="in")inSum+=Number(e.qty)||0;else outSum+=Number(e.qty)||0;});
+    var balance=inSum-outSum;
+    var unit=prod.unit||"g";
+    var srcLabels={paragon:"Zakupy",diet:"Dieta",manual:"Ręcznie",expired:"Przeterminowane",shopping_list:"Lista zakupów",receipt:"Paragon"};
+    var html='';
+    html+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px">';
+    html+='<div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">PODSUMOWANIE</div>';
+    html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center">';
+    html+='<div><div style="font-size:20px;color:var(--green);font-weight:600">+'+inSum+'</div><div style="font-size:10px;color:var(--text3)">Łącznie weszło ('+unit+')</div></div>';
+    html+='<div><div style="font-size:20px;color:var(--red);font-weight:600">-'+outSum+'</div><div style="font-size:10px;color:var(--text3)">Łącznie wyszło</div></div>';
+    html+='<div><div style="font-size:20px;color:var(--brand);font-weight:600">'+balance+'</div><div style="font-size:10px;color:var(--text3)">Bilans</div></div>';
+    html+='</div></div>';
+    html+='<div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">RUCHY (od najnowszego)</div>';
+    log.forEach(function(e){
+      var d=new Date(e.ts);
+      var dStr=d.toLocaleDateString("pl-PL",{day:"2-digit",month:"2-digit",year:"2-digit"})+" "+d.toLocaleTimeString("pl-PL",{hour:"2-digit",minute:"2-digit"});
+      var sign=e.type==="in"?"+":"-";
+      var col=e.type==="in"?"var(--green)":"var(--red)";
+      var srcLbl=srcLabels[e.source]||e.source||"manual";
+      html+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;gap:10px">';
+      html+='<div style="font-size:18px;color:'+col+';font-weight:600;min-width:60px">'+sign+(e.qty||0)+'<span style="font-size:11px;color:var(--text3);font-weight:400">'+unit+'</span></div>';
+      html+='<div style="flex:1;min-width:0">';
+      html+='<div style="font-size:12px;color:var(--text);font-weight:500">'+srcLbl+(e.note?' · '+e.note:'')+'</div>';
+      html+='<div style="font-size:10px;color:var(--text3)">'+dStr+'</div>';
+      html+='</div>';
+      html+='</div>';
+    });
+    b.innerHTML=html;
+  }
+  document.getElementById("pantry-history-overlay").classList.add("show");
+}
 function renderLog(){var b=document.getElementById("log-body");b.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3)">Ladowanie...</div>';fbGet(LP).then(function(data){if(!data){b.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3)">Brak zmian</div>';return;}var en=Object.values(data).sort(function(a,b){return b.ts-a.ts;}).slice(0,200);b.innerHTML=en.map(function(e){var d=new Date(e.ts),g=d.toLocaleDateString("pl-PL",{day:"2-digit",month:"2-digit"})+" "+d.toLocaleTimeString("pl-PL",{hour:"2-digit",minute:"2-digit"});var delta=e.delta||0,badge=delta>0?'<span class="lbadge up">+'+delta+'</span>':'<span class="lbadge dn">'+delta+'</span>';return'<div class="log-entry"><div class="log-av" style="background:'+nc(e.who||"?")+'">'+ni(e.who||"?")+'</div><div class="log-info"><div class="log-who">'+(e.who||"?")+'</div><div class="log-what">'+(delta>0?"dodal":"zabral")+" "+Math.abs(delta)+" x "+(e.what||"?")+'</div><div class="log-when">'+g+'</div></div>'+badge+'</div>';}).join("");}).catch(function(){b.innerHTML='<div style="text-align:center;padding:20px;color:var(--red)">Blad</div>';});}
 
 // ── CAT CHIPS ─────────────────────────────────────────────────────────────────
@@ -2405,6 +2494,8 @@ function render(){
   document.getElementById("n-red").textContent=nR;
   document.getElementById("n-grn").textContent=nG;
   document.getElementById("n-all").textContent=tot;
+  // Status lodówki badge (🟢/🟡/🔴)
+  try{if(typeof updatePantryDateUI==="function")updatePantryDateUI();}catch(e){}
   var nExp=0;CATS.forEach(function(cat){cat.items.forEach(function(it){if(isExpiredProduct(it))nExp++;});});
   var expEl=document.getElementById("n-exp");if(expEl)expEl.textContent=nExp;
   var expSoon=0;CATS.forEach(function(cc){cc.items.forEach(function(it){if(isExpiringSoonProduct(it))expSoon++;});});
@@ -2474,8 +2565,21 @@ function render(){
       }else{
         html+='<div style="font-size:13px;color:var(--text3);font-weight:600">Brak daty</div>';
       }
-      // 3. BUTTON Skanuj / Edytuj datę
-      html+='<button class="'+dateBtnCls+'" onclick="openExpiry(\''+ne+'\')">'+dateLabel+'</button>';
+      // 3. BUTTON Skanuj / Edytuj datę + Historia ruchów
+      var hasHistory=false;
+      try{
+        // Sprawdź czy są wpisy w pantryLog dla TEGO produktu lub po nazwie
+        var prodLookup=typeof findProduct==="function"?findProduct(it.n):null;
+        if(prodLookup&&pantryLog[prodLookup.id]&&pantryLog[prodLookup.id].length)hasHistory=true;
+      }catch(e){}
+      if(hasHistory){
+        html+='<div style="display:flex;gap:6px;align-items:center">';
+        html+='<button class="'+dateBtnCls+'" style="flex:1" onclick="openExpiry(\''+ne+'\')">'+dateLabel+'</button>';
+        html+='<button onclick="openPantryHistory(\''+ne+'\')" title="Historia ruchów" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:6px 10px;font-size:11px;cursor:pointer;white-space:nowrap">📋</button>';
+        html+='</div>';
+      }else{
+        html+='<button class="'+dateBtnCls+'" onclick="openExpiry(\''+ne+'\')">'+dateLabel+'</button>';
+      }
       // 4. PASEK STATUSU (progress + opis)
       html+='<div style="display:flex;align-items:center;gap:8px;margin-top:4px">';
       html+='<div style="flex:1;height:8px;background:var(--bg4);border-radius:6px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+borderColor+';border-radius:6px;transition:width .3s"></div></div>';
@@ -3846,6 +3950,8 @@ function startApp(){
       else{var preset=applyPresetProfile(userName);if(preset){saveUserProfile(preset);updateAISys();}else{setTimeout(showOb,600);}}
     });
     fbGet(FB+"/profiles/"+profileKey(userName)+"/weekplan").then(function(wp){if(wp)weekPlan=wp;}).catch(function(){});
+    fbGet(FB+"/profiles/"+profileKey(userName)+"/pantryLog").then(function(pl){if(pl)pantryLog=pl;}).catch(function(){});
+    fbGet(FB+"/profiles/"+profileKey(userName)+"/mealsEaten").then(function(me){if(me)mealsEaten=me;}).catch(function(){});
     // Załaduj user product overrides (z etykiet)
     fbGet(FB+"/productOverrides/"+profileKey(userName)).then(function(ov){
       if(ov)userProductOverrides=ov;
@@ -4576,6 +4682,169 @@ function normalizeFallbackKey(s){
     .replace(/ł/g,"l").replace(/ń/g,"n").replace(/ó/g,"o")
     .replace(/ś/g,"s").replace(/ź/g,"z").replace(/ż/g,"z")
     .replace(/[^a-z0-9 ]+/g," ").replace(/\s+/g," ").trim();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PANTRY LIFECYCLE — status lodówki + historia ruchów
+// ══════════════════════════════════════════════════════════════════════════════
+// Loguje ruch w lodówce: in (paragon/manual+) lub out (zjedzone/przeterminowane/manual-)
+function logPantryMovement(productId,type,qty,source,sourceId,note){
+  if(!productId||!qty)return;
+  if(!pantryLog[productId])pantryLog[productId]=[];
+  pantryLog[productId].push({
+    ts:Date.now(),
+    type:type,             // "in" | "out"
+    qty:Number(qty)||0,
+    source:source||"manual", // "paragon" | "diet" | "manual" | "expired"
+    sourceId:sourceId||null, // ID paragonu/posiłku
+    note:note||""
+  });
+  // Trim - keep last 50 ruchów per produkt
+  if(pantryLog[productId].length>50)pantryLog[productId]=pantryLog[productId].slice(-50);
+  // Persist do Firebase (debounced)
+  schedulePantryLogSave();
+}
+var _pantryLogSaveTimer=null;
+function schedulePantryLogSave(){
+  clearTimeout(_pantryLogSaveTimer);
+  _pantryLogSaveTimer=setTimeout(function(){
+    try{
+      if(typeof FB!=="undefined"&&typeof profileKey==="function"&&typeof userName!=="undefined"&&typeof fbPut==="function"&&userName){
+        fbPut(FB+"/profiles/"+profileKey(userName)+"/pantryLog",pantryLog).catch(function(){});
+        fbPut(FB+"/profiles/"+profileKey(userName)+"/mealsEaten",mealsEaten).catch(function(){});
+      }
+    }catch(e){}
+  },800);
+}
+// Status lodówki: PEŁNA / W TRAKCIE / DO UZUPEŁNIENIA
+function calculatePantryStatus(){
+  var diet=(typeof getDietData==="function")?getDietData():null;
+  var needed={},have={};
+  // 1. PRIORYTET: z aktywnej diety (skladniki które user planuje)
+  var fromDiet=0;
+  if(diet&&(diet.menu1||diet.menu2)){
+    ["menu1","menu2"].forEach(function(mk){
+      if(!diet[mk])return;
+      ["sniadania","obiady","kolacje"].forEach(function(typ){
+        (diet[mk][typ]||[]).forEach(function(meal){
+          (meal.skladniki||[]).forEach(function(sk){
+            var name=sk.n||sk.name||"";
+            if(!name||(typeof isNonMacroSeasoning==="function"&&isNonMacroSeasoning(name)))return;
+            var prod=typeof findProduct==="function"?findProduct(name):null;
+            var pid=prod?prod.id:("ext_"+(typeof dedupKey==="function"?dedupKey(name):name));
+            needed[pid]=true;fromDiet++;
+          });
+        });
+      });
+    });
+  }
+  // 2. FALLBACK: CATS jeśli nie ma diety
+  if(!Object.keys(needed).length&&typeof CATS!=="undefined"){
+    CATS.forEach(function(cat){cat.items.forEach(function(it){
+      var pid="cat_"+(typeof fbk==="function"?fbk(cat.id,it.n):cat.id+"_"+it.n);
+      needed[pid]=true;
+    });});
+  }
+  // Sprawdź ile z needed mam w lodówce (qty > 0)
+  Object.keys(needed).forEach(function(pid){
+    // PRODUCT_DB - sprawdź w pantryData lub CATS state
+    if(pid.indexOf("cat_")===0){
+      var key=pid.slice(4);
+      if(typeof state!=="undefined"&&Number(state[key])>0)have[pid]=true;
+    }else{
+      // pantryData (nowy system) lub state (stary CATS state)
+      if(typeof pantryData!=="undefined"&&pantryData[pid]&&Number(pantryData[pid].amount)>0){have[pid]=true;}
+      else{
+        // Spróbuj zmapować pid na CATS state
+        if(typeof CATS!=="undefined"&&typeof state!=="undefined"){
+          for(var i=0;i<CATS.length;i++){for(var j=0;j<CATS[i].items.length;j++){
+            var it=CATS[i].items[j];
+            if(typeof namesMatch==="function"&&namesMatch(it.n,pid.replace(/^ext_/,""))){
+              var k=typeof fbk==="function"?fbk(CATS[i].id,it.n):CATS[i].id+"_"+it.n;
+              if(Number(state[k])>0){have[pid]=true;break;}
+            }
+          }if(have[pid])break;}
+        }
+      }
+    }
+  });
+  var totalNeeded=Object.keys(needed).length;
+  var totalHave=Object.keys(have).length;
+  var percent=totalNeeded?Math.round((totalHave/totalNeeded)*100):0;
+  var status,emoji,label,color;
+  if(percent>=80){status="full";emoji="🟢";label="PEŁNA";color="var(--green)";}
+  else if(percent>=40){status="in_progress";emoji="🟡";label="W TRAKCIE";color="var(--amber)";}
+  else{status="low";emoji="🔴";label="DO UZUPEŁNIENIA";color="var(--red)";}
+  return{
+    status:status,emoji:emoji,label:label,color:color,percent:percent,
+    have:totalHave,needed:totalNeeded,
+    basedOn:fromDiet>0?"diet":"cats"
+  };
+}
+// Pobierz historię ruchów dla produktu (z timeline, bilans)
+function getPantryLogForProduct(productId){
+  return (pantryLog&&pantryLog[productId])?pantryLog[productId].slice().reverse():[];
+}
+// Oznacz posiłek jako zjedzony - odejmuje składniki z lodówki + log
+function markMealAsEaten(meal,dayKey,sectionKey){
+  if(!meal||!meal.skladniki)return 0;
+  var mealId=(dayKey||"")+"_"+(sectionKey||"")+"_"+(meal.nazwa||"");
+  var deductedCount=0;
+  var deductedItems=[];
+  meal.skladniki.forEach(function(sk){
+    var name=sk.n||sk.name||"";
+    if(!name||(typeof isNonMacroSeasoning==="function"&&isNonMacroSeasoning(name)))return;
+    var rawAmt=sk.il||sk.amount||"0";
+    var amt=typeof parseAmount==="function"?parseAmount(rawAmt):Number(rawAmt)||0;
+    var prod=typeof findProduct==="function"?findProduct(name):null;
+    if(!prod||!amt)return;
+    // Konwersja na jednostkę produktu (szt vs g)
+    var inGrams=typeof isGramAmount==="function"?isGramAmount(rawAmt):false;
+    var deductAmt=amt;
+    if(prod.unit==="szt"&&prod.singleWeight&&inGrams){
+      deductAmt=Math.max(1,Math.ceil(amt/prod.singleWeight));
+    }
+    // Odejmij z pantryData lub state
+    var actuallyDeducted=0;
+    if(typeof pantryData!=="undefined"&&pantryData[prod.id]&&Number(pantryData[prod.id].amount)>0){
+      var newAmt=Math.max(0,Number(pantryData[prod.id].amount)-deductAmt);
+      actuallyDeducted=Number(pantryData[prod.id].amount)-newAmt;
+      pantryData[prod.id].amount=newAmt;
+      if(typeof savePantryProduct==="function")savePantryProduct(prod.id,pantryData[prod.id]);
+    }else if(typeof CATS!=="undefined"&&typeof state!=="undefined"){
+      // Spróbuj CATS state
+      for(var i=0;i<CATS.length;i++){for(var j=0;j<CATS[i].items.length;j++){
+        var it=CATS[i].items[j];
+        if(typeof namesMatch==="function"&&namesMatch(it.n,name)){
+          var k=typeof fbk==="function"?fbk(CATS[i].id,it.n):CATS[i].id+"_"+it.n;
+          var cur=Number(state[k])||0;
+          if(cur>0){
+            var newCur=Math.max(0,cur-Math.ceil(deductAmt));
+            actuallyDeducted=cur-newCur;
+            state[k]=newCur;
+            if(typeof RP!=="undefined"&&typeof fbPatch==="function"){
+              var p={};p[k]=newCur;fbPatch(RP,p).catch(function(){});
+            }
+          }
+          break;
+        }
+      }if(actuallyDeducted)break;}
+    }
+    if(actuallyDeducted>0){
+      logPantryMovement(prod.id,"out",actuallyDeducted,"diet",mealId,meal.nazwa);
+      deductedCount++;
+      deductedItems.push(name+" -"+actuallyDeducted);
+    }
+  });
+  // Oznacz jako zjedzony
+  if(!mealsEaten)mealsEaten={};
+  var eatenKey=(dayKey||"")+"_"+(sectionKey||"");
+  mealsEaten[eatenKey]={mealName:meal.nazwa,ts:Date.now(),deducted:deductedItems};
+  schedulePantryLogSave();
+  // Re-render
+  if(typeof render==="function")render();
+  if(typeof renderDietBody==="function")renderDietBody();
+  return deductedCount;
 }
 
 // ── NUTRITION CACHE (localStorage z TTL) ────────────────────────────────────
@@ -5474,6 +5743,12 @@ function addToPantry(prod, amountG, source, receiptId){
   entry.source=source||"manual";
   if(receiptId)entry.receiptId=receiptId;
   savePantryProduct(prod.id, entry);
+  // Log do timeline - tylko jeśli source to "receipt" (skanowanie paragonu) - shopping_list loguje się w applyPurchasedItemsToPantry
+  try{
+    if(source==="receipt"&&typeof logPantryMovement==="function"){
+      logPantryMovement(prod.id,"in",amountG,"paragon",receiptId,prod.name||"");
+    }
+  }catch(e){}
 }
 
 // Odejmij ze stanu po przygotowaniu posiłku
@@ -6005,15 +6280,25 @@ function renderWeekPlan(){
         var isSel=(a.menu===chosen.menu&&a.idx===chosen.idx);
         opts+='<option value="'+a.menu+":"+a.idx+'"'+(isSel?" selected":"")+'>'+a.meal.nazwa+' ('+(a.meal.kcal||0)+' kcal) — M'+a.menu+'</option>';
       });
-      h+='<div style="padding:10px 14px;border-bottom:1px solid var(--border)">';
+      var eatenKey=dayKey+"_"+meal.key;
+      var isEaten=mealsEaten&&mealsEaten[eatenKey];
+      h+='<div style="padding:10px 14px;border-bottom:1px solid var(--border);'+(isEaten?'opacity:.6':'')+'">';
       h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
       h+='<span style="font-size:16px">'+meal.icon+'</span>';
       h+='<span style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:500">'+meal.label+'</span>';
+      if(isEaten)h+='<span style="background:var(--green);color:#000;font-size:10px;padding:2px 6px;border-radius:8px;font-weight:600">✓ ZJEDZONE</span>';
       h+='<span style="margin-left:auto;font-size:10px;color:var(--text3)">'+(m.kcal||0)+' kcal &bull; B:'+(m.prot||0)+'g W:'+(m.carb||0)+'g T:'+(m.fat||0)+'g</span>';
       h+='</div>';
-      h+='<select onchange="setWeekPlanMeal(\''+dayKey+'\',\''+meal.key+'\',this.value)" style="width:100%;background:var(--bg3);border:1.5px solid var(--border);color:var(--text);border-radius:8px;padding:8px 10px;font-size:13px;font-weight:500;cursor:pointer;outline:none;color-scheme:dark">';
+      h+='<div style="display:flex;gap:6px;align-items:center">';
+      h+='<select onchange="setWeekPlanMeal(\''+dayKey+'\',\''+meal.key+'\',this.value)" style="flex:1;background:var(--bg3);border:1.5px solid var(--border);color:var(--text);border-radius:8px;padding:8px 10px;font-size:13px;font-weight:500;cursor:pointer;outline:none;color-scheme:dark"'+(isEaten?' disabled':'')+'>';
       h+=opts;
       h+='</select>';
+      if(isEaten){
+        h+='<button onclick="undoMealEaten(\''+dayKey+'\',\''+meal.key+'\')" title="Cofnij ✓ Zjedzone" style="background:transparent;border:1px solid var(--text3);color:var(--text3);border-radius:8px;padding:8px 10px;font-size:11px;cursor:pointer;white-space:nowrap">Cofnij</button>';
+      }else{
+        h+='<button onclick="confirmMealEaten(\''+dayKey+'\',\''+meal.key+'\','+chosen.menu+','+chosen.idx+')" title="Oznacz jako zjedzone (odejmuje z lodówki)" style="background:var(--green);color:#000;border:none;border-radius:8px;padding:8px 12px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap">✓ Zjadłem</button>';
+      }
+      h+='</div>';
       h+='</div>';
     });
 
@@ -6044,6 +6329,48 @@ function setWeekPlanMeal(dayKey,sectionKey,val){
     }
   }catch(e){}
   renderDietBody();
+}
+// Oznacz posiłek z Planu jako zjedzony → odejmuje składniki z lodówki + log
+function confirmMealEaten(dayKey,sectionKey,menuNum,idx){
+  var d=getDietData();
+  var useMenu=(menuNum===2)?d.menu2:d.menu1;
+  if(!useMenu||!useMenu[sectionKey]||!useMenu[sectionKey][idx]){
+    dlgAlert("⚠️","Brak posiłku","Nie znaleziono wybranego posiłku.");
+    return;
+  }
+  var meal=useMenu[sectionKey][idx];
+  // Potwierdzenie
+  if(typeof dlgConfirm==="function"){
+    dlgConfirm("🍽️","Zjedzone?","Oznaczyć '"+(meal.nazwa||"posiłek")+"' jako zjedzone?\n\nSkładniki zostaną odjęte z lodówki.",function(ok){
+      if(!ok)return;
+      var count=markMealAsEaten(meal,dayKey,sectionKey);
+      if(count>0){dlgAlert("✓","Zjedzone","Odjęto "+count+" składnik(ów) z lodówki.");}
+      else{dlgAlert("ℹ️","Brak składników w lodówce","Posiłek oznaczony jako zjedzony, ale żaden składnik nie został odjęty (brak w lodówce).");}
+    });
+  }else{
+    if(!confirm("Oznaczyć '"+(meal.nazwa||"posiłek")+"' jako zjedzone? Składniki zostaną odjęte z lodówki."))return;
+    markMealAsEaten(meal,dayKey,sectionKey);
+  }
+}
+// Cofnij oznaczenie "Zjedzone" (przywraca składniki do lodówki z logu)
+function undoMealEaten(dayKey,sectionKey){
+  if(!mealsEaten)return;
+  var eatenKey=dayKey+"_"+sectionKey;
+  var entry=mealsEaten[eatenKey];
+  if(!entry)return;
+  if(typeof dlgConfirm==="function"){
+    dlgConfirm("↩️","Cofnąć?","Cofnąć '✓ Zjedzone' dla "+(entry.mealName||"posiłku")+"?\n\nUWAGA: Składniki NIE wrócą automatycznie do lodówki (musisz dodać ręcznie jeśli błędnie oznaczono).",function(ok){
+      if(!ok)return;
+      delete mealsEaten[eatenKey];
+      schedulePantryLogSave();
+      renderDietBody();
+    });
+  }else{
+    if(!confirm("Cofnąć ✓ Zjedzone?"))return;
+    delete mealsEaten[eatenKey];
+    schedulePantryLogSave();
+    renderDietBody();
+  }
 }
 // Generuj listę zakupów z DOKŁADNIE wybranych dań w Planie tygodnia
 function generateDietShoppingListFromWeekPlan(days){
@@ -6263,6 +6590,8 @@ function applyPurchasedItemsToPantry(shopList){
     // Dodaj PEŁNE kupione opakowanie (nie tylko brakującą ilość)
     var totalBought=item.buy.total||item.missing;
     addToPantry(prod, totalBought, "shopping_list");
+    // Log do timeline (paragon/zakupy → IN)
+    try{if(typeof logPantryMovement==="function")logPantryMovement(prod.id,"in",totalBought,"paragon",null,prod.name||item.name);}catch(e){}
     // Aktualizuj też stary CATS state
     CATS.forEach(function(cat){cat.items.forEach(function(it){
       if((prod.aliases||[]).some(function(a){return a===it.n.toLowerCase();})){
