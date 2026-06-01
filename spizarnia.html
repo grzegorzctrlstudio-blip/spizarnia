@@ -59,12 +59,57 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sa
 .login-tip{font-size:11px;color:var(--text3);text-align:center;margin-top:8px;line-height:1.55;max-width:300px}
 
 /* ── TOP NAV (segmented control) — single instance inside #app-hdr ── */
-.top-nav{display:flex;background:var(--bg3);border:1px solid var(--border);border-radius:50px;padding:4px;gap:4px;margin:0 0 12px}
-.tnav-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:transparent;border:none;color:var(--text3);font-size:13px;font-weight:400;padding:10px 8px;border-radius:50px;cursor:pointer;transition:background .2s,color .2s;white-space:nowrap}
-.tnav-btn.act{background:var(--brand);color:#000;font-weight:500}
-.tnav-ico{font-size:16px;line-height:1}
-.tnav-lbl{font-size:12px;font-weight:500;letter-spacing:.2px}
-@media (max-width:380px){.tnav-lbl{font-size:11px}}
+.top-nav{
+  display:flex;
+  background:linear-gradient(180deg,rgba(255,255,255,.04) 0%,rgba(255,255,255,.02) 100%);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:18px;
+  padding:5px;
+  gap:4px;
+  margin:0 0 12px;
+  box-shadow:0 1px 0 rgba(255,255,255,.04) inset, 0 4px 16px rgba(0,0,0,.25);
+  backdrop-filter:blur(12px);
+  position:relative;
+}
+.tnav-btn{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  background:transparent;
+  border:none;
+  color:var(--text2);
+  font-size:13px;
+  font-weight:500;
+  padding:12px 10px;
+  border-radius:14px;
+  cursor:pointer;
+  transition:all .25s cubic-bezier(.4,0,.2,1);
+  white-space:nowrap;
+  position:relative;
+  overflow:hidden;
+}
+.tnav-btn:not(.act):hover{
+  background:rgba(255,255,255,.04);
+  color:var(--text);
+}
+.tnav-btn:not(.act):hover .tnav-ico{transform:scale(1.1)}
+.tnav-btn.act{
+  background:linear-gradient(135deg,var(--brand) 0%,var(--brand2,#0891b2) 100%);
+  color:#001520;
+  font-weight:600;
+  box-shadow:0 4px 16px rgba(6,182,212,.4), 0 1px 0 rgba(255,255,255,.25) inset, 0 -1px 0 rgba(0,0,0,.1) inset;
+  transform:translateY(-1px);
+}
+.tnav-btn.act .tnav-ico{filter:drop-shadow(0 1px 2px rgba(0,0,0,.2))}
+.tnav-ico{font-size:18px;line-height:1;transition:transform .25s cubic-bezier(.4,0,.2,1);display:inline-flex;align-items:center}
+.tnav-lbl{font-size:13px;font-weight:inherit;letter-spacing:.1px}
+@media (max-width:380px){
+  .tnav-btn{padding:11px 6px;gap:6px}
+  .tnav-lbl{font-size:12px}
+  .tnav-ico{font-size:16px}
+}
 
 /* ── BOTTOM NAV (auxiliary, hidden by default — top nav is primary) ── */
 .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(17,17,24,.95);border-top:1px solid var(--border);backdrop-filter:blur(20px);z-index:50;padding:8px 0 max(8px,env(safe-area-inset-bottom))}
@@ -1097,7 +1142,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-06-01-seasonal-fresh-v44";
+var APP_VERSION="2026-06-01-topnav-v45";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
