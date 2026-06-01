@@ -1097,7 +1097,7 @@ body.admin-open .bottom-nav,body.user-panel-open .bottom-nav{display:none}
 
 <script>
 
-var APP_VERSION="2026-06-01-pantry-lifecycle-v43";
+var APP_VERSION="2026-06-01-seasonal-fresh-v44";
 try{console.log("Pełna Lodówka APP_VERSION:",APP_VERSION);}catch(e){}
 var FB="https://spizarnia-fdf18-default-rtdb.europe-west1.firebasedatabase.app";
 var PROXY="https://solitary-glade-16e4.grzegorzctrlstudio.workers.dev/";
@@ -2618,7 +2618,7 @@ function applyPresetProfile(name){
 }
 
 
-function updateAISys(){if(!userProfile)return;var st={biedronka:"Biedronke",lidl:"Lidl",both:"Biedronke i Lidl"}[userProfile.stores]||"Biedronke";SYS="Jestes agentem kulinarnym "+userName.split(" ")[0]+". Cel: "+({lose:"redukcja",maintain:"utrzymanie wagi",gain:"masa miesniowa"}[userProfile.goal]||"")+". "+userProfile.kcal+" kcal/dzien. B:"+userProfile.prot+"g W:"+userProfile.carb+"g T:"+userProfile.fat+"g. Sklep: "+st+". Wykluczenia: "+(userProfile.exclude||"brak")+". Odpowiadaj po polsku.";}
+function updateAISys(){if(!userProfile)return;var st={biedronka:"Biedronke",lidl:"Lidl",both:"Biedronke i Lidl"}[userProfile.stores]||"Biedronke";var seasonHint=(typeof getSeasonalRule==="function")?(" "+getSeasonalRule().replace(/\n/g,"")):"";SYS="Jestes agentem kulinarnym "+userName.split(" ")[0]+". Cel: "+({lose:"redukcja",maintain:"utrzymanie wagi",gain:"masa miesniowa"}[userProfile.goal]||"")+". "+userProfile.kcal+" kcal/dzien. B:"+userProfile.prot+"g W:"+userProfile.carb+"g T:"+userProfile.fat+"g. Sklep: "+st+". Wykluczenia: "+(userProfile.exclude||"brak")+"."+seasonHint+" Odpowiadaj po polsku.";}
 // ── USER PANEL ────────────────────────────────────────────────────────────────
 function openUserPanel(){
   var el=document.getElementById("user-panel-overlay");if(!el)return;
@@ -3469,6 +3469,7 @@ function generateAIDiet(profile,customWishes){
     +"⚠️ PRECYZJA MAKRO: aiTarget MUSI być realnie do osiągnięcia ze składników. PRZED zapisaniem przelicz w głowie: suma kcal/B/W/T ze składników (kcal100×g/100) MUSI być w granicach ±5% od aiTarget. Dobierz GRAMATURY składników tak żeby SUMA się ZGADZAŁA.\n"
     +"🎲 INTERCHANGEABLE: WSZYSTKIE 9 posiłków (3 śniadania + 3 obiady + 3 kolacje) muszą mieć IDENTYCZNE makro (kcal/B/W/T) z dokładnością ±10%. User będzie LOSOWO wybierał 1 śniadanie + 1 obiad + 1 kolacja i MUSI trafić w cel dnia. Każde danie = "+mK+" kcal / B"+mP+"g / W"+mC+"g / T"+mF+"g. To NIE jest sugestia tylko WYMÓG.\n"
     +"🌈 RÓŻNORODNOŚĆ: NIE używaj tego samego głównego składnika węglowodanowego (tortille, ryż, makaron, ziemniaki, kasza, chleb) w więcej niż 2-3 z 9 posiłków. Każda sekcja (śniadania/obiady/kolacje) powinna mieć RÓŻNE bazy węglowodanowe. To ważne dla użytkownika - bo jak zje 14 tortilli w tygodniu to się zniechęci.\n"
+    +(typeof getSeasonalRule==="function"?getSeasonalRule():"")
     +"TYLKO JSON.";
   // Nowy format: skladniki z state/amountBasis (AI samo określa), przyprawy w osobnym polu
   // aiTarget - tylko założenie AI, NIE realne makro (realne policzy aplikacja ze składników)
@@ -4716,6 +4717,29 @@ function schedulePantryLogSave(){
     }catch(e){}
   },800);
 }
+// Zwraca regułę sezonową dla AI promptu (świeże vs mrożone)
+// Wiosna-Jesień (kwie-paź) = ŚWIEŻE warzywa/owoce, mrożonki tylko wyjątkowo
+// Zima (lis-mar) = mrożonki dopuszczalne dla owoców letnich/brokuły/szpinak
+function getSeasonalRule(){
+  var m=new Date().getMonth(); // 0=styczeń, 11=grudzień
+  var monthNames=["styczeń","luty","marzec","kwiecień","maj","czerwiec","lipiec","sierpień","wrzesień","październik","listopad","grudzień"];
+  var seasonNames=["zima","zima","przedwiośnie","wiosna","wiosna","lato","lato","lato","jesień","jesień","późna jesień","zima"];
+  var isFreshSeason=(m>=3&&m<=9); // KWIECIEŃ-PAŹDZIERNIK
+  var inSeason={
+    3:"szparagi, rzodkiewka, szczypiorek, sałata, rabarbar, młoda kapusta, szpinak",        // kwiecień
+    4:"szparagi, rzodkiewka, sałata, młoda marchew, młode ziemniaki, truskawki (koniec)",   // maj
+    5:"truskawki, czereśnie, młode ziemniaki, ogórki, pomidory, papryka, cukinia, sałata",  // czerwiec
+    6:"borówki, czereśnie, maliny, jagody, pomidory, ogórki, papryka, cukinia, kabaczek",   // lipiec
+    7:"jabłka, gruszki, śliwki, brzoskwinie, maliny, pomidory, ogórki, papryka, kukurydza", // sierpień
+    8:"jabłka, gruszki, śliwki, winogrona, dynia, brokuły, kalafior, marchew, buraki",      // wrzesień
+    9:"jabłka, gruszki, dynia, brokuły, kalafior, marchew, buraki, kapusta, jarmuż"         // październik
+  }[m]||"";
+  if(isFreshSeason){
+    return "🌱 SEZON ŚWIEŻYCH ("+monthNames[m]+", "+seasonNames[m]+"): UŻYWAJ ŚWIEŻYCH owoców i warzyw - NIE mrożonych. W sezonie teraz: "+inSeason+". NIE pisz 'mrożone' przy warzywach/owocach - są w sklepie świeże. Mrożonki TYLKO jeśli składnik niedostępny świeży w Polsce.\n";
+  }
+  return "❄️ ZIMA ("+monthNames[m]+", "+seasonNames[m]+"): świeże owoce/warzywa krajowe ograniczone. Możesz używać mrożonek (mrożone owoce leśne, mrożony brokuł, mrożony szpinak, mrożona fasolka szparagowa). Świeże: jabłka, gruszki, kapusta, marchew, buraki, cebula, ziemniaki, pieczarki - dostępne cały rok.\n";
+}
+
 // Status lodówki: PEŁNA / W TRAKCIE / DO UZUPEŁNIENIA
 function calculatePantryStatus(){
   var diet=(typeof getDietData==="function")?getDietData():null;
